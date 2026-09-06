@@ -1,4 +1,5 @@
 import * as T from "three";
+import { villageRoof, hangarRoof, groundPath } from "./scenery-geometry";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import {
@@ -7,6 +8,7 @@ import {
   runwayLocal,
   random,
   WORLD_SIZE,
+  TERRAIN_SEGMENTS,
 } from "./terrain";
 export type Obstacle = {
   x: number;
@@ -101,7 +103,12 @@ export function makeWorld(scene: T.Scene) {
   scene.add(sun.target);
   scene.background = new T.Color("#a8dce5");
   scene.fog = new T.FogExp2("#badfe1", 0.00027);
-  const terrain = new T.PlaneGeometry(WORLD_SIZE, WORLD_SIZE, 256, 256);
+  const terrain = new T.PlaneGeometry(
+    WORLD_SIZE,
+    WORLD_SIZE,
+    TERRAIN_SEGMENTS,
+    TERRAIN_SEGMENTS,
+  );
   terrain.rotateX(-Math.PI / 2);
   const pos = terrain.attributes.position;
   const colors = [];
@@ -157,8 +164,18 @@ export function makeWorld(scene: T.Scene) {
       night: { value: 0 },
       fogColor: { value: scene.background },
     },
-    vertexShader: `varying vec3 vWorld; void main(){vec4 w=modelMatrix*vec4(position,1.);vWorld=w.xyz;gl_Position=projectionMatrix*viewMatrix*w;}`,
+    vertexShader: `
+      #include <common>
+      #include <logdepthbuf_pars_vertex>
+      varying vec3 vWorld;
+      void main(){
+        vec4 w=modelMatrix*vec4(position,1.);
+        vWorld=w.xyz;
+        gl_Position=projectionMatrix*viewMatrix*w;
+        #include <logdepthbuf_vertex>
+      }`,
     fragmentShader: `
+ #include <logdepthbuf_pars_fragment>
  uniform float time; uniform sampler2D heightmap; uniform float night; uniform vec3 fogColor; varying vec3 vWorld;
  void main(){vec2 p=vWorld.xz;vec2 uv=p/2800.+.5;float h=texture2D(heightmap,clamp(uv,0.,1.)).r*320.-45.; if(abs(p.x)>1400.||abs(p.y)>1400.)h=-45.;float depth=max(0.,-h);
  vec3 shallow=vec3(.075,.49,.40),deep=vec3(.014,.20,.26);vec3 color=mix(shallow,deep,smoothstep(0.,34.,depth));
@@ -166,6 +183,7 @@ export function makeWorld(scene: T.Scene) {
  color+=wave*.018;float foam=(1.-smoothstep(.6,5.,depth))*smoothstep(.25,.8,sin(depth*2.2-time*1.1+sin(p.x*.04)))*.35;color=mix(color,vec3(.82,.94,.85),foam);
  float sparkle=pow(max(0.,sin(p.x*.42+time)*sin(p.y*.39-time*.5)),28.);color+=sparkle*.19;
  color*=mix(1.,.29,night);float fog=smoothstep(1500.,6000.,length(p-cameraPosition.xz));
+ #include <logdepthbuf_fragment>
  gl_FragColor=vec4(color,1.);
  #include <tonemapping_fragment>
  #include <colorspace_fragment>
@@ -250,16 +268,7 @@ export function makeWorld(scene: T.Scene) {
     apron.rotation.x = -Math.PI / 2;
     for (let i = 0; i < (index === 0 ? 3 : 1); i++) {
       box(69, 5.3, i * 32 + 25, 23, 10.6, 24, white, g);
-      const hangarRoof = mesh(
-        new T.CylinderGeometry(12, 12, 24, 24, 1, false, 0, Math.PI),
-        mat("#648b8c"),
-        69,
-        10.2,
-        i * 32 + 25,
-        g,
-      );
-      hangarRoof.rotation.x = Math.PI / 2;
-      hangarRoof.rotation.z = Math.PI / 2;
+      mesh(hangarRoof(), mat("#648b8c"), 69, 10.2, i * 32 + 25, g);
       box(56.9, 4.3, i * 32 + 25, 0.5, 8, 18, dark, g);
       const p = new T.Vector3(69, 9, i * 32 + 25).applyMatrix4(g.matrixWorld);
       g.updateMatrixWorld(true);
@@ -455,10 +464,7 @@ export function makeWorld(scene: T.Scene) {
     g.rotation.y = (rng() - 0.5) * 0.5;
     scene.add(g);
     box(0, y / 2, 0, w, y, d, i % 3 === 0 ? mat("#eac7a0") : white, g);
-    const roofGeo = new T.CylinderGeometry(w * 0.76, w * 0.76, d + 3, 3, 1);
-    const ro = mesh(roofGeo, roof, 0, y + 0.8, 0, g);
-    ro.rotation.x = Math.PI / 2;
-    ro.rotation.y = Math.PI;
+    mesh(villageRoof(w, d), roof, 0, y, 0, g);
     for (let k = -1; k <= 1; k += 2) {
       box(k * w * 0.25, y * 0.55, d / 2 + 0.05, 2, 2, 0.15, mat("#557a82"), g);
       box(k * w * 0.25, y * 0.55, d / 2 + 0.16, 2.8, 0.25, 0.4, white, g);
@@ -473,30 +479,7 @@ export function makeWorld(scene: T.Scene) {
     });
   }
   function path(points: T.Vector3[], width: number, material: T.Material) {
-    const vertices: number[] = [],
-      indices: number[] = [];
-    const curve = new T.CatmullRomCurve3(points);
-    const pts = curve.getPoints(160);
-    for (let i = 0; i < pts.length; i++) {
-      const p = pts[i],
-        next = pts[Math.min(i + 1, pts.length - 1)],
-        prev = pts[Math.max(0, i - 1)];
-      const dir = next.clone().sub(prev).normalize();
-      for (const s of [-1, 1]) {
-        const x = p.x + ((dir.z * width) / 2) * s,
-          z = p.z - ((dir.x * width) / 2) * s;
-        vertices.push(x, terrainHeight(x, z) + 0.32, z);
-      }
-      if (i < pts.length - 1) {
-        const n = i * 2;
-        indices.push(n, n + 2, n + 1, n + 1, n + 2, n + 3);
-      }
-    }
-    const geo = new T.BufferGeometry();
-    geo.setAttribute("position", new T.Float32BufferAttribute(vertices, 3));
-    geo.setIndex(indices);
-    geo.computeVertexNormals();
-    const m = mesh(geo, material);
+    const m = mesh(groundPath(points, width), material);
     m.castShadow = false;
   }
   path(

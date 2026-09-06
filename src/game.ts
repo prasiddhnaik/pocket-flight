@@ -120,6 +120,7 @@ export class PocketFlight {
   constructor(private container: HTMLElement) {
     this.renderer = new T.WebGLRenderer({
       antialias: true,
+      logarithmicDepthBuffer: true,
       powerPreference: "high-performance",
     });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));

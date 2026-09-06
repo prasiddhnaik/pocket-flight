@@ -1,4 +1,6 @@
 export const WORLD_SIZE = 2800;
+export const TERRAIN_SEGMENTS = 256;
+const terrainCell = WORLD_SIZE / TERRAIN_SEGMENTS;
 export const runways = [
   {
     name: "Palm Bay",
@@ -70,9 +72,26 @@ export function terrainHeight(x: number, z: number) {
     Math.exp(-(((z + 240) / 350) ** 2));
   for (const r of runways) {
     const p = runwayLocal(x, z, r);
-    const blend =
-      (1 - smooth(r.width * 0.65, r.width * 2.8, Math.abs(p.x))) *
-      (1 - smooth(r.length / 2 + 10, r.length / 2 + 95, Math.abs(p.z)));
+    // Keep every triangle touching pavement on the plateau, including the
+    // apron, hangars and tower. A grid diagonal covers rotated airfields too.
+    const margin = terrainCell * Math.SQRT2;
+    const runwayBlend =
+      (1 -
+        smooth(
+          r.width / 2 + margin,
+          r.width / 2 + margin + 55,
+          Math.abs(p.x),
+        )) *
+      (1 -
+        smooth(
+          r.length / 2 + margin,
+          r.length / 2 + margin + 80,
+          Math.abs(p.z),
+        ));
+    const apronBlend =
+      (1 - smooth(40 + margin, 75 + margin, Math.abs(p.x - 50))) *
+      (1 - smooth(81 + margin, 116 + margin, Math.abs(p.z - 47)));
+    const blend = Math.max(runwayBlend, apronBlend);
     h = h * (1 - blend) + r.y * blend;
   }
   return Math.max(-40, h);
@@ -93,4 +112,24 @@ export function random(seed = 247) {
     seed = (seed * 1664525 + 1013904223) >>> 0;
     return seed / 4294967296;
   };
+}
+
+// Match PlaneGeometry's triangle interpolation for scenery placed on the mesh.
+export function terrainSurfaceHeight(x: number, z: number) {
+  const gx = (x + WORLD_SIZE / 2) / terrainCell;
+  const gz = (z + WORLD_SIZE / 2) / terrainCell;
+  const ix = Math.floor(gx),
+    iz = Math.floor(gz);
+  const u = gx - ix,
+    v = gz - iz;
+  const x0 = ix * terrainCell - WORLD_SIZE / 2;
+  const z0 = iz * terrainCell - WORLD_SIZE / 2;
+  const b = terrainHeight(x0, z0 + terrainCell);
+  const c = terrainHeight(x0 + terrainCell, z0);
+  if (u + v <= 1) return terrainHeight(x0, z0) * (1 - u - v) + c * u + b * v;
+  return (
+    terrainHeight(x0 + terrainCell, z0 + terrainCell) * (u + v - 1) +
+    b * (1 - u) +
+    c * (1 - v)
+  );
 }

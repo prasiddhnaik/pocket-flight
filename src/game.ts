@@ -788,7 +788,7 @@ export class PocketFlight {
       } else {
         let offset = new T.Vector3(
           0,
-          6.5,
+          4.5,
           22 + Math.min(6, p.airspeed * 0.075),
         );
         if (this.cameraMode === "landing") offset.set(17, 5, 20);
@@ -810,15 +810,9 @@ export class PocketFlight {
           goal,
           1 - Math.exp(-dt * (this.mode === "playing" ? 4 : 2)),
         );
-        const look = p.position
-          .clone()
-          .add(
-            new T.Vector3(0, 1, -10).applyAxisAngle(
-              new T.Vector3(0, 1, 0),
-              p.yaw,
-            ),
-          );
-        this.camera.lookAt(look);
+        // Follow position smoothly, but keep the aircraft centred while banking
+        // or catching up after a turn. Looking ahead made it drift off-screen.
+        this.camera.lookAt(model.position);
         this.camera.fov = T.MathUtils.damp(
           this.camera.fov,
           50 + p.airspeed * 0.065,

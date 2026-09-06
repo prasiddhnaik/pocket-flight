@@ -1,6 +1,7 @@
 import * as T from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { controlSurfaces } from "./control-surfaces";
+import { propellerAnimation } from "./propeller";
 export const paints = [
   { name: "Sunrise", color: "#eab34c", dark: "#bc702f" },
   { name: "Lagoon", color: "#48b9b1", dark: "#1f746e" },
@@ -61,19 +62,6 @@ export function disposeAircraft(root: T.Object3D, disposeTextures = true) {
 export function makeAircraft(paintIndex = 0) {
   const group = new T.Group();
   group.name = "PocketFlight_Finch_U2";
-  const disc = new T.Mesh(
-    new T.CircleGeometry(1.08, 48),
-    new T.MeshBasicMaterial({
-      color: "#d7ded9",
-      transparent: true,
-      opacity: 0.075,
-      side: T.DoubleSide,
-      depthWrite: false,
-    }),
-  );
-  disc.position.set(0, 0.025, -3.44);
-  disc.visible = false;
-  group.add(disc);
   let selectedPaint = paintIndex;
   let disposed = false;
   const livery = new Set<T.MeshStandardMaterial>();
@@ -84,7 +72,7 @@ export function makeAircraft(paintIndex = 0) {
     wings: [new T.Group(), new T.Group()] as T.Object3D[],
     gear: new T.Group() as T.Object3D,
     propeller: new T.Group() as T.Object3D,
-    disc,
+    propellerMotion: propellerAnimation(),
     ready: Promise.resolve(),
     controls,
     surfaces: controlSurfaces(controls),
@@ -128,6 +116,7 @@ export function makeAircraft(paintIndex = 0) {
     model.wings = [part("Wing_Left"), part("Wing_Right")];
     model.gear = part("LandingGear");
     model.propeller = part("Propeller");
+    model.propellerMotion.bind(model.propeller);
     for (const name of [
       "Aileron_Left",
       "Aileron_Right",

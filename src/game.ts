@@ -54,9 +54,9 @@ type ReplayFrame = {
   suspension: number;
   gearDamage: number;
   propAngle: number;
+  propRpm: number;
   surfaces: SurfacePose;
   propVisible: boolean;
-  discVisible: boolean;
   gearVisible: boolean;
   wings: boolean[];
   engineOut: boolean;
@@ -270,6 +270,7 @@ export class PocketFlight {
     this.crashDelay = 0;
     this.physics.reset(mission.airStart, mission.short);
     this.aircraft.surfaces.reset();
+    this.aircraft.propellerMotion.reset();
     this.physics.strongWind = mission.id === "crosswind";
     this.physics.engineOut = mission.id === "emergency";
     if (this.physics.engineOut) {
@@ -535,9 +536,9 @@ export class PocketFlight {
       suspension: p.suspension,
       gearDamage: p.damage.gear,
       propAngle: this.aircraft.propeller.rotation.z,
+      propRpm: this.aircraft.propellerMotion.snapshot().rpm,
       surfaces: this.aircraft.surfaces.snapshot(),
       propVisible: this.aircraft.propeller.visible,
-      discVisible: !p.engineOut && p.throttle > 0.2 && !p.crashed,
       gearVisible: this.aircraft.gear.visible,
       wings: this.aircraft.wings.map((w) => w.visible),
       engineOut: p.engineOut,
@@ -562,8 +563,7 @@ export class PocketFlight {
     a.gear.visible = frame.gearVisible;
     a.gear.rotation.z = frame.gearDamage * 0.35;
     a.propeller.visible = frame.propVisible;
-    a.propeller.rotation.z = frame.propAngle;
-    a.disc.visible = frame.discVisible;
+    a.propellerMotion.apply({ angle: frame.propAngle, rpm: frame.propRpm });
     a.wings.forEach((w, i) => (w.visible = frame.wings[i]));
     a.setSuspension(frame.suspension);
     a.surfaces.apply(frame.surfaces);
@@ -603,11 +603,10 @@ export class PocketFlight {
       pitch: T.MathUtils.lerp(a.surfaces.pitch, b.surfaces.pitch, mix),
       yaw: T.MathUtils.lerp(a.surfaces.yaw, b.surfaces.yaw, mix),
     });
-    this.aircraft.propeller.rotation.z = T.MathUtils.lerp(
-      a.propAngle,
-      b.propAngle,
-      mix,
-    );
+    this.aircraft.propellerMotion.apply({
+      angle: T.MathUtils.lerp(a.propAngle, b.propAngle, mix),
+      rpm: T.MathUtils.lerp(a.propRpm, b.propRpm, mix),
+    });
     this.world.update(
       T.MathUtils.lerp(a.worldTime, b.worldTime, mix),
       visual.night,
@@ -880,25 +879,26 @@ export class PocketFlight {
           break;
         }
       }
-      this.recordReplay();
     } else this.accumulator = 0;
-    if (active && this.mode !== "replay") {
+    if (this.mode === "playing" || this.mode === "menu") {
       this.world.update(this.time, this.night);
-      this.aircraft.propeller.rotation.z +=
-        (this.mode === "menu" && this.reducedMotion ? 0 : dt) *
-        (this.mode === "menu"
-          ? 90
-          : (15 + this.physics.throttle * 95) *
-            (1 - this.physics.damage.propeller) *
-            (this.physics.engineOut ? 0.15 : 1));
+      if (this.mode === "menu" && this.reducedMotion)
+        this.aircraft.propellerMotion.reset();
+      else
+        this.aircraft.propellerMotion.update(
+          {
+            throttle: this.mode === "menu" ? 0.45 : this.physics.throttle,
+            airspeed: this.physics.airspeed,
+            damage: this.mode === "menu" ? 0 : this.physics.damage.propeller,
+            engineOut: this.mode !== "menu" && this.physics.engineOut,
+            crashed: this.mode !== "menu" && this.physics.crashed,
+          },
+          dt,
+        );
+      if (this.mode === "playing") this.recordReplay();
     }
     this.aircraft.gear.rotation.z =
       this.mode === "menu" ? 0 : this.physics.damage.gear * 0.35;
-    this.aircraft.disc.visible =
-      this.mode === "menu" ||
-      (!this.physics.engineOut &&
-        this.physics.throttle > 0.2 &&
-        !this.physics.crashed);
     for (let i = 0; i < this.rings.length; i++) {
       const ring = this.rings[i];
       ring.visible = i >= this.ringIndex;

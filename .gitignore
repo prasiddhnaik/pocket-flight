@@ -7,7 +7,7 @@ output/
 assets/finch/**/*.blend1
 
 # Offline aircraft authoring; the runtime GLB is tracked under public/assets.
-assets/
+/assets/
 *.tsbuildinfo
 .DS_Store
 .env

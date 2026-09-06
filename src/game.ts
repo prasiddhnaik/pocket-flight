@@ -586,12 +586,18 @@ export class PocketFlight {
     const model = this.aircraft.group;
     model.scale.setScalar(1);
     model.position.lerpVectors(a.p, b.p, mix);
-    model.position.y -= Math.min(
-      0.16,
+    model.quaternion.slerpQuaternions(a.q, b.q, mix);
+    model.position.add(
+      new T.Vector3(
+        0,
+        -Math.min(0.16, T.MathUtils.lerp(a.suspension, b.suspension, mix)),
+        0,
+      ).applyQuaternion(model.quaternion),
+    );
+    this.applyReplayVisuals(visual);
+    this.aircraft.setSuspension(
       T.MathUtils.lerp(a.suspension, b.suspension, mix),
     );
-    model.quaternion.slerpQuaternions(a.q, b.q, mix);
-    this.applyReplayVisuals(visual);
     this.aircraft.surfaces.apply({
       roll: T.MathUtils.lerp(a.surfaces.roll, b.surfaces.roll, mix),
       pitch: T.MathUtils.lerp(a.surfaces.pitch, b.surfaces.pitch, mix),
@@ -784,7 +790,11 @@ export class PocketFlight {
     } else {
       model.scale.setScalar(1);
       model.position.copy(p.position);
-      model.position.y -= Math.min(0.16, p.suspension);
+      model.position.add(
+        new T.Vector3(0, -Math.min(0.16, p.suspension), 0).applyQuaternion(
+          p.quaternion,
+        ),
+      );
       this.aircraft.setSuspension(p.suspension);
       model.quaternion.copy(p.quaternion);
       model.visible = true;

@@ -9,6 +9,8 @@ import {
   random,
   WORLD_SIZE,
   TERRAIN_SEGMENTS,
+  RUNWAY_PAVEMENT_HEIGHT,
+  APRON_PAVEMENT_HEIGHT,
 } from "./terrain";
 export type Obstacle = {
   x: number;
@@ -237,7 +239,7 @@ export function makeWorld(scene: T.Scene) {
       new T.PlaneGeometry(r.width, r.length),
       new T.MeshStandardMaterial({ map: texture, roughness: 0.96 }),
       0,
-      0.03,
+      RUNWAY_PAVEMENT_HEIGHT - 0.22,
       0,
       g,
     );
@@ -261,7 +263,7 @@ export function makeWorld(scene: T.Scene) {
       new T.PlaneGeometry(64, 110),
       mat("#949482"),
       44,
-      -0.04,
+      APRON_PAVEMENT_HEIGHT - 0.22,
       70,
       g,
     );

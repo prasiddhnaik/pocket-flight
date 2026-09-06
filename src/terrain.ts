@@ -1,5 +1,7 @@
 export const WORLD_SIZE = 2800;
 export const TERRAIN_SEGMENTS = 256;
+export const RUNWAY_PAVEMENT_HEIGHT = 0.25;
+export const APRON_PAVEMENT_HEIGHT = 0.18;
 const terrainCell = WORLD_SIZE / TERRAIN_SEGMENTS;
 export const runways = [
   {
@@ -101,8 +103,15 @@ export function groundAt(x: number, z: number) {
     const p = runwayLocal(x, z, r);
     return Math.abs(p.x) < r.width / 2 && Math.abs(p.z) < r.length / 2;
   });
+  let height = Math.max(0, terrainSurfaceHeight(x, z));
+  for (const r of runways) {
+    const p = runwayLocal(x, z, r);
+    if (p.x >= 12 && p.x <= 76 && p.z >= 15 && p.z <= 125)
+      height = Math.max(height, r.y + APRON_PAVEMENT_HEIGHT);
+  }
+  if (runway) height = Math.max(height, runway.y + RUNWAY_PAVEMENT_HEIGHT);
   return {
-    height: Math.max(0, terrainHeight(x, z)),
+    height,
     runway,
     water: terrainHeight(x, z) < 0.25,
   };

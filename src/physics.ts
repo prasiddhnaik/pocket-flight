@@ -1,6 +1,7 @@
 import { Vector3, Quaternion, Euler, MathUtils } from "three";
 import { groundAt, runways, terrainHeight } from "./terrain";
 import type { Obstacle } from "./world";
+import { gearContactHeight } from "./landing-gear";
 export type Controls = {
   pitch: number;
   roll: number;
@@ -52,10 +53,11 @@ export class FlightPhysics {
     this.yaw = r.heading;
     this.pitch = airStart ? -0.015 : 0;
     this.roll = 0;
+    const spawnDistance = airStart ? 570 : r.length / 2 - 36;
     this.position.set(
-      r.x + Math.sin(r.heading) * (airStart ? 570 : 0),
-      r.y + (airStart ? 73 : 1.367),
-      r.z + Math.cos(r.heading) * (airStart ? 570 : r.length / 2 - 36),
+      r.x + Math.sin(r.heading) * spawnDistance,
+      r.y + (airStart ? 73 : 0),
+      r.z + Math.cos(r.heading) * spawnDistance,
     );
     this.velocity.set(
       -Math.sin(this.yaw) * (airStart ? 34 : 0),
@@ -78,6 +80,8 @@ export class FlightPhysics {
     this.engineOut = false;
     this.suspension = 0;
     this.updateQuaternion();
+    if (!airStart)
+      this.position.y = gearContactHeight(this.position, this.quaternion);
   }
   updateQuaternion() {
     this.quaternion.setFromEuler(
@@ -245,8 +249,11 @@ export class FlightPhysics {
     }
     this.position.addScaledVector(this.velocity, dt);
     const next = groundAt(this.position.x, this.position.z);
-    const gearHeight = 1.367 - this.damage.gear * 0.65;
-    const bottom = next.height + gearHeight;
+    const bottom = gearContactHeight(
+      this.position,
+      this.quaternion,
+      this.damage.gear,
+    );
     if (this.position.y <= bottom) {
       const slopeX =
         (terrainHeight(this.position.x + 2, this.position.z) -

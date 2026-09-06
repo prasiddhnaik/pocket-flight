@@ -10,6 +10,7 @@ import { terrainHeight, runways } from "./terrain";
 import { ReplayTimeline } from "./replay";
 import { ReplayVideoExport } from "./replay-export";
 import type { ExportState } from "./replay-export";
+import type { SurfacePose } from "./control-surfaces";
 export type CameraMode = "chase" | "cockpit" | "landing" | "cinematic";
 export type GameMode = "menu" | "playing" | "paused" | "result" | "replay";
 export type Snapshot = {
@@ -53,6 +54,7 @@ type ReplayFrame = {
   suspension: number;
   gearDamage: number;
   propAngle: number;
+  surfaces: SurfacePose;
   propVisible: boolean;
   discVisible: boolean;
   gearVisible: boolean;
@@ -267,6 +269,7 @@ export class PocketFlight {
     this.mission = mission;
     this.crashDelay = 0;
     this.physics.reset(mission.airStart, mission.short);
+    this.aircraft.surfaces.reset();
     this.physics.strongWind = mission.id === "crosswind";
     this.physics.engineOut = mission.id === "emergency";
     if (this.physics.engineOut) {
@@ -342,6 +345,7 @@ export class PocketFlight {
     if (this.mode === "replay") this.stopReplay();
     if (this.replayVideo.busy) this.replayVideo.cancel();
     this.mode = "menu";
+    this.aircraft.surfaces.reset();
     this.ringGroup.visible = false;
     this.keys.clear();
     this.aircraft.group.visible = true;
@@ -531,6 +535,7 @@ export class PocketFlight {
       suspension: p.suspension,
       gearDamage: p.damage.gear,
       propAngle: this.aircraft.propeller.rotation.z,
+      surfaces: this.aircraft.surfaces.snapshot(),
       propVisible: this.aircraft.propeller.visible,
       discVisible: !p.engineOut && p.throttle > 0.2 && !p.crashed,
       gearVisible: this.aircraft.gear.visible,
@@ -561,6 +566,7 @@ export class PocketFlight {
     a.disc.visible = frame.discVisible;
     a.wings.forEach((w, i) => (w.visible = frame.wings[i]));
     a.setSuspension(frame.suspension);
+    a.surfaces.apply(frame.surfaces);
     this.rings.forEach((r, i) => (r.visible = i >= frame.ring));
     this.debris.forEach((d, i) => {
       const pose = frame.debris[i];
@@ -586,6 +592,11 @@ export class PocketFlight {
     );
     model.quaternion.slerpQuaternions(a.q, b.q, mix);
     this.applyReplayVisuals(visual);
+    this.aircraft.surfaces.apply({
+      roll: T.MathUtils.lerp(a.surfaces.roll, b.surfaces.roll, mix),
+      pitch: T.MathUtils.lerp(a.surfaces.pitch, b.surfaces.pitch, mix),
+      yaw: T.MathUtils.lerp(a.surfaces.yaw, b.surfaces.yaw, mix),
+    });
     this.aircraft.propeller.rotation.z = T.MathUtils.lerp(
       a.propAngle,
       b.propAngle,
@@ -849,7 +860,9 @@ export class PocketFlight {
       this.accumulator += dt;
       while (this.accumulator >= 1 / 60) {
         const prev = this.physics.position.clone();
-        this.physics.step(1 / 60, this.controls(), this.world.obstacles);
+        const input = this.controls();
+        if (!this.physics.crashed) this.aircraft.surfaces.update(input, 1 / 60);
+        this.physics.step(1 / 60, input, this.world.obstacles);
         this.updateMission(prev);
         this.accumulator -= 1 / 60;
         if (this.mode !== "playing") {

@@ -1,5 +1,6 @@
 import * as T from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { controlSurfaces } from "./control-surfaces";
 export const paints = [
   { name: "Sunrise", color: "#eab34c", dark: "#bc702f" },
   { name: "Lagoon", color: "#48b9b1", dark: "#1f746e" },
@@ -77,6 +78,7 @@ export function makeAircraft(paintIndex = 0) {
   let disposed = false;
   const livery = new Set<T.MeshStandardMaterial>();
   const restPositions = new Map<string, T.Vector3>();
+  const controls = new Map<string, T.Object3D>();
   const model = {
     group,
     wings: [new T.Group(), new T.Group()] as T.Object3D[],
@@ -84,7 +86,8 @@ export function makeAircraft(paintIndex = 0) {
     propeller: new T.Group() as T.Object3D,
     disc,
     ready: Promise.resolve(),
-    controls: new Map<string, T.Object3D>(),
+    controls,
+    surfaces: controlSurfaces(controls),
     setPaint(index: number) {
       selectedPaint = index;
       livery.forEach((material) => material.color.set(paints[index].color));
@@ -155,6 +158,7 @@ export function makeAircraft(paintIndex = 0) {
     });
     for (const [name, node] of model.controls)
       restPositions.set(name, node.position.clone());
+    model.surfaces.apply(model.surfaces.snapshot());
     model.setPaint(selectedPaint);
   });
   return model;

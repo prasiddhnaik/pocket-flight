@@ -18,6 +18,14 @@ for wheel in wheels:
     assert verts
     contacts[wheel.name]=min(v.z for v in verts)
     assert -.01<contacts[wheel.name]<.04,contacts
-report={'status':'passed','wheel_count':len(wheels),'wheel_lowest_z_m':contacts,'articulation_groups':required,'finite_vertices':len(vertices),'mesh_count':sum(o.type=='MESH' for o in objects)}
+exhaust_depths={}
+for side in [-1,1]:
+    origin=Vector((side*.91,-16,2.88))
+    hit,location,normal,index,obj,matrix=bpy.context.scene.ray_cast(bpy.context.evaluated_depsgraph_get(),origin,Vector((0,1,0)))
+    assert hit
+    depth=(location-origin).length
+    assert depth>3.2,('Blocked exhaust',side,depth,obj.name)
+    exhaust_depths[str(side)]=depth
+report={'status':'passed','wheel_count':len(wheels),'wheel_lowest_z_m':contacts,'exhaust_depth_from_y_minus_16_m':exhaust_depths,'articulation_groups':required,'finite_vertices':len(vertices),'mesh_count':sum(o.type=='MESH' for o in objects)}
 (root/'validation/roundtrip.json').write_text(json.dumps(report,indent=2))
 print('ROUNDTRIP_VERIFIED',json.dumps(report))

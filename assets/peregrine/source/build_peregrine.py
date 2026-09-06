@@ -141,7 +141,14 @@ for y in [10.5,5.4,1.5,-3.6,-7.1,-10.2]:
     if y>6:points=[p for p in points if abs(p[0])>1.08 or p[2]<3.6]
     line('Pressure shell frame seam',points,.007,seam,fuse)
 for theta in [math.radians(a) for a in [15,165,205,335,270]]:
-    line('Longitudinal skin join',[skinpoint(11.8-23*i/100,theta,.012) for i in range(101)],.008,seam,fuse)
+    points=[]
+    for i in range(101):
+        point=skinpoint(11.8-23*i/100,theta,.012)
+        if 4.9<point[1]<8.5 and point[2]<2.85:
+            if len(points)>1:line('Longitudinal skin join',points,.008,seam,fuse)
+            points=[]
+        else:points.append(point)
+    if len(points)>1:line('Longitudinal skin join',points,.008,seam,fuse)
 # Broad side cargo/service doors, with inset seal, six latches and reinforced hinge leaves.
 for side in [-1,1]:
     for y0,length in [(0,3.1),(-5.3,1.5)]:
@@ -206,6 +213,10 @@ for side,label in [(-1,'Left'),(1,'Right')]:
     eng=empty('Engine_'+label,root);engines[side]=eng
     # Deep twin exhausts, petal rims, interior rings and stator.
     x=side*.91;z=2.88
+    cutter=ringloft('Exhaust passage cutter',[(x,-14.5,z,.74,.74),(x,-13.2,z,.74,.74),(x,-12.4,z,.69,.69),(x,-11.7,z,.55,.55)],None,root,caps=True)
+    bpy.context.view_layer.objects.active=hull
+    mod=hull.modifiers.new('Open exhaust passage','BOOLEAN');mod.operation='DIFFERENCE';mod.object=cutter
+    bpy.ops.object.modifier_apply(modifier=mod.name);bpy.data.objects.remove(cutter,do_unlink=True)
     ringloft('Nozzle outer barrel',[(x,-12.2,z,.78,.78),(x,-12.6,z,.80,.80),(x,-13.15,z,.77,.77),(x,-13.72,z,.69,.69)],nozzle,eng)
     ringloft('Nozzle inner refractory liner',[(x,-13.73,z,.64,.64),(x,-13.2,z,.67,.67),(x,-12.5,z,.62,.62),(x,-11.9,z,.48,.48)],black,eng)
     for yy,r in [(-13.5,.65),(-13.2,.67),(-12.8,.65),(-12.35,.59)]:torus('Exhaust cooling ring',(x,yy,z),r,.024,inner,eng)
@@ -372,8 +383,8 @@ for side in [-1,1]:
         rx,rz,zc=body(yy);cyl('Forward access fastener',(side*(rx+.007),yy,zc+.1),(side*(rx+.02),yy,zc+.1),.018,metal,fuse,8)
 # Small service annotations set into visible shoulder areas.
 for side in [-1,1]:
-    text('Rescue stencil','RESCUE →',(side*1.19,8.7,4.52),.16,amber,fuse,(0,0,side*.18))
-    text('Intake warning','DANGER  INTAKE',(side*1.50,7.25,2.77),.11,white,engines[side],(0,0,0))
+    text('Rescue stencil','RESCUE →',(side*1.7,8.7,3.85),.14,amber,fuse,(math.pi/2,0,side*math.pi/2))
+    text('Intake warning','DANGER  INTAKE',(side*2.2,6.5,3.5),.11,white,engines[side],(math.pi/2,0,side*math.pi/2))
 # Save asset separately from studio. Apply export-safe modifiers and curves once.
 print('PEREGRINE: geometry built',flush=True)
 bpy.ops.object.select_all(action='DESELECT')
@@ -394,8 +405,8 @@ def world_tree(objects):
 body_tree=world_tree([hull])
 fin_tree=world_tree([o for o in collection.objects if o.type=='MESH' and o.name in ['Swept vertical stabilizer','Rudder airfoil']])
 for obj in collection.objects:
-    if obj.type!='MESH' or not obj.name.startswith(('Fin serial','Fin type','Side serial')):continue
-    tree=body_tree if obj.name.startswith('Side') else fin_tree
+    if obj.type!='MESH' or not obj.name.startswith(('Fin serial','Fin type','Side serial','Rescue stencil','Intake warning')):continue
+    tree=fin_tree if obj.name.startswith('Fin') else body_tree
     inverse=obj.matrix_world.inverted()
     for vertex in obj.data.vertices:
         p=obj.matrix_world@vertex.co;side=1 if p.x>0 else -1

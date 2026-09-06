@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#eaece5" />
+    <title>Finch U–2 — Aircraft Study</title>
+    <link rel="icon" href="/favicon.svg" />
+  </head>
+  <body>
+    <div id="hangar"></div>
+    <header>
+      <a href="/" class="back">← POCKET FLIGHT</a><span>DESIGN STUDY · 002</span
+      ><a href="/assets/finch-u2.glb" download>DOWNLOAD GLB ↗</a>
+    </header>
+    <section class="intro">
+      <p class="eyebrow">AN ORIGINAL LIGHT UTILITY AIRCRAFT</p>
+      <h1>Meet the <em>Finch.</em></h1>
+      <p class="subtitle">
+        Purposeful proportions. Thoughtful details.<br />Built for the joy of
+        flying.
+      </p>
+      <div class="specs">
+        <div>
+          <strong>11.0<span>m</span></strong
+          ><small>WINGSPAN</small>
+        </div>
+        <div><strong>2</strong><small>SEATS</small></div>
+        <div><strong>3</strong><small>PROPELLER BLADES</small></div>
+      </div>
+    </section>
+    <aside>
+      <div class="panel-heading">
+        <span>EXPLORE THE AIRCRAFT</span><button id="reset">RESET ↺</button>
+      </div>
+      <div class="views">
+        <button class="selected" data-view="overview">
+          01 <span>Overview</span> ↗</button
+        ><button data-view="cockpit">
+          02 <span>Inside the cockpit</span> ↗</button
+        ><button data-view="wing">03 <span>Airfoil & controls</span> ↗</button
+        ><button data-view="gear">04 <span>Mechanical detail</span> ↗</button
+        ><button data-view="rear">05 <span>Tail & empennage</span> ↗</button>
+      </div>
+      <div class="rig">
+        <span class="eyebrow">ARTICULATION CHECK</span
+        ><label
+          >Control surfaces
+          <input
+            id="surfaces"
+            type="range"
+            min="0"
+            max="100"
+            value="0"
+            aria-label="Control surface deflection" /></label
+        ><label
+          >Suspension travel
+          <input
+            id="suspension"
+            type="range"
+            min="0"
+            max="100"
+            value="0"
+            aria-label="Suspension compression" /></label
+        ><label
+          >Front wheel steering
+          <input
+            id="steering"
+            type="range"
+            min="-28"
+            max="28"
+            value="0"
+            aria-label="Front wheel steering" /></label
+        ><button class="prop-toggle" id="propeller">▷ Spin propeller</button>
+      </div>
+      <p class="detail-caption" id="caption">
+        A hollow CAD airframe, fitted transparent glazing, true airfoils, and
+        independently rigged mechanical components.
+      </p>
+    </aside>
+    <footer>
+      <span>DRAG TO ORBIT · SCROLL TO ZOOM</span
+      ><span id="stats">Loading the finished aircraft…</span
+      ><span>FINCH U–2 / PALM BAY</span>
+    </footer>
+    <div id="loading">
+      <span>FINCH U–2</span>
+      <p>Opening the hangar…</p>
+    </div>
+    <script type="module" src="/src/hangar.ts"></script>
+  </body>
+</html>

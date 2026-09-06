@@ -1,0 +1,385 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Serif+Display:ital@0;1&display=swap");
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  overflow: hidden;
+  background: #eaece5;
+  color: #293e42;
+  font-family: "DM Sans", sans-serif;
+  font-size: 13px;
+}
+button,
+a,
+input {
+  font: inherit;
+  color: inherit;
+}
+button {
+  cursor: pointer;
+  border: 0;
+  background: none;
+}
+a {
+  text-decoration: none;
+}
+#hangar,
+#hangar canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+header {
+  position: absolute;
+  top: 32px;
+  left: 40px;
+  right: 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 9px;
+  letter-spacing: 1.8px;
+  z-index: 2;
+}
+header > span {
+  color: #9aa79b;
+}
+header a {
+  padding: 10px 0;
+}
+.intro {
+  position: absolute;
+  left: 48px;
+  top: 125px;
+  pointer-events: none;
+}
+.eyebrow {
+  font-size: 8px;
+  letter-spacing: 1.8px;
+  color: #819785;
+  font-weight: 600;
+}
+h1 {
+  font-family: "DM Serif Display", Georgia, serif;
+  font-size: 61px;
+  font-weight: 400;
+  letter-spacing: -2px;
+  line-height: 1;
+  margin: 22px 0;
+}
+h1 em {
+  color: #577b73;
+  font-weight: 400;
+}
+.subtitle {
+  color: #7d9187;
+  font-size: 11px;
+  line-height: 1.8;
+}
+.specs {
+  display: flex;
+  gap: 26px;
+  margin-top: 25px;
+}
+.specs strong {
+  font-size: 24px;
+  font-weight: 400;
+  letter-spacing: -1px;
+}
+.specs strong span {
+  font-size: 12px;
+  margin-left: 4px;
+  color: #9da89b;
+}
+.specs small {
+  display: block;
+  font-size: 6px;
+  letter-spacing: 1.2px;
+  margin-top: 7px;
+  color: #99a592;
+}
+aside {
+  position: absolute;
+  right: 35px;
+  top: 125px;
+  width: 255px;
+  border: 1px solid #ffffffc0;
+  background: #f7f7efa6;
+  border-radius: 13px;
+  padding: 23px;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 10px 30px #6074660a;
+}
+.panel-heading {
+  display: flex;
+  justify-content: space-between;
+  font-size: 7px;
+  letter-spacing: 1px;
+  color: #899b86;
+  align-items: center;
+}
+.panel-heading button {
+  font-size: 7px;
+  color: #5f806c;
+  padding: 0;
+}
+.views {
+  display: flex;
+  flex-direction: column;
+  margin-top: 17px;
+}
+.views button {
+  padding: 13px 9px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #778e6e16;
+  font-size: 9px;
+  color: #9aa98f;
+  border-radius: 5px;
+}
+.views button span {
+  flex: 1;
+  text-align: left;
+  margin-left: 14px;
+  color: #5e786a;
+  font-size: 11px;
+}
+.views button.selected {
+  background: #e2e8d9;
+  color: #708a6d;
+}
+.rig {
+  border-top: 1px solid #829e741f;
+  padding-top: 20px;
+  margin-top: 18px;
+}
+.rig > .eyebrow {
+  font-size: 7px;
+}
+.rig label {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  margin-top: 18px;
+  font-size: 10px;
+  color: #6d8574;
+}
+input[type="range"] {
+  appearance: none;
+  width: 100%;
+  height: 2px;
+  background: #c6d0bd;
+  cursor: pointer;
+}
+input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 10px;
+  height: 10px;
+  background: #739380;
+  border: 2px solid #eaeedf;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px #739380;
+}
+.prop-toggle {
+  border: 1px solid #94a78245;
+  border-radius: 6px;
+  padding: 9px;
+  width: 100%;
+  margin-top: 19px;
+  font-size: 10px;
+  color: #557b69;
+}
+.prop-toggle.active {
+  background: #dce5d0;
+}
+.detail-caption {
+  font-size: 9px;
+  line-height: 1.9;
+  color: #91a089;
+  border-top: 1px solid #829e741f;
+  padding-top: 16px;
+  margin: 20px 0 0;
+}
+footer {
+  position: absolute;
+  bottom: 29px;
+  left: 40px;
+  right: 40px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 7px;
+  letter-spacing: 1.4px;
+  color: #819889;
+  pointer-events: none;
+}
+#stats {
+  letter-spacing: 0.5px;
+  color: #9aaa97;
+}
+#loading {
+  position: absolute;
+  inset: 0;
+  background: #eaece5;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 9;
+  font-size: 11px;
+  letter-spacing: 3px;
+}
+#loading p {
+  font-size: 11px;
+  letter-spacing: 0;
+  color: #92a18b;
+}
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid #79917d;
+  outline-offset: 4px;
+}
+@media (max-width: 1000px) {
+  .intro {
+    top: 95px;
+    left: 30px;
+  }
+  h1 {
+    font-size: 48px;
+  }
+  aside {
+    right: 20px;
+    width: 220px;
+    padding: 18px;
+    top: 100px;
+  }
+  .specs {
+    gap: 18px;
+  }
+  .subtitle {
+    font-size: 10px;
+  }
+  .intro .eyebrow {
+    font-size: 6px;
+  }
+  header {
+    left: 30px;
+    right: 25px;
+    top: 22px;
+  }
+  footer {
+    left: 30px;
+    right: 25px;
+  }
+  .detail-caption {
+    display: none;
+  }
+}
+@media (max-width: 650px) {
+  header {
+    left: 20px;
+    right: 20px;
+    font-size: 7px;
+  }
+  header > span {
+    display: none;
+  }
+  .intro {
+    left: 22px;
+    top: 77px;
+  }
+  h1 {
+    font-size: 41px;
+    margin: 14px 0;
+  }
+  .intro .subtitle {
+    display: none;
+  }
+  .specs {
+    margin-top: 15px;
+    gap: 20px;
+  }
+  .specs strong {
+    font-size: 20px;
+  }
+  .specs small {
+    font-size: 5px;
+  }
+  aside {
+    top: auto;
+    left: 16px;
+    right: 16px;
+    bottom: 53px;
+    width: auto;
+    padding: 14px;
+  }
+  .panel-heading {
+    font-size: 6px;
+  }
+  .views {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 4px;
+    margin-top: 10px;
+  }
+  .views button {
+    font-size: 0;
+    padding: 9px 4px;
+    display: block;
+    text-align: center;
+    border: 0;
+  }
+  .views button span {
+    margin: 0;
+    font-size: 8px;
+    line-height: 1.5;
+    display: block;
+  }
+  .rig {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 13px;
+    margin-top: 10px;
+    padding-top: 13px;
+  }
+  .rig > .eyebrow {
+    display: none;
+  }
+  .rig label {
+    font-size: 8px;
+    margin-top: 0;
+    gap: 10px;
+  }
+  .rig label:last-of-type {
+    display: none;
+  }
+  .prop-toggle {
+    margin: 0;
+    grid-column: 1/-1;
+    padding: 7px;
+    font-size: 9px;
+  }
+  footer {
+    bottom: 24px;
+    left: 22px;
+    right: 22px;
+    font-size: 5px;
+  }
+  footer span:last-child {
+    display: none;
+  }
+  #stats {
+    font-size: 5px;
+  }
+  .intro .eyebrow {
+    font-size: 6px;
+    letter-spacing: 1.2px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  * {
+    scroll-behavior: auto;
+  }
+}

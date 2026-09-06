@@ -1,0 +1,14 @@
+node_modules/
+dist/
+output/
+.playwright-cli/
+
+.venv-cad/
+assets/finch/**/*.blend1
+
+# Offline aircraft authoring; the runtime GLB is tracked under public/assets.
+assets/
+*.tsbuildinfo
+.DS_Store
+.env
+.env.*

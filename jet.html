@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#e4e7e4" />
+    <title>Peregrine HX-27 — Pocket Flight</title>
+    <link rel="icon" href="/favicon.svg" />
+  </head>
+  <body>
+    <div id="jet-view" aria-label="Interactive Peregrine HX-27 aircraft"></div>
+    <header>
+      <a href="/">↖ POCKET FLIGHT</a><span>AIRCRAFT ATELIER / 002</span
+      ><a href="/assets/peregrine-hx27.glb" download>DOWNLOAD MODEL ↗</a>
+    </header>
+    <section class="identity">
+      <p class="eyebrow"><i></i> AN ORIGINAL FIGHTER–TRANSPORT HYBRID</p>
+      <h1>Peregrine<span>HX–27</span></h1>
+      <p class="description">Fighter instinct.<br />Transport presence.</p>
+    </section>
+    <aside class="details">
+      <span class="mini">DESIGN NOTES</span>
+      <p id="view-caption">
+        A sharp forward profile meets a full-bodied airframe. Built around
+        speed, volume, and mechanical presence.
+      </p>
+      <div class="metrics">
+        <div><b>29.6</b><span>METRES LONG</span></div>
+        <div><b>19.8</b><span>METRES SPAN</span></div>
+        <div><b>02</b><span>INTEGRATED JETS</span></div>
+      </div>
+    </aside>
+    <div id="loading" role="status">Preparing the aircraft…</div>
+    <footer>
+      <div class="views" role="group" aria-label="Aircraft views">
+        <button data-view="beauty" aria-pressed="true">Overview</button
+        ><button data-view="side">Profile</button
+        ><button data-view="front">Front</button
+        ><button data-view="rear">Engines</button
+        ><button data-view="top">Planform</button
+        ><button data-view="cockpit">Cockpit</button>
+      </div>
+      <div class="inspection">
+        <label><input id="gear" type="checkbox" checked /> Landing gear</label
+        ><label
+          ><input id="canopy" type="checkbox" checked /> Canopy glass</label
+        ><label class="surfaces"
+          >Control surfaces
+          <input
+            id="surfaces"
+            aria-label="Control surface deflection"
+            type="range"
+            min="-100"
+            max="100"
+            value="0" /></label
+        ><button id="reset">Reset pose ↺</button>
+      </div>
+      <div class="footnote">
+        <span>DRAG TO ORBIT · SCROLL TO EXPLORE</span
+        ><a href="/hangar.html">Explore the Finch U-2 ↗</a
+        ><span id="model-status">DETAILED REAL-TIME ASSET</span>
+      </div>
+    </footer>
+    <script type="module" src="/src/jet.ts"></script>
+  </body>
+</html>

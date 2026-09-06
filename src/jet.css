@@ -1,0 +1,276 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap");
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  overflow: hidden;
+  background: #e4e7e4;
+  color: #273940;
+  font-family: "DM Sans", sans-serif;
+  font-size: 13px;
+}
+button,
+a,
+input {
+  font: inherit;
+  color: inherit;
+}
+a {
+  text-decoration: none;
+}
+button {
+  cursor: pointer;
+  border: 0;
+  background: transparent;
+}
+button:focus-visible,
+a:focus-visible,
+input:focus-visible {
+  outline: 2px solid #467e81;
+  outline-offset: 5px;
+}
+#jet-view,
+#jet-view canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+header {
+  position: absolute;
+  top: 28px;
+  left: 36px;
+  right: 36px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 10px;
+  letter-spacing: 1.8px;
+}
+header span {
+  color: #728184;
+}
+header a {
+  padding: 12px 0;
+}
+.identity {
+  position: absolute;
+  left: 42px;
+  top: 110px;
+  pointer-events: none;
+}
+.eyebrow,
+.mini {
+  font-size: 9px;
+  letter-spacing: 1.6px;
+  font-weight: 600;
+  color: #69817f;
+}
+.eyebrow i {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #518579;
+  margin-right: 8px;
+}
+h1 {
+  font-family: "DM Serif Display", serif;
+  font-size: 64px;
+  line-height: 1.02;
+  font-weight: 400;
+  letter-spacing: -1.9px;
+  margin: 20px 0 16px;
+}
+h1 span {
+  display: block;
+  font-family: "DM Sans", sans-serif;
+  font-size: 15px;
+  letter-spacing: 6px;
+  font-weight: 500;
+  color: #7c8b8a;
+  margin: 14px 0;
+}
+.description {
+  font-size: 14px;
+  line-height: 1.7;
+  color: #71817f;
+}
+.details {
+  position: absolute;
+  right: 36px;
+  top: 120px;
+  width: 218px;
+  pointer-events: none;
+}
+.details p {
+  font-size: 12px;
+  line-height: 1.8;
+  color: #74827f;
+  margin: 14px 0 25px;
+}
+.metrics {
+  border-top: 1px solid #697d8027;
+}
+.metrics div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 13px 0;
+  border-bottom: 1px solid #697d8020;
+}
+.metrics b {
+  font-size: 23px;
+  font-weight: 400;
+  letter-spacing: -1px;
+}
+.metrics span {
+  font-size: 8px;
+  letter-spacing: 1.2px;
+  color: #72817e;
+}
+footer {
+  position: absolute;
+  bottom: 22px;
+  left: 36px;
+  right: 36px;
+}
+.views {
+  width: max-content;
+  max-width: 100%;
+  display: flex;
+  margin: 0 auto 14px;
+  gap: 3px;
+  background: #f9faf3db;
+  border: 1px solid #ffffff;
+  padding: 6px;
+  border-radius: 40px;
+  box-shadow: 0 10px 40px #1a3b4210;
+  backdrop-filter: blur(12px);
+}
+.views button {
+  font-size: 11px;
+  padding: 11px 18px;
+  border-radius: 24px;
+}
+.views button[aria-pressed="true"] {
+  background: #31494d;
+  color: #f4f4e9;
+}
+.inspection {
+  display: flex;
+  gap: 26px;
+  align-items: center;
+  justify-content: center;
+  color: #596f70;
+  font-size: 10px;
+}
+.inspection label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+input[type="checkbox"] {
+  accent-color: #4c7475;
+  width: 13px;
+  height: 13px;
+}
+input[type="range"] {
+  accent-color: #4c7475;
+  width: 115px;
+  height: 12px;
+}
+.footnote {
+  margin-top: 25px;
+  display: flex;
+  justify-content: space-between;
+  color: #81928e;
+  font-size: 8px;
+  letter-spacing: 1.5px;
+}
+.footnote a {
+  letter-spacing: 0.5px;
+}
+#loading {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  padding: 16px 25px;
+  border-radius: 12px;
+  background: #f6f7eedc;
+  color: #526a6d;
+}
+.loaded #loading {
+  display: none;
+}
+@media (max-width: 1000px) {
+  .details {
+    display: none;
+  }
+  .identity {
+    top: 95px;
+  }
+  h1 {
+    font-size: 50px;
+  }
+}
+@media (max-width: 620px) {
+  header {
+    left: 20px;
+    right: 20px;
+    top: 14px;
+    font-size: 8px;
+    letter-spacing: 0.8px;
+  }
+  header span {
+    display: none;
+  }
+  .identity {
+    left: 23px;
+    top: 72px;
+  }
+  h1 {
+    font-size: 43px;
+    margin-top: 12px;
+  }
+  .eyebrow {
+    font-size: 7px;
+  }
+  .description {
+    font-size: 11px;
+    line-height: 1.5;
+  }
+  h1 span {
+    font-size: 11px;
+    margin-top: 10px;
+  }
+  .views {
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
+    border-radius: 18px;
+    gap: 0;
+  }
+  .views button {
+    padding: 9px 12px;
+    font-size: 10px;
+  }
+  footer {
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+  }
+  .inspection {
+    flex-wrap: wrap;
+    gap: 10px 16px;
+  }
+  .footnote {
+    margin-top: 16px;
+    justify-content: center;
+  }
+  .footnote span {
+    display: none;
+  }
+}

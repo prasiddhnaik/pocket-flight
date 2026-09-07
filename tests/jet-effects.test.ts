@@ -52,3 +52,9 @@ test("canopy interlock closes it under power and landing cue returns to stopped 
   expect(landing.speed).toBe(0);
   expect(landing.throttle).toBe(0);
 });
+
+test("persistent contrails require the high-altitude cruise preview", () => {
+  expect(sequenceInput("cruise", 10).contrails).toBe(true);
+  for (const mode of ["manual", "startup", "takeoff", "afterburner", "landing", "emergency"] as const)
+    expect(sequenceInput(mode, 10).contrails).toBe(false);
+});

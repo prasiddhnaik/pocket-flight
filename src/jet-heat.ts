@@ -22,7 +22,8 @@ export class JetHeat {
     vertexShader:
       "varying vec2 v;void main(){v=uv;gl_Position=vec4(position.xy,0.,1.);}",
     fragmentShader: `varying vec2 v;uniform sampler2D image;uniform sampler2D depth;uniform vec3 a,b;uniform float time,power,aspect;
-void main(){vec2 axis=(b.xy-a.xy)*vec2(aspect,1.);vec2 delta=(v-a.xy)*vec2(aspect,1.);float along=clamp(dot(delta,axis)/max(.00001,dot(axis,axis)),0.,1.);float distance=length(delta-axis*along);float mask=exp(-distance*distance/ (.00018+along*.00065))*sin(along*3.14159);float z=mix(a.z,b.z,along);mask*=step(z-.002,texture2D(depth,v).r);vec2 noise=vec2(sin(v.y*340.-time*10.+sin(v.x*150.+time*5.)),cos(v.x*290.+time*8.));vec2 uv=v+noise*mask*power*.0023;gl_FragColor=texture2D(image,clamp(uv,.001,.999));
+void main(){vec2 axis=(b.xy-a.xy)*vec2(aspect,1.);vec2 delta=(v-a.xy)*vec2(aspect,1.);float along=clamp(dot(delta,axis)/max(.00001,dot(axis,axis)),0.,1.);float distance=length(delta-axis*along);float mask=exp(-distance*distance/ (.00018+along*.00065))*sin(along*3.14159);float z=mix(a.z,b.z,along);mask*=step(z-.002,texture2D(depth,v).r);vec2 noise=vec2(sin(v.y*180.-time*4.+sin(v.x*90.+time*2.)),cos(v.x*170.+time*3.));vec2 uv=v+noise*mask*power*.00065;gl_FragColor=texture2D(image,clamp(uv,.001,.999));
+#include <tonemapping_fragment>
 #include <colorspace_fragment>
 }`,
   });

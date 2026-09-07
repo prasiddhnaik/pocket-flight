@@ -20,6 +20,7 @@ export type JetInput = {
   flaps: number;
   speed: number;
   damage: number;
+  contrails: boolean;
 };
 export const initialJetInput = (): JetInput => ({
   throttle: 0,
@@ -33,6 +34,7 @@ export const initialJetInput = (): JetInput => ({
   flaps: 0,
   speed: 0,
   damage: 0,
+  contrails: false,
 });
 const clamp = T.MathUtils.clamp;
 const smooth = (a: number, b: number, t: number) =>
@@ -55,6 +57,7 @@ export function sequenceInput(mode: JetMode, t: number): JetInput {
     i.throttle = 0.65;
     i.gear = false;
     i.speed = 230;
+    i.contrails = true;
     i.roll = 0.15 * Math.sin(t * 0.4);
   }
   if (mode === "afterburner") {
@@ -121,29 +124,40 @@ export class JetMotion {
 }
 
 const flameVertex = `varying vec3 p; void main(){p=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`;
-// Crossed soft ribbons have no cone silhouette; colour and density vary along the jet.
-const flameFragment = `precision highp float; varying vec3 p; uniform float time; uniform float strength; uniform float phase;
-void main(){float x=abs(p.x); float z=clamp(p.z,0.,.99999); float taper=(.9-.35*z)*(1.-smoothstep(.67,1.,z));
-float wave=sin(z*39.-time*19.+phase)*.035+sin(z*71.+time*13.)*.02;
-float r=x/max(.03,taper+wave);float edge=exp(-r*r*2.2)*(1.-smoothstep(.65,1.8,r));float fade=pow(1.-z,.7)*smoothstep(0.,.025,z);
-float diamonds=pow(max(0.,cos(z*34.)),5.)*exp(-r*r*7.);
-float core=exp(-r*r*9.);vec3 blue=vec3(.3,.24,1.);vec3 orange=vec3(1.,.33,.065);
-vec3 color=mix(blue,orange,smoothstep(.08,.5,z));color=mix(color,vec3(.8,.62,.42),core*.25);color+=diamonds*vec3(.28,.19,.13);
-float turbulence=.88+.12*sin(z*63.-time*17.+r*4.);float alpha=edge*fade*strength*.23*turbulence;gl_FragColor=vec4(color,alpha);}`;
+// Integrate emission through a bounded volume so the exhaust reads consistently from every angle.
+const flameFragment = `precision highp float;
+varying vec3 p; uniform vec3 eye; uniform float time,strength,phase;
+float hash(vec3 q){return fract(sin(dot(q,vec3(127.1,311.7,74.7)))*43758.5453);}
+float noise(vec3 q){vec3 i=floor(q),f=fract(q);f=f*f*(3.-2.*f);
+return mix(mix(mix(hash(i),hash(i+vec3(1,0,0)),f.x),mix(hash(i+vec3(0,1,0)),hash(i+vec3(1,1,0)),f.x),f.y),mix(mix(hash(i+vec3(0,0,1)),hash(i+vec3(1,0,1)),f.x),mix(hash(i+vec3(0,1,1)),hash(i+vec3(1,1,1)),f.x),f.y),f.z);}
+void main(){
+vec3 ray=normalize(p-eye);vec3 inv=sign(ray)/max(abs(ray),vec3(.00001));
+vec3 lo=(vec3(-1,-1,0)-eye)*inv,hi=(vec3(1,1,1)-eye)*inv;
+vec3 near=min(lo,hi),far=max(lo,hi);
+float entry=max(0.,max(near.x,max(near.y,near.z))),leave=min(far.x,min(far.y,far.z));
+if(leave<=entry)discard;
+float stepSize=(leave-entry)/40.;vec3 emission=vec3(0);float density=0.;
+for(int j=0;j<40;j++){
+vec3 q=eye+ray*(entry+(float(j)+.5)*stepSize);float z=clamp(q.z,0.,1.);
+float n=noise(vec3(q.xy*6.,z*19.-time*5.+phase));
+float radius=mix(.84,.20,z)*(1.+.035*sin(z*37.));
+float r=length(q.xy)/radius;
+float envelope=exp(-r*r*3.2)*(1.-smoothstep(.64,1.,z))*smoothstep(0.,.018,z);
+float cell=abs(fract(z*4.5+.08)-.5)*2.;
+float shock=exp(-pow((r-cell*.52)*9.,2.))*(1.-z)*.27;
+float core=exp(-r*r*12.);
+vec3 color=mix(vec3(.22,.32,.65),vec3(1.,.37,.09),smoothstep(.04,.36,z));
+color=mix(color,vec3(1.,.78,.47),core*.7);
+float d=envelope*(.87+.18*n+shock)*stepSize;
+emission+=color*d;density+=d;
+}
+float alpha=1.-exp(-density*2.8*strength);
+gl_FragColor=vec4(emission/max(density,.0001)*1.7,alpha);
+#include <tonemapping_fragment>
+#include <colorspace_fragment>
+}`;
 function flameGeometry() {
-  const positions: number[] = [],
-    indices: number[] = [];
-  for (let j = 0; j <= 48; j++)
-    for (const x of [-1, 1]) positions.push(x, 0, j / 48);
-  for (let j = 0; j < 48; j++) {
-    const a = j * 2;
-    indices.push(a, a + 1, a + 2, a + 1, a + 3, a + 2);
-  }
-  const g = new T.BufferGeometry();
-  g.setAttribute("position", new T.Float32BufferAttribute(positions, 3));
-  g.setIndex(indices);
-  g.computeVertexNormals();
-  return g;
+  return new T.BoxGeometry(2, 2, 1).translate(0, 0, 0.5);
 }
 function glowTexture() {
   const c = document.createElement("canvas");
@@ -188,22 +202,25 @@ export class JetEffects {
       plume.position.set(x, 2.88, 13.72);
       this.group.add(plume);
       this.flames.push(plume);
-      for (let layer = 0; layer < 5; layer++) {
+      {
         const material = new T.ShaderMaterial({
           vertexShader: flameVertex,
           fragmentShader: flameFragment,
           uniforms: {
             time: { value: 0 },
             strength: { value: 0 },
-            phase: { value: index * 2.3 + layer * 0.6 },
+            phase: { value: index * 2.3 },
+            eye: { value: new T.Vector3() },
           },
           transparent: true,
           depthWrite: false,
-          side: T.DoubleSide,
+          side: T.BackSide,
           blending: T.AdditiveBlending,
         });
         const mesh = new T.Mesh(geometry, material);
-        mesh.rotation.z = (layer * Math.PI) / 5;
+        mesh.onBeforeRender = (_renderer, _scene, camera) => {
+          mesh.worldToLocal(camera.getWorldPosition(material.uniforms.eye.value));
+        };
         mesh.renderOrder = 4;
         plume.add(mesh);
         this.flameMaterials.push(material);
@@ -211,7 +228,7 @@ export class JetEffects {
       const glow = new T.Sprite(
         new T.SpriteMaterial({
           map: this.spriteMap,
-          color: "#a27cff",
+          color: "#ffd0a0",
           transparent: true,
           depthWrite: false,
           blending: T.AdditiveBlending,
@@ -386,16 +403,14 @@ export class JetEffects {
       const power = s.burner * health;
       const hot = s.rpm * health;
       this.flames[index].visible = power > 0.01;
-      this.flames[index].scale.set(0.72, 0.72, 2.5 + power * 4.4);
-      for (let layer = 0; layer < 5; layer++) {
-        const u = this.flameMaterials[index * 5 + layer].uniforms;
-        u.time.value = this.reduced ? 0 : t;
-        u.strength.value = power;
-      }
+      this.flames[index].scale.set(0.68, 0.68, 2.6 + power * 2.8);
+      const u = this.flameMaterials[index].uniforms;
+      u.time.value = this.reduced ? 0 : t;
+      u.strength.value = power;
       const glow = this.engineGlows[index];
-      glow.material.opacity = hot * 0.25 + power * 0.55;
-      glow.scale.setScalar(0.8 + power * 0.9);
-      this.engineLights[index].intensity = hot * 1.5 + power * 18;
+      glow.material.opacity = hot * 0.08 + power * 0.24;
+      glow.scale.setScalar(0.7 + power * 0.3);
+      this.engineLights[index].intensity = hot * 0.4 + power * 5;
     }
     for (const { sprite, kind } of this.lamps) {
       let a = input.lights ? 1 : 0;
@@ -443,8 +458,8 @@ export class JetEffects {
     (this.smoke.material as T.ShaderMaterial).uniforms.color.value.set(
       s.damage > 0.02 ? "#343d44" : "#b6c1c7",
     );
-    const condensation = smooth(160, 240, s.speed),
-      vortex = condensation * Math.min(1, Math.abs(s.roll) * 3 + 0.1);
+    const condensation = input.contrails ? smooth(160, 240, s.speed) : 0,
+      vortex = smooth(120, 200, s.speed) * smooth(0.25, 0.7, Math.abs(s.roll));
     this.particles(this.trail, 480, (j) => {
       const side = j % 2 ? 1 : -1;
       const f = (((j % 240) >> 1) / 120 + t * 0.18) % 1;
@@ -452,9 +467,9 @@ export class JetEffects {
       return [
         side * (wing ? 9.88 : 0.91) + Math.sin(f * 12 + t) * f * 0.12,
         (wing ? 4.08 : 2.88) - f * 0.5,
-        (wing ? 5.2 : 14) + f * (wing ? 18 : 38),
+        (wing ? 5.2 : 17) + f * (wing ? 9 : 38),
         Math.sin(f * Math.PI) * (wing ? vortex * 0.16 : condensation * 0.1),
-        wing ? 0.3 + f * 1 : 0.65 + f * 2.4,
+        wing ? 0.18 + f * 0.7 : 0.5 + f * 2.8,
       ];
     });
   }

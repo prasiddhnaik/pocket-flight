@@ -257,7 +257,13 @@ export class JetEffects {
       if (object) g.attach(object);
       return g;
     };
-    this.canopyPivot = pivot("Canopy", new T.Vector3(0, 4.47, -6.1));
+    const canopyHinge = model.getObjectByName("Canopy")?.userData.hinge_glTF;
+    this.canopyPivot = pivot(
+      "Canopy",
+      new T.Vector3().fromArray(
+        Array.isArray(canopyHinge) ? canopyHinge : [0, 4.47, -6.1],
+      ),
+    );
     this.legs.push({
       pivot: pivot("Nose_steering", new T.Vector3(0, 1.72, -7.05)),
       side: 0,

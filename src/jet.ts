@@ -169,13 +169,14 @@ function pose() {
   input.roll = Number(surfaces.value) / 100;
   input.pitch = input.roll * 0.5;
   input.yaw = input.roll * 0.4;
-  model.getObjectByName("Canopy")?.traverse((o) => {
-    if (o instanceof T.Mesh) {
-      const mats = Array.isArray(o.material) ? o.material : [o.material];
-      if (mats.some((m) => m.name.startsWith("Glass")))
-        o.visible = canopy.checked;
-    }
-  });
+  for (const name of ["Canopy", "Windscreen"])
+    model.getObjectByName(name)?.traverse((o) => {
+      if (o instanceof T.Mesh) {
+        const mats = Array.isArray(o.material) ? o.material : [o.material];
+        if (mats.some((m) => m.name.startsWith("Glass")))
+          o.visible = canopy.checked;
+      }
+    });
 }
 for (const input of [gear, canopy, surfaces])
   input.addEventListener("input", () => {
@@ -203,9 +204,10 @@ new GLTFLoader().load(
           m.envMapIntensity = 0.8;
           if (m.name.startsWith("Glass")) {
             m.transparent = true;
-            m.opacity = 0.22;
+            m.opacity = 0.20;
+            m.envMapIntensity = 1.15;
             m.depthWrite = false;
-            m.side = T.DoubleSide;
+            m.side = T.FrontSide;
             o.castShadow = false;
             o.renderOrder = 3;
             if (m instanceof T.MeshPhysicalMaterial) m.transmission = 0;

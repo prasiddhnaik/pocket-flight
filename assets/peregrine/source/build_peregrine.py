@@ -121,7 +121,7 @@ for i in range(len(ys)-1):
 faces.extend([tuple(reversed(range(N))),tuple((len(ys)-1)*N+j for j in range(N))])
 hull=mesh('Sculpted pressure fuselage',verts,faces,paint,fuse)
 # Cockpit recess: closed volume removed from the hull, rather than seats embedded in paint.
-bpy.ops.mesh.primitive_uv_sphere_add(segments=48,ring_count=24,location=(0,8.7,4.95));cut=bpy.context.object;cut.scale=(1.10,2.6,1.7)
+bpy.ops.mesh.primitive_uv_sphere_add(segments=96,ring_count=64,location=(0,8.7,4.95));cut=bpy.context.object;cut.scale=(1.10,2.6,1.7)
 bpy.ops.object.transform_apply(location=False,rotation=False,scale=True)
 bpy.context.view_layer.objects.active=hull;mod=hull.modifiers.new('Recessed cockpit tub','BOOLEAN');mod.operation='DIFFERENCE';mod.object=cut
 bpy.ops.object.modifier_apply(modifier=mod.name);bpy.data.objects.remove(cut,do_unlink=True)
@@ -321,18 +321,83 @@ for idx,y in enumerate([9.45,7.45]):
             cyl('Console switch',(side*.70,y-.35+k*.13,4.25),(side*.70,y-.35+k*.13,4.28),.018,metal,cockpit,vertices=8)
         cyl('Throttle lever',(side*.70,y+.21,4.25),(side*.70,y+.21,4.44),.025,metal,cockpit)
         box('Throttle handle',(side*.70,y+.21,4.46),(.11,.08,.065),black,cockpit,.02)
-# Sleek canopy with an unbroken transparent forward arc and restrained framing.
-canopy_sections=[(6.0,.08,4.43,.06),(6.45,.71,4.48,.60),(7.25,.96,4.50,1.11),(8.3,1.02,4.47,1.22),(9.35,.94,4.38,1.19),(10.25,.70,4.18,.91),(10.95,.25,3.98,.40),(11.10,.025,3.94,.04)]
-canopy=empty('Canopy',cockpit);canopy['axis']='glTF X';v=[];f=[];N=32
-for y,rx,z,h in canopy_sections:
-    for j in range(N+1):a=j*math.pi/N;v.append((rx*math.cos(a),y,z+h*math.sin(a)))
-for i in range(len(canopy_sections)-1):
-    for j in range(N):a=i*(N+1)+j;f.append((a,a+1,a+N+2,a+N+1))
-can=mesh('Bubble canopy glazing',v,f,glass,canopy)
-sub=can.modifiers.new('Optical canopy curvature','SUBSURF');sub.levels=2;sub.render_levels=2
-for side in [-1,1]:line('Canopy sill',[(side*rx,y,z) for y,rx,z,h in canopy_sections],.043,shade,canopy)
-for i in [1,5]:
-    y,rx,z,h=canopy_sections[i];line('Canopy structural bow',[(rx*math.cos(j*math.pi/48),y,z+h*math.sin(j*math.pi/48)) for j in range(49)],.035,shade,canopy)
+# Fitted glazing: perimeter follows the actual cockpit cut, with a fixed windscreen.
+def hull_top(x,y):
+    lo,hi=0,math.pi/2
+    for _ in range(36):
+        mid=(lo+hi)/2
+        if skinpoint(y,mid)[0]>abs(x):lo=mid
+        else:hi=mid
+    return skinpoint(y,(lo+hi)/2)[2]
+def opening_equation(x,y):return (x/1.1)**2+((y-8.7)/2.6)**2+((hull_top(x,y)-4.95)/1.7)**2-1
+def end_root(a,b):
+    fa=opening_equation(0,a)
+    for _ in range(40):
+        m=(a+b)/2
+        if opening_equation(0,m)*fa>0:a=m
+        else:b=m
+    return (a+b)/2
+rear_edge=end_root(6.0,6.5);front_edge=end_root(10.8,11.4)
+def rim(y):
+    lo,hi=0,1.1
+    for _ in range(36):
+        mid=(lo+hi)/2
+        if opening_equation(mid,y)<0:lo=mid
+        else:hi=mid
+    x=(lo+hi)/2;return x,hull_top(x,y)+.015
+canopy=empty('Canopy',cockpit);canopy['axis']='glTF X';canopy['hinge_glTF']=[0,hull_top(0,rear_edge)+.03,-rear_edge]
+windshield=empty('Windscreen',cockpit)
+span=front_edge-rear_edge
+# A smooth crown clears both headrests while staying low at the nose and tail.
+def crown(y):
+    t=max(0,min(1,(y-rear_edge)/span))
+    return 1.42*math.sin(math.pi*t)**.72
+
+def glass_section(name,a,b,parent):
+    count=max(12,int((b-a)*24));cross=56;v=[];f=[]
+    for i in range(count+1):
+        y=a+(b-a)*i/count;x,z=rim(y);h=crown(y)
+        for j in range(cross+1):
+            theta=j*math.pi/cross
+            v.append((x*math.cos(theta),y,z+h*math.sin(theta)))
+    for i in range(count):
+        for j in range(cross):
+            k=i*(cross+1)+j;f.append((k,k+1,k+cross+2,k+cross+1))
+    if a<rear_edge+.01:
+        cap=len(v);v.append((0,rear_edge,hull_top(0,rear_edge)+.015))
+        f.extend([(cap,j+1,j) for j in range(cross)])
+    if b>front_edge-.01:
+        cap=len(v);v.append((0,front_edge,hull_top(0,front_edge)+.015));base=count*(cross+1)
+        f.extend([(cap,base+j,base+j+1) for j in range(cross)])
+    obj=mesh(name,v,f,glass,parent)
+    shell=obj.modifiers.new('Laminated optical edge','SOLIDIFY');shell.thickness=.006;shell.offset=0
+    for side in [-1,1]:
+        points=[(side*rim(a+(b-a)*i/count)[0],a+(b-a)*i/count,rim(a+(b-a)*i/count)[1]) for i in range(count+1)]
+        if a<rear_edge+.01:points.insert(0,(0,rear_edge,hull_top(0,rear_edge)+.015))
+        if b>front_edge-.01:points.append((0,front_edge,hull_top(0,front_edge)+.015))
+        line(name+' | perimeter rail',points,.042,black,parent)
+    return obj
+split=10.05
+main_glass=glass_section('Bubble canopy glazing',rear_edge+.004,split,canopy)
+glass_section('Fixed windscreen glazing',split+.032,front_edge-.004,windshield)
+for y,parent,label in [(split,canopy,'Canopy forward arch'),(split+.032,windshield,'Windscreen rear arch')]:
+    x,z=rim(y);line(label,[(x*math.cos(j*math.pi/80),y,z+crown(y)*math.sin(j*math.pi/80)) for j in range(81)],.032,shade,parent)
+# Fixed gasket and coaming bridge the cut skin to the moving canopy rails.
+for side in [-1,1]:
+    pts=[];inner_pts=[]
+    for i in range(121):
+        y=rear_edge+.003+(span-.006)*i/120;x,z=rim(y)
+        pts.append((side*x,y,z-.018));inner_pts.append((side*(x-.032),y,z-.07))
+    line('Cockpit weather seal',pts,.037,black,cockpit)
+    vv=[]
+    for p,q in zip(pts,inner_pts):vv.extend([p,q])
+    mesh('Cockpit fitted inner coaming',vv,[(2*i,2*i+1,2*i+3,2*i+2) for i in range(120)],seat,cockpit)
+    hinge_y=rear_edge+.06;hinge_z=hull_top(0,rear_edge)+.035
+    cyl('Canopy rear hinge pin',(side*.11,hinge_y,hinge_z),(side*.25,hinge_y,hinge_z),.038,metal,cockpit)
+    box('Canopy hinge clevis',(side*.19,hinge_y,hinge_z-.04),(.12,.19,.12),shade,cockpit,.025)
+    for yy in [7.0,8.7,9.6]:
+        x,z=rim(yy);box('Canopy recessed latch',(side*(x-.025),yy,z-.075),(.07,.18,.065),metal,cockpit,.012)
+
 # Forward HUD and clear combiner.
 box('HUD projector',(0,10.33,4.43),(.35,.35,.14),black,cockpit,.04)
 hud=box('HUD combiner',(0,10.40,4.68),(.42,.016,.25),glass,cockpit,.02)

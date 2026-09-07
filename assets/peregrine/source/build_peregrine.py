@@ -95,7 +95,7 @@ def text(n,s,pos,size,m,parent=root,rot=(math.pi/2,0,0)):
     o=bpy.data.objects.new(n,data);collection.objects.link(o);o.location=pos;o.rotation_euler=rot;data.materials.append(m);parent_world(o,parent);return o
 
 def cat(a,b,c,d,t):return .5*((2*b)+(-a+c)*t+(2*a-5*b+4*c-d)*t*t+(-a+3*b-3*c+d)*t*t*t)
-profiles=[(15,.035,.035,3.68),(13.6,.48,.37,3.59),(11.8,1.04,.75,3.44),(9.8,1.46,1.13,3.27),(7.2,1.91,1.47,3.04),(4,2.38,1.69,2.88),(0,2.58,1.76,2.79),(-4,2.46,1.64,2.78),(-7.5,2.05,1.37,2.89),(-10.8,1.75,1.01,3.05),(-13,1.5,.72,3.10),(-14,.08,.10,3.35)]
+profiles=[(15,.035,.035,3.68),(13.6,.48,.37,3.59),(11.8,1.04,.75,3.44),(9.8,1.46,1.13,3.27),(7.2,1.91,1.47,3.04),(4,2.38,1.69,2.88),(0,2.58,1.76,2.79),(-4,2.46,1.64,2.78),(-7.5,2.05,1.37,2.89),(-10.8,1.87,1.08,2.99),(-12,1.84,1.00,2.92),(-12.85,1.80,.94,2.88)]
 def body(y):
     for i in range(len(profiles)-1):
         b,c=profiles[i:i+2]
@@ -114,7 +114,7 @@ def skinpoint(y,theta,offset=0):
     fillet=.62*math.exp(-((y+.3)/4.7)**4)*math.exp(-((si-.55)/.28)**2)
     return (x+math.copysign(fillet,co),y,z)
 # Hand-shaped, continuously varying full barrel; a fighter nose transitioning to transport mass.
-ys=[15-29*i/144 for i in range(145)];N=80;verts=[skinpoint(y,j*math.tau/N) for y in ys for j in range(N)]
+ys=[15-27.85*i/144 for i in range(145)];N=80;verts=[skinpoint(y,j*math.tau/N) for y in ys for j in range(N)]
 faces=[]
 for i in range(len(ys)-1):
     for j in range(N):a=i*N+j;b=i*N+(j+1)%N;faces.append((a,b,b+N,a+N))
@@ -213,6 +213,8 @@ for side,label in [(-1,'Left'),(1,'Right')]:
     eng=empty('Engine_'+label,root);engines[side]=eng
     # Deep twin exhausts, petal rims, interior rings and stator.
     x=side*.91;z=2.88
+    ringloft('Blended engine shoulder',[(x,-11.65,z,.94,.88),(x,-12.05,z,.89,.85),(x,-12.45,z,.84,.82),(x,-12.83,z,.802,.802)],paint,eng)
+    ringloft('Engine mounting seal',[(x,-12.68,z,.81,.81),(x,-12.82,z,.805,.805)],shade,eng)
     cutter=ringloft('Exhaust passage cutter',[(x,-14.5,z,.74,.74),(x,-13.2,z,.74,.74),(x,-12.4,z,.69,.69),(x,-11.7,z,.55,.55)],None,root,caps=True)
     bpy.context.view_layer.objects.active=hull
     mod=hull.modifiers.new('Open exhaust passage','BOOLEAN');mod.operation='DIFFERENCE';mod.object=cutter
@@ -343,6 +345,7 @@ line('Nose torque scissors',[(0,6.94,1.40),(0,6.70,1.04),(0,6.96,.76)],.038,meta
 for side in [-1,1]:cyl('Nose fork',(0,7.05,.70),(side*.24,7.05,.42),.059,metal,steer)
 # Angled, contoured gear-door skins meet the bay lip; no floating rectangular boards.
 def gear_door(name,x,y,z,length,height,parent):
+    door=empty(('Nose_door_' if name.startswith('Nose') else 'Main_door_')+('Left' if x<0 else 'Right'),None,(x,y,z));parent_world(door,parent);parent=door
     pts=[(x,y-length*.5,z),(x,y+length*.5,z),(x,y+length*.37,z-height*.86),(x,y-length*.39,z-height)]
     o=mesh(name,pts,[(0,1,2,3)],shade,parent,False)
     sol=o.modifiers.new('Door skin thickness','SOLIDIFY');sol.thickness=.035;bevel(o,.022,3)
@@ -351,7 +354,7 @@ def gear_door(name,x,y,z,length,height,parent):
 for side in [-1,1]:gear_door('Nose bay door',side*.40,7.08,1.57,1.34,.34,gear)
 
 def wheel(n,x,y,r,parent):
-    z=r;g=empty(n,parent,(x,y,z));g['axis']='local X'
+    z=r;g=empty(n,None,(x,y,z));parent_world(g,parent);g['axis']='local X'
     torus('Tire',(x,y,z),r*.73,r*.27,rubber,g,'X')
     for dx in [-.055,.055]:torus('Tread channel',(x+dx,y,z),r*.985,.009,seam,g,'X')
     cyl('Axle',(x-.17,y,z),(x+.17,y,z),r*.46,metal,g,32)

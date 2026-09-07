@@ -18,18 +18,46 @@
       <h1>Peregrine<span>HX–27</span></h1>
       <p class="description">Fighter instinct.<br />Transport presence.</p>
     </section>
-    <aside class="details">
-      <span class="mini">DESIGN NOTES</span>
-      <p id="view-caption">
-        A sharp forward profile meets a full-bodied airframe. Built around
-        speed, volume, and mechanical presence.
-      </p>
-      <div class="metrics">
-        <div><b>29.6</b><span>METRES LONG</span></div>
-        <div><b>19.8</b><span>METRES SPAN</span></div>
-        <div><b>02</b><span>INTEGRATED JETS</span></div>
+    <details class="fx-panel" open>
+      <summary>Motion studio <span>✦</span></summary>
+      <p class="fx-hint">Explore the jet’s systems and effects.</p>
+      <div class="sequences" role="group" aria-label="Animation sequences">
+        <button data-sequence="startup">01 · Startup</button
+        ><button data-sequence="takeoff">02 · Takeoff</button>
+        <button data-sequence="cruise">03 · Cruise</button
+        ><button data-sequence="afterburner" class="ignite">
+          04 · Afterburner
+        </button>
+        <button data-sequence="landing">05 · Touchdown</button
+        ><button data-sequence="emergency">06 · Engine trouble</button>
       </div>
-    </aside>
+      <div class="engine-readout">
+        <span id="sequence-name">Manual control</span><b id="rpm">N1 0%</b>
+      </div>
+      <label class="power-label"
+        >Engine power <output id="power-value">0%</output
+        ><input id="power" type="range" min="0" max="100" value="0"
+      /></label>
+      <div class="switches">
+        <label><input id="burner" type="checkbox" /> Afterburner</label>
+        <label><input id="open-canopy" type="checkbox" /> Open canopy</label>
+        <label
+          ><input id="lights" type="checkbox" checked /> Aircraft lights</label
+        >
+        <label><input id="heat" type="checkbox" checked /> Heat shimmer</label>
+        <label><input id="dusk" type="checkbox" checked /> Dusk lighting</label>
+        <label><input id="slow" type="checkbox" /> Slow motion</label>
+      </div>
+      <div class="transport">
+        <button id="pause" aria-pressed="false">Ⅱ Pause</button
+        ><button id="sound" aria-pressed="false">Sound off</button
+        ><button id="restart">↻ Restart</button>
+      </div>
+      <p class="fx-status" id="fx-status" role="status">
+        Choose a sequence or bring up the throttle.
+      </p>
+    </details>
+    <p id="view-caption" hidden></p>
     <div id="loading" role="status">Preparing the aircraft…</div>
     <footer>
       <div class="views" role="group" aria-label="Aircraft views">
@@ -41,7 +69,7 @@
         ><button data-view="cockpit">Cockpit</button>
       </div>
       <div class="inspection">
-        <label><input id="gear" type="checkbox" checked /> Landing gear</label
+        <label><input id="gear" type="checkbox" checked /> Gear down</label
         ><label
           ><input id="canopy" type="checkbox" checked /> Canopy glass</label
         ><label class="surfaces"
@@ -58,7 +86,7 @@
       <div class="footnote">
         <span>DRAG TO ORBIT · SCROLL TO EXPLORE</span
         ><a href="/hangar.html">Explore the Finch U-2 ↗</a
-        ><span id="model-status">DETAILED REAL-TIME ASSET</span>
+        ><span id="model-status">ANIMATION PREVIEW · DRAG TO EXPLORE</span>
       </div>
     </footer>
     <script type="module" src="/src/jet.ts"></script>

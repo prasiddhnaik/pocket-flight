@@ -1,7 +1,12 @@
 import { Vector3, Quaternion, Euler, MathUtils } from "three";
 import { groundAt, runways, terrainHeight } from "./terrain";
 import type { Obstacle } from "./world";
-import { gearContactHeight } from "./landing-gear";
+import type { AircraftId } from "./aircraft";
+import {
+  peregrineWheels,
+  finchWheels,
+  gearContactHeight,
+} from "./landing-gear";
 export type Controls = {
   pitch: number;
   roll: number;
@@ -23,6 +28,18 @@ export type FlightEvent = {
   accuracy?: number;
 };
 export class FlightPhysics {
+  aircraftId: AircraftId = "finch";
+  get jet() {
+    return this.aircraftId === "peregrine";
+  }
+  private contactHeight() {
+    return gearContactHeight(
+      this.position,
+      this.quaternion,
+      this.damage.gear,
+      this.jet ? peregrineWheels : finchWheels,
+    );
+  }
   position = new Vector3();
   velocity = new Vector3();
   quaternion = new Quaternion();
@@ -60,9 +77,9 @@ export class FlightPhysics {
       r.z + Math.cos(r.heading) * spawnDistance,
     );
     this.velocity.set(
-      -Math.sin(this.yaw) * (airStart ? 34 : 0),
+      -Math.sin(this.yaw) * (airStart ? (this.jet ? 48 : 34) : 0),
       airStart ? -1 : 0,
-      -Math.cos(this.yaw) * (airStart ? 34 : 0),
+      -Math.cos(this.yaw) * (airStart ? (this.jet ? 48 : 34) : 0),
     );
     this.throttle = airStart ? 0.46 : 0;
     this.grounded = !airStart;
@@ -80,8 +97,7 @@ export class FlightPhysics {
     this.engineOut = false;
     this.suspension = 0;
     this.updateQuaternion();
-    if (!airStart)
-      this.position.y = gearContactHeight(this.position, this.quaternion);
+    if (!airStart) this.position.y = this.contactHeight();
   }
   updateQuaternion() {
     this.quaternion.setFromEuler(
@@ -156,7 +172,8 @@ export class FlightPhysics {
       return;
     }
     const authority =
-      MathUtils.clamp(speed / 24, 0.25, 1.2) * (1 - this.damage.wing * 0.55);
+      MathUtils.clamp(speed / (this.jet ? 36 : 24), 0.25, 1.2) *
+      (1 - this.damage.wing * 0.55);
     const pitchTarget = input.pitch * 0.5 * authority;
     this.pitchRate = MathUtils.damp(this.pitchRate, pitchTarget, 5, dt);
     this.pitch += this.pitchRate * dt;
@@ -197,16 +214,18 @@ export class FlightPhysics {
     const dir = speed > 1 ? air.clone().divideScalar(speed) : forward.clone();
     const pathAngle = Math.asin(MathUtils.clamp(dir.y, -1, 1));
     const aoa = this.pitch - pathAngle;
-    this.stall = !this.grounded && (speed < 17 || Math.abs(aoa) > 0.36);
+    this.stall =
+      !this.grounded && (speed < (this.jet ? 25 : 17) || Math.abs(aoa) > 0.36);
     const stalledFactor =
       Math.abs(aoa) > 0.32
         ? Math.max(0.16, 1 - (Math.abs(aoa) - 0.32) * 2.4)
         : 1;
-    const trim = 9.81 / (0.027 * Math.max(27, speed) ** 2);
+    const liftScale = this.jet ? 0.0125 : 0.027;
+    const trim = 9.81 / (liftScale * Math.max(this.jet ? 38 : 27, speed) ** 2);
     const cl = MathUtils.clamp(trim + aoa * 3.7, -0.75, 1.65) * stalledFactor;
-    const lift = 0.027 * speed * speed * cl * (1 - this.damage.wing * 0.62);
+    const lift = liftScale * speed * speed * cl * (1 - this.damage.wing * 0.62);
     const drag =
-      (0.0016 +
+      ((this.jet ? 0.0008 : 0.0016) +
         0.0005 * cl * cl +
         this.damage.gear * 0.002 +
         this.damage.wing * 0.004 +
@@ -216,10 +235,13 @@ export class FlightPhysics {
     const engine = this.engineOut
       ? 0
       : this.throttle *
-        8.5 *
-        (1 - Math.min(0.65, speed / 95)) *
+        (this.jet ? 11 : 8.5) *
+        (this.jet
+          ? (1 + MathUtils.smoothstep(this.throttle, 0.88, 1) * 0.3) *
+            (1 - Math.min(0.6, speed / 170))
+          : 1 - Math.min(0.65, speed / 95)) *
         (1 - this.damage.engine * 0.85) *
-        (1 - this.damage.propeller * 0.8);
+        (1 - this.damage.propeller * (this.jet ? 0 : 0.8));
     const liftDir = new Vector3().crossVectors(right, dir).normalize();
     const accel = new Vector3(0, -9.81, 0)
       .addScaledVector(liftDir, lift)
@@ -249,11 +271,7 @@ export class FlightPhysics {
     }
     this.position.addScaledVector(this.velocity, dt);
     const next = groundAt(this.position.x, this.position.z);
-    const bottom = gearContactHeight(
-      this.position,
-      this.quaternion,
-      this.damage.gear,
-    );
+    const bottom = this.contactHeight();
     if (this.position.y <= bottom) {
       const slopeX =
         (terrainHeight(this.position.x + 2, this.position.z) -
@@ -323,7 +341,7 @@ export class FlightPhysics {
       if (
         this.position.y < o.y + 1 &&
         Math.hypot(this.position.x - o.x, this.position.z - o.z) <
-          o.radius + 1.8
+          o.radius + (this.jet ? 4.5 : 1.8)
       ) {
         this.impact(speed > 18 ? 1.2 : 0.25, "wing");
         this.velocity.multiplyScalar(0.65);

@@ -123,14 +123,21 @@ export class JetMotion {
   }
 }
 
-const flameVertex = `varying vec3 p; void main(){p=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`;
+const flameVertex = `#include <common>
+#include <logdepthbuf_pars_vertex>
+varying vec3 p; void main(){p=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);
+#include <logdepthbuf_vertex>
+}`;
 // Integrate emission through a bounded volume so the exhaust reads consistently from every angle.
 const flameFragment = `precision highp float;
+#include <logdepthbuf_pars_fragment>
 varying vec3 p; uniform vec3 eye; uniform float time,strength,phase;
 float hash(vec3 q){return fract(sin(dot(q,vec3(127.1,311.7,74.7)))*43758.5453);}
 float noise(vec3 q){vec3 i=floor(q),f=fract(q);f=f*f*(3.-2.*f);
 return mix(mix(mix(hash(i),hash(i+vec3(1,0,0)),f.x),mix(hash(i+vec3(0,1,0)),hash(i+vec3(1,1,0)),f.x),f.y),mix(mix(hash(i+vec3(0,0,1)),hash(i+vec3(1,0,1)),f.x),mix(hash(i+vec3(0,1,1)),hash(i+vec3(1,1,1)),f.x),f.y),f.z);}
 void main(){
+
+#include <logdepthbuf_fragment>
 vec3 ray=normalize(p-eye);vec3 inv=sign(ray)/max(abs(ray),vec3(.00001));
 vec3 lo=(vec3(-1,-1,0)-eye)*inv,hi=(vec3(1,1,1)-eye)*inv;
 vec3 near=min(lo,hi),far=max(lo,hi);
@@ -172,8 +179,15 @@ function glowTexture() {
   ctx.fillRect(0, 0, 64, 64);
   return new T.CanvasTexture(c);
 }
-const particleVertex = `attribute float alpha;attribute float size;varying float a;uniform float pixelRatio;void main(){a=alpha;vec4 mv=modelViewMatrix*vec4(position,1.);gl_PointSize=min(160.,size*pixelRatio*650./max(1.,-mv.z));gl_Position=projectionMatrix*mv;}`;
-const particleFragment = `varying float a;uniform vec3 color;void main(){float d=length(gl_PointCoord-.5)*2.;float soft=exp(-d*d*2.5)*(1.-smoothstep(.6,1.,d));gl_FragColor=vec4(color,soft*a);}`;
+const particleVertex = `#include <common>
+#include <logdepthbuf_pars_vertex>
+attribute float alpha;attribute float size;varying float a;uniform float pixelRatio;void main(){a=alpha;vec4 mv=modelViewMatrix*vec4(position,1.);gl_PointSize=min(160.,size*pixelRatio*650./max(1.,-mv.z));gl_Position=projectionMatrix*mv;
+#include <logdepthbuf_vertex>
+}`;
+const particleFragment = `#include <logdepthbuf_pars_fragment>
+varying float a;uniform vec3 color;void main(){
+#include <logdepthbuf_fragment>
+float d=length(gl_PointCoord-.5)*2.;float soft=exp(-d*d*2.5)*(1.-smoothstep(.6,1.,d));gl_FragColor=vec4(color,soft*a);}`;
 
 export class JetEffects {
   readonly motion = new JetMotion();
@@ -189,6 +203,7 @@ export class JetEffects {
   private smoke: T.Points;
   private trail: T.Points;
   private touchdownAge = 10;
+  private suspension = 0;
   private wheelAngle = 0;
   private rotorAngle = 0;
   private spriteMap = glowTexture();
@@ -219,7 +234,9 @@ export class JetEffects {
         });
         const mesh = new T.Mesh(geometry, material);
         mesh.onBeforeRender = (_renderer, _scene, camera) => {
-          mesh.worldToLocal(camera.getWorldPosition(material.uniforms.eye.value));
+          mesh.worldToLocal(
+            camera.getWorldPosition(material.uniforms.eye.value),
+          );
         };
         mesh.renderOrder = 4;
         plume.add(mesh);
@@ -345,6 +362,11 @@ export class JetEffects {
   touchdown() {
     this.touchdownAge = 0;
   }
+  setSuspension(value: number) {
+    const delta = value - this.suspension;
+    this.legs.forEach(({ pivot }) => (pivot.position.y += delta));
+    this.suspension = value;
+  }
   setReducedMotion(value: boolean) {
     this.reduced = value;
   }
@@ -393,7 +415,8 @@ export class JetEffects {
       pivot.rotation[nose ? "x" : "z"] = nose
         ? -fold * 1.48
         : -side * fold * 1.2;
-      pivot.position.y = (nose ? 1.72 : 2.16) + fold * 0.25 + compression;
+      pivot.position.y =
+        (nose ? 1.72 : 2.16) + fold * 0.25 + compression + this.suspension;
       pivot.visible = s.gear > 0.015;
     });
     const steering = this.model.getObjectByName("Nose_steering");

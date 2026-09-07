@@ -2,7 +2,7 @@ import { Quaternion, Vector3 } from "three";
 import { groundAt } from "./terrain";
 
 // Finch GLB axle positions and tire torus dimensions, in aircraft coordinates.
-const wheels = [
+export const finchWheels = [
   { center: new Vector3(-1.22, -1.09, 0.55), major: 0.212, minor: 0.065 },
   { center: new Vector3(1.22, -1.09, 0.55), major: 0.212, minor: 0.065 },
   { center: new Vector3(0, -1.12, -2.12), major: 0.177, minor: 0.055 },
@@ -17,6 +17,7 @@ export function gearContactHeight(
   position: Vector3,
   rotation: Quaternion,
   damage = 0,
+  wheels = finchWheels,
 ) {
   orientation
     .copy(rotation)
@@ -37,3 +38,17 @@ export function gearContactHeight(
   }
   return height;
 }
+
+// Same scale and centre offset as the flight GLB; six individual tire contacts.
+export const peregrineWheels = [
+  ...[-0.24, 0.24].map((x) => ({
+    center: new Vector3(x * 0.7, (0.42 - 2.3) * 0.7, -7.05 * 0.7),
+    major: 0.42 * 0.73 * 0.7,
+    minor: 0.42 * 0.27 * 0.7,
+  })),
+  ...[-2.39, -1.71, 1.71, 2.39].map((x) => ({
+    center: new Vector3(x * 0.7, (0.62 - 2.3) * 0.7, 2.45 * 0.7),
+    major: 0.62 * 0.73 * 0.7,
+    minor: 0.62 * 0.27 * 0.7,
+  })),
+];

@@ -40,6 +40,7 @@ import { PocketFlight } from "./game";
 import type { Snapshot } from "./game";
 import { missions } from "./missions";
 import type { Mission, FlightResult } from "./missions";
+import type { AircraftId } from "./aircraft";
 import { paints } from "./aircraft";
 import { terrainHeight, runways } from "./terrain";
 const icons: Record<string, LucideIcon> = {
@@ -231,6 +232,12 @@ export default function App() {
       const n = read("pocket-flight-paint", 0);
       return Number.isInteger(n) && n >= 0 && n < paints.length ? n : 0;
     }),
+    [aircraftId, setAircraftId] = useState<AircraftId>(() =>
+      read<string>("pocket-flight-aircraft", "finch") === "peregrine"
+        ? "peregrine"
+        : "finch",
+    ),
+    [switchingAircraft, setSwitchingAircraft] = useState(false),
     [night, setNight] = useState(false),
     [sound, setSound] = useState(false),
     [toast, setToast] = useState(""),
@@ -247,7 +254,7 @@ export default function App() {
     if (!viewport.current) return;
     let instance: PocketFlight;
     try {
-      instance = new PocketFlight(viewport.current);
+      instance = new PocketFlight(viewport.current, aircraftId);
       instance.setPaint(paint);
       instance.onSnapshot = (state) => {
         setSnapshot(state);
@@ -273,7 +280,7 @@ export default function App() {
         })
         .catch((error) => {
           if (game.current === instance)
-            setError(`Unable to load the Finch: ${String(error)}`);
+            setError(`Unable to load the aircraft: ${String(error)}`);
         });
       if (import.meta.env.DEV)
         (window as unknown as { pocketFlight: PocketFlight }).pocketFlight =
@@ -324,11 +331,26 @@ export default function App() {
     };
   }, [panel]);
   const fly = (m = selected) => {
+    if (!ready || switchingAircraft) return;
     setSelected(m);
     setPanel(null);
     setResult(null);
     game.current?.start(m);
     setSound(true);
+  };
+  const changeAircraft = async (id: AircraftId) => {
+    if (!game.current || switchingAircraft || id === aircraftId) return;
+    setSwitchingAircraft(true);
+    try {
+      await game.current.selectAircraft(id);
+      game.current.setPaint(paint);
+      setAircraftId(id);
+      save("pocket-flight-aircraft", id);
+    } catch {
+      setToast("Aircraft could not load. Please try again.");
+    } finally {
+      setSwitchingAircraft(false);
+    }
   };
   const changePaint = (i: number) => {
     setPaint(i);
@@ -534,37 +556,64 @@ export default function App() {
             </div>
             <div className="aircraft-selection">
               <div className="aircraft-caption">
-                <span className="tiny-label">MEET YOUR AIRCRAFT</span>
+                <span className="tiny-label">
+                  {switchingAircraft
+                    ? "LOADING AIRCRAFT…"
+                    : "CHOOSE YOUR AIRCRAFT"}
+                </span>
                 <h3>
-                  The Finch <span>U–2</span>
+                  <select
+                    aria-label="Choose aircraft"
+                    value={aircraftId}
+                    disabled={switchingAircraft || !ready}
+                    onChange={(e) =>
+                      void changeAircraft(e.target.value as AircraftId)
+                    }
+                    className="aircraft-picker"
+                  >
+                    <option value="finch">The Finch · U–2</option>
+                    <option value="peregrine">Peregrine · HX–27</option>
+                  </select>
                 </h3>
                 <p>
                   <a
-                    href="/hangar.html"
+                    href={aircraftId === "peregrine" ? "/jet" : "/hangar.html"}
                     style={{ color: "inherit", textUnderlineOffset: 3 }}
                   >
                     Explore the aircraft ↗
                   </a>
                 </p>
               </div>
-              <div className="paint-options">
-                <div className="swatches">
-                  {paints.map((p, i) => (
-                    <button
-                      key={p.name}
-                      className={`swatch ${paint === i ? "selected" : ""}`}
-                      style={{ "--paint": p.color } as React.CSSProperties}
-                      title={p.name}
-                      aria-label={`${p.name} paint`}
-                      aria-pressed={paint === i}
-                      onClick={() => changePaint(i)}
-                    >
-                      {paint === i && <Check size={12} />}
-                    </button>
-                  ))}
+              {aircraftId === "finch" ? (
+                <div className="paint-options">
+                  <div className="swatches">
+                    {paints.map((p, i) => (
+                      <button
+                        key={p.name}
+                        className={`swatch ${paint === i ? "selected" : ""}`}
+                        style={{ "--paint": p.color } as React.CSSProperties}
+                        title={p.name}
+                        aria-label={`${p.name} paint`}
+                        aria-pressed={paint === i}
+                        onClick={() => changePaint(i)}
+                      >
+                        {paint === i && <Check size={12} />}
+                      </button>
+                    ))}
+                  </div>
+                  <span>{paints[paint].name} livery</span>
                 </div>
-                <span>{paints[paint].name} livery</span>
-              </div>
+              ) : (
+                <div className="jet-flight-note">
+                  <b>
+                    {switchingAircraft
+                      ? "Loading aircraft…"
+                      : "Twin-engine jet"}
+                  </b>
+                  <span>Full throttle · Afterburners</span>
+                  <span>Automatic landing gear</span>
+                </div>
+              )}
             </div>
             <div className="board-end">
               <Wind size={22} strokeWidth={1.4} />

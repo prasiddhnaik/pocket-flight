@@ -1,5 +1,8 @@
 import * as T from "three";
 import { makeWorld } from "./world";
+import type { AircraftId, AircraftModel } from "./aircraft";
+import { initialJetInput } from "./jet-effects";
+import type { JetMotion } from "./jet-effects";
 import { makeAircraft, disposeAircraft } from "./aircraft";
 import { FlightPhysics } from "./physics";
 import type { Controls } from "./physics";
@@ -49,6 +52,7 @@ type ReplayFrame = {
   q: T.Quaternion;
   t: number;
   worldTime: number;
+  jet?: Omit<JetMotion, "update">;
   throttle: number;
   speed: number;
   suspension: number;
@@ -69,7 +73,7 @@ export class PocketFlight {
   readonly scene = new T.Scene();
   readonly camera = new T.PerspectiveCamera(48, 1, 0.2, 11000);
   readonly physics = new FlightPhysics();
-  readonly aircraft = makeAircraft();
+  aircraft: AircraftModel;
   readonly world: ReturnType<typeof makeWorld>;
   readonly audio = new FlightAudio();
   mode: GameMode = "menu";
@@ -119,7 +123,13 @@ export class PocketFlight {
   private disposed = false;
   private reducedMotion = matchMedia("(prefers-reduced-motion: reduce)")
     .matches;
-  constructor(private container: HTMLElement) {
+  constructor(
+    private container: HTMLElement,
+    aircraftId: AircraftId = "finch",
+  ) {
+    this.aircraft = makeAircraft(0, aircraftId);
+    this.physics.aircraftId = aircraftId;
+    this.audio.jet = aircraftId === "peregrine";
     this.renderer = new T.WebGLRenderer({
       antialias: true,
       logarithmicDepthBuffer: true,
@@ -263,6 +273,48 @@ export class PocketFlight {
       brake: !!k("KeyB", "Space"),
     };
   }
+  async selectAircraft(id: AircraftId) {
+    if (this.mode !== "menu" || id === this.aircraft.id) return;
+    const next = makeAircraft(0, id);
+    try {
+      await next.ready;
+    } catch (error) {
+      next.dispose();
+      throw error;
+    }
+    if (this.disposed || this.mode !== "menu") {
+      next.dispose();
+      return;
+    }
+    this.scene.remove(this.aircraft.group);
+    this.aircraft.dispose();
+    this.aircraft = next;
+    this.scene.add(next.group);
+    this.physics.aircraftId = id;
+    this.audio.jet = id === "peregrine";
+  }
+  private updateJet(dt: number) {
+    const effects = this.aircraft.effects;
+    if (!effects) return;
+    const p = this.physics,
+      menu = this.mode === "menu";
+    const input = {
+      ...initialJetInput(),
+      ...this.aircraft.surfaces.snapshot(),
+      throttle: menu ? 0.45 : p.engineOut || p.crashed ? 0 : p.throttle,
+      speed: menu ? 50 : p.airspeed,
+      gear:
+        !menu &&
+        (p.grounded ||
+          p.position.y - terrainHeight(p.position.x, p.position.z) < 35 ||
+          p.airspeed < 42),
+      damage: menu ? 0 : p.damage.engine,
+    };
+    input.burner = input.throttle > 0.9;
+    input.flaps = input.gear ? 0.35 : 0;
+    effects.setReducedMotion(this.reducedMotion);
+    effects.update(menu && this.reducedMotion ? 0 : dt, input);
+  }
   start(mission: Mission) {
     this.replayVideo.reset();
     this.replayLive = this.replaySample = null;
@@ -271,6 +323,7 @@ export class PocketFlight {
     this.physics.reset(mission.airStart, mission.short);
     this.aircraft.surfaces.reset();
     this.aircraft.propellerMotion.reset();
+    this.aircraft.effects?.reset();
     this.physics.strongWind = mission.id === "crosswind";
     this.physics.engineOut = mission.id === "emergency";
     if (this.physics.engineOut) {
@@ -280,7 +333,7 @@ export class PocketFlight {
     }
     if (mission.id === "canyon") {
       this.physics.position.set(95, 110, 470);
-      this.physics.velocity.set(0, 0, -34);
+      this.physics.velocity.set(0, 0, this.physics.jet ? -48 : -34);
     }
     this.aircraft.group.scale.setScalar(1);
     this.aircraft.group.visible = true;
@@ -310,10 +363,9 @@ export class PocketFlight {
     this.camera.position
       .copy(this.physics.position)
       .add(
-        new T.Vector3(0, 8, 25).applyAxisAngle(
-          new T.Vector3(0, 1, 0),
-          this.physics.yaw,
-        ),
+        new T.Vector3(0, 8, 25)
+          .multiplyScalar(this.aircraft.cameraScale)
+          .applyAxisAngle(new T.Vector3(0, 1, 0), this.physics.yaw),
       );
     this.camera.lookAt(this.physics.position);
     this.audio.start();
@@ -321,7 +373,9 @@ export class PocketFlight {
     this.onToast(
       mission.airStart
         ? "You have the controls. Enjoy the view."
-        : "Hold Shift to add throttle. Pull back with ↓ at 45 knots.",
+        : this.physics.jet
+          ? "Hold Shift for thrust. Pull back with ↓ at 65 knots. Full power lights the afterburners."
+          : "Hold Shift to add throttle. Pull back with ↓ at 45 knots.",
     );
     this.emit();
   }
@@ -531,6 +585,9 @@ export class PocketFlight {
       q: p.quaternion.clone(),
       t: p.flightTime,
       worldTime: this.time,
+      jet: this.aircraft.effects
+        ? { ...this.aircraft.effects.motion }
+        : undefined,
       throttle: p.throttle,
       speed: p.airspeed,
       suspension: p.suspension,
@@ -560,6 +617,10 @@ export class PocketFlight {
   }
   private applyReplayVisuals(frame: ReplayFrame) {
     const a = this.aircraft;
+    if (a.effects && frame.jet) {
+      Object.assign(a.effects.motion, frame.jet);
+      a.effects.update(0, { ...initialJetInput(), lights: true });
+    }
     a.gear.visible = frame.gearVisible;
     a.gear.rotation.z = frame.gearDamage * 0.35;
     a.propeller.visible = frame.propVisible;
@@ -619,6 +680,7 @@ export class PocketFlight {
       8,
       Math.cos(angle) * 29,
     ).applyAxisAngle(new T.Vector3(0, 1, 0), heading);
+    offset.multiplyScalar(this.aircraft.cameraScale);
     const goal = model.position.clone().add(offset);
     goal.y = Math.max(goal.y, terrainHeight(goal.x, goal.z) + 3);
     if (snapCamera) this.camera.position.copy(goal);
@@ -752,6 +814,7 @@ export class PocketFlight {
     const p = this.physics,
       model = this.aircraft.group;
     this.cockpit.visible =
+      this.aircraft.id === "finch" &&
       this.cameraMode === "cockpit" &&
       this.mode !== "menu" &&
       this.mode !== "replay";
@@ -775,7 +838,9 @@ export class PocketFlight {
         .addScaledVector(forward, 82)
         .addScaledVector(right, this.camera.aspect < 1 ? 4 : 21)
         .addScaledVector(up, this.camera.aspect < 1 ? -11 : 1);
-      model.scale.setScalar(this.camera.aspect < 1 ? 1.65 : 3.8);
+      model.scale.setScalar(
+        (this.camera.aspect < 1 ? 1.65 : 3.8) / this.aircraft.cameraScale,
+      );
       model.rotation.set(
         0.065 + Math.sin(this.time * 0.6) * 0.015,
         -0.32,
@@ -800,7 +865,12 @@ export class PocketFlight {
       if (this.cameraMode === "cockpit") {
         this.camera.position
           .copy(p.position)
-          .add(new T.Vector3(-0.3, 1.01, 0.1).applyQuaternion(p.quaternion));
+          .add(
+            (this.physics.jet
+              ? new T.Vector3(0, 1.855, -6.68)
+              : new T.Vector3(-0.3, 1.01, 0.1)
+            ).applyQuaternion(p.quaternion),
+          );
         this.camera.quaternion.copy(p.quaternion);
         this.camera.rotateY(this.orbit.x);
         this.camera.rotateX(-this.orbit.y);
@@ -819,6 +889,7 @@ export class PocketFlight {
             Math.cos(this.time * 0.14) * 25,
           );
         offset
+          .multiplyScalar(this.aircraft.cameraScale)
           .applyAxisAngle(new T.Vector3(1, 0, 0), this.orbit.y)
           .applyAxisAngle(new T.Vector3(0, 1, 0), p.yaw + this.orbit.x);
         const goal = p.position.clone().add(offset);
@@ -828,14 +899,17 @@ export class PocketFlight {
         );
         this.camera.position.lerp(
           goal,
-          1 - Math.exp(-dt * (this.mode === "playing" ? 4 : 2)),
+          1 -
+            Math.exp(
+              -dt * (this.mode === "playing" ? (this.physics.jet ? 9 : 4) : 2),
+            ),
         );
         // Follow position smoothly, but keep the aircraft centred while banking
         // or catching up after a turn. Looking ahead made it drift off-screen.
         this.camera.lookAt(model.position);
         this.camera.fov = T.MathUtils.damp(
           this.camera.fov,
-          50 + p.airspeed * 0.065,
+          50 + Math.min(8, p.airspeed * 0.065),
           2,
           dt,
         );
@@ -895,6 +969,7 @@ export class PocketFlight {
           },
           dt,
         );
+      this.updateJet(dt);
       if (this.mode === "playing") this.recordReplay();
     }
     this.aircraft.gear.rotation.z =
@@ -971,7 +1046,9 @@ export class PocketFlight {
     if (this.mission.id === "free") return "The islands are yours. Go explore.";
     if (!this.airborne)
       return this.physics.airspeed < 23
-        ? "Throttle up. Pull back at 45 knots."
+        ? this.physics.jet
+          ? "Throttle up. Pull back at 65 knots."
+          : "Throttle up. Pull back at 45 knots."
         : "Gently pull back to lift off.";
     if (this.ringIndex < this.mission.rings.length)
       return `Fly through checkpoint ${this.ringIndex + 1} of ${this.mission.rings.length}`;
@@ -1029,7 +1106,9 @@ export class PocketFlight {
       totalRings: this.mission.rings.length,
       objective: this.objective(),
       hint: p.engineOut
-        ? "Engine out · maintain 55–65 knots"
+        ? p.jet
+          ? "Engine out · maintain 75–90 knots"
+          : "Engine out · maintain 55–65 knots"
         : p.stall
           ? "STALL · Lower the nose and add power"
           : p.grounded

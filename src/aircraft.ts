@@ -1,5 +1,9 @@
 import * as T from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { JetEffects } from "./jet-effects";
+export type AircraftId = "finch" | "peregrine";
+export const JET_SCALE = 0.7;
+export const JET_CENTER = 2.3;
 import { controlSurfaces } from "./control-surfaces";
 import { propellerAnimation } from "./propeller";
 export const paints = [
@@ -45,8 +49,13 @@ export function disposeAircraft(root: T.Object3D, disposeTextures = true) {
   const materials = new Set<T.Material>();
   const textures = new Set<T.Texture>();
   root.traverse((object) => {
-    if (!(object instanceof T.Mesh)) return;
-    object.geometry.dispose();
+    if (!(
+      object instanceof T.Mesh ||
+      object instanceof T.Points ||
+      object instanceof T.Sprite
+    ))
+      return;
+    if (!(object instanceof T.Sprite)) object.geometry.dispose();
     for (const m of Array.isArray(object.material)
       ? object.material
       : [object.material])
@@ -59,7 +68,7 @@ export function disposeAircraft(root: T.Object3D, disposeTextures = true) {
   }
   if (disposeTextures) textures.forEach((texture) => texture.dispose());
 }
-export function makeAircraft(paintIndex = 0) {
+export function makeAircraft(paintIndex = 0, id: AircraftId = "finch") {
   const group = new T.Group();
   group.name = "PocketFlight_Finch_U2";
   let selectedPaint = paintIndex;
@@ -69,6 +78,9 @@ export function makeAircraft(paintIndex = 0) {
   const controls = new Map<string, T.Object3D>();
   const model = {
     group,
+    id,
+    effects: null as JetEffects | null,
+    cameraScale: id === "peregrine" ? 1.4 : 1,
     wings: [new T.Group(), new T.Group()] as T.Object3D[],
     gear: new T.Group() as T.Object3D,
     propeller: new T.Group() as T.Object3D,
@@ -82,6 +94,10 @@ export function makeAircraft(paintIndex = 0) {
     },
     setSuspension(meters: number) {
       const travel = T.MathUtils.clamp(meters, 0, 0.16);
+      if (model.effects) {
+        model.effects.setSuspension(travel / JET_SCALE);
+        return;
+      }
       for (const name of [
         "Suspension_Main_Left",
         "Suspension_Main_Right",
@@ -101,55 +117,78 @@ export function makeAircraft(paintIndex = 0) {
       disposeAircraft(group);
     },
   };
-  model.ready = new GLTFLoader().loadAsync(AIRCRAFT_URL).then((gltf) => {
-    if (disposed) {
-      disposeAircraft(gltf.scene);
-      return;
-    }
-    prepareAircraftMaterials(gltf.scene);
-    group.add(gltf.scene);
-    const part = (name: string) => {
-      const node = gltf.scene.getObjectByName(name);
-      if (!node) throw new Error(`The Finch aircraft is missing ${name}.`);
-      return node;
-    };
-    model.wings = [part("Wing_Left"), part("Wing_Right")];
-    model.gear = part("LandingGear");
-    model.propeller = part("Propeller");
-    model.propellerMotion.bind(model.propeller);
-    for (const name of [
-      "Aileron_Left",
-      "Aileron_Right",
-      "Flap_Left",
-      "Flap_Right",
-      "Elevator",
-      "Rudder",
-      "Wheel_Main_Left",
-      "Wheel_Main_Right",
-      "Wheel_Front",
-      "Front_Wheel_Steering",
-      "Suspension_Main_Left",
-      "Suspension_Main_Right",
-      "Suspension_Nose",
-    ])
-      model.controls.set(name, part(name));
-    gltf.scene.traverse((object) => {
-      if (!(object instanceof T.Mesh)) return;
-      for (const material of Array.isArray(object.material)
-        ? object.material
-        : [object.material]) {
-        if (
-          material instanceof T.MeshStandardMaterial &&
-          material.name.startsWith("Livery • coastal")
-        )
-          livery.add(material);
+  model.ready = new GLTFLoader()
+    .loadAsync(id === "peregrine" ? "/assets/peregrine-hx27.glb" : AIRCRAFT_URL)
+    .then((gltf) => {
+      if (disposed) {
+        disposeAircraft(gltf.scene);
+        return;
       }
+      prepareAircraftMaterials(gltf.scene);
+      group.add(gltf.scene);
+      const part = (name: string) => {
+        const node = gltf.scene.getObjectByName(name);
+        if (!node) throw new Error(`The Finch aircraft is missing ${name}.`);
+        return node;
+      };
+      model.wings = [part("Wing_Left"), part("Wing_Right")];
+      model.gear = part("LandingGear");
+      if (id === "peregrine") {
+        gltf.scene.scale.setScalar(JET_SCALE);
+        gltf.scene.position.y = -JET_CENTER * JET_SCALE;
+        gltf.scene.traverse((node) => {
+          if (node instanceof T.Mesh) {
+            for (const material of Array.isArray(node.material)
+              ? node.material
+              : [node.material]) {
+              if (
+                material instanceof T.MeshStandardMaterial &&
+                material.name.startsWith("Glass")
+              ) {
+                material.side = T.FrontSide;
+                material.opacity = 0.22;
+              }
+            }
+          }
+        });
+        model.effects = new JetEffects(gltf.scene);
+        return;
+      }
+      model.propeller = part("Propeller");
+      model.propellerMotion.bind(model.propeller);
+      for (const name of [
+        "Aileron_Left",
+        "Aileron_Right",
+        "Flap_Left",
+        "Flap_Right",
+        "Elevator",
+        "Rudder",
+        "Wheel_Main_Left",
+        "Wheel_Main_Right",
+        "Wheel_Front",
+        "Front_Wheel_Steering",
+        "Suspension_Main_Left",
+        "Suspension_Main_Right",
+        "Suspension_Nose",
+      ])
+        model.controls.set(name, part(name));
+      gltf.scene.traverse((object) => {
+        if (!(object instanceof T.Mesh)) return;
+        for (const material of Array.isArray(object.material)
+          ? object.material
+          : [object.material]) {
+          if (
+            material instanceof T.MeshStandardMaterial &&
+            material.name.startsWith("Livery • coastal")
+          )
+            livery.add(material);
+        }
+      });
+      for (const [name, node] of model.controls)
+        restPositions.set(name, node.position.clone());
+      model.surfaces.apply(model.surfaces.snapshot());
+      model.setPaint(selectedPaint);
     });
-    for (const [name, node] of model.controls)
-      restPositions.set(name, node.position.clone());
-    model.surfaces.apply(model.surfaces.snapshot());
-    model.setPaint(selectedPaint);
-  });
   return model;
 }
 export type AircraftModel = ReturnType<typeof makeAircraft>;

@@ -1,16 +1,18 @@
 export class FlightAudio {
   private context: AudioContext | null = null;
   private oscillator: OscillatorNode | null = null;
+  private engineFilter: BiquadFilterNode | null = null;
   private gain: GainNode | null = null;
   private windGain: GainNode | null = null;
   private capture: MediaStreamAudioDestinationNode | null = null;
   enabled = false;
+  jet = false;
   start() {
     if (!this.context) {
       const ctx = (this.context = new AudioContext());
       const osc = (this.oscillator = ctx.createOscillator());
       osc.type = "sawtooth";
-      const filter = ctx.createBiquadFilter();
+      const filter = (this.engineFilter = ctx.createBiquadFilter());
       filter.type = "lowpass";
       filter.frequency.value = 280;
       const gain = (this.gain = ctx.createGain());
@@ -59,8 +61,14 @@ export class FlightAudio {
     if (!this.context || !this.gain || !this.oscillator || !this.windGain)
       return;
     const t = this.context.currentTime;
+    this.oscillator.type = this.jet ? "sine" : "sawtooth";
+    this.engineFilter?.frequency.setTargetAtTime(
+      this.jet ? 1600 : 280,
+      t,
+      0.15,
+    );
     this.oscillator.frequency.setTargetAtTime(
-      24 + throttle * 49 + speed * 0.2,
+      this.jet ? 100 + throttle * 480 : 24 + throttle * 49 + speed * 0.2,
       t,
       0.15,
     );
@@ -70,7 +78,11 @@ export class FlightAudio {
       0.1,
     );
     this.windGain.gain.setTargetAtTime(
-      this.enabled && active ? Math.min(0.09, speed * 0.0012) : 0,
+      this.enabled && active
+        ? this.jet
+          ? 0.04 + throttle * 0.15
+          : Math.min(0.09, speed * 0.0012)
+        : 0,
       t,
       0.1,
     );

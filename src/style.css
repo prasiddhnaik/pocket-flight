@@ -2327,3 +2327,29 @@ kbd {
   .replay-progress { flex-basis: 100%; }
   .is-replaying .replay-bar button, .is-replaying .replay-bar a { font-size: 11px; }
 }
+
+.aircraft-picker {
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid #aab9af;
+  padding: 4px 24px 4px 0;
+  max-width: 100%;
+  cursor: pointer;
+}
+.aircraft-picker:focus-visible {
+  outline: 2px solid #327c79;
+  outline-offset: 4px;
+}
+.jet-flight-note {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  color: #6b837b;
+  font-size: 12px;
+}
+.jet-flight-note b {
+  color: #25464b;
+  font-size: 15px;
+}

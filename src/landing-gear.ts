@@ -52,3 +52,16 @@ export const peregrineWheels = [
     minor: 0.62 * 0.27 * 0.7,
   })),
 ];
+
+export const aureliaWheels = [
+  ...[-0.2, 0.2].map((x) => ({
+    center: new Vector3(x * 0.55, (0.37 - 2.3) * 0.55, -10.65 * 0.55),
+    major: 0.37 * 0.73 * 0.55,
+    minor: 0.37 * 0.27 * 0.55,
+  })),
+  ...[-2.42, -1.88, 1.88, 2.42].map((x) => ({
+    center: new Vector3(x * 0.55, (0.51 - 2.3) * 0.55, 1.1 * 0.55),
+    major: 0.51 * 0.73 * 0.55,
+    minor: 0.51 * 0.27 * 0.55,
+  })),
+];

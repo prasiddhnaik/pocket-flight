@@ -3,6 +3,7 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import "./civilian.css";
+import { Actuator, controlCheck } from "./aurelia-motion";
 const renderer = new T.WebGLRenderer({
   antialias: true,
   preserveDrawingBuffer: true,
@@ -76,6 +77,8 @@ const views = {
 type View = keyof typeof views;
 let current: View = "beauty",
   model: T.Group | undefined;
+let cameraMove: { position: T.Vector3; target: T.Vector3 } | undefined;
+let initialized = false;
 function showView(view: View) {
   current = view;
   const v = views[view],
@@ -84,9 +87,9 @@ function showView(view: View) {
   const detail = view === "cockpit" || view === "engine";
   if (innerWidth < 700 && !detail)
     pos.sub(target).multiplyScalar(2.0).add(target);
-  camera.position.copy(pos);
-  orbit.target.copy(target);
-  orbit.update();
+  if (!initialized || matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    camera.position.copy(pos); orbit.target.copy(target); orbit.update(); initialized = true;
+  } else cameraMove = { position: pos, target };
   document.body.classList.toggle("detail", detail);
   document
     .querySelectorAll<HTMLButtonElement>("[data-view]")
@@ -103,19 +106,25 @@ document.querySelector<HTMLButtonElement>("#orbit")!.onclick = () => {
     .querySelector("#orbit")!
     .setAttribute("aria-pressed", String(orbit.autoRotate));
 };
-document.querySelector<HTMLInputElement>("#surfaces")!.oninput = (e) => {
-  const value = Number((e.target as HTMLInputElement).value) / 100;
-  for (const [name, axis, angle] of [
-    ["Aileron_Left", "x", 0.35],
-    ["Aileron_Right", "x", -0.35],
-    ["Elevator_Left", "x", -0.35],
-    ["Elevator_Right", "x", -0.35],
-    ["Rudder", "y", 0.35],
-  ] as const) {
-    const o = model?.getObjectByName(name);
-    if (o) o.rotation[axis] = value * angle;
-  }
+const actuator = new Actuator(), flapActuator = new Actuator(), engine = new Actuator();
+let controlTarget = 0, demo = false, demoTime = 0, engineOn = false;
+const surfaceInput = document.querySelector<HTMLInputElement>("#surfaces")!;
+surfaceInput.oninput = () => {
+  demo = false; updateDemoButton(); controlTarget = Number(surfaceInput.value) / 100;
 };
+function updateDemoButton() {
+  document.querySelector("#motion-demo")!.setAttribute("aria-pressed", String(demo));
+  document.querySelector("#motion-demo")!.textContent = demo ? "Pause control check" : "▶ Smooth control check";
+}
+document.querySelector<HTMLButtonElement>("#motion-demo")!.onclick = () => {
+  demo = !demo; updateDemoButton();
+};
+document.querySelector<HTMLButtonElement>("#engine-demo")!.onclick = () => {
+  engineOn = !engineOn;
+  document.querySelector("#engine-demo")!.setAttribute("aria-pressed", String(engineOn));
+  document.querySelector("#engine-demo")!.textContent = engineOn ? "Stop fans" : "Start fans";
+};
+orbit.addEventListener("start", () => { cameraMove = undefined; });
 document.querySelector<HTMLButtonElement>("#photo")!.onclick = () => {
   renderer.render(scene, camera);
   const a = document.createElement("a");
@@ -167,10 +176,35 @@ addEventListener("resize", () => {
   camera.updateProjectionMatrix();
   showView(current);
 });
+document.addEventListener("visibilitychange", () => { last = performance.now(); });
 let last = performance.now();
 function tick(now: number) {
   requestAnimationFrame(tick);
-  orbit.update(Math.min(0.05, (now - last) / 1000));
+  const dt = Math.min(0.05, (now - last) / 1000);
+  if (demo) { demoTime += dt; controlTarget = controlCheck(demoTime); surfaceInput.value = String(controlTarget * 100); }
+  const deflection = actuator.step(controlTarget, dt);
+  const flap = flapActuator.step(Math.max(0, controlTarget), dt, 3);
+  for (const [name, axis, value] of [
+    ["Aileron_Left", "x", deflection * .35], ["Aileron_Right", "x", -deflection * .35],
+    ["Elevator_Left", "x", -deflection * .35], ["Elevator_Right", "x", -deflection * .35],
+    ["Rudder", "y", deflection * .35],
+    ["Flap_Left", "x", -flap * .5], ["Flap_Right", "x", -flap * .5],
+  ] as const) {
+    const part = model?.getObjectByName(name);
+    if (part) part.rotation[axis] = value;
+  }
+  const fanSpeed = engine.step(engineOn ? 15 : 0, dt, 1.2);
+  for (const name of ["Fan_Left", "Fan_Right"]) {
+    const fan = model?.getObjectByName(name);
+    if (fan) fan.rotation.z = (fan.rotation.z + fanSpeed * dt) % (Math.PI * 2);
+  }
+  if (cameraMove) {
+    const blend = 1 - Math.exp(-5 * dt);
+    camera.position.lerp(cameraMove.position, blend);
+    orbit.target.lerp(cameraMove.target, blend);
+    if (camera.position.distanceTo(cameraMove.position) < .005) cameraMove = undefined;
+  }
+  orbit.update(dt);
   last = now;
   renderer.render(scene, camera);
 }

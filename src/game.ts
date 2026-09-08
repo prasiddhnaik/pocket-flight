@@ -129,7 +129,7 @@ export class PocketFlight {
   ) {
     this.aircraft = makeAircraft(0, aircraftId);
     this.physics.aircraftId = aircraftId;
-    this.audio.jet = aircraftId === "peregrine";
+    this.audio.jet = aircraftId !== "finch";
     this.renderer = new T.WebGLRenderer({
       antialias: true,
       logarithmicDepthBuffer: true,
@@ -291,7 +291,7 @@ export class PocketFlight {
     this.aircraft = next;
     this.scene.add(next.group);
     this.physics.aircraftId = id;
-    this.audio.jet = id === "peregrine";
+    this.audio.jet = id !== "finch";
   }
   private updateJet(dt: number) {
     const effects = this.aircraft.effects;
@@ -374,7 +374,9 @@ export class PocketFlight {
       mission.airStart
         ? "You have the controls. Enjoy the view."
         : this.physics.jet
-          ? "Hold Shift for thrust. Pull back with ↓ at 65 knots. Full power lights the afterburners."
+          ? this.aircraft.id === "aurelia"
+            ? "Hold Shift for thrust. Pull back with ↓ at 65 knots. Landing gear operates automatically."
+            : "Hold Shift for thrust. Pull back with ↓ at 65 knots. Full power lights the afterburners."
           : "Hold Shift to add throttle. Pull back with ↓ at 45 knots.",
     );
     this.emit();
@@ -866,9 +868,11 @@ export class PocketFlight {
         this.camera.position
           .copy(p.position)
           .add(
-            (this.physics.jet
-              ? new T.Vector3(0, 1.855, -6.68)
-              : new T.Vector3(-0.3, 1.01, 0.1)
+            (this.aircraft.id === "aurelia"
+              ? new T.Vector3(0, 1.265, -5.83)
+              : this.physics.jet
+                ? new T.Vector3(0, 1.855, -6.68)
+                : new T.Vector3(-0.3, 1.01, 0.1)
             ).applyQuaternion(p.quaternion),
           );
         this.camera.quaternion.copy(p.quaternion);

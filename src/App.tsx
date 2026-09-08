@@ -233,9 +233,11 @@ export default function App() {
       return Number.isInteger(n) && n >= 0 && n < paints.length ? n : 0;
     }),
     [aircraftId, setAircraftId] = useState<AircraftId>(() =>
-      read<string>("pocket-flight-aircraft", "finch") === "peregrine"
-        ? "peregrine"
-        : "finch",
+      read<string>("pocket-flight-aircraft", "finch") === "aurelia"
+        ? "aurelia"
+        : read<string>("pocket-flight-aircraft", "finch") === "peregrine"
+          ? "peregrine"
+          : "finch",
     ),
     [switchingAircraft, setSwitchingAircraft] = useState(false),
     [night, setNight] = useState(false),
@@ -573,11 +575,18 @@ export default function App() {
                   >
                     <option value="finch">The Finch · U–2</option>
                     <option value="peregrine">Peregrine · HX–27</option>
+                    <option value="aurelia">Aurelia · S32</option>
                   </select>
                 </h3>
                 <p>
                   <a
-                    href={aircraftId === "peregrine" ? "/jet" : "/hangar.html"}
+                    href={
+                      aircraftId === "aurelia"
+                        ? "/civilian.html"
+                        : aircraftId === "peregrine"
+                          ? "/jet"
+                          : "/hangar.html"
+                    }
                     style={{ color: "inherit", textUnderlineOffset: 3 }}
                   >
                     Explore the aircraft ↗
@@ -610,7 +619,11 @@ export default function App() {
                       ? "Loading aircraft…"
                       : "Twin-engine jet"}
                   </b>
-                  <span>Full throttle · Afterburners</span>
+                  <span>
+                    {aircraftId === "aurelia"
+                      ? "Civilian jet · Animated systems"
+                      : "Full throttle · Afterburners"}
+                  </span>
                   <span>Automatic landing gear</span>
                 </div>
               )}

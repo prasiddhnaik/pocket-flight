@@ -1,7 +1,8 @@
 import * as T from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { AureliaEffects } from "./aurelia-effects";
 import { JetEffects } from "./jet-effects";
-export type AircraftId = "finch" | "peregrine";
+export type AircraftId = "finch" | "peregrine" | "aurelia";
 export const JET_SCALE = 0.7;
 export const JET_CENTER = 2.3;
 import { controlSurfaces } from "./control-surfaces";
@@ -79,8 +80,8 @@ export function makeAircraft(paintIndex = 0, id: AircraftId = "finch") {
   const model = {
     group,
     id,
-    effects: null as JetEffects | null,
-    cameraScale: id === "peregrine" ? 1.4 : 1,
+    effects: null as JetEffects | AureliaEffects | null,
+    cameraScale: id === "aurelia" ? 1.8 : id === "peregrine" ? 1.4 : 1,
     wings: [new T.Group(), new T.Group()] as T.Object3D[],
     gear: new T.Group() as T.Object3D,
     propeller: new T.Group() as T.Object3D,
@@ -95,7 +96,9 @@ export function makeAircraft(paintIndex = 0, id: AircraftId = "finch") {
     setSuspension(meters: number) {
       const travel = T.MathUtils.clamp(meters, 0, 0.16);
       if (model.effects) {
-        model.effects.setSuspension(travel / JET_SCALE);
+        model.effects.setSuspension(
+          travel / (id === "aurelia" ? 0.55 : JET_SCALE),
+        );
         return;
       }
       for (const name of [
@@ -118,7 +121,13 @@ export function makeAircraft(paintIndex = 0, id: AircraftId = "finch") {
     },
   };
   model.ready = new GLTFLoader()
-    .loadAsync(id === "peregrine" ? "/assets/peregrine-hx27.glb" : AIRCRAFT_URL)
+    .loadAsync(
+      id === "aurelia"
+        ? "/assets/aurelia-flight.glb"
+        : id === "peregrine"
+          ? "/assets/peregrine-hx27.glb"
+          : AIRCRAFT_URL,
+    )
     .then((gltf) => {
       if (disposed) {
         disposeAircraft(gltf.scene);
@@ -133,6 +142,12 @@ export function makeAircraft(paintIndex = 0, id: AircraftId = "finch") {
       };
       model.wings = [part("Wing_Left"), part("Wing_Right")];
       model.gear = part("LandingGear");
+      if (id === "aurelia") {
+        gltf.scene.scale.setScalar(0.55);
+        gltf.scene.position.y = -2.3 * 0.55;
+        model.effects = new AureliaEffects(gltf.scene, gltf.animations);
+        return;
+      }
       if (id === "peregrine") {
         gltf.scene.scale.setScalar(JET_SCALE);
         gltf.scene.position.y = -JET_CENTER * JET_SCALE;

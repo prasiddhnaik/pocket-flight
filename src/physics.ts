@@ -4,6 +4,7 @@ import type { Obstacle } from "./world";
 import type { AircraftId } from "./aircraft";
 import {
   peregrineWheels,
+  aureliaWheels,
   finchWheels,
   gearContactHeight,
 } from "./landing-gear";
@@ -30,14 +31,18 @@ export type FlightEvent = {
 export class FlightPhysics {
   aircraftId: AircraftId = "finch";
   get jet() {
-    return this.aircraftId === "peregrine";
+    return this.aircraftId !== "finch";
   }
   private contactHeight() {
     return gearContactHeight(
       this.position,
       this.quaternion,
       this.damage.gear,
-      this.jet ? peregrineWheels : finchWheels,
+      this.aircraftId === "aurelia"
+        ? aureliaWheels
+        : this.jet
+          ? peregrineWheels
+          : finchWheels,
     );
   }
   position = new Vector3();

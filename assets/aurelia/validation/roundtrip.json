@@ -1,0 +1,44 @@
+{
+  "status": "passed",
+  "meshes": 197,
+  "vertices": 160725,
+  "wheel_count": 6,
+  "tire_lowest_z_m": {
+    "Main_wheel_Left_0.27": -0.0013901116326451302,
+    "Main_wheel_Left_-0.27": -0.0013901116326451302,
+    "Main_wheel_Right_0.27": -0.0013901116326451302,
+    "Main_wheel_Right_-0.27": -0.0013901116326451302,
+    "Nose_wheel_1": -0.0029300572350621223,
+    "Nose_wheel_-1": -0.0029300572350621223
+  },
+  "rudder_bounds_m": [
+    [
+      -0.11393687129020691,
+      -14.800000190734863,
+      4.050000190734863
+    ],
+    [
+      0.23314791917800903,
+      -12.979000091552734,
+      9.550000190734863
+    ]
+  ],
+  "intake_axis_clearance_m": [
+    0.8200002312660217,
+    0.8200002312660217
+  ],
+  "mirrored_wings": true,
+  "cabin_windows": 16,
+  "separate_moving_parts": [
+    "Aileron_Left",
+    "Aileron_Right",
+    "Flap_Left",
+    "Flap_Right",
+    "Elevator_Left",
+    "Elevator_Right",
+    "Rudder",
+    "Fan_Left",
+    "Fan_Right",
+    "Nose_steering"
+  ]
+}

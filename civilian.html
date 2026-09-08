@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#e8ece8" />
+    <title>Aurelia S32 · Pocket Flight Atelier</title>
+    <link rel="icon" href="/favicon.svg" />
+  </head>
+  <body>
+    <div id="aircraft-view" aria-label="Interactive Aurelia S32 aircraft"></div>
+    <header>
+      <a href="/">↖ POCKET FLIGHT</a><span>AIRCRAFT ATELIER / 003</span
+      ><a href="/assets/aurelia-s32.glb" download>DOWNLOAD 3D MODEL ↗</a>
+    </header>
+    <section class="identity">
+      <p class="eyebrow">THE WIDE-CABIN EXECUTIVE</p>
+      <h1>Aurelia<span>S32</span></h1>
+      <p>Presence, with pace.<br />Space, without compromise.</p>
+    </section>
+    <aside>
+      <span class="eyebrow">AN ORIGINAL CIVILIAN DESIGN</span>
+      <p>Pearl ceramic. Atlantic blue.<br />A touch of champagne.</p>
+      <dl>
+        <div>
+          <dt>Length</dt>
+          <dd>31.5 m</dd>
+        </div>
+        <div>
+          <dt>Wingspan</dt>
+          <dd>27.2 m</dd>
+        </div>
+        <div>
+          <dt>Cabin</dt>
+          <dd>12 guests</dd>
+        </div>
+      </dl>
+      <a href="/aurelia-inspection.html">360° photo inspection ↗</a>
+    </aside>
+    <p id="loading" role="status">Preparing Aurelia…</p>
+    <footer>
+      <nav aria-label="Inspection angles">
+        <button data-view="beauty" aria-pressed="true">Overview</button
+        ><button data-view="front">Front</button
+        ><button data-view="back">Back</button
+        ><button data-view="left">Left</button
+        ><button data-view="right">Right</button
+        ><button data-view="top">Top</button
+        ><button data-view="cockpit">Flight deck</button
+        ><button data-view="engine">Engines</button>
+      </nav>
+      <div class="tools">
+        <button id="orbit" aria-pressed="false">↻ 360° turntable</button
+        ><label
+          >Control surfaces
+          <input
+            id="surfaces"
+            type="range"
+            min="-100"
+            max="100"
+            value="0"
+            aria-label="Control surface deflection" /></label
+        ><button id="photo">↓ Take photo</button>
+      </div>
+      <small
+        >DRAG TO ORBIT · SCROLL TO EXPLORE
+        <span>ORIGINAL DESIGN STUDY · EDITABLE 3D AIRCRAFT</span></small
+      >
+    </footer>
+    <script type="module" src="/src/civilian.ts"></script>
+  </body>
+</html>

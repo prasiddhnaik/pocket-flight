@@ -232,13 +232,11 @@ export default function App() {
       const n = read("pocket-flight-paint", 0);
       return Number.isInteger(n) && n >= 0 && n < paints.length ? n : 0;
     }),
-    [aircraftId, setAircraftId] = useState<AircraftId>(() =>
-      read<string>("pocket-flight-aircraft", "finch") === "aurelia"
-        ? "aurelia"
-        : read<string>("pocket-flight-aircraft", "finch") === "peregrine"
-          ? "peregrine"
-          : "finch",
-    ),
+    [aircraftId, setAircraftId] = useState<AircraftId>(() => {
+      const id = new URLSearchParams(location.search).get("aircraft") ??
+        read<string>("pocket-flight-aircraft", "finch");
+      return ["finch", "peregrine", "aurelia", "stormbird"].includes(id) ? id as AircraftId : "finch";
+    }),
     [switchingAircraft, setSwitchingAircraft] = useState(false),
     [night, setNight] = useState(false),
     [sound, setSound] = useState(false),
@@ -576,12 +574,15 @@ export default function App() {
                     <option value="finch">The Finch · U–2</option>
                     <option value="peregrine">Peregrine · HX–27</option>
                     <option value="aurelia">Aurelia · S32</option>
+                    <option value="stormbird">Stormbird · HX–40</option>
                   </select>
                 </h3>
                 <p>
                   <a
                     href={
-                      aircraftId === "aurelia"
+                      aircraftId === "stormbird"
+                        ? "/stormbird.html"
+                        : aircraftId === "aurelia"
                         ? "/civilian.html"
                         : aircraftId === "peregrine"
                           ? "/jet"
@@ -620,7 +621,9 @@ export default function App() {
                       : "Twin-engine jet"}
                   </b>
                   <span>
-                    {aircraftId === "aurelia"
+                    {aircraftId === "stormbird"
+                      ? "Stormbird jet · Animated gear · Afterburners"
+                      : aircraftId === "aurelia"
                       ? "Civilian jet · Animated systems"
                       : "Full throttle · Afterburners"}
                   </span>

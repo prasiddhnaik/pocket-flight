@@ -2,6 +2,10 @@ import { Vector3, Quaternion, Euler, MathUtils } from "three";
 import { groundAt, runways, terrainHeight } from "./terrain";
 import type { Obstacle } from "./world";
 import type { AircraftId } from "./aircraft";
+import { flightProfiles } from "./flight-profiles";
+import { stormbirdContact } from "./stormbird-contact";
+import stormbirdGeometry from "./stormbird-geometry.json";
+import { STORMBIRD_GEAR_SECONDS } from "./stormbird-kinematics";
 import {
   peregrineWheels,
   aureliaWheels,
@@ -33,7 +37,11 @@ export class FlightPhysics {
   get jet() {
     return this.aircraftId !== "finch";
   }
+  get profile() {
+    return flightProfiles[this.aircraftId];
+  }
   private contactHeight() {
+    if (this.aircraftId === "stormbird") return this.stormbirdContact().height;
     return gearContactHeight(
       this.position,
       this.quaternion,
@@ -45,6 +53,24 @@ export class FlightPhysics {
           : finchWheels,
     );
   }
+  private stormbirdContact() {
+    return stormbirdContact(
+      this.position,
+      this.quaternion,
+      this.gearPosition,
+      this.suspension,
+      this.gearSteering,
+    );
+  }
+  get gearCommand() {
+    return (
+      this.grounded ||
+      this.position.y - terrainHeight(this.position.x, this.position.z) < 35 ||
+      this.airspeed < this.profile.gearSpeed
+    );
+  }
+  gearPosition = 1;
+  gearSteering = 0;
   position = new Vector3();
   velocity = new Vector3();
   quaternion = new Quaternion();
@@ -101,6 +127,8 @@ export class FlightPhysics {
     this.events = [];
     this.engineOut = false;
     this.suspension = 0;
+    this.gearPosition = airStart ? 0 : 1;
+    this.gearSteering = 0;
     this.updateQuaternion();
     if (!airStart) this.position.y = this.contactHeight();
   }
@@ -122,6 +150,7 @@ export class FlightPhysics {
   }
   impact(severity: number, part: keyof Damage = "gear") {
     if (this.lastImpact > 0.15 || this.crashed) return;
+    if (part === "gear" && severity < 0.85) severity *= this.profile.gearDamage;
     this.damage[part] = MathUtils.clamp(this.damage[part] + severity, 0, 1);
     this.lastImpact = 0.7;
     if (part === "gear") {
@@ -162,6 +191,14 @@ export class FlightPhysics {
     const air = this.velocity.clone().sub(this.wind);
     const speed = air.length();
     this.airspeed = speed;
+    if (this.aircraftId === "stormbird") {
+      this.gearPosition += MathUtils.clamp(
+        (this.gearCommand ? 1 : 0) - this.gearPosition,
+        -dt / STORMBIRD_GEAR_SECONDS,
+        dt / STORMBIRD_GEAR_SECONDS,
+      );
+      this.gearSteering = MathUtils.damp(this.gearSteering, input.yaw, 7, dt);
+    }
     this.verticalSpeed = this.velocity.y;
     if (this.crashed) {
       this.velocity.y -= 9.81 * dt;
@@ -177,9 +214,9 @@ export class FlightPhysics {
       return;
     }
     const authority =
-      MathUtils.clamp(speed / (this.jet ? 36 : 24), 0.25, 1.2) *
+      MathUtils.clamp(speed / this.profile.controlSpeed, 0.25, 1.2) *
       (1 - this.damage.wing * 0.55);
-    const pitchTarget = input.pitch * 0.5 * authority;
+    const pitchTarget = input.pitch * this.profile.pitchRate * authority;
     this.pitchRate = MathUtils.damp(this.pitchRate, pitchTarget, 5, dt);
     this.pitch += this.pitchRate * dt;
     if (!input.pitch && !this.grounded)
@@ -192,7 +229,7 @@ export class FlightPhysics {
     this.pitch = MathUtils.clamp(this.pitch, -0.85, 1.05);
     this.rollRate = MathUtils.damp(
       this.rollRate,
-      -input.roll * 1.2 * authority,
+      -input.roll * this.profile.rollRate * authority,
       4.5,
       dt,
     );
@@ -204,7 +241,13 @@ export class FlightPhysics {
       this.roll = MathUtils.damp(this.roll, 0, 9, dt);
       this.yaw -=
         (input.yaw * 0.6 + input.roll * 0.37) * dt * Math.min(1, speed / 8);
-      this.pitch = MathUtils.clamp(this.pitch, -0.025, 0.23);
+      this.pitch = MathUtils.clamp(
+        this.pitch,
+        -0.025,
+        this.aircraftId === "stormbird"
+          ? stormbirdGeometry.groundPitchLimit
+          : 0.23,
+      );
     } else {
       this.yaw +=
         ((Math.tan(this.roll) * 9.81) / Math.max(speed, 19) -
@@ -220,31 +263,37 @@ export class FlightPhysics {
     const pathAngle = Math.asin(MathUtils.clamp(dir.y, -1, 1));
     const aoa = this.pitch - pathAngle;
     this.stall =
-      !this.grounded && (speed < (this.jet ? 25 : 17) || Math.abs(aoa) > 0.36);
+      !this.grounded &&
+      (speed < this.profile.stallSpeed || Math.abs(aoa) > 0.36);
     const stalledFactor =
       Math.abs(aoa) > 0.32
         ? Math.max(0.16, 1 - (Math.abs(aoa) - 0.32) * 2.4)
         : 1;
-    const liftScale = this.jet ? 0.0125 : 0.027;
-    const trim = 9.81 / (liftScale * Math.max(this.jet ? 38 : 27, speed) ** 2);
+    const liftScale = this.profile.lift;
+    const trim =
+      9.81 / (liftScale * Math.max(this.profile.trimSpeed, speed) ** 2);
     const cl = MathUtils.clamp(trim + aoa * 3.7, -0.75, 1.65) * stalledFactor;
     const lift = liftScale * speed * speed * cl * (1 - this.damage.wing * 0.62);
     const drag =
-      ((this.jet ? 0.0008 : 0.0016) +
+      (this.profile.drag +
         0.0005 * cl * cl +
         this.damage.gear * 0.002 +
         this.damage.wing * 0.004 +
+        // Arcade acceleration coefficient; no measured drag polar is claimed.
+        (this.aircraftId === "stormbird" ? this.gearPosition * 0.00035 : 0) +
         (this.stall ? 0.007 : 0)) *
       speed *
       speed;
     const engine = this.engineOut
       ? 0
       : this.throttle *
-        (this.jet ? 11 : 8.5) *
+        this.profile.thrust *
         (this.jet
-          ? (1 + MathUtils.smoothstep(this.throttle, 0.88, 1) * 0.3) *
-            (1 - Math.min(0.6, speed / 170))
-          : 1 - Math.min(0.65, speed / 95)) *
+          ? (1 +
+              MathUtils.smoothstep(this.throttle, 0.88, 1) *
+                this.profile.afterburner) *
+            (1 - Math.min(0.6, speed / this.profile.speedFalloff))
+          : 1 - Math.min(0.65, speed / this.profile.speedFalloff)) *
         (1 - this.damage.engine * 0.85) *
         (1 - this.damage.propeller * (this.jet ? 0 : 0.8));
     const liftDir = new Vector3().crossVectors(right, dir).normalize();
@@ -277,6 +326,7 @@ export class FlightPhysics {
     this.position.addScaledVector(this.velocity, dt);
     const next = groundAt(this.position.x, this.position.z);
     const bottom = this.contactHeight();
+    const touchedGround = this.position.y <= bottom;
     if (this.position.y <= bottom) {
       const slopeX =
         (terrainHeight(this.position.x + 2, this.position.z) -
@@ -296,6 +346,11 @@ export class FlightPhysics {
       if (!next.runway && !next.water && closingSpeed > 9 && speed > 15)
         this.impact(Math.min(1.3, closingSpeed / 15), "wing");
       if (wasAirborne && this.airborneTime > 1.2) {
+        if (this.aircraftId === "stormbird") {
+          const contact = this.stormbirdContact();
+          if (!contact.downlocked || !contact.wheelSupported)
+            this.impact(1.1, "gear");
+        }
         const bank = Math.abs(this.roll),
           rough = next.runway ? 0 : 0.15;
         const severity = Math.max(0, (sink - 2.7) / 9) + bank * 0.6 + rough;
@@ -354,6 +409,8 @@ export class FlightPhysics {
       }
     }
     this.suspension = MathUtils.damp(this.suspension, 0, 7, dt);
+    if (touchedGround && this.aircraftId === "stormbird")
+      this.position.y = this.contactHeight();
     this.distance += this.position.distanceTo(prev);
     if (this.position.y > 1800) {
       this.position.y = 1800;

@@ -1,0 +1,172 @@
+{
+  "name": "Stormbird HX-40",
+  "revision": "2026-10-01 handbook audit",
+  "mission": {
+    "role": "Fictional tandem-seat twin-engine jet for the existing island game",
+    "performanceStatus": "Arcade targets only; physical sizing incomplete",
+    "runwayRequirement_m": null,
+    "payload_kg": null,
+    "range_km": null
+  },
+  "frames": {
+    "cad": "millimetres: X right, Y forward, Z up; source dimensions in metres",
+    "game": "metres: X right, Y up, Z aft",
+    "meshToAircraftTranslation_m": [
+      0,
+      -2,
+      0
+    ],
+    "physicalCGDefined": false
+  },
+  "geometry": {
+    "nominalLength_m": 17.2,
+    "overallMeshLength_m": 17.589,
+    "span_m": 13.4,
+    "heightGroundDatum_m": 4.5057674818098805,
+    "wing": {
+      "mainWingStationsCAD": [
+        [
+          0.65,
+          1.95,
+          6.22,
+          2.03
+        ],
+        [
+          1.85,
+          1.3,
+          5.49,
+          2.03
+        ],
+        [
+          6.7,
+          -2.33,
+          1.36,
+          2.03
+        ]
+      ],
+      "exposedArea_m2": 47.2745,
+      "referenceArea_m2": 55.3605,
+      "span_m": 13.4,
+      "aspectRatio": 3.243467815500221,
+      "meanAerodynamicChord_m": 4.701017572697741,
+      "convention": "Main wing only; constant root chord across centerline strip; root fairings excluded.",
+      "section": "Custom 9 percent thickness section with 0.4 percent sinusoidal camber; no validated polar."
+    },
+    "mainWheelTrack_m": 3.97,
+    "wheelbase_m": 6.5,
+    "noseTires": "2 x 550 mm diameter, 130 mm width",
+    "mainTires": "2 x 740 mm diameter, 210 mm width"
+  },
+  "massProperties": {
+    "emptyMass_kg": null,
+    "fuelCapacity_kg": null,
+    "payloadCases": [],
+    "cg_m": null,
+    "inertia_kg_m2": null,
+    "status": "Required: component mass budget, loading cases, CG and inertia. Body offset is a scene datum only."
+  },
+  "aerodynamics": {
+    "CLalpha": null,
+    "CLmax": null,
+    "CDpolar": null,
+    "neutralPoint_m": null,
+    "staticMargin": null,
+    "trimCases": [],
+    "controlDerivatives": null,
+    "status": "Custom sections have no measured or computed polars; simulator lift and thrust values are tuning constants."
+  },
+  "propulsion": {
+    "layout": "Two continuous intake ducts and rear exhausts with reserved engine-core envelopes",
+    "ratedThrust_N": null,
+    "engineMass_kg": null,
+    "fuelFlow_kg_s": null,
+    "inletPressureRecovery": null,
+    "nozzleSchedule": null,
+    "status": "Engine internals, pressure recovery, thrust map and fuel consumption unanalysed."
+  },
+  "mechanisms": {
+    "gearTravelSeconds": 4.8,
+    "canopyTravelSeconds": 3.2,
+    "oleoTravel_m": 0.16,
+    "canopyOpen_degrees": 55,
+    "mainFold_degrees": -90,
+    "mainSwivel_degrees": [
+      -90,
+      90
+    ],
+    "groundEnvelopes": [
+      {
+        "compression_m": 0,
+        "pitch_contact_degrees": 11.8099,
+        "pitch_limiting_point": [
+          1.28,
+          1.28,
+          7.36
+        ],
+        "bank_contact_degrees": 22.9081,
+        "bank_limiting_point": [
+          -6.700000000000001,
+          1.9730780189782087,
+          2.6969120676870055
+        ]
+      },
+      {
+        "compression_m": 0.08,
+        "pitch_contact_degrees": 11.0865,
+        "pitch_limiting_point": [
+          1.28,
+          1.28,
+          7.36
+        ],
+        "bank_contact_degrees": 22.0699,
+        "bank_limiting_point": [
+          -6.700000000000001,
+          1.9730780189782087,
+          2.6969120676870055
+        ]
+      },
+      {
+        "compression_m": 0.16,
+        "pitch_contact_degrees": 10.3545,
+        "pitch_limiting_point": [
+          1.5907960688803526e-15,
+          1.2564348876548685,
+          7.234360806822243
+        ],
+        "bank_contact_degrees": 21.2217,
+        "bank_limiting_point": [
+          -6.700000000000001,
+          1.9730780189782087,
+          2.6969120676870055
+        ]
+      }
+    ],
+    "groundPitchLimit_degrees": 9.3545,
+    "groundContactStatus": "Geometry-derived neutral hull and rigid tire profiles; sampled terrain approximation."
+  },
+  "cockpit": {
+    "seats": 2,
+    "seatPanWidth_m": 0.5,
+    "seatRecline_degrees": 10,
+    "pilotEyeCAD_m": [
+      0,
+      5.28,
+      2.78
+    ],
+    "pilotEyeStatus": "Provisional camera datum; anthropometric occupant and reach analysis required."
+  },
+  "assists": [
+    "Automatic gear command below 35 m or gear-speed threshold",
+    "Direct pitch and roll response; self-leveling; coordinated-turn and sideslip assistance",
+    "Arcade lift, drag and engine acceleration; no rigid-body inertia integration"
+  ],
+  "evidence": {
+    "savedCAD": "503 valid positive-volume solids; prior 15 gear and 60 door component sampled poses; artifact hash reconfirmed",
+    "seatFit": "84 mounted seat parts; front/rear headrest glazing gaps 193.7/108.3 mm, limited to seats",
+    "newMeasurements": "4 exported tire pivots matched; static pitch and bank ground clearance at 0/80/160 mm oleo compression",
+    "build": "TypeScript and Vite production compilation",
+    "flightTestsRun": false,
+    "runtimeMechanismsExercised": false,
+    "realWorldFlyabilityEstablished": false
+  }
+}

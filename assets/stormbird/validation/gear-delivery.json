@@ -1,0 +1,17 @@
+{
+  "cad_document_hash": "5c0c4a0fb9ec718307b115746871987b289d2f74470e67d8cd43251cec873b97",
+  "gear_poses": 15,
+  "door_component_poses": 60,
+  "solids": {
+    "count": 503,
+    "invalid": []
+  },
+  "gear_mounts": 12,
+  "main_door_mounts": 8,
+  "asset_sha256": {
+    "public/assets/stormbird-hx40.glb": "ed4983227e156caac42fe5c9f022714e3272cb9d75602e4c4669f39eaf231d5f",
+    "dist/assets/stormbird-hx40.glb": "ed4983227e156caac42fe5c9f022714e3272cb9d75602e4c4669f39eaf231d5f",
+    "assets/stormbird/GLB/Stormbird-HX40-game.glb": "ed4983227e156caac42fe5c9f022714e3272cb9d75602e4c4669f39eaf231d5f"
+  },
+  "flight_tests_run": false
+}

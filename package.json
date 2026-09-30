@@ -7,7 +7,10 @@
     "dev": "vite --host 0.0.0.0",
     "build": "tsc -b && vite build",
     "preview": "vite preview --host 0.0.0.0",
-    "test": "bun test"
+    "test": "bun test",
+    "stormbird:build": "bun scripts/build-stormbird.ts",
+    "stormbird:inspect": "bun scripts/inspect-stormbird.ts",
+    "stormbird:audit": "bun scripts/audit-stormbird.ts"
   },
   "dependencies": {
     "@fix-webm-duration/fix": "1.0.1",

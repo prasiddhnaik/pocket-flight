@@ -2371,7 +2371,8 @@ kbd {
 .flight-plan:hover .plan-name { text-decoration: underline; text-underline-offset: 4px; }
 .night .launch-brief, .night .quick-help { color: #f6efd9; }
 .night .launch-brief > span:last-child { color: #d1dbd0; }
-.compass { background: #12363de0; border: 1px solid #fff6de30; border-radius: 24px; padding: 10px 16px; gap: 12px; font-size: 10px; color: #e3e8db; text-shadow: none; }
+.flight-header, .compass, .flight-bottom { z-index: 2; }
+.compass { background: #12363d; border: 1px solid #fff6de30; border-radius: 24px; padding: 10px 16px; gap: 12px; font-size: 10px; color: #e3e8db; text-shadow: none; }
 .compass strong { font-variant-numeric: tabular-nums; font-size: 18px; }
 .compass-cardinal { color: var(--gold); font-weight: 700; min-width: 20px; text-align: center; }
 .telemetry { width: 330px; background: #12363de8; padding: 18px 20px; border-color: #fff6de40; }

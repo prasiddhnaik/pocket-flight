@@ -1,5 +1,5 @@
 {
-  "document_hash": "5c0c4a0fb9ec718307b115746871987b289d2f74470e67d8cd43251cec873b97",
+  "document_hash": "15bf4b5ba1863b274f366f6bc06199f2941d32a3f115a3675f69e445f9db95fa",
   "units": "mm",
   "interference_threshold_mm3": 0.1,
   "wheels": [
@@ -215,7 +215,7 @@
     }
   ],
   "solids": {
-    "count": 503,
+    "count": 527,
     "invalid": []
   },
   "engine_bay_roof_overlaps_mm3": {},

@@ -3,7 +3,7 @@
   "up": "Y",
   "forward": "-Z",
   "centerOffsetY": 2,
-  "transferSha256": "981bfd7480725d24c6a2770151dc7c6e32de87ecbed7af633532230aac94edae",
+  "transferSha256": "40544d2929886daffae4a11cdba4d60cf86076a3d3d3d6ed8dd7bcdcf352574c",
   "bounds": {
     "min": [
       -6.700000000000002,
@@ -667,7 +667,7 @@
       "compression_m": 0,
       "pitch_contact_degrees": 11.8099,
       "pitch_limiting_point": [
-        1.28,
+        -1.28,
         1.28,
         7.36
       ],
@@ -682,7 +682,7 @@
       "compression_m": 0.08,
       "pitch_contact_degrees": 11.0865,
       "pitch_limiting_point": [
-        1.28,
+        -1.28,
         1.28,
         7.36
       ],

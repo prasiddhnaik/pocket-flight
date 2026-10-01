@@ -1,0 +1,33 @@
+$ tsc -b && vite build
+vite v7.3.6 building client environment for production...
+transforming...
+✓ 1653 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                            0.99 kB │ gzip:   0.48 kB
+dist/stormbird.html                        2.14 kB │ gzip:   1.00 kB
+dist/civilian.html                         2.87 kB │ gzip:   1.23 kB
+dist/hangar.html                           3.57 kB │ gzip:   1.38 kB
+dist/jet.html                              4.48 kB │ gzip:   1.64 kB
+dist/assets/stormbird-CIkevzJq.css         1.95 kB │ gzip:   0.85 kB
+dist/assets/civilian-6L4mG1Sc.css          2.85 kB │ gzip:   1.11 kB
+dist/assets/hangar-BmW2rM77.css            4.69 kB │ gzip:   1.66 kB
+dist/assets/jet-Dj51nlho.css               6.26 kB │ gzip:   2.12 kB
+dist/assets/game-BRigvMUf.css             31.83 kB │ gzip:   7.67 kB
+dist/assets/jet-heat-CIhxqIbi.js           2.47 kB │ gzip:   1.24 kB
+dist/assets/stormbird-CQMqc6j5.js          2.85 kB │ gzip:   1.52 kB
+dist/assets/civilian-CJPFz__h.js           5.04 kB │ gzip:   2.40 kB
+dist/assets/hangar-DVA_tbpD.js             5.53 kB │ gzip:   2.54 kB
+dist/assets/aircraft-CKBWC-Hn.js           8.77 kB │ gzip:   3.72 kB
+dist/assets/jet-DscNa7mq.js                9.45 kB │ gzip:   4.14 kB
+dist/assets/RoomEnvironment-5V6EOLTY.js   21.09 kB │ gzip:   5.12 kB
+dist/assets/index-BgLy9FlL.js             31.17 kB │ gzip:   8.83 kB
+dist/assets/jet-effects-dqLI3sOA.js       73.49 kB │ gzip:  26.54 kB
+dist/assets/game-DVUVsE0Y.js             293.71 kB │ gzip:  94.05 kB
+dist/assets/GLTFLoader-DUjHHH0z.js       629.00 kB │ gzip: 161.66 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 1.45s

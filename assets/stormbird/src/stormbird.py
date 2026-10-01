@@ -13,6 +13,11 @@ LENGTH, SPAN = 17.2, 13.4
 PAINT, WING_PAINT, GRAPHITE = '#8c9ca6', '#b3bfc5', '#293b47'
 ORANGE, METAL, RUBBER, GLASS = '#d76d38', '#a2acb4', '#1b2227', '#698b98'
 ENGINE_X, ENGINE_Z = 1.28, 1.90
+COMPRESSOR_BLADES = 24
+# Radius, chord, stagger, circumferential sweep and axial datum, in metres/degrees.
+# Concept geometry: these sections are not a validated compressor aerodynamic design.
+COMPRESSOR_SECTIONS = [(.102,.026,50,-7,.105),(.245,.082,37,0,.095),
+                       (.401,.115,29,9,.080)]
 CANOPY_BASE = 2.55
 COCKPIT_DROP = .28
 HINGES = {
@@ -197,6 +202,44 @@ def airfoil(x, leading, chord, z, side, thickness=.085, camber=.004):
 
 def wing(stations, side, thickness=.085):
     return b.Solid.make_loft([airfoil(*p,side,thickness) for p in stations], ruled=True)
+
+
+def compressor_blade(side, index):
+    """A closed cambered foil loft, rooted inside the hub, with matched rails."""
+    wires=[]
+    for radius,chord,stagger,sweep,y in COMPRESSOR_SECTIONS:
+        angle=index*math.tau/COMPRESSOR_BLADES+math.radians(sweep)
+        stagger=math.radians(stagger)
+        upper,lower=[],[]
+        for i in range(25):
+            u=(1-math.cos(math.pi*i/24))/2
+            thickness=5*.08*chord*(.2969*math.sqrt(u)-.126*u-.3516*u*u+.2843*u**3-.1015*u**4)
+            camber=.035*chord*math.sin(math.pi*u)
+            along=(.5-u)*chord
+            for sign,points in [(1,upper),(-1,lower)]:
+                normal=camber+sign*thickness
+                tangential=along*math.sin(stagger)+normal*math.cos(stagger)
+                axial=y+along*math.cos(stagger)-normal*math.sin(stagger)
+                points.append(v((side*1.40+radius*math.sin(angle)+tangential*math.cos(angle),
+                                 axial,1.92+radius*math.cos(angle)-tangential*math.sin(angle))))
+        wires.append(b.Wire([b.Edge.make_spline(upper),b.Edge.make_line(upper[-1],lower[-1]),
+                             b.Edge.make_spline(list(reversed(lower)))]))
+    return mark(b.Solid.make_loft(wires), 'Compressor_blade_'+str(index), METAL)
+
+
+def engine_center(side,y):
+    fraction=(-.02-y)/6.08
+    return (side*(1.40-.12*fraction),y,1.92-.02*fraction)
+
+
+def engine_case(side):
+    """Six-millimetre casing, mating with the compressor ring and exhaust liner."""
+    def ring(y,radius):
+        x,_,z=engine_center(side,y)
+        return ellipse(y,radius,z-radius,z+radius,x)
+    outer=b.Solid.make_loft([ring(y,.443) for y in [-.02,-6.10]])
+    inner=b.Solid.make_loft([ring(y,.437) for y in [.01,-6.13]])
+    return mark(outer.cut(inner),'Engine_core_case_'+('Left' if side<0 else 'Right'),GRAPHITE)
 
 
 def fin_section(side,z,x,leading,chord):
@@ -396,14 +439,25 @@ def stormbird():
                            (1.65,1.35,1.30,1.34,.35,.04),
                            (.45,1.30,1.42,1.45,.56,0),
                            (-1.05,1.28,1.34,1.38,.60,0)]])
-        inlet_inner=b.Solid.make_loft([intake_section(side,*p) for p in
-                          [(3.23,1.40,.924,.724,.047,.18),
+        inlet_sections=[(3.23,1.40,.924,.724,.047,.18),
                            (2.75,1.39,.97,.91,.10,.12),
                            (1.65,1.35,.99,1.03,.32,.04),
-                           (.42,1.40,.85,.85,.395,0)]])
+                           (.42,1.40,.85,.85,.395,0)]
+        inlet_inner=b.Solid.make_loft([intake_section(side,*p) for p in inlet_sections])
         aft_duct=tube('Inlet_duct_tool',(side*1.40,.025,1.92),(side*1.40,.85,1.92),.43)
         duct=inlet_inner.fuse(aft_duct)
-        ducts.append(duct)
+        core_tool=tube('Engine_core_bore',engine_center(side,.15),engine_center(side,-6.60),.449)
+        # Recess the overlapping wing material by 2 mm so only the fuselage owns
+        # the duct wall. Identical cutters on both parts leave coincident skins.
+        wing_inner=b.Solid.make_loft([intake_section(side,y,x,w+.004,h+.004,r+.002,rake)
+                                     for y,x,w,h,r,rake in inlet_sections])
+        wing_aft=tube('Wing_duct_clearance',(side*1.40,.025,1.92),
+                      (side*1.40,.85,1.92),.432)
+        mouth_clearance=b.Solid.make_loft([intake_section(side,y,1.40,.924,.724,.047,.18)
+                                          for y in [3.12,6.50]],ruled=True)
+        # The wing root also crosses the engine envelope; cut the full path from it.
+        # Its leading edge must also stay outside the opening ahead of the lip.
+        ducts.extend([wing_inner,wing_aft,core_tool,mouth_clearance])
         fairing=inlet_outer.cut(duct)
         front_edges=[e for e in fairing.edges()
                      if abs(e.center().Y+side*.18*(e.center().X-side*1.40*MM)-3.15*MM)<.01
@@ -417,13 +471,13 @@ def stormbird():
         body=body.fuse(nacelle).cut(duct).cut(nozzle_bore)
         # Compressor is upstream, linked to a shaft; nothing fan-like at the exhaust.
         rotor=[tube('Compressor_hub',(side*1.40,.04,1.92),(side*1.40,.18,1.92),.115)]
-        for j in range(16):
-            a=j*math.tau/16
-            rotor.append(tube('Compressor_blade_'+str(j),
-                         (side*1.40+.09*math.sin(a),.10,1.92+.09*math.cos(a)),
-                         (side*1.40+.385*math.sin(a),.08,1.92+.385*math.cos(a)),.025,color=METAL))
+        rotor += [compressor_blade(side,j) for j in range(COMPRESSOR_BLADES)]
+        rotor.append(mark(hull([(y,r,1.92-r,1.92+r) for y,r in
+                               [(.15,.115),(.24,.101),(.35,.048),(.385,.007)]],x=side*1.40),
+                          'Compressor_spinner',METAL))
         add(group('Compressor_'+str(side),rotor))
         add(tube('Compressor_case_'+label,(side*1.40,-.02,1.92),(side*1.40,.25,1.92),.443,.409,GRAPHITE))
+        add(engine_case(side))
         add(tube('Engine_shaft_'+label,(side*1.40,.04,1.92),(x,-6.52,ENGINE_Z),.056))
         add(tube('Exhaust_liner_'+label,(x,-7.91,ENGINE_Z),(x,-6.10,ENGINE_Z),.447,.404,GRAPHITE))
         add(tube('Nozzle_actuator_ring_'+label,(x,-7.56,ENGINE_Z),(x,-7.32,ENGINE_Z),.509,.442))
@@ -455,25 +509,28 @@ def stormbird():
     for side,label in [(-1,'Left'),(1,'Right')]:
         air=wing([(.65,1.95,6.22,2.03),(1.85,1.30,5.49,2.03),
                   (6.70,-2.33,1.36,2.03)],side,.09)
-        for duct in ducts: air=air.cut(duct)
-        controls=[]
-        for kind,x0,x1 in [('Flap',1.98,3.40),('Aileron',3.56,6.40)]:
-            cut=box('Control_tool',(side*(x0+x1)/2,-4.0,2.03),(x1-x0,1.4,2))
-            controls.append(mark(air.intersect(cut),kind+'_'+label,WING_PAINT))
-            gap=box('Control_gap',(side*(x0+x1)/2,-4.0,2.03),(x1-x0+.006,1.406,2))
-            air=air.cut(gap)
-            for x in [x0+.14,x1-.14]:
-                add(tube(f'{kind}_hinge_{label}_{x}',(side*(x-.05),-3.3,2.05),
-                         (side*(x+.05),-3.3,2.05),.023,color=GRAPHITE))
-        chine=wing([(.38,4.55,8.72,2.05),(.80,4.16,8.38,2.05),
-                    (1.89,1.36,5.55,2.03)],side,.075)
-        for duct in ducts: chine=chine.cut(duct)
-        wings.append(air)
-        wing_parts=[mark(air,'Wing_skin_'+label,WING_PAINT),mark(chine,'Wing_root_fairing_'+label),*controls]
-        tip_tool=box('Tip_tool',(side*6.54,-2.94,2.03),(.32,2.0,1))
-        tip=air.intersect(tip_tool)
-        wing_parts[0]=mark(air.cut(tip_tool),'Wing_skin_'+label,WING_PAINT)
-        wing_parts.append(mark(tip,'Wingtip_identification_'+label,ORANGE))
+        # OCCT's optional same-domain cleanup loops on the recessed duct faces.
+        # Keep the valid Boolean topology; saved-artifact inspection checks it.
+        with b.SkipClean():
+            for duct in ducts: air=air.cut(duct)
+            controls=[]
+            for kind,x0,x1 in [('Flap',1.98,3.40),('Aileron',3.56,6.40)]:
+                cut=box('Control_tool',(side*(x0+x1)/2,-4.0,2.03),(x1-x0,1.4,2))
+                controls.append(mark(air.intersect(cut),kind+'_'+label,WING_PAINT))
+                gap=box('Control_gap',(side*(x0+x1)/2,-4.0,2.03),(x1-x0+.006,1.406,2))
+                air=air.cut(gap)
+                for x in [x0+.14,x1-.14]:
+                    add(tube(f'{kind}_hinge_{label}_{x}',(side*(x-.05),-3.3,2.05),
+                             (side*(x+.05),-3.3,2.05),.023,color=GRAPHITE))
+            chine=wing([(.38,4.55,8.72,2.05),(.80,4.16,8.38,2.05),
+                        (1.89,1.36,5.55,2.03)],side,.075)
+            for duct in ducts: chine=chine.cut(duct)
+            wings.append(air)
+            wing_parts=[mark(air,'Wing_skin_'+label,WING_PAINT),mark(chine,'Wing_root_fairing_'+label),*controls]
+            tip_tool=box('Tip_tool',(side*6.54,-2.94,2.03),(.32,2.0,1))
+            tip=air.intersect(tip_tool)
+            wing_parts[0]=mark(air.cut(tip_tool),'Wing_skin_'+label,WING_PAINT)
+            wing_parts.append(mark(tip,'Wingtip_identification_'+label,ORANGE))
         add(group('Wing_'+label,wing_parts))
         tail=wing([(1.05,-4.35,3.12,2.16),(3.85,-5.62,1.42,2.16)],side,.085)
         mask=box('Elevator_tool',(side*2.5,-7.5,2.16),(3.1,2.16,2))
@@ -535,6 +592,13 @@ def stormbird():
             box('Nose_door_skin_tool',(side*.155,4.55,1.30),(.303,2.08,.55)))
     nose_bay=box('Nose_bay_tool',(0,4.55,.90),(.62,2.12,1.79))
     body=body.cut(nose_bay)
+    # Apply the continuous bores last, to owned solids rather than an assembly wrapper.
+    # Later unions must not refill these passages or retain uncut child geometry.
+    for side in [-1,1]:
+        tool=tube('Engine_final_core_bore',engine_center(side,.15),engine_center(side,-6.60),.449)
+        body=b.Compound([solid for source in body.solids() for solid in source.cut(tool).solids()])
+        if body.is_inside(v((side*1.65,-.10,1.92))):
+            raise ValueError('Engine annular passage was not opened')
     add(mark(body,'Fuselage'))
     add(box('Nose_bay_roof_rear',(0,4.55,1.807),(.64,2.14,.024),GRAPHITE))
     for roof in bay_roofs: add(roof)

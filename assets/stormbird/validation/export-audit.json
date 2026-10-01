@@ -1,8 +1,8 @@
 {
-  "transferSha256": "981bfd7480725d24c6a2770151dc7c6e32de87ecbed7af633532230aac94edae",
-  "gameGlbSha256": "ed4983227e156caac42fe5c9f022714e3272cb9d75602e4c4669f39eaf231d5f",
+  "transferSha256": "40544d2929886daffae4a11cdba4d60cf86076a3d3d3d6ed8dd7bcdcf352574c",
+  "gameGlbSha256": "17f84578e79f26891349b2332a841aec7f957f69b3a5328e6f5585d5cd926da8",
   "wheelPivotsMatched": 4,
-  "triangles": 1107662,
+  "triangles": 1261664,
   "flightTestsRun": false,
   "runtimeMechanismsExercised": false
 }

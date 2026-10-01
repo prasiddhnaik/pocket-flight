@@ -31,8 +31,24 @@ def nozzles():
 
 @step(out='../STEP/inspection/Intakes.step')
 def intakes():
-    return select(('Fuselage',),'Intake_shoulders_context')
+    return select(('Fuselage','Compressor_','Engine_core_case_','Engine_shaft_'),'Intake_shoulders_context')
+
+
+@step(out='../STEP/inspection/CompressorFaces.step')
+def compressor_faces():
+    # Inspect the actual saved artifact without rebuilding the complete master.
+    from pathlib import Path
+    from cadgen import read_scene, srgb
+    scene=read_scene(Path(__file__).resolve().parents[1]/'STEP/Stormbird-HX40.step')
+    parts=[]
+    for node in scene.roots[0].children:
+        if not node.label.startswith('Compressor_'):continue
+        part=scene.resolve(node.ref).shape()
+        part.label=node.label
+        part.color=srgb('#293b47' if node.label.startswith('Compressor_case_') else '#a2acb4')
+        parts.append(part)
+    return b.Compound(children=parts,label='Compressor_faces')
 
 
 if __name__=='__main__':
-    cockpit(); landing_gear(); nozzles(); intakes()
+    cockpit(); landing_gear(); nozzles(); intakes(); compressor_faces()

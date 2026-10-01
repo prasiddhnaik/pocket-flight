@@ -1,6 +1,6 @@
 {
   "name": "Stormbird HX-40",
-  "revision": "2026-10-01 handbook audit",
+  "revision": "2026-10-01 intake correction",
   "mission": {
     "role": "Fictional tandem-seat twin-engine jet for the existing island game",
     "performanceStatus": "Arcade targets only; physical sizing incomplete",
@@ -76,13 +76,19 @@
     "status": "Custom sections have no measured or computed polars; simulator lift and thrust values are tuning constants."
   },
   "propulsion": {
-    "layout": "Two continuous intake ducts and rear exhausts with reserved engine-core envelopes",
+    "layout": "Two intake ducts, 24-blade compressor rotors, continuous 6 mm core casings and aft exhaust liners",
     "ratedThrust_N": null,
     "engineMass_kg": null,
     "fuelFlow_kg_s": null,
     "inletPressureRecovery": null,
     "nozzleSchedule": null,
-    "status": "Engine internals, pressure recovery, thrust map and fuel consumption unanalysed."
+    "status": "Engine internals, pressure recovery, thrust map and fuel consumption unanalysed.",
+    "compressorGeometry": {
+      "bladesPerEngine": 24,
+      "sections": "Three-section cambered foil loft, stagger 50/37/29 degrees, circumferential sweep -7/0/9 degrees",
+      "minimumBladeCaseGap_mm": 6.981014859903643,
+      "status": "Concept geometry; no validated compressor aerodynamics or manufacturing tolerances"
+    }
   },
   "mechanisms": {
     "gearTravelSeconds": 4.8,
@@ -161,12 +167,15 @@
     "Arcade lift, drag and engine acceleration; no rigid-body inertia integration"
   ],
   "evidence": {
-    "savedCAD": "503 valid positive-volume solids; prior 15 gear and 60 door component sampled poses; artifact hash reconfirmed",
+    "savedCAD": "527 valid positive-volume solids in current intake master; rotor and casing fit checked against fuselage and wing roots",
     "seatFit": "84 mounted seat parts; front/rear headrest glazing gaps 193.7/108.3 mm, limited to seats",
     "newMeasurements": "4 exported tire pivots matched; static pitch and bank ground clearance at 0/80/160 mm oleo compression",
     "build": "TypeScript and Vite production compilation",
     "flightTestsRun": false,
     "runtimeMechanismsExercised": false,
-    "realWorldFlyabilityEstablished": false
+    "realWorldFlyabilityEstablished": false,
+    "compressorFit": "1,152 sampled annular passage points; zero blocked by checked airframe; rotor/airframe overlap zero; representative blade roots and both spinners embed in hubs",
+    "intakeDelivery": "../assets/stormbird/validation/intake-delivery.json",
+    "priorMechanismChecks": "Gear check retained from engine-cavity revision before final wing-root mouth and wall trims; older door/seat evidence retains original document hashes"
   }
 }

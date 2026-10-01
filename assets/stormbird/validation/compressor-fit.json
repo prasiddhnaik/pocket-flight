@@ -1,0 +1,48 @@
+{
+  "document_hash": "8327d7a3e1495e091c1123ab4bfac5dede1ac5816dfcb0392aa8f9823b43ea53",
+  "units": "mm",
+  "overlap_threshold_mm3": 0.1,
+  "engines": [
+    {
+      "name": "Left",
+      "blade_count": 24,
+      "rotor_parts_valid": true,
+      "root_embed_mm3": 576.1339384738666,
+      "neighbor_overlap_mm3": 0,
+      "neighbor_gap_mm": 15.52820636165895,
+      "tip_case_gap_mm": 6.981014859903643,
+      "spinner_hub_embed_mm3": 1217515.209314256,
+      "rotor_airframe_overlap_mm3": 0,
+      "compressor_case_airframe_embed_mm3": 3562966.8304079846,
+      "core_front_contact_gap_mm": 0.0,
+      "core_aft_contact_gap_mm": 0.0,
+      "core_case_valid": true,
+      "core_airframe_overlap_mm3": 0,
+      "core_wing_overlap_mm3": 0
+    },
+    {
+      "name": "Right",
+      "blade_count": 24,
+      "rotor_parts_valid": true,
+      "root_embed_mm3": 576.1339381316571,
+      "neighbor_overlap_mm3": 0,
+      "neighbor_gap_mm": 15.52820636165895,
+      "tip_case_gap_mm": 6.981014859903643,
+      "spinner_hub_embed_mm3": 1217515.2128482861,
+      "rotor_airframe_overlap_mm3": 0,
+      "compressor_case_airframe_embed_mm3": 3562966.832387723,
+      "core_front_contact_gap_mm": 0.0,
+      "core_aft_contact_gap_mm": 0.0,
+      "core_case_valid": true,
+      "core_airframe_overlap_mm3": 0,
+      "core_wing_overlap_mm3": 0
+    }
+  ],
+  "passage_samples": 1152,
+  "blocked_passage_samples": [],
+  "scope": "Static geometry and mounting only; no airflow, engine-performance or flight simulation.",
+  "solids": {
+    "count": 527,
+    "invalid": []
+  }
+}

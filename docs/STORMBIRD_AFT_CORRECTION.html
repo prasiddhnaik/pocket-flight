@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Stormbird rear airframe correction</title>
+<style>body{max-width:920px;margin:40px auto;padding:0 22px;font:16px/1.6 system-ui;color:#26343d}h1,h2{line-height:1.2}h2{margin-top:32px}table{border-collapse:collapse;width:100%}th,td{padding:10px 8px;text-align:left;border-bottom:1px solid #ddd;vertical-align:top}img{max-width:100%;height:auto}figure{margin:24px 0}figcaption{font-size:14px}a{color:#234f6b}code{overflow-wrap:anywhere}</style></head><body>
+<h1>Stormbird HX-40 · Rear airframe correction</h1>
+<p>October 1, 2026 · <a href="stormbird-design.json">Design manifest</a> · <a href="PRINCIPLES_OF_MAKING_PLANES.md">Aircraft principles</a></p>
+<h2>What the rear view exposed</h2>
+<p>The former fin-root slabs intersected each horizontal tailplane by approximately 105,527,186 mm³ (105.5 litres). The horizontal tails also crossed the exhaust envelope at their inboard roots. Hollow engine cases allowed a direct view of the inlet compressor through the rear nozzle. The earlier front-view review did not establish the rear installation.</p>
+<h2>Corrections</h2>
+<ul><li>Replaced the wing-shaped fin-root slabs with narrow fairings fused into the fuselage. Raised the vertical-fin bases from 2.24 m to 2.55 m and updated rudder hinge datums.</li>
+<li>Moved the horizontal tails to a 1.60 m height datum, below the main wing. Their fixed roots begin at X=±1.80 m, outside the engine bore. Moving elevators begin at X=±1.98 m, clear of the nacelle skin. Elevator hinges now use a 1.61 m height datum.</li>
+<li>Trimmed 10 mm from each flap's inboard boundary. Added a fixed rudder heel and a 3 mm running gap to clear the root skin.</li>
+<li>Installed a distinct 48-blade rear turbine stage in each engine, with an attached hub, casing, spool drum and supported annular combustor liners. Staggered blade passages obscure the inlet rotor from behind.</li>
+<li>Regenerated the native master, declared animation handles, game mesh and shared geometry manifest.</li></ul>
+<p>The engine's compressor–combustor–turbine–nozzle order follows the <a href="https://www.grc.nasa.gov/WWW/K-12/BGP/turbparts.html">NASA gas-turbine component layout</a>. Blade counts, vane angles and dimensions here are concept geometry, with no aerodynamic, thermal or structural substantiation.</p>
+<figure><img src="../assets/stormbird/renders/aft-quarter-corrected.png" alt="Corrected rear quarter view with separate horizontal tailplanes and narrow vertical-fin root fairings"><figcaption>Reviewed saved STEP, rear quarter view.</figcaption></figure>
+<figure><img src="../assets/stormbird/renders/aft-game-rear-corrected.png" alt="Corrected game mesh rear view with separated tailplanes and no visible inlet compressor"><figcaption>Reviewed static image of the exported game asset. The game was not launched.</figcaption></figure>
+<p><a href="../assets/stormbird/renders/aft-rear-corrected.png">Native rear view</a> · <a href="../assets/stormbird/renders/aft-front-corrected.png">Native front view</a></p>
+<h2>Saved-artifact evidence</h2>
+<table><tr><th>Check</th><th>Result</th><th>Scope</th></tr>
+<tr><td>Native topology</td><td>679 valid positive-volume solids</td><td>Current saved STEP</td></tr>
+<tr><td>Surface and installation fit</td><td>46 checked pairs, zero overlap above 0.1 mm³</td><td>Main wing/control interfaces, moving surfaces versus fuselage, and tail/fin surfaces versus engine cases and exhaust liners</td></tr>
+<tr><td>Root attachment</td><td>Positive measured embedding</td><td>Both fixed tailplanes and vertical fins in the fuselage; turbine blade roots in hubs; spool in shaft; all 48 combustor supports in their adjoining parts</td></tr>
+<tr><td>Turbine blade fit</td><td>5.836 mm neighbor gap; 1.457 mm minimum casing gap</td><td>Representative repeated blade pair in each engine</td></tr>
+<tr><td>Rear occlusion</td><td>360 sampled sightlines, zero unblocked</td><td>Projected turbine triangles at five aperture radii and 36 angles per engine. This is a static optical sample, not airflow analysis.</td></tr>
+<tr><td>Export and compilation</td><td>Four wheel pivots matched; game asset hashes matched; production build passed</td><td>Exported data and TypeScript/Vite compilation. Existing bundle-size warning remains.</td></tr></table>
+<p>No flight, gameplay or runtime aircraft tests were run. The source-defined geometry and sampled fit checks do not establish aircraft strength, thermal capability, stability, engine performance or real-world flyability. Earlier gear, door, seat and intake checks retain their dated document hashes; they are not fresh mechanism checks of this revision.</p>
+<h2>Files and reproducibility</h2>
+<p><a href="../assets/stormbird/validation/aft-airframe-fit.json">Fit and sightline measurements</a> · <a href="../assets/stormbird/validation/aft-delivery.json">Delivery hashes and scope</a> · <a href="../assets/stormbird/validation/export-audit.json">Export audit</a> · <a href="../assets/stormbird/validation/aft-production-build-log.txt">Production build log</a></p>
+<p><a href="../assets/stormbird/STEP/Stormbird-HX40.step">STEP master</a> · <a href="../public/assets/stormbird-hx40.glb">Game GLB</a> · <a href="../assets/stormbird/src/stormbird.py">Parametric source</a> · <a href="../assets/stormbird/checks/aft_airframe_fit.py">Maintained fit check</a></p>
+<p><a href="http://127.0.0.1:3245/?file=STEP%2FStormbird-HX40.step">Live CAD master</a> · <a href="https://github.com/prasiddhnaik/pocket-flight">GitHub repository</a></p>
+<p><code>bun run stormbird:build</code> rebuilds the aircraft; <code>bun run stormbird:inspect</code> now includes the rear installation check and a rear snapshot; <code>bun run stormbird:audit</code> checks export datums; <code>bun run stormbird:viewer</code> starts or reuses CAD Viewer. These workflows do not fly the aircraft.</p>
+</body></html>

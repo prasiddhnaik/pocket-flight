@@ -3,7 +3,7 @@
   "up": "Y",
   "forward": "-Z",
   "centerOffsetY": 2,
-  "transferSha256": "40544d2929886daffae4a11cdba4d60cf86076a3d3d3d6ed8dd7bcdcf352574c",
+  "transferSha256": "654a746feeb866ac3c70d03e03e137e97514c2ee0b75c1b431a6ac7b1880f8b0",
   "bounds": {
     "min": [
       -6.700000000000002,
@@ -12,7 +12,7 @@
     ],
     "max": [
       6.700000000000002,
-      4.5057674818098805,
+      4.505757036677263,
       8.109
     ]
   },
@@ -739,7 +739,7 @@
     "section": "Custom 9 percent thickness section with 0.4 percent sinusoidal camber; no validated polar."
   },
   "groundPitchLimit": 0.16326682487780955,
-  "bodyHullVertices": 1738,
+  "bodyHullVertices": 1708,
   "limitations": [
     "Mesh tolerance 0.5 mm; neutral controls and closed canopy.",
     "Ground envelopes use a flat plane and rigid tires, not tire deflection.",

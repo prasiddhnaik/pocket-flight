@@ -18,6 +18,9 @@ COMPRESSOR_BLADES = 24
 # Concept geometry: these sections are not a validated compressor aerodynamic design.
 COMPRESSOR_SECTIONS = [(.102,.026,50,-7,.105),(.245,.082,37,0,.095),
                        (.401,.115,29,9,.080)]
+TURBINE_BLADES = 48
+TURBINE_SECTIONS = [(.148,.065,58,0,-6.01),(.265,.120,63,3,-6.00),
+                    (.398,.130,68,6,-5.99)]
 CANOPY_BASE = 2.55
 COCKPIT_DROP = .28
 HINGES = {
@@ -26,9 +29,9 @@ HINGES = {
 }
 for side, label in [(-1, 'Left'), (1, 'Right')]:
     for kind, x, y, z in [('Flap', 2.7, -3.30, 2.05), ('Aileron', 5.0, -3.30, 2.05),
-                           ('Elevator', 2.4, -6.42, 2.17)]:
+                           ('Elevator', 2.4, -6.42, 1.61)]:
         HINGES[kind+'_'+label] = {'point': [side*x, y, z], 'axis': [1, 0, 0]}
-    HINGES['Rudder_'+label] = {'point': [side*1.42, -6.20, 2.24], 'axis': [side*.72, 0, 2.26]}
+    HINGES['Rudder_'+label] = {'point': [side*1.52, -6.20, 2.55], 'axis': [side*.62, 0, 1.95]}
     HINGES['Compressor_'+str(side)] = {'point': [side*1.40, .08, 1.92], 'axis': [0, 1, 0]}
 
 for datum in [*LEGS, *DOORS]:
@@ -204,11 +207,11 @@ def wing(stations, side, thickness=.085):
     return b.Solid.make_loft([airfoil(*p,side,thickness) for p in stations], ruled=True)
 
 
-def compressor_blade(side, index):
+def radial_blade(index,count,sections,center,label,color=METAL):
     """A closed cambered foil loft, rooted inside the hub, with matched rails."""
     wires=[]
-    for radius,chord,stagger,sweep,y in COMPRESSOR_SECTIONS:
-        angle=index*math.tau/COMPRESSOR_BLADES+math.radians(sweep)
+    for radius,chord,stagger,sweep,y in sections:
+        angle=index*math.tau/count+math.radians(sweep)
         stagger=math.radians(stagger)
         upper,lower=[],[]
         for i in range(25):
@@ -220,11 +223,24 @@ def compressor_blade(side, index):
                 normal=camber+sign*thickness
                 tangential=along*math.sin(stagger)+normal*math.cos(stagger)
                 axial=y+along*math.cos(stagger)-normal*math.sin(stagger)
-                points.append(v((side*1.40+radius*math.sin(angle)+tangential*math.cos(angle),
-                                 axial,1.92+radius*math.cos(angle)-tangential*math.sin(angle))))
+                points.append(v((center[0]+radius*math.sin(angle)+tangential*math.cos(angle),
+                                 axial,center[1]+radius*math.cos(angle)-tangential*math.sin(angle))))
         wires.append(b.Wire([b.Edge.make_spline(upper),b.Edge.make_line(upper[-1],lower[-1]),
                              b.Edge.make_spline(list(reversed(lower)))]))
-    return mark(b.Solid.make_loft(wires), 'Compressor_blade_'+str(index), METAL)
+    return mark(b.Solid.make_loft(wires),label+'_'+str(index),color)
+
+
+def compressor_blade(side,index):
+    return radial_blade(index,COMPRESSOR_BLADES,COMPRESSOR_SECTIONS,
+                        (side*1.40,1.92),'Compressor_blade')
+
+
+def turbine_stage(side):
+    x=side*ENGINE_X
+    parts=[tube('Turbine_hub',(x,-5.90,ENGINE_Z),(x,-6.51,ENGINE_Z),.170)]
+    parts += [radial_blade(j,TURBINE_BLADES,TURBINE_SECTIONS,(x,ENGINE_Z),
+                          'Turbine_blade','#746f68') for j in range(TURBINE_BLADES)]
+    return group('Turbine_stage_'+('Left' if side<0 else 'Right'),parts)
 
 
 def engine_center(side,y):
@@ -479,6 +495,27 @@ def stormbird():
         add(tube('Compressor_case_'+label,(side*1.40,-.02,1.92),(side*1.40,.25,1.92),.443,.409,GRAPHITE))
         add(engine_case(side))
         add(tube('Engine_shaft_'+label,(side*1.40,.04,1.92),(x,-6.52,ENGINE_Z),.056))
+        # The rear turbine is distinct from the inlet compressor. Its staggered
+        # blades obscure the upstream fan while leaving passages between vanes.
+        add(turbine_stage(side))
+        add(tube('Turbine_case_'+label,(x,-5.87,ENGINE_Z),(x,-6.10,ENGINE_Z),.443,.404,GRAPHITE))
+        # A supported spool drum and annular combustor liners occupy the core.
+        add(tube('Engine_spool_'+label,engine_center(side,-.30),engine_center(side,-5.92),.140))
+        add(tube('Combustor_outer_liner_'+label,engine_center(side,-3.00),engine_center(side,-4.65),.398,.392,GRAPHITE))
+        add(tube('Combustor_inner_liner_'+label,engine_center(side,-3.00),engine_center(side,-4.65),.235,.229,GRAPHITE))
+        for j in range(12):
+            angle=j*math.tau/12
+            cx,yy,zz=engine_center(side,-3.05)
+            add(tube(f'Combustor_dome_support_{label}_{j}',
+                     (cx+.135*math.sin(angle),yy,zz+.135*math.cos(angle)),
+                     (cx+.237*math.sin(angle),yy,zz+.237*math.cos(angle)),.018,color=GRAPHITE))
+        for yy in [-3.20,-4.50]:
+            cx,_,zz=engine_center(side,yy)
+            for j in range(6):
+                angle=j*math.tau/6
+                add(tube(f'Combustor_outer_mount_{label}_{yy}_{j}',
+                         (cx+.395*math.sin(angle),yy,zz+.395*math.cos(angle)),
+                         (cx+.441*math.sin(angle),yy,zz+.441*math.cos(angle)),.014,color=GRAPHITE))
         add(tube('Exhaust_liner_'+label,(x,-7.91,ENGINE_Z),(x,-6.10,ENGINE_Z),.447,.404,GRAPHITE))
         add(tube('Nozzle_actuator_ring_'+label,(x,-7.56,ENGINE_Z),(x,-7.32,ENGINE_Z),.509,.442))
         add(tube('Nozzle_exit_ring_'+label,(x,-7.94,ENGINE_Z),(x,-7.88,ENGINE_Z),.462,.405,GRAPHITE))
@@ -514,7 +551,7 @@ def stormbird():
         with b.SkipClean():
             for duct in ducts: air=air.cut(duct)
             controls=[]
-            for kind,x0,x1 in [('Flap',1.98,3.40),('Aileron',3.56,6.40)]:
+            for kind,x0,x1 in [('Flap',1.99,3.40),('Aileron',3.56,6.40)]:
                 cut=box('Control_tool',(side*(x0+x1)/2,-4.0,2.03),(x1-x0,1.4,2))
                 controls.append(mark(air.intersect(cut),kind+'_'+label,WING_PAINT))
                 gap=box('Control_gap',(side*(x0+x1)/2,-4.0,2.03),(x1-x0+.006,1.406,2))
@@ -532,21 +569,28 @@ def stormbird():
             wing_parts[0]=mark(air.cut(tip_tool),'Wing_skin_'+label,WING_PAINT)
             wing_parts.append(mark(tip,'Wingtip_identification_'+label,ORANGE))
         add(group('Wing_'+label,wing_parts))
-        tail=wing([(1.05,-4.35,3.12,2.16),(3.85,-5.62,1.42,2.16)],side,.085)
-        mask=box('Elevator_tool',(side*2.5,-7.5,2.16),(3.1,2.16,2))
+        # Tail roots mount outside the engine bore, below the main wing.
+        # The moving elevator starts outboard of the nacelle skin.
+        tail=wing([(1.80,-4.35,3.12,1.60),(3.85,-5.62,1.42,1.60)],side,.085)
+        mask=box('Elevator_tool',(side*3.015,-7.5,1.60),(2.07,2.16,2))
         add(mark(tail.intersect(mask),'Elevator_'+label,WING_PAINT))
         add(mark(tail.cut(b.Pos(0,3,0)*mask),'Tailplane_'+label,WING_PAINT))
-        for x in [1.42,2.65,3.49]:
-            add(tube(f'Elevator_hinge_{label}_{x}',(side*(x-.055),-6.42,2.17),
-                     (side*(x+.055),-6.42,2.17),.021,color=GRAPHITE))
+        for x in [2.08,2.65,3.49]:
+            add(tube(f'Elevator_hinge_{label}_{x}',(side*(x-.055),-6.42,1.61),
+                     (side*(x+.055),-6.42,1.61),.021,color=GRAPHITE))
         fin=b.Solid.make_loft([fin_section(side,*p) for p in
-                     [(2.24,1.42,-3.86,3.26),(4.50,2.14,-5.10,1.25)]],ruled=True)
-        mask=box('Rudder_tool',(side*1.85,-7.1,3.3),(2,1.8,3))
+                     [(2.55,1.52,-3.86,3.26),(4.50,2.14,-5.10,1.25)]],ruled=True)
+        # A fixed heel and a 3 mm root gap clear the nacelle skin below the rudder.
+        mask=box('Rudder_tool',(side*1.85,-7.1,3.559),(2,1.8,2.0))
         add(mark(fin.intersect(mask),'Rudder_'+label,PAINT))
-        add(mark(fin.cut(b.Pos(0,3,0)*mask),'Fin_'+label))
-        add(tube('Rudder_hinge_'+label,(side*1.42,-6.20,2.24),(side*2.14,-6.20,4.50),.019,color=GRAPHITE))
-        add(mark(wing([(1.10,-3.50,3.75,2.35),(1.48,-3.84,3.4,2.39),
-                       (1.7,-4.1,2.85,2.35)],side,.14),'Fin_root_fillet_'+label))
+        add(mark(fin.cut(b.Pos(0,3,-3)*mask),'Fin_'+label))
+        add(tube('Rudder_hinge_'+label,(side*1.52,-6.20,2.55),(side*2.14,-6.20,4.50),.019,color=GRAPHITE))
+        # A narrow root boss blends into the fuselage above the horizontal tail.
+        # The former wing-shaped slab intersected the tailplane and engine bore.
+        root_boss=hull([(-3.60,.018,2.45,2.51),(-4.05,.14,2.43,2.71),
+                        (-5.0,.18,2.40,2.74),(-5.90,.17,2.40,2.72),
+                        (-6.18,.018,2.44,2.51)],x=side*1.48)
+        body=body.fuse(root_boss)
         # Lamps are embedded in a wingtip fairing, with a visible bezel and lens.
         x=side*6.58; y=-3.01
         add(seated_box(air,'Navigation_light_mount_'+label,x,y,.16,.24,.038,GRAPHITE))

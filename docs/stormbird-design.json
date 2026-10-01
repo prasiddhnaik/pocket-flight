@@ -1,6 +1,6 @@
 {
   "name": "Stormbird HX-40",
-  "revision": "2026-10-01 intake correction",
+  "revision": "2026-10-01 rear airframe correction",
   "mission": {
     "role": "Fictional tandem-seat twin-engine jet for the existing island game",
     "performanceStatus": "Arcade targets only; physical sizing incomplete",
@@ -55,7 +55,33 @@
     "mainWheelTrack_m": 3.97,
     "wheelbase_m": 6.5,
     "noseTires": "2 x 550 mm diameter, 130 mm width",
-    "mainTires": "2 x 740 mm diameter, 210 mm width"
+    "mainTires": "2 x 740 mm diameter, 210 mm width",
+    "horizontalTail": {
+      "stationsCAD_m": [
+        [
+          1.8,
+          -4.35,
+          3.12,
+          1.6
+        ],
+        [
+          3.85,
+          -5.62,
+          1.42,
+          1.6
+        ]
+      ],
+      "elevatorInboardX_m": 1.98,
+      "elevatorHingeHeight_m": 1.61,
+      "status": "Source geometry and static fit only; stability derivatives unverified"
+    },
+    "verticalTail": {
+      "rootHeight_m": 2.55,
+      "tipHeight_m": 4.5,
+      "rootX_m": 1.52,
+      "tipX_m": 2.14,
+      "rootFairing": "Fused narrow fuselage boss; former intersecting wing-shaped slab removed"
+    }
   },
   "massProperties": {
     "emptyMass_kg": null,
@@ -76,7 +102,7 @@
     "status": "Custom sections have no measured or computed polars; simulator lift and thrust values are tuning constants."
   },
   "propulsion": {
-    "layout": "Two intake ducts, 24-blade compressor rotors, continuous 6 mm core casings and aft exhaust liners",
+    "layout": "Twin inlet compressors, supported spool drums and combustor liners, 48-blade rear turbine stages, and aft exhaust liners",
     "ratedThrust_N": null,
     "engineMass_kg": null,
     "fuelFlow_kg_s": null,
@@ -88,6 +114,11 @@
       "sections": "Three-section cambered foil loft, stagger 50/37/29 degrees, circumferential sweep -7/0/9 degrees",
       "minimumBladeCaseGap_mm": 6.981014859903643,
       "status": "Concept geometry; no validated compressor aerodynamics or manufacturing tolerances"
+    },
+    "turbineGeometry": {
+      "bladesPerEngine": 48,
+      "minimumBladeCaseGap_mm": 1.4567878020671008,
+      "status": "Concept geometry; rear occlusion checked at 360 sampled sightlines; aerodynamic and thermal design unverified"
     }
   },
   "mechanisms": {
@@ -167,15 +198,17 @@
     "Arcade lift, drag and engine acceleration; no rigid-body inertia integration"
   ],
   "evidence": {
-    "savedCAD": "527 valid positive-volume solids in current intake master; rotor and casing fit checked against fuselage and wing roots",
+    "savedCAD": "679 valid positive-volume solids in current rear-airframe master; 46 checked interference pairs",
     "seatFit": "84 mounted seat parts; front/rear headrest glazing gaps 193.7/108.3 mm, limited to seats",
     "newMeasurements": "4 exported tire pivots matched; static pitch and bank ground clearance at 0/80/160 mm oleo compression",
     "build": "TypeScript and Vite production compilation",
     "flightTestsRun": false,
     "runtimeMechanismsExercised": false,
     "realWorldFlyabilityEstablished": false,
-    "compressorFit": "1,152 sampled annular passage points; zero blocked by checked airframe; rotor/airframe overlap zero; representative blade roots and both spinners embed in hubs",
+    "compressorFit": "Prior intake revision: 1,152 passage samples and mounted 24-blade rotors; retained record has its original document hash",
     "intakeDelivery": "../assets/stormbird/validation/intake-delivery.json",
-    "priorMechanismChecks": "Gear check retained from engine-cavity revision before final wing-root mouth and wall trims; older door/seat evidence retains original document hashes"
+    "priorMechanismChecks": "Earlier gear, door, seat and intake checks retain original document hashes; no fresh runtime mechanism checks",
+    "aftFit": "Current rear revision: native surface fit, mounted core components and 360 projected rear sightlines",
+    "aftDelivery": "../assets/stormbird/validation/aft-delivery.json"
   }
 }

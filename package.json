@@ -10,7 +10,8 @@
     "test": "bun test",
     "stormbird:build": "bun scripts/build-stormbird.ts",
     "stormbird:inspect": "bun scripts/inspect-stormbird.ts",
-    "stormbird:audit": "bun scripts/audit-stormbird.ts"
+    "stormbird:audit": "bun scripts/audit-stormbird.ts",
+    "stormbird:viewer": "bun scripts/start-cad-viewer.ts"
   },
   "dependencies": {
     "@fix-webm-duration/fix": "1.0.1",

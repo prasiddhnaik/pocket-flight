@@ -2372,35 +2372,45 @@ kbd {
 .night .launch-brief, .night .quick-help { color: #f6efd9; }
 .night .launch-brief > span:last-child { color: #d1dbd0; }
 .flight-header, .compass, .flight-bottom { z-index: 2; }
-.compass { background: #12363d; border: 1px solid #fff6de30; border-radius: 24px; padding: 10px 16px; gap: 12px; font-size: 10px; color: #e3e8db; text-shadow: none; }
-.compass strong { font-variant-numeric: tabular-nums; font-size: 18px; }
+.compass { background: #12363d; border: 1px solid #fff6de30; border-radius: 20px; padding: 7px 11px; gap: 9px; font-size: 10px; color: #e3e8db; text-shadow: none; }
+.compass strong { font-variant-numeric: tabular-nums; font-size: 15px; }
 .compass-cardinal { color: var(--gold); font-weight: 700; min-width: 20px; text-align: center; }
-.telemetry { width: 330px; background: #12363de8; padding: 18px 20px; border-color: #fff6de40; }
-.deck-status { display: flex; justify-content: space-between; gap: 10px; align-items: center; padding-bottom: 12px; margin-bottom: 15px; border-bottom: 1px solid #ffffff26; font-size: 12px; }
-.deck-status b { font-size: 9px; letter-spacing: 1px; color: #e3d19c; }
+.telemetry { width: 264px; background: #12363dd9; padding: 12px 14px; border-color: #fff6de30; }
+.telemetry.expanded { width: 300px; }
+.deck-status { display: flex; gap: 6px; align-items: center; padding-bottom: 6px; margin-bottom: 8px; border-bottom: 1px solid #ffffff26; font-size: 10px; }
+.deck-status > span { margin-right: auto; }
+.instrument-toggle { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 5px; }
+.instrument-toggle:hover { background: #ffffff20; }
+.telemetry.expanded .instrument-toggle svg { transform: rotate(180deg); }
+.telemetry.expanded .main-readouts strong { font-size: 36px; }
+.deck-status b { font-size: 8px; letter-spacing: .6px; color: #e3d19c; }
 .deck-status .stall-status { color: #ffb299; }
-.main-readouts label { font-size: 10px; letter-spacing: 1px; color: #d7e1d7; }
-.main-readouts strong { font-size: 40px; }
+.main-readouts label { font-size: 9px; letter-spacing: .7px; color: #d7e1d7; }
+.main-readouts strong { font-size: 31px; margin-top: 4px; }
 .main-readouts strong small { color: #d7e1d7; }
-.sub-readout { font-size: 9px; letter-spacing: .3px; color: #d7e1d7; margin-top: 5px; }
+.sub-readout { font-size: 8px; letter-spacing: .2px; color: #d7e1d7; margin-top: 4px; }
 .climb-readout { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 15px; font-size: 10px; color: #d7e1d7; }
 .climb-readout b { font-size: 12px; color: #fff6df; font-variant-numeric: tabular-nums; font-weight: 500; }
 .climb-readout small { font-size: 10px; color: #d7e1d7; }
-.secondary-readouts { margin-top: 12px; padding-top: 12px; }
+.secondary-readouts { margin-top: 10px; padding-top: 9px; }
 .secondary-readouts label { font-size: 9px; color: #d7e1d7; }
 .secondary-readouts label b { font-size: 12px; font-weight: 600; }
-.secondary-readouts input { flex: 1; min-width: 45px; width: 110px; height: 6px; }
+.secondary-readouts input { flex: 1; min-width: 45px; width: 80px; height: 5px; }
 .secondary-readouts input::-webkit-slider-thumb { width: 18px; height: 18px; }
 .secondary-readouts input:focus-visible { outline: 2px solid var(--gold); outline-offset: 7px; }
-.health { font-size: 12px; }
+.health { font-size: 10px; }
 .flight-header { text-shadow: 0 1px 4px #082d33; }
-.objective { background: #12363dd9; border: 1px solid #fff6de30; border-radius: 12px; padding: 12px 16px; max-width: 390px; }
-.objective .tiny-label { font-size: 10px; opacity: 1; }
-.objective h3 { font-size: 15px; line-height: 1.45; }
-.mission-progress > span { font-size: 11px; opacity: 1; }
+.objective { background: #12363dbf; border: 1px solid #fff6de30; border-radius: 10px; padding: 9px 12px; max-width: 300px; }
+.objective .tiny-label { font-size: 9px; opacity: 1; }
+.objective h3 { font-size: 13px; line-height: 1.4; margin-top: 5px; }
+.mission-progress { margin-top: 7px; gap: 4px; }
+.mission-progress i { width: 12px; }
+.mission-progress > span { font-size: 9px; opacity: 1; }
 .flight-tools { background: #12363de8; }
 .flight-clock { width: fit-content; margin-left: auto; padding: 8px 10px; border-radius: 9px; background: #12363de8; }
-.flight-clock small { font-size: 9px; color: #d7e1d7; }
+.flight-clock > span { font-size: 16px; }
+.flight-clock small { font-size: 8px; color: #d7e1d7; }
+.map-wrap, .minimap { width: 124px; }
 .map-top { font-size: 9px; }
 .map-bottom { font-size: 8px; }
 .flight-hint { background: #12363de8; color: #fff6df; font-size: 12px; line-height: 1.5; max-width: 420px; }
@@ -2418,17 +2428,17 @@ kbd {
 .mission-option.selected { border-color: #456d60; }
 button:disabled { cursor: not-allowed; }
 @media (max-width: 1150px) {
-  .compass { top: 130px; }
-  .in-flight .toast { top: 190px; }
-  .flight-center-bottom { position: absolute; bottom: 275px; left: 50%; transform: translateX(-50%); width: max-content; max-width: 90vw; }
+  .compass { top: 110px; }
+  .in-flight .toast { top: 155px; }
+  .flight-center-bottom { position: absolute; bottom: 195px; left: 50%; transform: translateX(-50%); width: max-content; max-width: 90vw; }
 }
 @media (max-width: 800px) {
   .hero { top: 17%; }
   .hero > p { font-size: 13px; }
   .launch-brief { margin-top: 18px; }
   .quick-help { font-size: 12px; }
-  .telemetry { width: 300px; }
-  .main-readouts strong { font-size: 35px; }
+  .telemetry { width: 264px; }
+  .main-readouts strong { font-size: 31px; }
   .objective { padding: 10px 12px; }
   .objective h3 { font-size: 13px; }
   .control-list small { max-width: 235px; }
@@ -2453,10 +2463,12 @@ button:disabled { cursor: not-allowed; }
   .objective .tiny-label { font-size: 9px; letter-spacing: .8px; }
   .flight-tools .icon-button { width: 38px; height: 38px; }
   .flight-tools .icon-button:first-of-type { display: inline-flex; }
-  .compass { top: 123px; padding: 8px 13px; }
+  .compass { top: 108px; padding: 7px 10px; }
   .flight-bottom { left: 12px; right: 12px; bottom: 12px; }
   .telemetry { width: calc(100% - 94px); padding: 13px; }
-  .deck-status { font-size: 11px; margin-bottom: 12px; padding-bottom: 10px; }
+  .telemetry.expanded { width: calc(100% - 94px); }
+  .telemetry.expanded .main-readouts strong { font-size: 28px; }
+  .deck-status { font-size: 10px; margin-bottom: 8px; padding-bottom: 6px; }
   .deck-status b { font-size: 8px; letter-spacing: .4px; }
   .main-readouts { gap: 10px; }
   .main-readouts label { font-size: 9px; }
@@ -2471,7 +2483,7 @@ button:disabled { cursor: not-allowed; }
   .flight-clock { flex-wrap: wrap; gap: 4px; justify-content: center; }
   .flight-clock { width: 100%; padding: 8px 4px; }
   .flight-clock small { font-size: 8px; }
-  .flight-center-bottom { bottom: 235px; }
+  .flight-center-bottom { bottom: 185px; }
   .flight-hint { font-size: 11px; max-width: calc(100vw - 28px); padding: 9px 12px; }
   .control-list > div { flex-direction: column; gap: 8px; padding: 14px 0; }
   .control-list > div > span:last-child { max-width: none; justify-content: flex-start; gap: 5px; }
@@ -2499,8 +2511,8 @@ button:disabled { cursor: not-allowed; }
   .departure-board { padding: 12px; gap: 12px; }
 }
 @media (pointer: coarse) {
-  .touch-stick { bottom: 315px; }
-  .touch-brake { bottom: 330px; }
+  .touch-stick { bottom: 250px; }
+  .touch-brake { bottom: 265px; }
   .secondary-readouts input { min-height: 12px; }
 }
 @media (max-height: 550px) and (min-width: 541px) {
@@ -2519,7 +2531,7 @@ button:disabled { cursor: not-allowed; }
   .flight-header { top: 12px; }
   .compass { top: 102px; }
   .in-flight .toast { top: 155px; }
-  .telemetry { width: 280px; padding: 12px 16px; }
+  .telemetry { width: 264px; padding: 10px 12px; }
   .deck-status { margin-bottom: 8px; padding-bottom: 8px; }
   .main-readouts strong { font-size: 28px; }
   .climb-readout { margin-top: 8px; }

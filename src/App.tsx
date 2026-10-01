@@ -243,6 +243,7 @@ export default function App() {
         : "finch";
     }),
     [switchingAircraft, setSwitchingAircraft] = useState(false),
+    [instrumentsExpanded, setInstrumentsExpanded] = useState(false),
     [night, setNight] = useState(false),
     [sound, setSound] = useState(false),
     [toast, setToast] = useState(""),
@@ -261,6 +262,8 @@ export default function App() {
   const launchDisabled = !ready || switchingAircraft;
   const heading = headingReadout(snapshot?.heading ?? 0);
   const climb = climbReadout(snapshot?.verticalSpeed ?? 0);
+  const flightWarning =
+    snapshot?.stall || snapshot?.hint.startsWith("Engine out");
   const closePanel = () => {
     setPanel(null);
     if (resumeAfterPanel.current) game.current?.resume();
@@ -690,7 +693,7 @@ export default function App() {
               </span>
             </button>
             <div className="objective">
-              <span className="tiny-label">{current.eyebrow}</span>
+              <span className="tiny-label">{current.name}</span>
               <h3>{snapshot.objective}</h3>
               <div className="mission-progress">
                 {snapshot.totalRings > 0 &&
@@ -707,9 +710,11 @@ export default function App() {
                     />
                   ))}
                 <span>
-                  {current.id === "free"
-                    ? "No plans. Just possibilities."
-                    : current.name}
+                  {snapshot.totalRings > 0
+                    ? `${snapshot.ring}/${snapshot.totalRings}`
+                    : current.id === "free"
+                      ? "Free flight"
+                      : "Landing mission"}
                 </span>
               </div>
             </div>
@@ -734,6 +739,14 @@ export default function App() {
                 {sound ? <Volume2 size={19} /> : <VolumeX size={19} />}
               </button>
               <button
+                className="icon-button flight-help"
+                title="Flight controls"
+                aria-label="Flight controls"
+                onClick={() => openPanel("controls")}
+              >
+                <CircleHelp size={19} />
+              </button>
+              <button
                 className="icon-button"
                 aria-label="Pause flight"
                 onClick={() => game.current?.pause()}
@@ -746,8 +759,6 @@ export default function App() {
             className="compass"
             aria-label={`Heading ${heading.degrees} degrees ${heading.cardinal}`}
           >
-            <span>HEADING</span>
-            <i />
             <strong>{heading.degrees}°</strong>
             <i />
             <span className="compass-cardinal">{heading.cardinal}</span>
@@ -783,7 +794,9 @@ export default function App() {
             </div>
           )}
           <div className="flight-bottom">
-            <div className="telemetry">
+            <div
+              className={`telemetry ${instrumentsExpanded ? "expanded" : "compact"}`}
+            >
               <div className="deck-status">
                 <span>{aircraftName}</span>
                 <b className={snapshot.stall ? "stall-status" : ""}>
@@ -793,6 +806,23 @@ export default function App() {
                       ? "ON RUNWAY"
                       : "AIRBORNE"}
                 </b>
+                <button
+                  className="instrument-toggle"
+                  aria-label={
+                    instrumentsExpanded
+                      ? "Collapse flight instruments"
+                      : "Expand flight instruments"
+                  }
+                  aria-expanded={instrumentsExpanded}
+                  title={
+                    instrumentsExpanded
+                      ? "Less detail"
+                      : "Climb rate and instrument detail"
+                  }
+                  onClick={() => setInstrumentsExpanded(!instrumentsExpanded)}
+                >
+                  <ChevronDown size={16} />
+                </button>
               </div>
               <div className="main-readouts">
                 <div>
@@ -821,13 +851,15 @@ export default function App() {
                   </span>
                 </div>
               </div>
-              <div className="climb-readout">
-                <span>CLIMB RATE</span>
-                <b>
-                  {climb}
-                  {climb !== "LEVEL" && <small> ft/min</small>}
-                </b>
-              </div>
+              {instrumentsExpanded && (
+                <div className="climb-readout">
+                  <span>CLIMB RATE</span>
+                  <b>
+                    {climb}
+                    {climb !== "LEVEL" && <small> ft/min</small>}
+                  </b>
+                </div>
+              )}
               <div className="secondary-readouts">
                 <label>
                   THROTTLE <b>{Math.round(snapshot.throttle)}%</b>
@@ -866,18 +898,17 @@ export default function App() {
                 </div>
               )}
             </div>
-            <div className="flight-center-bottom">
-              <div className={`flight-hint ${snapshot.stall ? "warning" : ""}`}>
-                {snapshot.grounded && !snapshot.stall
-                  ? `Shift: power up · ↓ / S: raise nose at ${rotationKnots} kn · B: brake`
-                  : snapshot.hint}
+            {(flightWarning || (snapshot.grounded && snapshot.time < 18)) && (
+              <div className="flight-center-bottom">
+                <div
+                  className={`flight-hint ${flightWarning ? "warning" : ""}`}
+                >
+                  {snapshot.grounded && !flightWarning
+                    ? `Shift: power up · ↓ / S: raise nose at ${rotationKnots} kn · B: brake`
+                    : snapshot.hint}
+                </div>
               </div>
-              <button onClick={() => openPanel("controls")}>
-                <CircleHelp size={13} /> Controls
-              </button>
-              <span>·</span>
-              <span>{snapshot.camera} camera</span>
-            </div>
+            )}
             <div className="map-wrap">
               <div className="flight-clock">
                 <Timer size={14} />

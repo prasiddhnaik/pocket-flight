@@ -291,8 +291,9 @@
   border: 1px solid var(--line);
   border-radius: 9px;
   overflow: hidden;
-  flex: none;
-  max-height: calc(100vh - 340px);
+  flex: 1 1 auto;
+  min-height: 160px;
+  max-height: none;
 }
 .studio-preview canvas {
   display: block;
@@ -540,7 +541,7 @@
     padding: 30px;
   }
   .studio-preview {
-    max-height: calc(100vh - 330px);
+    max-height: none;
   }
 }
 @media (max-width: 1080px) {

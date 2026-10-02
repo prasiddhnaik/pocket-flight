@@ -12,6 +12,9 @@ import { FlightAudio } from "./audio";
 import { terrainHeight, runways } from "./terrain";
 import { ReplayTimeline } from "./replay";
 import { ReplayVideoExport } from "./replay-export";
+import { ReplayLibrary } from "./replay-library";
+import { saveFrames, type SavedReplay } from "./replay-data";
+import { STORMBIRD_PILOT_EYE } from "./stormbird-config";
 import type { ExportState } from "./replay-export";
 import type { SurfacePose } from "./control-surfaces";
 export type CameraMode = "chase" | "cockpit" | "landing" | "cinematic";
@@ -47,7 +50,7 @@ export type Snapshot = {
   exportSupported: boolean;
   replayExport: ExportState;
 };
-type ReplayFrame = {
+export type ReplayFrame = {
   p: T.Vector3;
   q: T.Quaternion;
   t: number;
@@ -94,9 +97,63 @@ export class PocketFlight {
   private time = 0;
   private last = 0;
   private accumulator = 0;
+  private previousPosition = new T.Vector3();
+  private previousQuaternion = new T.Quaternion();
+  private renderPosition = new T.Vector3();
+  private renderQuaternion = new T.Quaternion();
   private emitTime = 0;
   private fps = 60;
   private replay = new ReplayTimeline<ReplayFrame>();
+  private library: ReplayLibrary | null = null;
+  private recordingId = crypto.randomUUID();
+  private recordingDate = Date.now();
+  private recordingAircraft: AircraftId = "finch";
+  private recordingPaint = 0;
+  private paintIndex = 0;
+  private savedStamp = "";
+  private nextArchive = 10;
+  private suspended = false;
+  get replayLibrary() {
+    return (this.library ??= new ReplayLibrary());
+  }
+  setSuspended(value: boolean) {
+    this.suspended = value;
+    if (value) this.audio.update(0, 0, false);
+    this.keys.clear();
+    this.last = performance.now();
+  }
+  captureSavedReplay(): SavedReplay | null {
+    if (this.replay.duration < 1) return null;
+    return {
+      schemaVersion: 1,
+      id: this.recordingId,
+      name: this.mission.name,
+      aircraft: this.recordingAircraft,
+      paint: this.recordingPaint,
+      mission: this.mission.id,
+      createdAt: this.recordingDate,
+      updatedAt: Date.now(),
+      duration: this.replay.duration,
+      trimmed: this.replay.trimmed,
+      frames: saveFrames(this.replay.toArray()),
+    };
+  }
+  async archiveReplay() {
+    const stamp = `${this.recordingId}:${this.replay.duration}:${this.replay.length}`;
+    if (stamp === this.savedStamp) return this.recordingId;
+    const replay = this.captureSavedReplay();
+    if (!replay) return null;
+    await this.replayLibrary.saveReplay(replay);
+    if (replay.id === this.recordingId) this.savedStamp = stamp;
+    return replay.id;
+  }
+  private archiveQuietly() {
+    void this.archiveReplay().catch(() =>
+      this.onToast(
+        "Replay could not save to browser storage. Your current replay is still available.",
+      ),
+    );
+  }
   readonly replayVideo = new ReplayVideoExport();
   private replayLive: ReplayFrame | null = null;
   private replaySample: ReplayFrame | null = null;
@@ -303,11 +360,17 @@ export class PocketFlight {
       ...this.aircraft.surfaces.snapshot(),
       throttle: menu ? 0.45 : p.engineOut || p.crashed ? 0 : p.throttle,
       speed: menu ? 50 : p.airspeed,
+      grounded: !menu && p.grounded,
+      groundSpeed: p.velocity.dot(new T.Vector3(0,0,-1).applyQuaternion(p.quaternion)),
+      ...(p.aircraftId === "stormbird" && !menu ? {
+        gearPosition: p.gearPosition,
+        gearSteering: p.gearSteering,
+      } : {}),
       gear:
         !menu &&
         (p.grounded ||
           p.position.y - terrainHeight(p.position.x, p.position.z) < 35 ||
-          p.airspeed < 42),
+          p.airspeed < p.profile.gearSpeed),
       damage: menu ? 0 : p.damage.engine,
     };
     input.burner = input.throttle > 0.9;
@@ -316,6 +379,13 @@ export class PocketFlight {
     effects.update(menu && this.reducedMotion ? 0 : dt, input);
   }
   start(mission: Mission) {
+    this.archiveQuietly();
+    this.recordingId = crypto.randomUUID();
+    this.recordingDate = Date.now();
+    this.recordingAircraft = this.aircraft.id;
+    this.recordingPaint = this.paintIndex;
+    this.nextArchive = 10;
+    this.savedStamp = "";
     this.replayVideo.reset();
     this.replayLive = this.replaySample = null;
     this.mission = mission;
@@ -348,6 +418,9 @@ export class PocketFlight {
     this.landingSink = 0;
     this.landingAccuracy = 0;
     this.result = null;
+    this.accumulator = 0;
+    this.previousPosition.copy(this.physics.position);
+    this.previousQuaternion.copy(this.physics.quaternion);
     this.mode = "playing";
     this.replay.clear();
     this.replayClock = 0;
@@ -374,7 +447,9 @@ export class PocketFlight {
       mission.airStart
         ? "You have the controls. Enjoy the view."
         : this.physics.jet
-          ? this.aircraft.id === "aurelia"
+          ? this.aircraft.id === "stormbird"
+            ? "Hold Shift for thrust. Pull back with ↓ at 75 knots. Stormbird accelerates quickly; plan a longer approach."
+            : this.aircraft.id === "aurelia"
             ? "Hold Shift for thrust. Pull back with ↓ at 65 knots. Landing gear operates automatically."
             : "Hold Shift for thrust. Pull back with ↓ at 65 knots. Full power lights the afterburners."
           : "Hold Shift to add throttle. Pull back with ↓ at 45 knots.",
@@ -384,6 +459,7 @@ export class PocketFlight {
   pause() {
     if (this.mode === "playing") {
       this.recordReplay(true);
+      this.archiveQuietly();
       this.mode = "paused";
       this.keys.clear();
       this.touch = { pitch: 0, roll: 0, yaw: 0 };
@@ -399,6 +475,7 @@ export class PocketFlight {
     }
   }
   menu() {
+    this.archiveQuietly();
     if (this.mode === "replay") this.stopReplay();
     if (this.replayVideo.busy) this.replayVideo.cancel();
     this.mode = "menu";
@@ -422,6 +499,7 @@ export class PocketFlight {
     this.emit();
   }
   setPaint(index: number) {
+    this.paintIndex = index;
     this.aircraft.setPaint(index);
   }
   private buildRings() {
@@ -576,6 +654,7 @@ export class PocketFlight {
     };
     this.recordReplay(true);
     this.mode = "result";
+    this.archiveQuietly();
     this.audio.chime(success);
     this.onResult(this.result);
     this.emit();
@@ -650,7 +729,7 @@ export class PocketFlight {
     model.scale.setScalar(1);
     model.position.lerpVectors(a.p, b.p, mix);
     model.quaternion.slerpQuaternions(a.q, b.q, mix);
-    model.position.add(
+    if (this.aircraft.id !== "stormbird") model.position.add(
       new T.Vector3(
         0,
         -Math.min(0.16, T.MathUtils.lerp(a.suspension, b.suspension, mix)),
@@ -658,6 +737,14 @@ export class PocketFlight {
       ).applyQuaternion(model.quaternion),
     );
     this.applyReplayVisuals(visual);
+    if (a.jet && b.jet && this.aircraft.effects) {
+      const motion = this.aircraft.effects.motion;
+      for (const key of Object.keys(a.jet) as (keyof typeof a.jet)[]) {
+        // Continuous, unwrapped phases prevent 15 Hz stepping and backwards fan jumps.
+        motion[key] = T.MathUtils.lerp(a.jet[key], b.jet[key], mix);
+      }
+      this.aircraft.effects.update(0, { ...initialJetInput(), lights: true });
+    }
     this.aircraft.setSuspension(
       T.MathUtils.lerp(a.suspension, b.suspension, mix),
     );
@@ -854,28 +941,34 @@ export class PocketFlight {
       this.poseReplay();
       this.replayEnded = this.replayClock >= this.replay.duration;
     } else {
+      // Physics advances at 60 Hz; interpolate its poses for smooth rendering at any refresh rate.
+      const alpha = this.mode === "playing" ? this.accumulator * 60 : 1;
+      const position = this.renderPosition.lerpVectors(this.previousPosition, p.position, alpha);
+      const quaternion = this.renderQuaternion.slerpQuaternions(this.previousQuaternion, p.quaternion, alpha);
       model.scale.setScalar(1);
-      model.position.copy(p.position);
-      model.position.add(
+      model.position.copy(position);
+      if (this.aircraft.id !== "stormbird") model.position.add(
         new T.Vector3(0, -Math.min(0.16, p.suspension), 0).applyQuaternion(
-          p.quaternion,
+          quaternion,
         ),
       );
       this.aircraft.setSuspension(p.suspension);
-      model.quaternion.copy(p.quaternion);
+      model.quaternion.copy(quaternion);
       model.visible = true;
       if (this.cameraMode === "cockpit") {
         this.camera.position
-          .copy(p.position)
+          .copy(position)
           .add(
-            (this.aircraft.id === "aurelia"
+            (this.aircraft.id === "stormbird"
+              ? new T.Vector3().fromArray(STORMBIRD_PILOT_EYE)
+              : this.aircraft.id === "aurelia"
               ? new T.Vector3(0, 1.265, -5.83)
               : this.physics.jet
                 ? new T.Vector3(0, 1.855, -6.68)
                 : new T.Vector3(-0.3, 1.01, 0.1)
-            ).applyQuaternion(p.quaternion),
+            ).applyQuaternion(quaternion),
           );
-        this.camera.quaternion.copy(p.quaternion);
+        this.camera.quaternion.copy(quaternion);
         this.camera.rotateY(this.orbit.x);
         this.camera.rotateX(-this.orbit.y);
         this.camera.fov = 68;
@@ -896,7 +989,7 @@ export class PocketFlight {
           .multiplyScalar(this.aircraft.cameraScale)
           .applyAxisAngle(new T.Vector3(1, 0, 0), this.orbit.y)
           .applyAxisAngle(new T.Vector3(0, 1, 0), p.yaw + this.orbit.x);
-        const goal = p.position.clone().add(offset);
+        const goal = position.clone().add(offset);
         goal.y = Math.max(
           goal.y,
           Math.max(0, terrainHeight(goal.x, goal.z)) + 3,
@@ -930,6 +1023,11 @@ export class PocketFlight {
   }
   private tick = (now: number) => {
     if (this.disposed) return;
+    if (this.suspended) {
+      this.last = now;
+      this.frame = requestAnimationFrame(this.tick);
+      return;
+    }
     this.frame = requestAnimationFrame(this.tick);
     const elapsed = (now - (this.last || now)) / 1000;
     const dt = Math.min(elapsed, 0.05);
@@ -946,11 +1044,12 @@ export class PocketFlight {
     if (this.mode === "playing") {
       this.accumulator += dt;
       while (this.accumulator >= 1 / 60) {
-        const prev = this.physics.position.clone();
+        this.previousPosition.copy(this.physics.position);
+        this.previousQuaternion.copy(this.physics.quaternion);
         const input = this.controls();
         if (!this.physics.crashed) this.aircraft.surfaces.update(input, 1 / 60);
         this.physics.step(1 / 60, input, this.world.obstacles);
-        this.updateMission(prev);
+        this.updateMission(this.previousPosition);
         this.accumulator -= 1 / 60;
         if (this.mode !== "playing") {
           this.accumulator = 0;
@@ -974,7 +1073,13 @@ export class PocketFlight {
           dt,
         );
       this.updateJet(dt);
-      if (this.mode === "playing") this.recordReplay();
+      if (this.mode === "playing") {
+        this.recordReplay();
+        if (this.physics.flightTime >= this.nextArchive) {
+          this.nextArchive = this.physics.flightTime + 10;
+          this.archiveQuietly();
+        }
+      }
     }
     this.aircraft.gear.rotation.z =
       this.mode === "menu" ? 0 : this.physics.damage.gear * 0.35;
@@ -1051,7 +1156,7 @@ export class PocketFlight {
     if (!this.airborne)
       return this.physics.airspeed < 23
         ? this.physics.jet
-          ? "Throttle up. Pull back at 65 knots."
+          ? `Throttle up. Pull back at ${this.physics.profile.rotationKnots} knots.`
           : "Throttle up. Pull back at 45 knots."
         : "Gently pull back to lift off.";
     if (this.ringIndex < this.mission.rings.length)
@@ -1143,6 +1248,7 @@ export class PocketFlight {
     const p = this.physics;
     return {
       mode: this.mode,
+      aircraft: this.aircraft.id,
       position: p.position.toArray(),
       velocity: p.velocity.toArray(),
       speed: p.airspeed,
@@ -1182,6 +1288,7 @@ export class PocketFlight {
     this.world.dispose();
     this.renderer.dispose();
     this.audio.dispose();
+    this.library?.close();
     this.renderer.domElement.remove();
   }
 }

@@ -1,5 +1,6 @@
 import { Quaternion, Vector3 } from "three";
 import { groundAt } from "./terrain";
+import stormbirdGeometry from "./stormbird-geometry.json";
 
 // Finch GLB axle positions and tire torus dimensions, in aircraft coordinates.
 export const finchWheels = [
@@ -63,5 +64,16 @@ export const aureliaWheels = [
     center: new Vector3(x * 0.55, (0.51 - 2.3) * 0.55, 1.1 * 0.55),
     major: 0.51 * 0.73 * 0.55,
     minor: 0.51 * 0.27 * 0.55,
+  })),
+];
+
+// CAD ground datum is Y=0; the flight model is centered two metres above it.
+export const stormbirdWheels = [
+  ...stormbirdGeometry.wheels.map((wheel) => ({
+    center: new Vector3()
+      .fromArray(wheel.center)
+      .add(new Vector3(0, -stormbirdGeometry.centerOffsetY, 0)),
+    major: wheel.radius,
+    minor: 0,
   })),
 ];

@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+  <meta charset="utf-8" /><meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  /><title>Pocket Flight Scene Studio</title
+  ><style>
+    body {
+      font:
+        16px/1.65 system-ui,
+        sans-serif;
+      margin: 40px auto;
+      max-width: 850px;
+      padding: 0 24px;
+      color: #20282c;
+    }
+    h1,
+    h2 {
+      line-height: 1.2;
+    }
+    h2 {
+      margin-top: 38px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    th,
+    td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid #d9dfe0;
+    }
+    code {
+      background: #eef1f1;
+      padding: 2px 5px;
+    }
+    aside {
+      border-left: 3px solid #ac9760;
+      padding: 8px 18px;
+      background: #f7f6f2;
+    }
+  </style>
+  <header>
+    <small>POCKET FLIGHT · EDITOR GUIDE</small>
+    <h1>Build a film around your flight.</h1>
+    <p>
+      Scene Studio combines saved flights with imported models, image planes,
+      animated props, camera paths, and custom audio. Open
+      <strong>Replay studio</strong> from the game's home or pause menu.
+    </p>
+  </header>
+  <h2>1. Assemble the flight</h2>
+  <p>
+    Add saved flights from the Flights tab. Select clips to trim source seconds,
+    change playback speed, choose camera shots, and add titles. Split,
+    duplicate, and reorder clips. The flight recording remains intact; this film
+    stores its own copy.
+  </p>
+  <h2>2. Bring your own assets</h2>
+  <p>
+    Open Assets and choose <strong>Import your assets</strong>, or drop files
+    into the editor. Imported items enter the asset library and the current
+    scene. Select an asset's Add button to place more instances.
+  </p>
+  <table>
+    <thead>
+      <tr>
+        <th>Asset</th>
+        <th>Supported workflow</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Blender models</td>
+        <td>
+          Export glTF 2.0 as <code>.glb</code> with textures and animations
+          embedded. Use uncompressed output. GLB is the simplest portable
+          format.
+        </td>
+      </tr>
+      <tr>
+        <td>glTF files</td>
+        <td>
+          Select the <code>.gltf</code>, referenced <code>.bin</code> buffers,
+          and textures together. References must resolve to selected local
+          files.
+        </td>
+      </tr>
+      <tr>
+        <td>Geometry</td>
+        <td>
+          <code>.obj</code> and <code>.stl</code>. OBJ imports geometry and
+          embedded vertex colors; separate MTL files are not loaded.
+        </td>
+      </tr>
+      <tr>
+        <td>Images</td>
+        <td>
+          PNG, JPEG, WebP become 3D image planes with their original aspect
+          ratio.
+        </td>
+      </tr>
+      <tr>
+        <td>Sound</td>
+        <td>
+          WAV, MP3, OGG, M4A, AAC, FLAC when the browser can decode the format.
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <p>
+    Imports are limited to 128 MB per batch. Models are centered and normalized
+    to a 6 meter maximum dimension; use Scale to set the final size. Imported
+    files stay in this browser and are not uploaded to a server.
+  </p>
+  <h2>3. Arrange the scene</h2>
+  <p>
+    Select in the Scene outliner or click a model in Scene mode. Move, rotate,
+    and scale using the viewport gizmo or numeric Object fields. Objects can
+    stay fixed in the world or follow the aircraft. Position uses meters,
+    rotation uses degrees, and Y points up. World coordinates use the first film
+    clip's initial aircraft position as their origin.
+  </p>
+  <p>
+    Use F to frame the selected object. Drag empty viewport space to orbit,
+    right-drag to pan, and scroll to zoom. Snapping uses 1 meter, 15 degree, and
+    0.1 scale increments. The outliner offers hide, lock, duplicate, and
+    undoable removal. Add cubes, spheres, cylinders, rings, planes, and point
+    lights from Assets.
+  </p>
+  <h2>4. Animate objects</h2>
+  <p>
+    Move to a film time and choose <strong>Key at playhead</strong> or press I.
+    Move to another time and change the transform to add the next key. Once an
+    object has keys, subsequent transform edits update the key at the playhead.
+    Auto keyframes also creates keys on an object that has none. Choose smooth,
+    linear, or hold easing for each key. Scene tracks show key positions and
+    visibility intervals.
+  </p>
+  <p>
+    Imported GLB/glTF animation clips appear in Object → Embedded animation.
+    Choose a clip, set its speed, and toggle looping. Scene animation follows
+    film time, including scrubbing.
+  </p>
+  <h2>5. Direct the camera</h2>
+  <p>
+    Choose Scene mode, orbit to compose a shot, and choose
+    <strong>Camera key</strong>. Move to another time, adjust the view, and
+    capture again. The Camera tab also edits camera position, target, field of
+    view, and easing. Camera keys use the original recording's source seconds,
+    so they follow clip trimming and playback speed. Track the aircraft or
+    anchor the camera in the world. Rendered preview shows the camera path
+    without editing helpers.
+  </p>
+  <h2>6. Mix and render</h2>
+  <p>
+    The Project tab sets exposure, recorded/day/night lighting, 720p or 1080p
+    resolution, and a 30 or 60 fps capture target. Audio layers have film
+    start/end times, source offsets, volume, looping, and fade controls.
+    Imported audio mixes with engine and wind audio in the exported video.
+  </p>
+  <p>
+    Choose <strong>Export video</strong> and keep the tab visible. Export runs
+    in real time; actual frame rate depends on browser and hardware performance.
+    The browser chooses MP4 when supported, otherwise WebM. Watch the finished
+    export inside the editor or save it using the download link.
+  </p>
+  <h2>7. Save and move a project</h2>
+  <p>
+    Projects, flights, and original asset bytes save automatically in IndexedDB.
+    The Backup button creates a <code>.studio.json</code> containing the film,
+    embedded flight recordings, and all referenced assets. Restore it using the
+    backup picker. Existing replay and older project JSON files remain
+    supported. Keep a backup before clearing browser/site data.
+  </p>
+  <table>
+    <thead>
+      <tr>
+        <th>Shortcut</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>G / R / S</td>
+        <td>Move / rotate / scale</td>
+      </tr>
+      <tr>
+        <td>F / I</td>
+        <td>Frame object / add transform key</td>
+      </tr>
+      <tr>
+        <td>Shift D / Delete</td>
+        <td>Duplicate / remove selected object</td>
+      </tr>
+      <tr>
+        <td>Space</td>
+        <td>Play or pause the film</td>
+      </tr>
+      <tr>
+        <td>⌘ Z / ⇧ ⌘ Z</td>
+        <td>Undo / redo</td>
+      </tr>
+    </tbody>
+  </table>
+  <aside>
+    <p>
+      Scene Studio edits replay scenes. It does not load native
+      <code>.blend</code> files or provide Blender's mesh editing, sculpting,
+      simulations, compositing nodes, or Python runtime. Create those assets in
+      Blender, then export GLB for placement and animation here.
+    </p>
+  </aside>
+</html>

@@ -7,6 +7,7 @@ export default defineConfig({
         hangar: "hangar.html",
         jet: "jet.html",
         civilian: "civilian.html",
+        stormbird: "stormbird.html",
       },
     },
   },

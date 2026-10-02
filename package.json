@@ -7,7 +7,11 @@
     "dev": "vite --host 0.0.0.0",
     "build": "tsc -b && vite build",
     "preview": "vite preview --host 0.0.0.0",
-    "test": "bun test"
+    "test": "bun test",
+    "stormbird:build": "bun scripts/build-stormbird.ts",
+    "stormbird:inspect": "bun scripts/inspect-stormbird.ts",
+    "stormbird:audit": "bun scripts/audit-stormbird.ts",
+    "stormbird:viewer": "bun scripts/start-cad-viewer.ts"
   },
   "dependencies": {
     "@fix-webm-duration/fix": "1.0.1",
@@ -22,6 +26,7 @@
     "@types/react-dom": "^19.1.0",
     "@types/three": "^0.180.0",
     "@vitejs/plugin-react": "^5.0.0",
+    "fake-indexeddb": "^6.2.5",
     "prettier": "^3.9.6",
     "typescript": "^5.8.3",
     "vite": "^7.1.0"

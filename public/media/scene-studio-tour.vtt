@@ -1,0 +1,64 @@
+WEBVTT
+
+00:00:00.700 --> 00:00:03.761
+Scene Studio turns a recorded flight into a scene you
+
+00:00:03.761 --> 00:00:06.516
+can direct. Here are the tools to start with.
+
+00:00:08.316 --> 00:00:12.199
+Open Assets and import your own models, images, or audio.
+
+00:00:12.199 --> 00:00:16.082
+For Blender models, export a G L B file with
+
+00:00:16.082 --> 00:00:19.965
+textures and animation included. Native blend files do not load
+
+00:00:19.965 --> 00:00:20.353
+directly.
+
+00:00:22.153 --> 00:00:25.833
+Select an object in the Scene collection. Use G, R,
+
+00:00:25.833 --> 00:00:29.514
+and S to move, rotate, and scale, or enter exact
+
+00:00:29.514 --> 00:00:33.194
+numbers. Choose World to keep it fixed, or Aircraft to
+
+00:00:33.194 --> 00:00:34.298
+follow the flight.
+
+00:00:36.098 --> 00:00:39.630
+At the playhead, save a transform key. Move to another
+
+00:00:39.630 --> 00:00:43.162
+time and change the pose. The editor fills in the
+
+00:00:43.162 --> 00:00:46.341
+motion between keys. Choose smooth, linear, or hold easing.
+
+00:00:48.141 --> 00:00:51.505
+Switch to Scene mode and orbit to compose a shot.
+
+00:00:51.505 --> 00:00:54.868
+Capture a camera key, then repeat from a new view.
+
+00:00:54.868 --> 00:00:58.232
+The Camera tab lets you refine position, target, and field
+
+00:00:58.232 --> 00:00:58.904
+of view.
+
+00:01:00.704 --> 00:01:05.240
+In Project, adjust soundtracks, fades, lighting, and export resolution. Keep
+
+00:01:05.240 --> 00:01:09.775
+the tab visible while rendering. Projects save in this browser.
+
+00:01:09.775 --> 00:01:14.311
+Use Backup to carry the recordings and assets together. Your
+
+00:01:14.311 --> 00:01:16.125
+original flight stays intact.

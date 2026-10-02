@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Stormbird HX-40 intake correction</title>
+<style>body{max-width:920px;margin:40px auto;padding:0 22px;font:16px/1.6 system-ui;color:#26343d}h1,h2{line-height:1.2}h2{margin-top:32px}table{border-collapse:collapse;width:100%}th,td{padding:10px 8px;text-align:left;border-bottom:1px solid #ddd;vertical-align:top}img{max-width:100%;height:auto}a{color:#234f6b}code{overflow-wrap:anywhere}figure{margin:24px 0}figcaption{font-size:14px}</style>
+</head>
+<body>
+<h1>Stormbird HX-40 · Intake correction</h1>
+<p>October 1, 2026 · <a href="stormbird-design.json">Design manifest</a> · <a href="PRINCIPLES_OF_MAKING_PLANES.md">Aircraft principles</a></p>
+<p><strong>Later revision:</strong> <a href="STORMBIRD_AFT_CORRECTION.html">Rear airframe and engine correction</a>. This page retains its earlier revision evidence; the new report identifies the current artifacts.</p>
+<h2>Why the fans looked distorted</h2>
+<p>The previous rotor used sixteen round rods as blades. Solid fuselage and wing-root material crossed the engine passage, and the wing-root leading edges projected ahead of the intake mouths. Together, those shapes hid parts of the rotor and produced an uneven front view.</p>
+<h2>Corrected geometry</h2>
+<ul>
+<li>Each rotor has twenty-four closed foil blades. Three radial sections give them camber, changing stagger and circumferential sweep.</li>
+<li>Blade roots embed in the hub. A tapered spinner embeds in that hub rather than floating ahead of it.</li>
+<li>A continuous 6 mm casing connects the compressor ring to the aft exhaust liner.</li>
+<li>The engine passage is cut through the saved fuselage, wing skins and wing-root fairings. The forward wing-root material is trimmed out of the intake mouths.</li>
+<li>Wing material inside the ducts is recessed by 2 mm. This gives the fuselage ownership of the visible duct walls and removes coincident surfaces that caused speckling.</li>
+<li>The STEP master, animation bindings and game GLB were regenerated from the same parametric source.</li>
+</ul>
+<figure><img src="../assets/stormbird/renders/intake-front-corrected.png" alt="Corrected intake mouths with unobstructed circular compressor faces"><figcaption>Reviewed static view of the saved STEP master.</figcaption></figure>
+<figure><img src="../assets/stormbird/renders/compressor-faces-corrected.png" alt="Both compressor rotors isolated, showing curved blades and tapered spinners"><figcaption>Saved native compressor detail, with the surrounding aircraft hidden.</figcaption></figure>
+<figure><img src="../assets/stormbird/renders/intake-game-corrected.png" alt="Static front view of the regenerated game mesh"><figcaption>Static image of the exported game asset. The game was not launched.</figcaption></figure>
+<h2>Measured static checks</h2>
+<table>
+<tr><th>Check</th><th>Result</th><th>Scope</th></tr>
+<tr><td>Saved solid validity</td><td>527 positive-volume solids; no validity failures</td><td>Current STEP artifact, checked after export</td></tr>
+<tr><td>Blade-to-case gap</td><td>6.981 mm</td><td>Representative blade; both engines have identical repeated geometry</td></tr>
+<tr><td>Neighboring blades</td><td>15.528 mm minimum gap; zero overlap</td><td>Representative neighboring pair on each rotor</td></tr>
+<tr><td>Blade root attachment</td><td>576.134 mm³ embedded in hub</td><td>Representative blade root on each rotor</td></tr>
+<tr><td>Spinner attachment</td><td>1,217,515 mm³ embedded in hub</td><td>Each spinner; geometric attachment only</td></tr>
+<tr><td>Rotor / airframe interference</td><td>Zero measured overlap</td><td>All rotor parts against fuselage, wing skins and root fairings</td></tr>
+<tr><td>Casing continuity</td><td>0 mm front and aft contact gaps; no overlap with checked airframe</td><td>Compressor ring to core case to exhaust liner</td></tr>
+<tr><td>Passage samples</td><td>1,152 samples; zero blocked by checked airframe</td><td>Three radii, twelve angles and sixteen axial stations per engine; excludes intended engine internals</td></tr>
+<tr><td>Game export</td><td>Four wheel pivots matched; public, production and delivery GLBs have identical SHA-256 hashes</td><td>Exported data, without runtime mechanisms</td></tr>
+<tr><td>Production build</td><td>TypeScript and Vite passed</td><td>Existing bundle-size warning remains</td></tr>
+</table>
+<p>These blades are concept geometry. Their aerodynamic performance, manufacturing tolerances, shaft dynamics and structural loads have not been substantiated. A clear geometric passage is not an airflow or pressure-recovery result. No flight, gameplay or runtime aircraft tests were performed.</p>
+<p>The retained gear check used the engine-cavity revision before the final wing-root mouth and wall trims. Those trims remove wing material at the intake opening and recess it inside the ducts; they do not change the fuselage, core, gear or mounts. The earlier gear, door and cockpit records retain their original document hashes and are not presented as fresh checks of this master.</p>
+<h2>Evidence and files</h2>
+<p><a href="../assets/stormbird/validation/compressor-fit.json">Compressor measurements</a> · <a href="../assets/stormbird/validation/intake-delivery.json">Current delivery hashes and scope</a> · <a href="../assets/stormbird/validation/export-audit.json">Export audit</a> · <a href="../assets/stormbird/validation/intake-production-build-log.txt">Production build log</a></p>
+<p><a href="../assets/stormbird/STEP/Stormbird-HX40.step">STEP master</a> · <a href="../assets/stormbird/STEP/inspection/CompressorFaces.step">Compressor detail</a> · <a href="../public/assets/stormbird-hx40.glb">Game GLB</a> · <a href="../assets/stormbird/src/stormbird.py">Parametric source</a></p>
+<p><a href="http://127.0.0.1:3245/?file=STEP%2FStormbird-HX40.step">Live CAD master</a> · <a href="http://127.0.0.1:3245/?file=STEP%2Finspection%2FCompressorFaces.step">Live compressor detail</a> · <a href="https://github.com/prasiddhnaik/pocket-flight">GitHub repository</a></p>
+<h2>Repeatable workflow</h2>
+<p><code>bun run stormbird:build</code> rebuilds the aircraft and exported game mesh. <code>bun run stormbird:inspect</code> includes the new saved-artifact compressor check. <code>bun run stormbird:audit</code> checks export datums and static ground geometry. <code>bun run stormbird:viewer</code> starts or reuses the independent CAD Viewer.</p>
+</body>
+</html>

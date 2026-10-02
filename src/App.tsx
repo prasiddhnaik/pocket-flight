@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import {
   Plane,
   ArrowUpRight,
@@ -43,6 +43,10 @@ import type { Mission, FlightResult } from "./missions";
 import type { AircraftId } from "./aircraft";
 import { paints } from "./aircraft";
 import { terrainHeight, runways } from "./terrain";
+import { flightProfiles } from "./flight-profiles";
+import { aircraftNames, climbReadout, headingReadout } from "./flight-ui";
+import type { SavedReplay } from "./replay-data";
+const ReplayStudio = lazy(() => import("./ReplayStudio"));
 const icons: Record<string, LucideIcon> = {
   sunrise: Sunrise,
   compass: Compass,
@@ -219,6 +223,8 @@ function MiniMap({
   );
 }
 export default function App() {
+  const [studioOpen, setStudioOpen] = useState(false);
+  const [studioReplay, setStudioReplay] = useState<SavedReplay | null>(null);
   const viewport = useRef<HTMLDivElement>(null),
     game = useRef<PocketFlight | null>(null);
   const [ready, setReady] = useState(false),
@@ -232,14 +238,16 @@ export default function App() {
       const n = read("pocket-flight-paint", 0);
       return Number.isInteger(n) && n >= 0 && n < paints.length ? n : 0;
     }),
-    [aircraftId, setAircraftId] = useState<AircraftId>(() =>
-      read<string>("pocket-flight-aircraft", "finch") === "aurelia"
-        ? "aurelia"
-        : read<string>("pocket-flight-aircraft", "finch") === "peregrine"
-          ? "peregrine"
-          : "finch",
-    ),
+    [aircraftId, setAircraftId] = useState<AircraftId>(() => {
+      const id =
+        new URLSearchParams(location.search).get("aircraft") ??
+        read<string>("pocket-flight-aircraft", "finch");
+      return ["finch", "peregrine", "aurelia", "stormbird"].includes(id)
+        ? (id as AircraftId)
+        : "finch";
+    }),
     [switchingAircraft, setSwitchingAircraft] = useState(false),
+    [instrumentsExpanded, setInstrumentsExpanded] = useState(false),
     [night, setNight] = useState(false),
     [sound, setSound] = useState(false),
     [toast, setToast] = useState(""),
@@ -252,6 +260,19 @@ export default function App() {
   );
   const mode = snapshot?.mode ?? "menu";
   const current = game.current?.mission ?? selected;
+  const resumeAfterPanel = useRef(false);
+  const aircraftName = aircraftNames[aircraftId];
+  const rotationKnots = flightProfiles[aircraftId].rotationKnots;
+  const launchDisabled = !ready || switchingAircraft;
+  const heading = headingReadout(snapshot?.heading ?? 0);
+  const climb = climbReadout(snapshot?.verticalSpeed ?? 0);
+  const flightWarning =
+    snapshot?.stall || snapshot?.hint.startsWith("Engine out");
+  const closePanel = () => {
+    setPanel(null);
+    if (resumeAfterPanel.current) game.current?.resume();
+    resumeAfterPanel.current = false;
+  };
   useEffect(() => {
     if (!viewport.current) return;
     let instance: PocketFlight;
@@ -299,7 +320,8 @@ export default function App() {
     };
   }, []);
   useEffect(() => {
-    if (!panel) return;
+    if (studioOpen) return;
+    if (!panel && mode !== "paused" && mode !== "result") return;
     const previous = document.activeElement as HTMLElement;
     const dialog = document.querySelector<HTMLElement>('[role="dialog"]');
     dialog?.querySelector<HTMLElement>("button")?.focus();
@@ -307,12 +329,18 @@ export default function App() {
       if (e.key === "Escape") {
         e.preventDefault();
         e.stopImmediatePropagation();
-        setPanel(null);
+        if (panel) closePanel();
+        else if (mode === "paused") game.current?.resume();
+        else back();
+      }
+      if (!panel && e.code === "KeyR" && !e.repeat) {
+        e.preventDefault();
+        fly(current);
       }
       if (e.key === "Tab" && dialog) {
         const nodes = Array.from(
           dialog.querySelectorAll<HTMLElement>(
-            'button:not(:disabled),input,a[href],[tabindex="0"]',
+            'button:not(:disabled),input:not(:disabled),select:not(:disabled),a[href],[tabindex="0"]',
           ),
         );
         const first = nodes[0],
@@ -329,12 +357,13 @@ export default function App() {
     window.addEventListener("keydown", handle, true);
     return () => {
       window.removeEventListener("keydown", handle, true);
-      previous?.focus();
+      if (!document.querySelector(".replay-studio")) previous?.focus();
     };
-  }, [panel]);
+  }, [panel, mode, studioOpen]);
   const fly = (m = selected) => {
     if (!ready || switchingAircraft) return;
     setSelected(m);
+    resumeAfterPanel.current = false;
     setPanel(null);
     setResult(null);
     game.current?.start(m);
@@ -365,6 +394,7 @@ export default function App() {
   };
   const toggleSound = () => setSound(game.current?.audio.toggle() ?? false);
   const back = () => {
+    resumeAfterPanel.current = false;
     game.current?.menu();
     setPanel(null);
     setResult(null);
@@ -378,11 +408,22 @@ export default function App() {
         .catch(() => setToast("Fullscreen is unavailable in this browser."));
   };
   const openPanel = (p: typeof panel) => {
+    resumeAfterPanel.current = mode === "playing";
     if (mode === "playing") game.current?.pause();
     setPanel(p);
   };
-  const closePanel = () => {
+  const openStudio = () => {
+    const instance = game.current;
+    if (!instance) return;
+    if (mode === "playing") instance.pause();
+    instance.setSuspended(true);
+    setStudioReplay(mode === "menu" ? null : instance.captureSavedReplay());
     setPanel(null);
+    setStudioOpen(true);
+  };
+  const closeStudio = () => {
+    setStudioOpen(false);
+    game.current?.setSuspended(false);
   };
   const selectedIcon = icons[selected.icon];
   const SelectedIcon = selectedIcon;
@@ -394,6 +435,26 @@ export default function App() {
     >
       <div className="viewport" ref={viewport} />
       <div className="vignette" />
+      {studioOpen && game.current && (
+        <Suspense
+          fallback={
+            <div
+              className="loading"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Opening replay studio"
+            >
+              Opening replay studio…
+            </div>
+          }
+        >
+          <ReplayStudio
+            library={game.current.replayLibrary}
+            initialReplay={studioReplay}
+            onClose={closeStudio}
+          />
+        </Suspense>
+      )}
       {!ready && (
         <div className="loading">
           <Plane size={36} />
@@ -435,6 +496,9 @@ export default function App() {
               >
                 The island
               </button>
+              <button onClick={openStudio} disabled={!ready}>
+                Replay studio <Film size={14} />
+              </button>
               <button onClick={() => setPanel("log")}>
                 Flight log{" "}
                 <span className="nav-count">
@@ -446,6 +510,15 @@ export default function App() {
               </button>
             </nav>
             <div className="header-actions">
+              <button
+                className="icon-button replay-studio-entry"
+                aria-label="Replay studio"
+                title="Replay studio"
+                disabled={!ready}
+                onClick={openStudio}
+              >
+                <Film size={19} />
+              </button>
               <button
                 className="weather-pill"
                 onClick={toggleNight}
@@ -486,26 +559,39 @@ export default function App() {
               <br />
               And absolutely nowhere you have to be.
             </p>
+            <div className="launch-brief" aria-live="polite">
+              <span>
+                <SelectedIcon size={16} /> {selected.name}
+              </span>
+              <span>
+                {aircraftName} ·{" "}
+                {selected.airStart ? "Start in the air" : "Runway departure"} ·{" "}
+                {selected.duration}
+              </span>
+            </div>
             <div className="hero-buttons">
               <button
                 className="primary"
-                disabled={!ready}
+                disabled={launchDisabled}
                 onClick={() => fly()}
               >
-                Let’s fly <ArrowUpRight size={21} />
+                {switchingAircraft ? "Loading aircraft…" : "Start flight"}{" "}
+                <ArrowUpRight size={21} />
               </button>
               <button
                 className="text-button"
-                disabled={!ready}
+                disabled={launchDisabled}
                 onClick={() => fly(missions[7])}
               >
                 Free flight <ArrowRight size={17} />
               </button>
             </div>
-            <div className="hero-note">
-              <span className="keycap">✦</span>
-              <span>Small adventures. Great landings.</span>
-            </div>
+            <button
+              className="quick-help"
+              onClick={() => openPanel("controls")}
+            >
+              <CircleHelp size={16} /> First time here? See the controls
+            </button>
           </section>
           <div className="world-label">
             <span className="label-line" />
@@ -521,14 +607,10 @@ export default function App() {
             <span className="pin-dot" />
           </button>
           <section className="departure-board">
-            <div
+            <button
               className="flight-plan"
               onClick={() => setPanel("missions")}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") setPanel("missions");
-              }}
+              aria-label={`Choose a mission. Selected: ${selected.name}`}
             >
               <div className="board-icon">
                 <SelectedIcon size={25} strokeWidth={1.45} />
@@ -545,17 +627,10 @@ export default function App() {
                   {selected.difficulty}
                 </p>
               </div>
-              <button
-                className="circle-button"
-                aria-label="Choose a mission"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setPanel("missions");
-                }}
-              >
+              <span className="circle-button" aria-hidden="true">
                 <ArrowUpRight size={19} />
-              </button>
-            </div>
+              </span>
+            </button>
             <div className="aircraft-selection">
               <div className="aircraft-caption">
                 <span className="tiny-label">
@@ -576,16 +651,19 @@ export default function App() {
                     <option value="finch">The Finch · U–2</option>
                     <option value="peregrine">Peregrine · HX–27</option>
                     <option value="aurelia">Aurelia · S32</option>
+                    <option value="stormbird">Stormbird · HX–40</option>
                   </select>
                 </h3>
                 <p>
                   <a
                     href={
-                      aircraftId === "aurelia"
-                        ? "/civilian.html"
-                        : aircraftId === "peregrine"
-                          ? "/jet"
-                          : "/hangar.html"
+                      aircraftId === "stormbird"
+                        ? "/stormbird.html"
+                        : aircraftId === "aurelia"
+                          ? "/civilian.html"
+                          : aircraftId === "peregrine"
+                            ? "/jet"
+                            : "/hangar.html"
                     }
                     style={{ color: "inherit", textUnderlineOffset: 3 }}
                   >
@@ -620,9 +698,11 @@ export default function App() {
                       : "Twin-engine jet"}
                   </b>
                   <span>
-                    {aircraftId === "aurelia"
-                      ? "Civilian jet · Animated systems"
-                      : "Full throttle · Afterburners"}
+                    {aircraftId === "stormbird"
+                      ? "Stormbird jet · Animated gear · Afterburners"
+                      : aircraftId === "aurelia"
+                        ? "Civilian jet · Animated systems"
+                        : "Full throttle · Afterburners"}
                   </span>
                   <span>Automatic landing gear</span>
                 </div>
@@ -663,7 +743,7 @@ export default function App() {
               </span>
             </button>
             <div className="objective">
-              <span className="tiny-label">{current.eyebrow}</span>
+              <span className="tiny-label">{current.name}</span>
               <h3>{snapshot.objective}</h3>
               <div className="mission-progress">
                 {snapshot.totalRings > 0 &&
@@ -680,9 +760,11 @@ export default function App() {
                     />
                   ))}
                 <span>
-                  {current.id === "free"
-                    ? "No plans. Just possibilities."
-                    : current.name}
+                  {snapshot.totalRings > 0
+                    ? `${snapshot.ring}/${snapshot.totalRings}`
+                    : current.id === "free"
+                      ? "Free flight"
+                      : "Landing mission"}
                 </span>
               </div>
             </div>
@@ -707,6 +789,14 @@ export default function App() {
                 {sound ? <Volume2 size={19} /> : <VolumeX size={19} />}
               </button>
               <button
+                className="icon-button flight-help"
+                title="Flight controls"
+                aria-label="Flight controls"
+                onClick={() => openPanel("controls")}
+              >
+                <CircleHelp size={19} />
+              </button>
+              <button
                 className="icon-button"
                 aria-label="Pause flight"
                 onClick={() => game.current?.pause()}
@@ -715,19 +805,13 @@ export default function App() {
               </button>
             </div>
           </header>
-          <div className="compass">
-            <span>W</span>
+          <div
+            className="compass"
+            aria-label={`Heading ${heading.degrees} degrees ${heading.cardinal}`}
+          >
+            <strong>{heading.degrees}°</strong>
             <i />
-            <span>{Math.round(snapshot.heading - 15 + 360) % 360}°</span>
-            <i />
-            <strong>
-              {Math.round(snapshot.heading).toString().padStart(3, "0")}
-              <b>▼</b>
-            </strong>
-            <i />
-            <span>{Math.round(snapshot.heading + 15) % 360}°</span>
-            <i />
-            <span>E</span>
+            <span className="compass-cardinal">{heading.cardinal}</span>
           </div>
           {mode === "playing" && snapshot.target && (
             <div
@@ -760,7 +844,36 @@ export default function App() {
             </div>
           )}
           <div className="flight-bottom">
-            <div className="telemetry">
+            <div
+              className={`telemetry ${instrumentsExpanded ? "expanded" : "compact"}`}
+            >
+              <div className="deck-status">
+                <span>{aircraftName}</span>
+                <b className={snapshot.stall ? "stall-status" : ""}>
+                  {snapshot.stall
+                    ? "STALL"
+                    : snapshot.grounded
+                      ? "ON RUNWAY"
+                      : "AIRBORNE"}
+                </b>
+                <button
+                  className="instrument-toggle"
+                  aria-label={
+                    instrumentsExpanded
+                      ? "Collapse flight instruments"
+                      : "Expand flight instruments"
+                  }
+                  aria-expanded={instrumentsExpanded}
+                  title={
+                    instrumentsExpanded
+                      ? "Less detail"
+                      : "Climb rate and instrument detail"
+                  }
+                  onClick={() => setInstrumentsExpanded(!instrumentsExpanded)}
+                >
+                  <ChevronDown size={16} />
+                </button>
+              </div>
               <div className="main-readouts">
                 <div>
                   <label>AIRSPEED</label>
@@ -768,9 +881,11 @@ export default function App() {
                     {Math.round(snapshot.speed)}
                     <small>kn</small>
                   </strong>
-                  <div className="speed-line">
-                    <i style={{ width: `${Math.min(100, snapshot.speed)}%` }} />
-                  </div>
+                  <span className="sub-readout">
+                    {snapshot.grounded
+                      ? `ROTATE ${rotationKnots} KN`
+                      : "AIR RELATIVE"}
+                  </span>
                 </div>
                 <span className="readout-divider" />
                 <div>
@@ -782,10 +897,19 @@ export default function App() {
                   <span className="sub-readout">
                     {snapshot.grounded
                       ? "ON THE GROUND"
-                      : `${Math.round(snapshot.agl)} FT ABOVE GROUND`}
+                      : `${Math.max(0, Math.round(snapshot.agl))} FT AGL`}
                   </span>
                 </div>
               </div>
+              {instrumentsExpanded && (
+                <div className="climb-readout">
+                  <span>CLIMB RATE</span>
+                  <b>
+                    {climb}
+                    {climb !== "LEVEL" && <small> ft/min</small>}
+                  </b>
+                </div>
+              )}
               <div className="secondary-readouts">
                 <label>
                   THROTTLE <b>{Math.round(snapshot.throttle)}%</b>
@@ -805,6 +929,8 @@ export default function App() {
                 />
                 <div
                   className={`health ${snapshot.health < 70 ? "damaged" : ""}`}
+                  aria-label={`Aircraft condition ${Math.round(snapshot.health)} percent`}
+                  title="Aircraft condition"
                 >
                   <Heart size={13} />
                   <span>{Math.round(snapshot.health)}%</span>
@@ -822,16 +948,17 @@ export default function App() {
                 </div>
               )}
             </div>
-            <div className="flight-center-bottom">
-              <div className={`flight-hint ${snapshot.stall ? "warning" : ""}`}>
-                {snapshot.hint}
+            {(flightWarning || (snapshot.grounded && snapshot.time < 18)) && (
+              <div className="flight-center-bottom">
+                <div
+                  className={`flight-hint ${flightWarning ? "warning" : ""}`}
+                >
+                  {snapshot.grounded && !flightWarning
+                    ? `Shift: power up · ↓ / S: raise nose at ${rotationKnots} kn · B: brake`
+                    : snapshot.hint}
+                </div>
               </div>
-              <button onClick={() => openPanel("controls")}>
-                <CircleHelp size={13} /> Controls
-              </button>
-              <span>·</span>
-              <span>{snapshot.camera} camera</span>
-            </div>
+            )}
             <div className="map-wrap">
               <div className="flight-clock">
                 <Timer size={14} />
@@ -906,6 +1033,7 @@ export default function App() {
                 onPointerDown={() => game.current?.keys.add("KeyB")}
                 onPointerUp={() => game.current?.keys.delete("KeyB")}
                 onPointerLeave={() => game.current?.keys.delete("KeyB")}
+                onPointerCancel={() => game.current?.keys.delete("KeyB")}
               >
                 BRAKE
               </button>
@@ -958,9 +1086,14 @@ export default function App() {
           {toast}
         </div>
       )}
-      {mode === "paused" && !panel && (
+      {mode === "paused" && !panel && !studioOpen && (
         <div className="modal-scrim">
-          <section className="pause-card">
+          <section
+            className="pause-card"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Flight paused"
+          >
             <span className="modal-icon">
               <Pause size={25} />
             </span>
@@ -978,12 +1111,9 @@ export default function App() {
                 <RotateCcw size={17} />
                 Restart flight
               </button>
-              <button
-                disabled={!game.current?.canReplay}
-                onClick={() => game.current?.playReplay()}
-              >
+              <button disabled={!game.current?.canReplay} onClick={openStudio}>
                 <Film size={17} />
-                Watch replay
+                Edit replay
               </button>
               <button onClick={() => setPanel("controls")}>
                 <BookOpen size={17} />
@@ -1002,9 +1132,14 @@ export default function App() {
           </section>
         </div>
       )}
-      {mode === "result" && result && !panel && (
+      {mode === "result" && result && !panel && !studioOpen && (
         <div className="modal-scrim">
-          <section className="result-card">
+          <section
+            className="result-card"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Flight result"
+          >
             <span className={`medal ${result.medal ?? "none"}`}>
               <Trophy size={34} strokeWidth={1.4} />
             </span>
@@ -1044,10 +1179,10 @@ export default function App() {
               <button
                 className="text-button"
                 disabled={!game.current?.canReplay}
-                onClick={() => game.current?.playReplay()}
+                onClick={openStudio}
               >
                 <Film size={16} />
-                Watch replay
+                Edit replay
               </button>
               <ReplayDownload game={game.current} snapshot={snapshot} />
               <button className="text-button" onClick={back}>
@@ -1129,8 +1264,12 @@ export default function App() {
                     <SelectedIcon size={16} />
                     {selected.name}
                   </span>
-                  <button className="primary" onClick={() => fly(selected)}>
-                    Let’s fly
+                  <button
+                    className="primary"
+                    disabled={launchDisabled}
+                    onClick={() => fly(selected)}
+                  >
+                    Start flight
                     <ArrowUpRight size={18} />
                   </button>
                 </div>
@@ -1139,15 +1278,16 @@ export default function App() {
             {panel === "controls" && (
               <>
                 <div className="eyebrow">A LITTLE KNOW-HOW</div>
-                <h2>You’ve got this, pilot.</h2>
-                <p>Easy to pick up. A joy to get good at.</p>
+                <h2>Your controls, at a glance.</h2>
+                <p>
+                  {aircraftName} · Keyboard or touch. Your flight pauses while
+                  you read.
+                </p>
                 <div className="control-list">
                   <div>
                     <span>
                       <b>Pitch</b>
-                      <small>
-                        Pull back to climb. Push forward to descend.
-                      </small>
+                      <small>↓ / S raises the nose. ↑ / W lowers it.</small>
                     </span>
                     <span>
                       <kbd>↑</kbd>
@@ -1231,25 +1371,27 @@ export default function App() {
                 <div className="pilot-tip">
                   <Sunrise size={23} />
                   <p>
-                    <b>Your first takeoff</b>Hold Shift for full power. At 45
-                    knots, gently hold ↓. Once airborne, release to trim. For
-                    landing, use 25–40% power, approach at 55–65 knots, and
-                    gently raise the nose just above the runway. Hold B after
-                    touchdown.
+                    <b>Taking off in {aircraftName}</b>Hold Shift for full
+                    power. At {rotationKnots} knots, gently hold ↓ or S to raise
+                    the nose. Once airborne, release to let the flight
+                    assistance trim.
+                    {aircraftId === "finch"
+                      ? " For landing, use 25–40% power and approach at 55–65 knots."
+                      : " Landing gear retracts and deploys automatically. Reduce power gradually on approach."}{" "}
+                    Gently raise the nose just above the runway, then hold B
+                    after touchdown.
                   </p>
                 </div>
                 <p className="touch-note">
                   On touchscreens, use the flight stick and throttle slider.
                   Desktop keyboard controls offer the most precision.
                 </p>
-                <button
-                  className="primary full"
-                  onClick={() => {
-                    setPanel(null);
-                    if (mode === "paused") game.current?.resume();
-                  }}
-                >
-                  Ready for the sky
+                <button className="primary full" onClick={closePanel}>
+                  {resumeAfterPanel.current
+                    ? "Resume flight"
+                    : mode === "paused"
+                      ? "Back to pause menu"
+                      : "Back to the island"}
                   <ArrowUpRight size={18} />
                 </button>
               </>
@@ -1344,26 +1486,28 @@ export default function App() {
                     <ArrowUpRight size={17} />
                   </button>
                 </div>
-                <div className="setting-row paint-setting">
-                  <span>
-                    <Plane size={21} />
-                    <b>Finch livery</b>
-                  </span>
-                  <div className="swatches">
-                    {paints.map((p, i) => (
-                      <button
-                        key={p.name}
-                        className={`swatch ${paint === i ? "selected" : ""}`}
-                        style={{ "--paint": p.color } as React.CSSProperties}
-                        aria-label={`${p.name} paint`}
-                        aria-pressed={paint === i}
-                        onClick={() => changePaint(i)}
-                      >
-                        {paint === i && <Check size={12} />}
-                      </button>
-                    ))}
+                {aircraftId === "finch" && (
+                  <div className="setting-row paint-setting">
+                    <span>
+                      <Plane size={21} />
+                      <b>Finch livery</b>
+                    </span>
+                    <div className="swatches">
+                      {paints.map((p, i) => (
+                        <button
+                          key={p.name}
+                          className={`swatch ${paint === i ? "selected" : ""}`}
+                          style={{ "--paint": p.color } as React.CSSProperties}
+                          aria-label={`${p.name} paint`}
+                          aria-pressed={paint === i}
+                          onClick={() => changePaint(i)}
+                        >
+                          {paint === i && <Check size={12} />}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
                 <div className="pilot-tip">
                   <Heart size={23} />
                   <p>

@@ -2,7 +2,8 @@ import * as T from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { AureliaEffects } from "./aurelia-effects";
 import { JetEffects } from "./jet-effects";
-export type AircraftId = "finch" | "peregrine" | "aurelia";
+import { STORMBIRD_CENTER, stormbirdLayout } from "./stormbird-config";
+export type AircraftId = "finch" | "peregrine" | "aurelia" | "stormbird";
 export const JET_SCALE = 0.7;
 export const JET_CENTER = 2.3;
 import { controlSurfaces } from "./control-surfaces";
@@ -71,7 +72,7 @@ export function disposeAircraft(root: T.Object3D, disposeTextures = true) {
 }
 export function makeAircraft(paintIndex = 0, id: AircraftId = "finch") {
   const group = new T.Group();
-  group.name = "PocketFlight_Finch_U2";
+  group.name = `PocketFlight_${id}`;
   let selectedPaint = paintIndex;
   let disposed = false;
   const livery = new Set<T.MeshStandardMaterial>();
@@ -81,7 +82,7 @@ export function makeAircraft(paintIndex = 0, id: AircraftId = "finch") {
     group,
     id,
     effects: null as JetEffects | AureliaEffects | null,
-    cameraScale: id === "aurelia" ? 1.8 : id === "peregrine" ? 1.4 : 1,
+    cameraScale: id === "aurelia" ? 1.8 : id === "finch" ? 1 : 1.4,
     wings: [new T.Group(), new T.Group()] as T.Object3D[],
     gear: new T.Group() as T.Object3D,
     propeller: new T.Group() as T.Object3D,
@@ -97,7 +98,7 @@ export function makeAircraft(paintIndex = 0, id: AircraftId = "finch") {
       const travel = T.MathUtils.clamp(meters, 0, 0.16);
       if (model.effects) {
         model.effects.setSuspension(
-          travel / (id === "aurelia" ? 0.55 : JET_SCALE),
+          travel / (id === "aurelia" ? 0.55 : id === "stormbird" ? 1 : JET_SCALE),
         );
         return;
       }
@@ -122,7 +123,9 @@ export function makeAircraft(paintIndex = 0, id: AircraftId = "finch") {
   };
   model.ready = new GLTFLoader()
     .loadAsync(
-      id === "aurelia"
+      id === "stormbird"
+        ? "/assets/stormbird-hx40.gltf"
+        : id === "aurelia"
         ? "/assets/aurelia-flight.glb"
         : id === "peregrine"
           ? "/assets/peregrine-hx27.glb"
@@ -137,11 +140,32 @@ export function makeAircraft(paintIndex = 0, id: AircraftId = "finch") {
       group.add(gltf.scene);
       const part = (name: string) => {
         const node = gltf.scene.getObjectByName(name);
-        if (!node) throw new Error(`The Finch aircraft is missing ${name}.`);
+        if (!node) throw new Error(`The ${id} aircraft is missing ${name}.`);
         return node;
       };
       model.wings = [part("Wing_Left"), part("Wing_Right")];
       model.gear = part("LandingGear");
+      if (id === "stormbird") {
+        gltf.scene.position.y = -STORMBIRD_CENTER;
+        gltf.scene.traverse((node) => {
+          if (!(node instanceof T.Mesh)) return;
+          for (const material of Array.isArray(node.material) ? node.material : [node.material]) {
+            if (!(material instanceof T.MeshStandardMaterial)) continue;
+            material.envMapIntensity = 0.35;
+            if (material.name === "Stormbird alloy 0") {
+              material.metalness = 0.12;
+              material.roughness = 0.6;
+            }
+            if (material.name.startsWith("Glass")) {
+              material.opacity = 0.30;
+              material.color.set("#8ca9b2");
+              material.side = T.FrontSide;
+            }
+          }
+        });
+        model.effects = new JetEffects(gltf.scene, stormbirdLayout);
+        return;
+      }
       if (id === "aurelia") {
         gltf.scene.scale.setScalar(0.55);
         gltf.scene.position.y = -2.3 * 0.55;

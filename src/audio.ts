@@ -57,7 +57,7 @@ export class FlightAudio {
     }
     return this.enabled;
   }
-  update(throttle: number, speed: number, active: boolean) {
+  update(throttle: number, speed: number, active: boolean, volume = 1) {
     if (!this.context || !this.gain || !this.oscillator || !this.windGain)
       return;
     const t = this.context.currentTime;
@@ -73,15 +73,15 @@ export class FlightAudio {
       0.15,
     );
     this.gain.gain.setTargetAtTime(
-      this.enabled && active ? 0.016 + throttle * 0.035 : 0,
+      this.enabled && active ? (0.016 + throttle * 0.035) * volume : 0,
       t,
       0.1,
     );
     this.windGain.gain.setTargetAtTime(
       this.enabled && active
         ? this.jet
-          ? 0.04 + throttle * 0.15
-          : Math.min(0.09, speed * 0.0012)
+          ? (0.04 + throttle * 0.15) * volume
+          : Math.min(0.09, speed * 0.0012) * volume
         : 0,
       t,
       0.1,

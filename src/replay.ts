@@ -42,6 +42,9 @@ export class ReplayTimeline<T extends { t: number }> {
   get duration() {
     return this.length > 1 ? this.at(this.length - 1).t - this.at(0).t : 0;
   }
+  toArray() {
+    return Array.from({ length: this.length }, (_, i) => this.at(i));
+  }
   sample(elapsed: number) {
     if (this.length < 2) return null;
     const t = this.at(0).t + Math.max(0, Math.min(elapsed, this.duration));

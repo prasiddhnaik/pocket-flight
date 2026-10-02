@@ -25,7 +25,7 @@ export function replayFilename(
   return `pocket-flight-${slug}-${date.toISOString().replace(/[:.]/g, "-")}.${mime.includes("mp4") ? "mp4" : "webm"}`;
 }
 
-/** Captures only game imagery and synthesized game audio, never screen or microphone. */
+/** Captures rendered game imagery and the supplied game/scene audio mix. */
 export class ReplayVideoExport {
   state: ExportState = { phase: "idle" };
   private recorder: MediaRecorder | null = null;
@@ -37,6 +37,8 @@ export class ReplayVideoExport {
   private generation = 0;
   private startedAt = 0;
   private recordedDuration = 0;
+  private width = 1280;
+  private height = 720;
   get supported() {
     return (
       typeof MediaRecorder !== "undefined" &&
@@ -52,6 +54,7 @@ export class ReplayVideoExport {
     audio: MediaStreamTrack | null,
     source: HTMLCanvasElement,
     duration: number,
+    settings = { width: 1280, height: 720, fps: 30 },
   ) {
     this.reset();
     if (!this.supported) {
@@ -66,21 +69,21 @@ export class ReplayVideoExport {
     const generation = this.generation;
     try {
       const canvas = (this.canvas = document.createElement("canvas"));
-      canvas.width = 1280;
-      canvas.height = 720;
+      this.width = canvas.width = settings.width;
+      this.height = canvas.height = settings.height;
       this.context = canvas.getContext("2d", { alpha: false });
       if (!this.context) throw new Error("Unable to create the video canvas.");
       this.context.fillStyle = "#163b40";
-      this.context.fillRect(0, 0, 1280, 720);
+      this.context.fillRect(0, 0, this.width, this.height);
       this.state = { phase: "recording" };
       this.draw(source);
-      const stream = (this.stream = canvas.captureStream(30));
+      const stream = (this.stream = canvas.captureStream(settings.fps));
       if (audio) stream.addTrack(audio);
       const mimeType = replayMimeType((m) => MediaRecorder.isTypeSupported(m))!;
       const recorder = (this.recorder = new MediaRecorder(stream, {
         mimeType,
         videoBitsPerSecond: Math.min(
-          5_000_000,
+          settings.width >= 1920 ? 10_000_000 : 5_000_000,
           Math.floor((360 * 1024 * 1024 * 8) / Math.max(1, duration)),
         ),
       }));
@@ -145,15 +148,28 @@ export class ReplayVideoExport {
       return false;
     }
   }
-  draw(source: HTMLCanvasElement) {
+  draw(source: HTMLCanvasElement, title = "") {
     if (this.state.phase !== "recording" || !this.context) return;
     const ctx = this.context,
-      scale = Math.min(1280 / source.width, 720 / source.height);
+      scale = Math.min(this.width / source.width, this.height / source.height);
     const w = source.width * scale,
       h = source.height * scale;
     ctx.fillStyle = "#163b40";
-    ctx.fillRect(0, 0, 1280, 720);
-    ctx.drawImage(source, (1280 - w) / 2, (720 - h) / 2, w, h);
+    ctx.fillRect(0, 0, this.width, this.height);
+    ctx.drawImage(source, (this.width - w) / 2, (this.height - h) / 2, w, h);
+    ctx.save();
+    ctx.scale(this.width / 1280, this.height / 720);
+    if (title.trim()) {
+      ctx.font = "600 30px sans-serif";
+      ctx.textAlign = "center";
+      const text = title.slice(0, 100),
+        width = Math.min(1160, ctx.measureText(text).width + 48);
+      ctx.fillStyle = "rgba(12, 24, 29, .72)";
+      ctx.fillRect((1280 - width) / 2, 624, width, 60);
+      ctx.fillStyle = "#fff9e9";
+      ctx.fillText(text, 640, 663, width - 36);
+    }
+    ctx.restore();
   }
   finish() {
     if (this.state.phase !== "recording" || !this.recorder) return;

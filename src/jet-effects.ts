@@ -1,4 +1,7 @@
 import * as T from "three";
+import { StormbirdMechanisms } from "./stormbird-mechanisms";
+import stormbirdGeometry from "./stormbird-geometry.json";
+import { STORMBIRD_GEAR_SECONDS } from "./stormbird-kinematics";
 
 export type JetMode =
   | "manual"
@@ -21,6 +24,34 @@ export type JetInput = {
   speed: number;
   damage: number;
   contrails: boolean;
+  gearPosition?: number;
+  gearSteering?: number;
+  groundSpeed?: number;
+  grounded?: boolean;
+};
+type Point = [number, number, number];
+export type JetLayout = {
+  exhaust: Point;
+  wingtip: Point;
+  noseGear: Point;
+  mainGear: Point;
+  canopy: Point;
+  flameRadius: number;
+  flameLength: number;
+  flameEmission?: number;
+  flameLight?: number;
+  flameBlending?: "normal";
+  gearDoorsOpen?: boolean;
+  lamps?: [number, number, number, string, string][];
+};
+const peregrineLayout: JetLayout = {
+  exhaust: [0.91, 2.88, 13.72],
+  wingtip: [9.88, 4.08, 5.2],
+  noseGear: [0, 1.72, -7.05],
+  mainGear: [1.25, 2.16, 2.15],
+  canopy: [0, 4.47, -6.1],
+  flameRadius: 0.68,
+  flameLength: 5.4,
 };
 export const initialJetInput = (): JetInput => ({
   throttle: 0,
@@ -83,6 +114,10 @@ export function sequenceInput(mode: JetMode, t: number): JetInput {
   return i;
 }
 export class JetMotion {
+  #mechanical: boolean;
+  constructor(mechanical = false) {
+    this.#mechanical = mechanical;
+  }
   time = 0;
   rpm = 0;
   burner = 0;
@@ -94,9 +129,18 @@ export class JetMotion {
   flaps = 0;
   speed = 0;
   damage = 0;
+  rotorAngle = 0;
+  wheelAngle = 0;
+  wheelDistance = 0;
+  gearSteering = 0;
+  fanPhase = 0;
+  touchdownAge = 10;
   update(dt: number, i: JetInput) {
     if (dt <= 0) return;
     this.time += dt;
+    this.touchdownAge += dt;
+    const previousRpm = this.rpm,
+      previousSpeed = this.speed;
     const approach = (value: number, target: number, rate: number) =>
       T.MathUtils.damp(value, target, rate, dt);
     this.rpm = approach(
@@ -109,17 +153,37 @@ export class JetMotion {
       i.burner ? smooth(0.75, 0.95, this.rpm) : 0,
       3,
     );
-    this.gear = approach(this.gear, i.gear ? 1 : 0, 1.35);
-    this.canopy = approach(
-      this.canopy,
-      i.canopy && this.rpm < 0.12 && this.speed < 2 ? 1 : 0,
-      1.8,
-    );
+    const advance = (value: number, target: number, seconds: number) =>
+      value + clamp(target - value, -dt / seconds, dt / seconds);
+    this.gear = this.#mechanical
+      ? i.gearPosition === undefined
+        ? advance(this.gear, i.gear ? 1 : 0, STORMBIRD_GEAR_SECONDS)
+        : clamp(i.gearPosition, 0, 1)
+      : approach(this.gear, i.gear ? 1 : 0, 1.35);
+    const canopyTarget = i.canopy && this.rpm < 0.12 && this.speed < 2 ? 1 : 0;
+    this.canopy = this.#mechanical
+      ? advance(this.canopy, canopyTarget, 3.2)
+      : approach(this.canopy, canopyTarget, 1.8);
     for (const key of ["roll", "pitch", "yaw"] as const)
       this[key] = approach(this[key], clamp(i[key], -1, 1), 7);
+    this.gearSteering = i.gearSteering ?? this.yaw;
     this.flaps = approach(this.flaps, clamp(i.flaps, 0, 1), 2);
     this.speed = approach(this.speed, Math.max(0, i.speed), 1.3);
     this.damage = approach(this.damage, clamp(i.damage, 0, 1), 2);
+    const rate = i.throttle > previousRpm ? 0.85 : 0.55;
+    const target = clamp(i.throttle, 0, 1);
+    const revolutions =
+      target * dt +
+      ((previousRpm - target) * (1 - Math.exp(-rate * dt))) / rate;
+    this.rotorAngle += revolutions * 48;
+    this.fanPhase += revolutions * 18;
+    const speedTarget = Math.max(0, i.speed);
+    this.wheelAngle +=
+      (speedTarget * dt +
+        ((previousSpeed - speedTarget) * (1 - Math.exp(-1.3 * dt))) / 1.3) *
+      0.08;
+    if (this.#mechanical && i.grounded)
+      this.wheelDistance += (i.groundSpeed ?? 0) * dt;
   }
 }
 
@@ -131,7 +195,7 @@ varying vec3 p; void main(){p=position;gl_Position=projectionMatrix*modelViewMat
 // Integrate emission through a bounded volume so the exhaust reads consistently from every angle.
 const flameFragment = `precision highp float;
 #include <logdepthbuf_pars_fragment>
-varying vec3 p; uniform vec3 eye; uniform float time,strength,phase;
+varying vec3 p; uniform vec3 eye; uniform float time,strength,phase,gain;
 float hash(vec3 q){return fract(sin(dot(q,vec3(127.1,311.7,74.7)))*43758.5453);}
 float noise(vec3 q){vec3 i=floor(q),f=fract(q);f=f*f*(3.-2.*f);
 return mix(mix(mix(hash(i),hash(i+vec3(1,0,0)),f.x),mix(hash(i+vec3(0,1,0)),hash(i+vec3(1,1,0)),f.x),f.y),mix(mix(hash(i+vec3(0,0,1)),hash(i+vec3(1,0,1)),f.x),mix(hash(i+vec3(0,1,1)),hash(i+vec3(1,1,1)),f.x),f.y),f.z);}
@@ -159,7 +223,7 @@ float d=envelope*(.87+.18*n+shock)*stepSize;
 emission+=color*d;density+=d;
 }
 float alpha=1.-exp(-density*2.8*strength);
-gl_FragColor=vec4(emission/max(density,.0001)*1.7,alpha);
+gl_FragColor=vec4(emission/max(density,.0001)*gain,alpha);
 #include <tonemapping_fragment>
 #include <colorspace_fragment>
 }`;
@@ -190,7 +254,7 @@ varying float a;uniform vec3 color;void main(){
 float d=length(gl_PointCoord-.5)*2.;float soft=exp(-d*d*2.5)*(1.-smoothstep(.6,1.,d));gl_FragColor=vec4(color,soft*a);}`;
 
 export class JetEffects {
-  readonly motion = new JetMotion();
+  readonly motion: JetMotion;
   readonly group = new T.Group();
   private flames: T.Group[] = [];
   private flameMaterials: T.ShaderMaterial[] = [];
@@ -198,23 +262,29 @@ export class JetEffects {
   private engineLights: T.PointLight[] = [];
   private lamps: { sprite: T.Sprite; kind: string }[] = [];
   private canopyPivot: T.Group;
+  private mechanisms?: StormbirdMechanisms;
   private legs: { pivot: T.Group; side: number; nose: boolean }[] = [];
   private wheels: T.Object3D[] = [];
   private smoke: T.Points;
   private trail: T.Points;
-  private touchdownAge = 10;
   private suspension = 0;
-  private wheelAngle = 0;
-  private rotorAngle = 0;
   private spriteMap = glowTexture();
   private reduced = false;
-  constructor(readonly model: T.Group) {
+  private nodes = new Map<string, T.Object3D>();
+  constructor(
+    readonly model: T.Group,
+    private readonly layout = peregrineLayout,
+  ) {
+    const mechanical =
+      model.getObjectByName("Stormbird_HX40")?.userData.mechanisms;
+    this.motion = new JetMotion(!!mechanical);
     this.group.name = "Peregrine effects";
     model.add(this.group);
     const geometry = flameGeometry();
-    for (const [index, x] of [-0.91, 0.91].entries()) {
+    const [ex, ey, ez] = layout.exhaust;
+    for (const [index, x] of [-ex, ex].entries()) {
       const plume = new T.Group();
-      plume.position.set(x, 2.88, 13.72);
+      plume.position.set(x, ey, ez);
       this.group.add(plume);
       this.flames.push(plume);
       {
@@ -225,12 +295,16 @@ export class JetEffects {
             time: { value: 0 },
             strength: { value: 0 },
             phase: { value: index * 2.3 },
+            gain: { value: layout.flameEmission ?? 1.7 },
             eye: { value: new T.Vector3() },
           },
           transparent: true,
           depthWrite: false,
           side: T.BackSide,
-          blending: T.AdditiveBlending,
+          blending:
+            layout.flameBlending === "normal"
+              ? T.NormalBlending
+              : T.AdditiveBlending,
         });
         const mesh = new T.Mesh(geometry, material);
         mesh.onBeforeRender = (_renderer, _scene, camera) => {
@@ -251,15 +325,15 @@ export class JetEffects {
           blending: T.AdditiveBlending,
         }),
       );
-      glow.position.set(x, 2.88, 13.64);
+      glow.position.set(x, ey, ez - 0.08);
       this.group.add(glow);
       this.engineGlows.push(glow);
       const light = new T.PointLight("#ff792f", 0, 9, 2);
-      light.position.set(x, 2.88, 14.4);
+      light.position.set(x, ey, ez + 0.68);
       this.group.add(light);
       this.engineLights.push(light);
     }
-    for (const [x, y, z, color, kind] of [
+    for (const [x, y, z, color, kind] of layout.lamps ?? [
       [-9.9, 4.08, 5.2, "#ff3425", "nav"],
       [9.9, 4.08, 5.2, "#39ffa9", "nav"],
       [0, 7.87, 12.5, "#ff4e37", "beacon"],
@@ -267,7 +341,7 @@ export class JetEffects {
       [-9.88, 4.1, 5.3, "#ffffff", "strobe"],
       [9.88, 4.1, 5.3, "#ffffff", "strobe"],
       [0, 1.6, -7.08, "#fff1d5", "landing"],
-    ] as const) {
+    ]) {
       const sprite = new T.Sprite(
         new T.SpriteMaterial({
           map: this.spriteMap,
@@ -291,35 +365,56 @@ export class JetEffects {
       if (object) g.attach(object);
       return g;
     };
+    if (mechanical) this.mechanisms = new StormbirdMechanisms(model);
     const canopyHinge = model.getObjectByName("Canopy")?.userData.hinge_glTF;
-    this.canopyPivot = pivot(
-      "Canopy",
-      new T.Vector3().fromArray(
-        Array.isArray(canopyHinge) ? canopyHinge : [0, 4.47, -6.1],
-      ),
-    );
-    this.legs.push({
-      pivot: pivot("Nose_steering", new T.Vector3(0, 1.72, -7.05)),
-      side: 0,
-      nose: true,
-    });
-    for (const side of [-1, 1])
+    this.canopyPivot = mechanical
+      ? new T.Group()
+      : pivot(
+          "Canopy",
+          new T.Vector3().fromArray(
+            Array.isArray(canopyHinge) ? canopyHinge : layout.canopy,
+          ),
+        );
+    if (!mechanical) {
       this.legs.push({
-        pivot: pivot(
-          "Main_gear_" + (side < 0 ? "Left" : "Right"),
-          new T.Vector3(side * 1.25, 2.16, 2.15),
-        ),
-        side,
-        nose: false,
+        pivot: pivot("Nose_steering", new T.Vector3(...layout.noseGear)),
+        side: 0,
+        nose: true,
       });
+      for (const side of [-1, 1])
+        this.legs.push({
+          pivot: pivot(
+            "Main_gear_" + (side < 0 ? "Left" : "Right"),
+            new T.Vector3(
+              side * layout.mainGear[0],
+              layout.mainGear[1],
+              layout.mainGear[2],
+            ),
+          ),
+          side,
+          nose: false,
+        });
+    }
     model.traverse((o) => {
+      if (!this.nodes.has(o.name)) this.nodes.set(o.name, o);
       if (
-        /^(Nose_wheel_|Main_wheel_)/.test(o.name) &&
+        /^(Nose_wheel_|Main_wheel_|Nose_steering_wheel_|Nose_gear_wheel_|Main_gear_(Left|Right)_wheel_)/.test(
+          o.name,
+        ) &&
         !o.name.includes(" | ") &&
         !(o instanceof T.Mesh)
       )
         this.wheels.push(o);
     });
+    if (layout.gearDoorsOpen) {
+      const noseLeg = this.nodes.get(
+        mechanical ? "Nose_gear" : "Nose_steering",
+      );
+      model.updateMatrixWorld(true);
+      if (noseLeg)
+        for (const { sprite, kind } of this.lamps)
+          if (kind === "landing") noseLeg.attach(sprite);
+    }
     const particles = (name: string, count: number, color: string) => {
       const geo = new T.BufferGeometry();
       geo.setAttribute(
@@ -354,15 +449,14 @@ export class JetEffects {
     this.trail = particles("Condensation and wingtip vortices", 480, "#dceaf0");
   }
   reset() {
-    Object.assign(this.motion, new JetMotion());
-    this.touchdownAge = 10;
-    this.wheelAngle = 0;
-    this.rotorAngle = 0;
+    Object.assign(this.motion, new JetMotion(!!this.mechanisms));
+    this.mechanisms?.reset();
   }
   touchdown() {
-    this.touchdownAge = 0;
+    this.motion.touchdownAge = 0;
   }
   setSuspension(value: number) {
+    this.mechanisms?.setSuspension(value);
     const delta = value - this.suspension;
     this.legs.forEach(({ pivot }) => (pivot.position.y += delta));
     this.suspension = value;
@@ -374,66 +468,106 @@ export class JetEffects {
     this.motion.update(dt, input);
     const s = this.motion,
       t = s.time;
-    this.touchdownAge += dt;
-    this.rotorAngle = (this.rotorAngle + dt * s.rpm * 48) % (Math.PI * 2);
-    this.wheelAngle = (this.wheelAngle + dt * s.speed * 0.08) % (Math.PI * 2);
     for (const name of ["Compressor_-1", "Compressor_1"]) {
-      const o = this.model.getObjectByName(name);
-      if (o) o.rotation.z = this.rotorAngle;
+      const o = this.nodes.get(name);
+      if (o) o.rotation.z = this.motion.rotorAngle;
     }
-    for (const w of this.wheels) w.rotation.x = this.wheelAngle;
+    for (const w of this.wheels) {
+      const tire = this.mechanisms && stormbirdGeometry.wheels.find(t => t.name === w.name);
+      w.rotation.x = tire ? -this.motion.wheelDistance / tire.radius : this.motion.wheelAngle;
+    }
     const set = (name: string, axis: "x" | "y", v: number) => {
-      const o = this.model.getObjectByName(name);
-      if (o) o.rotation[axis] = v;
+      const o = this.nodes.get(name);
+      if (!o) return;
+      const datum = o.userData.hinge_axis;
+      if (Array.isArray(datum))
+        o.quaternion.setFromAxisAngle(
+          new T.Vector3().fromArray(datum).normalize(),
+          v,
+        );
+      else o.rotation[axis] = v;
     };
     set("Aileron_Left", "x", s.roll * 0.38);
     set("Aileron_Right", "x", -s.roll * 0.38);
     set("Rudder", "y", s.yaw * 0.42);
     for (const side of ["Left", "Right"]) {
+      set("Rudder_" + side, "y", s.yaw * 0.42);
+      set("Canard_" + side, "x", s.pitch * 0.28);
       set("Elevator_" + side, "x", -s.pitch * 0.4);
       set("Flap_" + side, "x", s.flaps * 0.5);
     }
-    this.canopyPivot.rotation.x = s.canopy * 0.65;
-    for (const part of ["Nose", "Main"])
-      for (const side of ["Left", "Right"]) {
-        const door = this.model.getObjectByName(part + "_door_" + side);
-        if (door)
-          door.rotation.z =
-            ((side === "Left" ? 1 : -1) *
-              (1 - smooth(0.03, 0.35, s.gear)) *
-              Math.PI) /
-            2;
-      }
-    const compression =
-      this.touchdownAge < 2
-        ? Math.exp(-this.touchdownAge * 3) *
-          Math.sin(this.touchdownAge * 8) *
-          0.14
-        : 0;
-    this.legs.forEach(({ pivot, side, nose }) => {
-      const fold = 1 - smooth(0.03, 0.98, s.gear);
-      pivot.rotation[nose ? "x" : "z"] = nose
-        ? -fold * 1.48
-        : -side * fold * 1.2;
-      pivot.position.y =
-        (nose ? 1.72 : 2.16) + fold * 0.25 + compression + this.suspension;
-      pivot.visible = s.gear > 0.015;
-    });
-    const steering = this.model.getObjectByName("Nose_steering");
-    if (steering) steering.rotation.y = s.yaw * 0.35 * s.gear;
+    if (this.mechanisms) {
+      this.mechanisms.apply(s.gear, s.canopy, s.gearSteering);
+    } else {
+      this.canopyPivot.rotation.x = s.canopy * 0.65;
+      for (const part of ["Nose", "Main"])
+        for (const side of ["Left", "Right"]) {
+          const door = this.nodes.get(part + "_door_" + side);
+          if (door)
+            door.rotation.z = this.layout.gearDoorsOpen
+              ? ((side === "Left" ? -1 : 1) *
+                  (1 - smooth(0.03, 0.35, s.gear)) *
+                  82 *
+                  Math.PI) /
+                180
+              : ((side === "Left" ? 1 : -1) *
+                  (1 - smooth(0.03, 0.35, s.gear)) *
+                  Math.PI) /
+                2;
+          for (const leg of ["Left", "Right"]) {
+            const door = this.nodes.get(`${part}_door_${leg}_${side}`);
+            if (door)
+              door.rotation.z = this.layout.gearDoorsOpen
+                ? ((side === "Left" ? -1 : 1) *
+                    (1 - smooth(0.03, 0.35, s.gear)) *
+                    82 *
+                    Math.PI) /
+                  180
+                : ((side === "Left" ? 1 : -1) *
+                    (1 - smooth(0.03, 0.35, s.gear)) *
+                    Math.PI) /
+                  2;
+          }
+        }
+      const compression =
+        this.motion.touchdownAge < 2
+          ? Math.exp(-this.motion.touchdownAge * 3) *
+            Math.sin(this.motion.touchdownAge * 8) *
+            0.14
+          : 0;
+      this.legs.forEach(({ pivot, side, nose }) => {
+        const fold = 1 - smooth(0.03, 0.98, s.gear);
+        pivot.rotation[nose ? "x" : "z"] = nose
+          ? -fold * 1.48
+          : -side * fold * 1.2;
+        pivot.position.y =
+          (nose ? this.layout.noseGear[1] : this.layout.mainGear[1]) +
+          fold * 0.25 +
+          compression +
+          this.suspension;
+        pivot.visible = s.gear > 0.015;
+      });
+      const steering = this.nodes.get("Nose_steering");
+      if (steering) steering.rotation.y = s.yaw * 0.35 * s.gear;
+    }
     for (let index = 0; index < 2; index++) {
       const health = index === 0 ? 1 - s.damage : 1;
       const power = s.burner * health;
       const hot = s.rpm * health;
       this.flames[index].visible = power > 0.01;
-      this.flames[index].scale.set(0.68, 0.68, 2.6 + power * 2.8);
+      this.flames[index].scale.set(
+        this.layout.flameRadius,
+        this.layout.flameRadius,
+        this.layout.flameLength * (0.48 + power * 0.52),
+      );
       const u = this.flameMaterials[index].uniforms;
       u.time.value = this.reduced ? 0 : t;
       u.strength.value = power;
       const glow = this.engineGlows[index];
       glow.material.opacity = hot * 0.08 + power * 0.24;
       glow.scale.setScalar(0.7 + power * 0.3);
-      this.engineLights[index].intensity = hot * 0.4 + power * 5;
+      this.engineLights[index].intensity =
+        (hot * 0.4 + power * 5) * (this.layout.flameLight ?? 1);
     }
     for (const { sprite, kind } of this.lamps) {
       let a = input.lights ? 1 : 0;
@@ -452,49 +586,55 @@ export class JetEffects {
       if (kind === "landing") a *= s.gear * smooth(0, 0.15, s.rpm);
       sprite.material.opacity = a;
     }
-    this.particles(this.smoke, 100, (j) => {
-      const f = (j * 0.61803398875) % 1;
-      const age = (t * 0.23 + f) % 1;
-      const touchdown = this.touchdownAge < 2.8;
-      const damage = s.damage > 0.02;
-      const side = j % 2 ? 1 : -1;
-      if (damage)
-        return [
-          -0.91 + Math.sin(j * 3 + age * 8) * age * 1.8,
-          2.88 + age * 3.5,
-          13.8 + age * 20,
-          Math.sin(age * Math.PI) * s.damage * 0.12,
-          1.5 + age * 6,
-        ];
-      if (touchdown) {
-        const age = this.touchdownAge / 2.8;
-        return [
-          side * 2.05 + Math.sin(j * 2) * age * 2,
-          0.2 + age * f * 2,
-          2.45 + age * (1 + f) * 5,
-          (1 - age) * 0.15,
-          0.3 + age * 1.6,
-        ];
-      }
-      return [0, 0, 0, 0, 0];
-    });
+    this.smoke.visible = s.damage > 0.02 || this.motion.touchdownAge < 2.8;
+    if (this.smoke.visible)
+      this.particles(this.smoke, 100, (j) => {
+        const f = (j * 0.61803398875) % 1;
+        const age = (t * 0.23 + f) % 1;
+        const touchdown = this.motion.touchdownAge < 2.8;
+        const damage = s.damage > 0.02;
+        const side = j % 2 ? 1 : -1;
+        if (damage)
+          return [
+            -this.layout.exhaust[0] + Math.sin(j * 3 + age * 8) * age * 1.8,
+            this.layout.exhaust[1] + age * 3.5,
+            this.layout.exhaust[2] + 0.08 + age * 20,
+            Math.sin(age * Math.PI) * s.damage * 0.12,
+            1.5 + age * 6,
+          ];
+        if (touchdown) {
+          const age = this.motion.touchdownAge / 2.8;
+          return [
+            side * (this.layout.mainGear[0] + 0.8) + Math.sin(j * 2) * age * 2,
+            0.2 + age * f * 2,
+            this.layout.mainGear[2] + 0.3 + age * (1 + f) * 5,
+            (1 - age) * 0.15,
+            0.3 + age * 1.6,
+          ];
+        }
+        return [0, 0, 0, 0, 0];
+      });
     (this.smoke.material as T.ShaderMaterial).uniforms.color.value.set(
       s.damage > 0.02 ? "#343d44" : "#b6c1c7",
     );
     const condensation = input.contrails ? smooth(160, 240, s.speed) : 0,
       vortex = smooth(120, 200, s.speed) * smooth(0.25, 0.7, Math.abs(s.roll));
-    this.particles(this.trail, 480, (j) => {
-      const side = j % 2 ? 1 : -1;
-      const f = (((j % 240) >> 1) / 120 + t * 0.18) % 1;
-      const wing = j < 240;
-      return [
-        side * (wing ? 9.88 : 0.91) + Math.sin(f * 12 + t) * f * 0.12,
-        (wing ? 4.08 : 2.88) - f * 0.5,
-        (wing ? 5.2 : 17) + f * (wing ? 9 : 38),
-        Math.sin(f * Math.PI) * (wing ? vortex * 0.16 : condensation * 0.1),
-        wing ? 0.18 + f * 0.7 : 0.5 + f * 2.8,
-      ];
-    });
+    this.trail.visible = condensation > 0 || vortex > 0;
+    if (this.trail.visible)
+      this.particles(this.trail, 480, (j) => {
+        const side = j % 2 ? 1 : -1;
+        const f = (((j % 240) >> 1) / 120 + t * 0.18) % 1;
+        const wing = j < 240;
+        return [
+          side * (wing ? this.layout.wingtip[0] : this.layout.exhaust[0]) +
+            Math.sin(f * 12 + t) * f * 0.12,
+          (wing ? this.layout.wingtip[1] : this.layout.exhaust[1]) - f * 0.5,
+          (wing ? this.layout.wingtip[2] : this.layout.exhaust[2] + 3.28) +
+            f * (wing ? 9 : 38),
+          Math.sin(f * Math.PI) * (wing ? vortex * 0.16 : condensation * 0.1),
+          wing ? 0.18 + f * 0.7 : 0.5 + f * 2.8,
+        ];
+      });
   }
   private particles(
     points: T.Points,

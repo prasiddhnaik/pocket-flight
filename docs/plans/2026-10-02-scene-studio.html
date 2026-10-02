@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+  <meta charset="utf-8" /><meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  /><title>Pocket Flight Scene Studio</title
+  ><style>
+    body {
+      max-width: 900px;
+      margin: 48px auto;
+      padding: 0 24px;
+      background: #fafaf7;
+      color: #24332e;
+      font: 16px/1.65 system-ui;
+    }
+    h1,
+    h2 {
+      line-height: 1.25;
+    }
+    h2 {
+      margin-top: 32px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    td,
+    th {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+    code {
+      font-size: 13px;
+    }
+  </style>
+  <h1>Scene Studio</h1>
+  <p>2 October 2026. Build directly, without subagents, as requested.</p>
+  <h2>Outcome</h2>
+  <p>
+    Extend the replay video editor with Blender-style scene assembly: bring in
+    local assets, arrange and animate objects, direct cameras, mix imported
+    audio, and render the composition into a saved video. Flight replays remain
+    the footage source. Preserve existing projects and original aircraft
+    recordings. Do not test jets.
+  </p>
+  <table>
+    <tr>
+      <th>Workflow</th>
+      <th>Implementation</th>
+    </tr>
+    <tr>
+      <td>Assets</td>
+      <td>
+        GLB, glTF with selected companion files, OBJ, STL, PNG/JPEG/WebP, and
+        audio. Import through file selection or drop; keep asset files in
+        IndexedDB. Support geometry, textures, and embedded GLB animations.
+        Explain unsupported compressed assets and missing dependencies.
+      </td>
+    </tr>
+    <tr>
+      <td>Scene assembly</td>
+      <td>
+        Outliner, primitives, visible/hidden and locked objects,
+        duplicate/remove, position/rotation/scale, world and aircraft anchors,
+        material tint and lighting. Mouse selection, orbit navigation,
+        move/rotate/scale gizmos, snapping, framing, and undo.
+      </td>
+    </tr>
+    <tr>
+      <td>Animation</td>
+      <td>
+        Object transform keyframes with linear, smooth, and hold interpolation.
+        Timeline visibility ranges and key markers. Custom camera keys from the
+        free viewport, position and target controls, lens/FOV, aircraft/world
+        camera anchors. Deterministic samples while scrubbing and exporting.
+      </td>
+    </tr>
+    <tr>
+      <td>Audio and export</td>
+      <td>
+        Imported soundtrack layers with offsets, volume, looping, and fades,
+        mixed with game audio. 720p and 1080p export. Hide all editing helpers
+        during render. Preload assets and audio before recording.
+      </td>
+    </tr>
+    <tr>
+      <td>Persistence</td>
+      <td>
+        Upgrade the browser database with an asset store. Projects contain asset
+        references and edit decisions. Portable project backups package
+        referenced asset bytes; restore atomically. Maintain compatibility with
+        existing replay-only projects.
+      </td>
+    </tr>
+  </table>
+  <h2>Execution</h2>
+  <ol>
+    <li>
+      Pure scene schema, interpolation, key editing, asset validation, and
+      migration/backup tests.
+    </li>
+    <li>
+      Local asset loaders, scene renderer, transform controls, viewport picking,
+      and camera sampling.
+    </li>
+    <li>
+      Outliner, asset browser, scene inspector, key timeline, keyboard tools,
+      audio controls, and rendering options.
+    </li>
+    <li>
+      Build and focused tests, then Finch-only browser verification with actual
+      imported assets, reload, backup restore, manipulation, animated preview,
+      and export inspection.
+    </li>
+    <li>
+      Commit and push only this feature, retaining unrelated
+      aircraft/performance edits.
+    </li>
+  </ol>
+  <h2>Structure</h2>
+  <p>
+    <code>studio-scene.ts</code> owns data and deterministic sampling.
+    <code>studio-assets.ts</code> owns file bundles and portable backups.
+    <code>studio-scene-renderer.ts</code> owns imported model instances.
+    <code>studio-soundtrack.ts</code> owns audio scheduling and mix capture.
+    Modular React scene panels plug into the existing editor. Existing replay
+    library, preview, project validation, and export receive focused extensions.
+  </p>
+  <h2>Boundaries</h2>
+  <p>
+    This is a browser scene editor for replay films. Mesh modeling, sculpting,
+    arbitrary Blender Python execution, and .blend parsing are outside the
+    implementation. Use Blender's GLB/glTF exports to transfer assets. Video
+    export runs in real time in a visible tab. Browser storage remains local to
+    the site origin.
+  </p>
+  <h2>Primary references</h2>
+  <p>
+    <a href="https://threejs.org/docs/pages/TransformControls.html"
+      >Three.js TransformControls</a
+    >
+    ·
+    <a href="https://threejs.org/docs/pages/GLTFLoader.html"
+      >Three.js GLTFLoader</a
+    >
+  </p>
+</html>

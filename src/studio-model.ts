@@ -1,5 +1,11 @@
 import { validateReplay, type SavedReplay } from "./replay-data";
-export type Shot = "chase" | "orbit" | "side" | "front" | "wide";
+import {
+  validateScene,
+  validCameraKeys,
+  type StudioScene,
+  type CameraKey,
+} from "./studio-scene";
+export type Shot = "custom" | "chase" | "orbit" | "side" | "front" | "wide";
 export type StudioClip = {
   id: string;
   replayId: string;
@@ -9,6 +15,8 @@ export type StudioClip = {
   camera: Shot;
   title: string;
   volume: number;
+  cameraKeys?: CameraKey[];
+  cameraAnchor?: "aircraft" | "world";
 };
 export type StudioProject = {
   schemaVersion: 1;
@@ -17,8 +25,10 @@ export type StudioProject = {
   updatedAt: number;
   clips: StudioClip[];
   sources: Record<string, SavedReplay>;
+  scene?: StudioScene;
 };
 export const shots: Record<Shot, string> = {
+  custom: "Keyframed camera",
   chase: "Follow",
   orbit: "Orbit",
   side: "Side profile",
@@ -105,6 +115,7 @@ export function validateProject(p: unknown): p is StudioProject {
   const v = p as StudioProject;
   return (
     v.schemaVersion === 1 &&
+    (v.scene === undefined || validateScene(v.scene)) &&
     typeof v.id === "string" &&
     v.id.length > 0 &&
     typeof v.name === "string" &&
@@ -127,6 +138,10 @@ export function validateProject(p: unknown): p is StudioProject {
         c.out <= v.sources[c.replayId].duration + 0.001 &&
         [0.25, 0.5, 1, 1.5, 2].includes(c.speed) &&
         Object.hasOwn(shots, c.camera) &&
+        (c.cameraKeys === undefined || validCameraKeys(c.cameraKeys)) &&
+        (c.cameraAnchor === undefined ||
+          c.cameraAnchor === "world" ||
+          c.cameraAnchor === "aircraft") &&
         typeof c.title === "string" &&
         c.title.length <= 100 &&
         Number.isFinite(c.volume) &&

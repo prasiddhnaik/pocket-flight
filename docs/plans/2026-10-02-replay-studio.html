@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+  <meta charset="utf-8" /><meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  /><title>Pocket Flight — Replay Studio</title
+  ><style>
+    body {
+      max-width: 880px;
+      margin: 48px auto;
+      padding: 0 24px;
+      font: 16px/1.65 system-ui;
+      color: #24332e;
+      background: #fafaf7;
+    }
+    h1,
+    h2 {
+      line-height: 1.2;
+    }
+    h2 {
+      margin-top: 32px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    th,
+    td {
+      padding: 12px;
+      text-align: left;
+      border: 1px solid #ddd;
+      vertical-align: top;
+    }
+    code {
+      font-size: 13px;
+    }
+    small {
+      color: #59665f;
+    }
+    a {
+      color: #236657;
+    }
+  </style>
+  <h1>Pocket Flight: Replay Studio</h1>
+  <p><small>2 October 2026 · Implementation brief</small></p>
+  <h2>Current scope</h2>
+  <p>
+    Only flight replays. Save recordings and editing projects in browser
+    storage. Combine saved flights into one film, preserve original flight data,
+    and export edited video. Keep the existing compact flight HUD. Use Finch
+    only for live verification; do not test jets.
+  </p>
+  <h2>Design</h2>
+  <table>
+    <tr>
+      <th>Part</th>
+      <th>Player experience</th>
+      <th>Implementation</th>
+    </tr>
+    <tr>
+      <td>Library</td>
+      <td>
+        Reopen saved flights after reload, rename recordings, view storage
+        usage, download and restore backups.
+      </td>
+      <td>
+        Versioned flight frames in transactional IndexedDB storage. Archive on
+        pause/end, before restart, and every ten seconds. Storage failure leaves
+        current footage usable.
+      </td>
+    </tr>
+    <tr>
+      <td>Editor</td>
+      <td>
+        Preview, sequential clip timeline, scrubber, trim, split, reorder,
+        duplicate, camera shots, speed, titles, audio level, undo/redo, project
+        autosave.
+      </td>
+      <td>
+        React editor and pure timeline functions. Projects retain immutable
+        copies of source recordings. Independent renderer samples recorded
+        poses; background game rendering is suspended while editing.
+      </td>
+    </tr>
+    <tr>
+      <td>Export</td>
+      <td>
+        720p video with camera cuts, playback speed, titles, and synthesized
+        game audio. Progress, cancellation, and download.
+      </td>
+      <td>
+        Preload every required aircraft before recording. Canvas capture and
+        MediaRecorder, choosing MP4 when supported or WebM as fallback. Tab
+        hiding cancels export to avoid missing footage.
+      </td>
+    </tr>
+  </table>
+  <h2>Implementation sequence</h2>
+  <ol>
+    <li>
+      Storage-safe schema, validation, IndexedDB library, and clip-time mapping.
+    </li>
+    <li>Automatic archiving and suspension integration in the game.</li>
+    <li>Library, editor controls, preview, captions, and export.</li>
+    <li>
+      Build, focused storage/timeline tests, Finch browser checks, mobile
+      layout, video inspection.
+    </li>
+    <li>
+      Commit and push only replay changes, preserving unrelated local work.
+    </li>
+  </ol>
+  <h2>Files</h2>
+  <p>
+    <code>replay-data.ts</code>, <code>replay-library.ts</code>,
+    <code>studio-model.ts</code>, <code>replay-preview.ts</code>,
+    <code>ReplayStudio.tsx</code>, and <code>studio.css</code>. Focused
+    integration in <code>game.ts</code>, <code>App.tsx</code>,
+    <code>audio.ts</code>, <code>replay.ts</code>, and
+    <code>replay-export.ts</code>.
+  </p>
+  <h2>Acceptance</h2>
+  <p>
+    Pause a Finch flight, reopen its recording after reload, combine two saved
+    flights, trim and split clips, change cameras and speed, add titles, preview
+    the film, undo edits, and download a valid video. A corrupt backup or failed
+    save must produce a usable error without overwriting valid data.
+  </p>
+  <h2>Storage details</h2>
+  <p>
+    The library stores flight data and edit decisions rather than rendered
+    movies. Storage belongs to a browser and site origin, including port.
+    Clearing site data removes saves. Include backup downloads and a request for
+    persistent storage where supported.
+  </p>
+  <p>
+    <a href="https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API"
+      >IndexedDB</a
+    >
+    ·
+    <a
+      href="https://developer.mozilla.org/en-US/docs/Web/API/Storage_API/Storage_quotas_and_eviction_criteria"
+      >Storage quotas and persistence</a
+    >
+  </p>
+  <h2>Verification limits</h2>
+  <p>
+    Video capture occurs in real time while the tab stays visible. The recorder
+    retains the latest thirty minutes of long free flights. Aircraft and scenery
+    updates may affect how older recorded flight data is rendered. Jet replay
+    preview and mobile video encoding are not part of live verification for this
+    pass.
+  </p>
+</html>

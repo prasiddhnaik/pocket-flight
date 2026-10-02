@@ -12,6 +12,8 @@ import { FlightAudio } from "./audio";
 import { terrainHeight, runways } from "./terrain";
 import { ReplayTimeline } from "./replay";
 import { ReplayVideoExport } from "./replay-export";
+import { ReplayLibrary } from "./replay-library";
+import { saveFrames, type SavedReplay } from "./replay-data";
 import { STORMBIRD_PILOT_EYE } from "./stormbird-config";
 import type { ExportState } from "./replay-export";
 import type { SurfacePose } from "./control-surfaces";
@@ -48,7 +50,7 @@ export type Snapshot = {
   exportSupported: boolean;
   replayExport: ExportState;
 };
-type ReplayFrame = {
+export type ReplayFrame = {
   p: T.Vector3;
   q: T.Quaternion;
   t: number;
@@ -102,6 +104,56 @@ export class PocketFlight {
   private emitTime = 0;
   private fps = 60;
   private replay = new ReplayTimeline<ReplayFrame>();
+  private library: ReplayLibrary | null = null;
+  private recordingId = crypto.randomUUID();
+  private recordingDate = Date.now();
+  private recordingAircraft: AircraftId = "finch";
+  private recordingPaint = 0;
+  private paintIndex = 0;
+  private savedStamp = "";
+  private nextArchive = 10;
+  private suspended = false;
+  get replayLibrary() {
+    return (this.library ??= new ReplayLibrary());
+  }
+  setSuspended(value: boolean) {
+    this.suspended = value;
+    if (value) this.audio.update(0, 0, false);
+    this.keys.clear();
+    this.last = performance.now();
+  }
+  captureSavedReplay(): SavedReplay | null {
+    if (this.replay.duration < 1) return null;
+    return {
+      schemaVersion: 1,
+      id: this.recordingId,
+      name: this.mission.name,
+      aircraft: this.recordingAircraft,
+      paint: this.recordingPaint,
+      mission: this.mission.id,
+      createdAt: this.recordingDate,
+      updatedAt: Date.now(),
+      duration: this.replay.duration,
+      trimmed: this.replay.trimmed,
+      frames: saveFrames(this.replay.toArray()),
+    };
+  }
+  async archiveReplay() {
+    const stamp = `${this.recordingId}:${this.replay.duration}:${this.replay.length}`;
+    if (stamp === this.savedStamp) return this.recordingId;
+    const replay = this.captureSavedReplay();
+    if (!replay) return null;
+    await this.replayLibrary.saveReplay(replay);
+    if (replay.id === this.recordingId) this.savedStamp = stamp;
+    return replay.id;
+  }
+  private archiveQuietly() {
+    void this.archiveReplay().catch(() =>
+      this.onToast(
+        "Replay could not save to browser storage. Your current replay is still available.",
+      ),
+    );
+  }
   readonly replayVideo = new ReplayVideoExport();
   private replayLive: ReplayFrame | null = null;
   private replaySample: ReplayFrame | null = null;
@@ -327,6 +379,13 @@ export class PocketFlight {
     effects.update(menu && this.reducedMotion ? 0 : dt, input);
   }
   start(mission: Mission) {
+    this.archiveQuietly();
+    this.recordingId = crypto.randomUUID();
+    this.recordingDate = Date.now();
+    this.recordingAircraft = this.aircraft.id;
+    this.recordingPaint = this.paintIndex;
+    this.nextArchive = 10;
+    this.savedStamp = "";
     this.replayVideo.reset();
     this.replayLive = this.replaySample = null;
     this.mission = mission;
@@ -400,6 +459,7 @@ export class PocketFlight {
   pause() {
     if (this.mode === "playing") {
       this.recordReplay(true);
+      this.archiveQuietly();
       this.mode = "paused";
       this.keys.clear();
       this.touch = { pitch: 0, roll: 0, yaw: 0 };
@@ -415,6 +475,7 @@ export class PocketFlight {
     }
   }
   menu() {
+    this.archiveQuietly();
     if (this.mode === "replay") this.stopReplay();
     if (this.replayVideo.busy) this.replayVideo.cancel();
     this.mode = "menu";
@@ -438,6 +499,7 @@ export class PocketFlight {
     this.emit();
   }
   setPaint(index: number) {
+    this.paintIndex = index;
     this.aircraft.setPaint(index);
   }
   private buildRings() {
@@ -592,6 +654,7 @@ export class PocketFlight {
     };
     this.recordReplay(true);
     this.mode = "result";
+    this.archiveQuietly();
     this.audio.chime(success);
     this.onResult(this.result);
     this.emit();
@@ -960,6 +1023,11 @@ export class PocketFlight {
   }
   private tick = (now: number) => {
     if (this.disposed) return;
+    if (this.suspended) {
+      this.last = now;
+      this.frame = requestAnimationFrame(this.tick);
+      return;
+    }
     this.frame = requestAnimationFrame(this.tick);
     const elapsed = (now - (this.last || now)) / 1000;
     const dt = Math.min(elapsed, 0.05);
@@ -1005,7 +1073,13 @@ export class PocketFlight {
           dt,
         );
       this.updateJet(dt);
-      if (this.mode === "playing") this.recordReplay();
+      if (this.mode === "playing") {
+        this.recordReplay();
+        if (this.physics.flightTime >= this.nextArchive) {
+          this.nextArchive = this.physics.flightTime + 10;
+          this.archiveQuietly();
+        }
+      }
     }
     this.aircraft.gear.rotation.z =
       this.mode === "menu" ? 0 : this.physics.damage.gear * 0.35;
@@ -1214,6 +1288,7 @@ export class PocketFlight {
     this.world.dispose();
     this.renderer.dispose();
     this.audio.dispose();
+    this.library?.close();
     this.renderer.domElement.remove();
   }
 }

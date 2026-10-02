@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import {
   Plane,
   ArrowUpRight,
@@ -45,6 +45,8 @@ import { paints } from "./aircraft";
 import { terrainHeight, runways } from "./terrain";
 import { flightProfiles } from "./flight-profiles";
 import { aircraftNames, climbReadout, headingReadout } from "./flight-ui";
+import type { SavedReplay } from "./replay-data";
+const ReplayStudio = lazy(() => import("./ReplayStudio"));
 const icons: Record<string, LucideIcon> = {
   sunrise: Sunrise,
   compass: Compass,
@@ -221,6 +223,8 @@ function MiniMap({
   );
 }
 export default function App() {
+  const [studioOpen, setStudioOpen] = useState(false);
+  const [studioReplay, setStudioReplay] = useState<SavedReplay | null>(null);
   const viewport = useRef<HTMLDivElement>(null),
     game = useRef<PocketFlight | null>(null);
   const [ready, setReady] = useState(false),
@@ -316,6 +320,7 @@ export default function App() {
     };
   }, []);
   useEffect(() => {
+    if (studioOpen) return;
     if (!panel && mode !== "paused" && mode !== "result") return;
     const previous = document.activeElement as HTMLElement;
     const dialog = document.querySelector<HTMLElement>('[role="dialog"]');
@@ -352,9 +357,9 @@ export default function App() {
     window.addEventListener("keydown", handle, true);
     return () => {
       window.removeEventListener("keydown", handle, true);
-      previous?.focus();
+      if (!document.querySelector(".replay-studio")) previous?.focus();
     };
-  }, [panel, mode]);
+  }, [panel, mode, studioOpen]);
   const fly = (m = selected) => {
     if (!ready || switchingAircraft) return;
     setSelected(m);
@@ -407,6 +412,19 @@ export default function App() {
     if (mode === "playing") game.current?.pause();
     setPanel(p);
   };
+  const openStudio = () => {
+    const instance = game.current;
+    if (!instance) return;
+    if (mode === "playing") instance.pause();
+    instance.setSuspended(true);
+    setStudioReplay(mode === "menu" ? null : instance.captureSavedReplay());
+    setPanel(null);
+    setStudioOpen(true);
+  };
+  const closeStudio = () => {
+    setStudioOpen(false);
+    game.current?.setSuspended(false);
+  };
   const selectedIcon = icons[selected.icon];
   const SelectedIcon = selectedIcon;
   const completed = log.filter((l) => l.success),
@@ -417,6 +435,26 @@ export default function App() {
     >
       <div className="viewport" ref={viewport} />
       <div className="vignette" />
+      {studioOpen && game.current && (
+        <Suspense
+          fallback={
+            <div
+              className="loading"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Opening replay studio"
+            >
+              Opening replay studio…
+            </div>
+          }
+        >
+          <ReplayStudio
+            library={game.current.replayLibrary}
+            initialReplay={studioReplay}
+            onClose={closeStudio}
+          />
+        </Suspense>
+      )}
       {!ready && (
         <div className="loading">
           <Plane size={36} />
@@ -458,6 +496,9 @@ export default function App() {
               >
                 The island
               </button>
+              <button onClick={openStudio} disabled={!ready}>
+                Replay studio <Film size={14} />
+              </button>
               <button onClick={() => setPanel("log")}>
                 Flight log{" "}
                 <span className="nav-count">
@@ -469,6 +510,15 @@ export default function App() {
               </button>
             </nav>
             <div className="header-actions">
+              <button
+                className="icon-button replay-studio-entry"
+                aria-label="Replay studio"
+                title="Replay studio"
+                disabled={!ready}
+                onClick={openStudio}
+              >
+                <Film size={19} />
+              </button>
               <button
                 className="weather-pill"
                 onClick={toggleNight}
@@ -1036,7 +1086,7 @@ export default function App() {
           {toast}
         </div>
       )}
-      {mode === "paused" && !panel && (
+      {mode === "paused" && !panel && !studioOpen && (
         <div className="modal-scrim">
           <section
             className="pause-card"
@@ -1061,12 +1111,9 @@ export default function App() {
                 <RotateCcw size={17} />
                 Restart flight
               </button>
-              <button
-                disabled={!game.current?.canReplay}
-                onClick={() => game.current?.playReplay()}
-              >
+              <button disabled={!game.current?.canReplay} onClick={openStudio}>
                 <Film size={17} />
-                Watch replay
+                Edit replay
               </button>
               <button onClick={() => setPanel("controls")}>
                 <BookOpen size={17} />
@@ -1085,7 +1132,7 @@ export default function App() {
           </section>
         </div>
       )}
-      {mode === "result" && result && !panel && (
+      {mode === "result" && result && !panel && !studioOpen && (
         <div className="modal-scrim">
           <section
             className="result-card"
@@ -1132,10 +1179,10 @@ export default function App() {
               <button
                 className="text-button"
                 disabled={!game.current?.canReplay}
-                onClick={() => game.current?.playReplay()}
+                onClick={openStudio}
               >
                 <Film size={16} />
-                Watch replay
+                Edit replay
               </button>
               <ReplayDownload game={game.current} snapshot={snapshot} />
               <button className="text-button" onClick={back}>

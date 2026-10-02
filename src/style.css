@@ -2541,3 +2541,8 @@ button:disabled { cursor: not-allowed; }
   .map-wrap, .minimap { width: 100px; }
   .map-top, .map-bottom { display: none; }
 }
+
+.replay-studio-entry { display: none; }
+@media (max-width: 800px) {
+  .header-actions .replay-studio-entry { display: inline-flex; }
+}

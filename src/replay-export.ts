@@ -145,7 +145,7 @@ export class ReplayVideoExport {
       return false;
     }
   }
-  draw(source: HTMLCanvasElement) {
+  draw(source: HTMLCanvasElement, title = "") {
     if (this.state.phase !== "recording" || !this.context) return;
     const ctx = this.context,
       scale = Math.min(1280 / source.width, 720 / source.height);
@@ -154,6 +154,16 @@ export class ReplayVideoExport {
     ctx.fillStyle = "#163b40";
     ctx.fillRect(0, 0, 1280, 720);
     ctx.drawImage(source, (1280 - w) / 2, (720 - h) / 2, w, h);
+    if (title.trim()) {
+      ctx.font = "600 30px sans-serif";
+      ctx.textAlign = "center";
+      const text = title.slice(0, 100),
+        width = Math.min(1160, ctx.measureText(text).width + 48);
+      ctx.fillStyle = "rgba(12, 24, 29, .72)";
+      ctx.fillRect((1280 - width) / 2, 624, width, 60);
+      ctx.fillStyle = "#fff9e9";
+      ctx.fillText(text, 640, 663, width - 36);
+    }
   }
   finish() {
     if (this.state.phase !== "recording" || !this.recorder) return;

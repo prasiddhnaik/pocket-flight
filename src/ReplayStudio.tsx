@@ -1786,6 +1786,14 @@ export default function ReplayStudio({
         <span>
           G move · R rotate · S scale · F frame · I key · Space play · ⌘Z undo
         </span>
+        <a
+          className="studio-guide-link"
+          href="/scene-studio-guide.html"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Video guide ↗
+        </a>
         <span>
           Scene Studio · {scene.render.size} / {scene.render.fps} fps
         </span>

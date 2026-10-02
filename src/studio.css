@@ -513,6 +513,13 @@
   color: #879b9f;
   font-size: 10px;
   flex: none;
+  align-items: center;
+}
+.replay-studio .studio-guide-link {
+  padding: 2px 6px;
+  font-size: 10px;
+  color: var(--gold);
+  background: transparent;
 }
 .studio-error {
   display: flex;

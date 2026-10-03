@@ -49,6 +49,21 @@ const hill = (
   height: number,
 ) =>
   height * Math.exp(-2.8 * ((x - cx) ** 2 / rx ** 2 + (z - cz) ** 2 / rz ** 2));
+// Smooth, deterministic relief: erosion follows warped valley lines down the ridges.
+function reliefNoise(x: number, z: number) {
+  const hash = (a: number, b: number) => {
+    const v = Math.sin(a * 127.1 + b * 311.7) * 43758.5453;
+    return v - Math.floor(v);
+  };
+  const ix = Math.floor(x),
+    iz = Math.floor(z);
+  const u = smooth(0, 1, x - ix),
+    v = smooth(0, 1, z - iz);
+  return (
+    (hash(ix, iz) * (1 - u) + hash(ix + 1, iz) * u) * (1 - v) +
+    (hash(ix, iz + 1) * (1 - u) + hash(ix + 1, iz + 1) * u) * v
+  );
+}
 export function terrainHeight(x: number, z: number) {
   const edge = Math.sqrt((x + 140) ** 2 / 620 ** 2 + (z + 20) ** 2 / 800 ** 2);
   const shore =
@@ -72,6 +87,25 @@ export function terrainHeight(x: number, z: number) {
     28 *
     Math.exp(-(((x - 95) / 65) ** 2)) *
     Math.exp(-(((z + 240) / 350) ** 2));
+  const highland = smooth(30, 105, h);
+  const warp = (reliefNoise(x * 0.006, z * 0.006) - 0.5) * 52;
+  const valley = Math.pow(
+    1 - Math.abs(Math.sin((x + warp) * 0.031 + z * 0.012)),
+    4,
+  );
+  const relief =
+    (reliefNoise(x * 0.018, z * 0.018) - 0.5) * 22 +
+    (reliefNoise(x * 0.047, z * 0.047) - 0.5) * 7;
+  h += highland * (relief - valley * 30);
+  // Coastal shelves create rock ledges without changing the airfield plateaus.
+  const shelf = smooth(2, 9, h) * (1 - smooth(20, 42, h));
+  h += shelf * (reliefNoise(x * 0.024, z * 0.024) - 0.5) * 4;
+  // A prepared village terrace gives porches, streets and stairs a common grade.
+  const villageBlend =
+    (1 - smooth(83, 108, Math.abs(x + 355))) *
+    (1 - smooth(85, 110, Math.abs(z - 562))) *
+    smooth(1, 3, h);
+  h = h * (1 - villageBlend) + 6.4 * villageBlend;
   for (const r of runways) {
     const p = runwayLocal(x, z, r);
     // Keep every triangle touching pavement on the plateau, including the

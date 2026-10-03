@@ -297,7 +297,7 @@ export default function App() {
         });
       };
       game.current = instance;
-      instance.aircraft.ready
+      Promise.all([instance.aircraft.ready, instance.world.ready])
         .then(() => {
           if (game.current === instance) setReady(true);
         })

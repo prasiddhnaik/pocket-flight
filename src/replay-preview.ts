@@ -137,6 +137,7 @@ export class ReplayPreview {
   }
   async prepareScene(project: StudioProject, assets: Map<string, StudioAsset>) {
     await Promise.all([
+      this.world.ready,
       this.assets.prepare(project.scene, assets),
       this.soundtrack.prepare(project.scene, assets),
     ]);

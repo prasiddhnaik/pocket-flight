@@ -1,5 +1,7 @@
 import * as T from "three";
 import { villageRoof, hangarRoof, groundPath } from "./scenery-geometry";
+import { makeTerrainMaterial } from "./terrain-material";
+import { addEnvironmentAssets, type VillageSite, type HangarSite } from "./environment-assets";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import {
@@ -22,6 +24,7 @@ export type Obstacle = {
 export function makeWorld(scene: T.Scene) {
   const rng = random(512),
     obstacles: Obstacle[] = [];
+  const villageSites: VillageSite[] = [], hangarSites: HangarSite[] = [];
   const mat = (color: string, roughness = 0.85) =>
     new T.MeshStandardMaterial({ color, roughness });
   const white = mat("#f8f0dd"),
@@ -85,7 +88,7 @@ export function makeWorld(scene: T.Scene) {
       parent,
     );
   }
-  const ambient = new T.HemisphereLight("#c5f0fa", "#76845a", 1.55);
+  const ambient = new T.HemisphereLight("#d0dce4", "#625b48", 1.55);
   scene.add(ambient);
   const sun = new T.DirectionalLight("#fff0d0", 2.7);
   sun.position.set(-600, 900, 500);
@@ -103,8 +106,8 @@ export function makeWorld(scene: T.Scene) {
   sun.shadow.normalBias = 1.6;
   scene.add(sun);
   scene.add(sun.target);
-  scene.background = new T.Color("#a8dce5");
-  scene.fog = new T.FogExp2("#badfe1", 0.00027);
+  scene.background = new T.Color("#a7c3d3");
+  scene.fog = new T.FogExp2("#c5d0d1", 0.00027);
   const terrain = new T.PlaneGeometry(
     WORLD_SIZE,
     WORLD_SIZE,
@@ -124,7 +127,7 @@ export function makeWorld(scene: T.Scene) {
       h = terrainHeight(x, z);
     pos.setY(i, h);
     const c = beachColor.clone();
-    if (h > 5) c.lerp(grass, Math.min(1, (h - 5) / 16));
+    if (h > 3) c.lerp(grass, Math.min(1, (h - 3) / 4));
     if (h > 35) c.lerp(forest, Math.min(0.65, (h - 35) / 130));
     const slope =
       Math.abs(terrainHeight(x + 6, z) - h) +
@@ -141,7 +144,7 @@ export function makeWorld(scene: T.Scene) {
   terrain.computeVertexNormals();
   const land = mesh(
     terrain,
-    new T.MeshStandardMaterial({ vertexColors: true, roughness: 1 }),
+    makeTerrainMaterial(),
   );
   land.castShadow = false;
   const depthData = new Uint8Array(256 * 256 * 4);
@@ -180,10 +183,22 @@ export function makeWorld(scene: T.Scene) {
  #include <logdepthbuf_pars_fragment>
  uniform float time; uniform sampler2D heightmap; uniform float night; uniform vec3 fogColor; varying vec3 vWorld;
  void main(){vec2 p=vWorld.xz;vec2 uv=p/2800.+.5;float h=texture2D(heightmap,clamp(uv,0.,1.)).r*320.-45.; if(abs(p.x)>1400.||abs(p.y)>1400.)h=-45.;float depth=max(0.,-h);
- vec3 shallow=vec3(.075,.49,.40),deep=vec3(.014,.20,.26);vec3 color=mix(shallow,deep,smoothstep(0.,34.,depth));
- float wave=sin(p.x*.15+time*.8+sin(p.y*.11))*sin(p.y*.16-time*.45)+sin(p.x*.041+p.y*.052+time*.35)*.8;
- color+=wave*.018;float foam=(1.-smoothstep(.6,5.,depth))*smoothstep(.25,.8,sin(depth*2.2-time*1.1+sin(p.x*.04)))*.35;color=mix(color,vec3(.82,.94,.85),foam);
- float sparkle=pow(max(0.,sin(p.x*.42+time)*sin(p.y*.39-time*.5)),28.);color+=sparkle*.19;
+ vec3 shallow=vec3(.055,.24,.20),deep=vec3(.012,.055,.082);vec3 color=mix(shallow,deep,smoothstep(0.,34.,depth));
+ // Several oblique wave trains vary their phase; avoid the previous rectangular grid.
+ float warp=sin(p.x*.009+p.y*.006)*2.1+sin(p.y*.017-p.x*.003)*1.3;
+ float wave=sin(p.x*.11+p.y*.043+warp+time*.7)*.55+sin(p.x*-.058+p.y*.097+warp*.6-time*.44)*.3+sin(p.x*.023-p.y*.037+time*.3)*.15;
+ float footprint=max(length(dFdx(p)),length(dFdy(p)));
+ float detail=1.-smoothstep(2.,12.,footprint);
+ color+=wave*.007*detail;
+ float foam=(1.-smoothstep(.4,3.8,depth))*smoothstep(.4,.9,sin(depth*2.1-time*.9+warp))*.32;color=mix(color,vec3(.48,.62,.55),foam);
+ vec3 view=normalize(cameraPosition-vWorld);
+ vec2 slope=vec2(cos(p.x*.11+p.y*.043+warp+time*.7)*.06,cos(p.x*-.058+p.y*.097+warp*.6-time*.44)*.04)*detail;
+ vec3 normal=normalize(vec3(slope.x,1.,slope.y));
+ vec3 halfVector=normalize(normalize(vec3(-.55,.82,.25))+view);
+ float highlight=pow(max(0.,dot(normal,halfVector)),150.);
+ color+=vec3(.27,.24,.18)*highlight;
+ float fresnel=pow(1.-max(0.,dot(view,normal)),5.);
+ color=mix(color,vec3(.20,.28,.33),fresnel*.65);
  color*=mix(1.,.29,night);float fog=smoothstep(1500.,6000.,length(p-cameraPosition.xz));
  #include <logdepthbuf_fragment>
  gl_FragColor=vec4(color,1.);
@@ -269,9 +284,11 @@ export function makeWorld(scene: T.Scene) {
     );
     apron.rotation.x = -Math.PI / 2;
     for (let i = 0; i < (index === 0 ? 3 : 1); i++) {
-      box(69, 5.3, i * 32 + 25, 23, 10.6, 24, white, g);
-      mesh(hangarRoof(), mat("#648b8c"), 69, 10.2, i * 32 + 25, g);
-      box(56.9, 4.3, i * 32 + 25, 0.5, 8, 18, dark, g);
+      const shell = box(69, 5.3, i * 32 + 25, 23, 10.6, 24, white, g);
+      const covering = mesh(hangarRoof(), mat("#648b8c"), 69, 10.2, i * 32 + 25, g);
+      const door = box(56.9, 4.3, i * 32 + 25, 0.5, 8, 18, dark, g);
+      g.updateMatrixWorld(true);
+      hangarSites.push({ placeholder: [shell, covering, door], matrix: g.matrixWorld.clone().multiply(new T.Matrix4().makeTranslation(69, 0, i * 32 + 25)) });
       const p = new T.Vector3(69, 9, i * 32 + 25).applyMatrix4(g.matrixWorld);
       g.updateMatrixWorld(true);
       p.set(69, 9, i * 32 + 25).applyMatrix4(g.matrixWorld);
@@ -336,7 +353,7 @@ export function makeWorld(scene: T.Scene) {
       const t = i / 10;
       const len = t * 6.6,
         y = 12 + Math.sin(t * Math.PI) * 1.5 - t * 2.3,
-        w = Math.sin(t * Math.PI) * 0.7;
+        w = Math.sin(t * Math.PI) * 0.045;
       for (const side of [-1, 1])
         verts.push(
           Math.cos(angle) * len - Math.sin(angle) * w * side + 0.5,
@@ -348,6 +365,20 @@ export function makeWorld(scene: T.Scene) {
       const n = i * 2;
       idx.push(n, n + 1, n + 2, n + 1, n + 3, n + 2);
     }
+    // Pinnate leaflets attach to each curved frond's rachis.
+    for (let j=1;j<18;j++) {
+      const t=j/18, len=t*6.6;
+      const y=12+Math.sin(t*Math.PI)*1.5-t*2.3;
+      const width=Math.sin(t*Math.PI)*1.05;
+      for (const side of [-1,1]) {
+        const start=verts.length/3;
+        const dx=Math.cos(angle), dz=Math.sin(angle);
+        verts.push(dx*len+.5,y,dz*len,
+          dx*(len+.38)-dz*width*side+.5,y-.25,dz*(len+.38)+dx*width*side,
+          dx*(len+.12)+.5,y-.05,dz*(len+.12));
+        idx.push(start,start+1,start+2);
+      }
+    }
     const geo = new T.BufferGeometry();
     geo.setAttribute("position", new T.Float32BufferAttribute(verts, 3));
     geo.setIndex(idx);
@@ -358,7 +389,7 @@ export function makeWorld(scene: T.Scene) {
     leaves = new T.InstancedMesh(
       mergeGeometries(leafParts)!,
       new T.MeshStandardMaterial({
-        color: "#397960",
+        color: "#496f34",
         roughness: 0.85,
         side: T.DoubleSide,
       }),
@@ -452,6 +483,9 @@ export function makeWorld(scene: T.Scene) {
     count++;
   }
   crowns.count = count;
+  crowns.name = "Forest crowns";
+  trunks.name = "Palm trunks";
+  leaves.name = "Palm leaves";
   // Coral-roofed village, footpaths and a waterfront marina.
   for (let i = 0; i < 27; i++) {
     const x = -430 + (i % 6) * 27 + (rng() - 0.5) * 6,
@@ -472,6 +506,8 @@ export function makeWorld(scene: T.Scene) {
       box(k * w * 0.25, y * 0.55, d / 2 + 0.16, 2.8, 0.25, 0.4, white, g);
     }
     box(0, 1.6, d / 2 + 0.1, 1.7, 3, 0.15, wood, g);
+    g.name = "Village fallback";
+    villageSites.push({ placeholder: g, width: w, depth: d });
     obstacles.push({
       x,
       y: h + y,
@@ -628,6 +664,7 @@ export function makeWorld(scene: T.Scene) {
     }
     g.scale.setScalar(0.6 + rng());
     scene.add(g);
+    g.name = "Cloud formation";
     clouds.push(g);
   }
   const birdGeo = new T.BufferGeometry().setFromPoints([
@@ -666,10 +703,12 @@ export function makeWorld(scene: T.Scene) {
     sizeAttenuation: false,
   });
   scene.add(new T.Points(starsGeo, starMat));
+  const environment = typeof window === "undefined" ? undefined : addEnvironmentAssets(scene, villageSites, hangarSites, obstacles, land);
   let nightValue = 0;
   return {
     obstacles,
     sun,
+    ready: environment?.ready ?? Promise.resolve(),
     update(time: number, night: boolean) {
       nightValue = T.MathUtils.lerp(nightValue, night ? 1 : 0, 0.022);
       oceanMaterial.uniforms.time.value = time;
@@ -680,12 +719,12 @@ export function makeWorld(scene: T.Scene) {
       beacon.intensity = nightValue * 25;
       starMat.opacity = nightValue;
       (scene.background as T.Color).lerpColors(
-        new T.Color("#a8dce5"),
+        new T.Color("#a7c3d3"),
         new T.Color("#101f35"),
         nightValue,
       );
       (scene.fog as T.FogExp2).color.lerpColors(
-        new T.Color("#badfe1"),
+        new T.Color("#c5d0d1"),
         new T.Color("#14283a"),
         nightValue,
       );
@@ -719,6 +758,7 @@ export function makeWorld(scene: T.Scene) {
       }
     },
     dispose() {
+      environment?.dispose();
       scene.traverse((o) => {
         if (
           o instanceof T.Mesh ||

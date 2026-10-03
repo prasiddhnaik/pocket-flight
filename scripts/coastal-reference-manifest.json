@@ -1,0 +1,93 @@
+{
+  "sources": [
+    {
+      "id": "island_tree_02",
+      "license": "CC0",
+      "source": "https://polyhaven.com/a/island_tree_02",
+      "files": {
+        "url": "https://dl.polyhaven.org/file/ph-assets/Models/blend/1k/island_tree_02/island_tree_02_1k.blend",
+        "md5": "eeacbddb0ae5ceafa70115d066f21178",
+        "size": 38795227,
+        "include": {
+          "textures/island_tree_02_branches_diff_1k.png": {
+            "url": "https://dl.polyhaven.org/file/ph-assets/Models/png/1k/island_tree_02/island_tree_02_branches_diff_1k.png",
+            "md5": "06881375b8ce350a45746e30b68a5d4c",
+            "size": 5300342
+          },
+          "textures/island_tree_02_branches_nor_gl_1k.png": {
+            "url": "https://dl.polyhaven.org/file/ph-assets/Models/png/1k/island_tree_02/island_tree_02_branches_nor_gl_1k.png",
+            "md5": "df3d91a9c29266f44b0b17da135a2899",
+            "size": 5400459
+          },
+          "textures/island_tree_02_branches_rough_1k.png": {
+            "url": "https://dl.polyhaven.org/file/ph-assets/Models/png/1k/island_tree_02/island_tree_02_branches_rough_1k.png",
+            "md5": "8bd9e066f93c242ef468c7c6ea6dc382",
+            "size": 1625206
+          },
+          "textures/island_tree_02_diff_1k.jpg": {
+            "url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/island_tree_02/island_tree_02_diff_1k.jpg",
+            "md5": "b7435527d9628527ce47d89fc1468e9a",
+            "size": 738738
+          },
+          "textures/island_tree_02_leaves_alpha_1k.png": {
+            "url": "https://dl.polyhaven.org/file/ph-assets/Models/png/1k/island_tree_02/island_tree_02_leaves_alpha_1k.png",
+            "md5": "5ad9fb9a06e70c069bd3d3ba23577375",
+            "size": 57438
+          },
+          "textures/island_tree_02_leaves_diff_1k.png": {
+            "url": "https://dl.polyhaven.org/file/ph-assets/Models/png/1k/island_tree_02/island_tree_02_leaves_diff_1k.png",
+            "md5": "f5dcd85f170c154cba9cb8367af5dbdd",
+            "size": 1638916
+          },
+          "textures/island_tree_02_leaves_nor_gl_1k.png": {
+            "url": "https://dl.polyhaven.org/file/ph-assets/Models/png/1k/island_tree_02/island_tree_02_leaves_nor_gl_1k.png",
+            "md5": "13a7610b0459f3175ca049b70eadbfea",
+            "size": 2886859
+          },
+          "textures/island_tree_02_leaves_rough_1k.png": {
+            "url": "https://dl.polyhaven.org/file/ph-assets/Models/png/1k/island_tree_02/island_tree_02_leaves_rough_1k.png",
+            "md5": "6195150c02ed2522f8ab60c2ec02f1b9",
+            "size": 879599
+          },
+          "textures/island_tree_02_nor_gl_1k.exr": {
+            "url": "https://dl.polyhaven.org/file/ph-assets/Models/exr/1k/island_tree_02/island_tree_02_nor_gl_1k.exr",
+            "md5": "0dcb044743f8fd590115311417084a4b",
+            "size": 2353279
+          },
+          "textures/island_tree_02_rough_1k.exr": {
+            "url": "https://dl.polyhaven.org/file/ph-assets/Models/exr/1k/island_tree_02/island_tree_02_rough_1k.exr",
+            "md5": "058be0ebbb1777e70f8df6d9d2337361",
+            "size": 892307
+          }
+        }
+      }
+    },
+    {
+      "id": "coast_rocks_05",
+      "license": "CC0",
+      "source": "https://polyhaven.com/a/coast_rocks_05",
+      "files": {
+        "include": {
+          "textures/coast_rocks_05_rough_1k.exr": {
+            "size": 837722,
+            "url": "https://dl.polyhaven.org/file/ph-assets/Models/exr/1k/coast_rocks_05/coast_rocks_05_rough_1k.exr",
+            "md5": "fb789dcda0f128cff5a45992f8f6ba59"
+          },
+          "textures/coast_rocks_05_nor_gl_1k.exr": {
+            "size": 2590910,
+            "url": "https://dl.polyhaven.org/file/ph-assets/Models/exr/1k/coast_rocks_05/coast_rocks_05_nor_gl_1k.exr",
+            "md5": "2d8b7ed2f4c027a54fbf03838997a3f9"
+          },
+          "textures/coast_rocks_05_diff_1k.jpg": {
+            "size": 954605,
+            "url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/coast_rocks_05/coast_rocks_05_diff_1k.jpg",
+            "md5": "f2b66bad46855efa031e21aa392f4349"
+          }
+        },
+        "url": "https://dl.polyhaven.org/file/ph-assets/Models/blend/1k/coast_rocks_05/coast_rocks_05_1k.blend",
+        "size": 51267329,
+        "md5": "18fb258da1a2b798b2f87df79e9104aa"
+      }
+    }
+  ]
+}

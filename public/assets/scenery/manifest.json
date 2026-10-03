@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "units": "meters",
+  "authoredWith": "Blender 5.2.1 LTS",
+  "assets": [
+    {
+      "file": "basalt-outcrop.glb",
+      "bytes": 23616,
+      "triangles": 329,
+      "meshes": 1,
+      "sha256": "65be15ea8c6150bbd0e1bc84fb59a67058bd846589b0ca63ea8aa9dfe1d6574f"
+    },
+    {
+      "file": "coastal-hangar.glb",
+      "bytes": 394448,
+      "triangles": 4522,
+      "meshes": 6,
+      "sha256": "0d8a4e7c77d000444ea50aea4ef5b46924680a4a5c149485c52f123e8e0a07b2"
+    },
+    {
+      "file": "coastal-rock-far.glb",
+      "bytes": 1398856,
+      "triangles": 1445,
+      "meshes": 1,
+      "sha256": "e069017ba4f8446c06aaeca804ca0fe3517932e240dd23ad2c0310aee12237c0"
+    },
+    {
+      "file": "coastal-rock-near.glb",
+      "bytes": 1623520,
+      "triangles": 9646,
+      "meshes": 1,
+      "sha256": "9502d6b611e3fe56909621dfddd091076b89e09995afc9bc5f24956de10e4bb0"
+    },
+    {
+      "file": "coastal-tree-far.glb",
+      "bytes": 637532,
+      "triangles": 4,
+      "meshes": 2,
+      "sha256": "71a97af9c394230a7cca584f9cff26fc468561cb27de95e42a588b957d5b5321"
+    },
+    {
+      "file": "coastal-tree-near.glb",
+      "bytes": 3659164,
+      "triangles": 31295,
+      "meshes": 1,
+      "sha256": "d856d5a05bc2723582fec5c56e08b363e7d70d8624e2b0dae6d076ee7d1a7dd5"
+    },
+    {
+      "file": "palm-bay-terrain.glb",
+      "bytes": 4176592,
+      "triangles": 131072,
+      "meshes": 1,
+      "sha256": "ff9d2906a1cd4a102ef5122aa69a768ac2255ff681efd64fe7c199ef80d3eb5f"
+    },
+    {
+      "file": "plantation-cottage.glb",
+      "bytes": 761504,
+      "triangles": 8770,
+      "meshes": 7,
+      "sha256": "25d2c1cbe2f16f48b1437569441baf187be36554db46685d14b8d39ca8ed6ff9"
+    }
+  ],
+  "credits": [
+    {
+      "name": "Island Tree 02",
+      "creator": "Poly Haven",
+      "license": "CC0",
+      "url": "https://polyhaven.com/a/island_tree_02"
+    },
+    {
+      "name": "Coast Rocks 05",
+      "creator": "Poly Haven",
+      "license": "CC0",
+      "url": "https://polyhaven.com/a/coast_rocks_05"
+    },
+    {
+      "name": "Architecture references",
+      "creator": "Library of Congress HABS",
+      "url": "https://www.loc.gov/item/hi0080/"
+    },
+    {
+      "name": "Cloud sprite",
+      "creator": "OpenAI image generation",
+      "usage": "Generated for Pocket Flight"
+    }
+  ]
+}

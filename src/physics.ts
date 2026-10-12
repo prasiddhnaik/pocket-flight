@@ -267,8 +267,19 @@ export class FlightPhysics {
           : 0.025
         : this.engineOut
           ? -0.03
-          : trimAlpha;
+          : Math.atan2(air.y, Math.hypot(air.x, air.z)) + trimAlpha;
       this.pitch = MathUtils.damp(this.pitch, targetPitch, 0.24, dt);
+    }
+    if (this.aircraftId === "finch" && this.beginnerAssist && input.pitch > 0) {
+      // A keyboard key is full elevator. Assist makes that a controlled
+      // rotation/climb request instead of pulling straight through the stall.
+      const flightPath = Math.atan2(air.y, Math.hypot(air.x, air.z));
+      const limit = this.grounded
+        ? speed * 1.943844 < this.profile.rotationKnots
+          ? 0.05
+          : 0.21
+        : Math.min(0.3, flightPath + 0.21);
+      this.pitch = Math.min(this.pitch, limit);
     }
     this.pitch = MathUtils.clamp(this.pitch, -0.85, 1.05);
     this.rollRate = MathUtils.damp(

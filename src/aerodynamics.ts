@@ -68,12 +68,11 @@ export function finchStallSpeed(
 
 export function finchThrust(speed: number, throttle: number, density: number) {
   const p = finchDesign.propulsion;
-  const power =
-    (MathUtils.clamp(throttle, 0, 1) * p.shaftPower * density) /
-    SEA_LEVEL_DENSITY;
+  const command = MathUtils.clamp(throttle, 0, 1);
+  const densityRatio = density / SEA_LEVEL_DENSITY;
+  const power = command * p.shaftPower * densityRatio;
   return Math.min(
-    (p.staticThrust * MathUtils.clamp(throttle, 0, 1) * density) /
-      SEA_LEVEL_DENSITY,
+    p.staticThrust * command * densityRatio,
     (power * p.efficiency) / Math.max(speed, 1),
   );
 }

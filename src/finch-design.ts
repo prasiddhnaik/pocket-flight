@@ -31,7 +31,7 @@ export const finchDesign = {
     sideslipDrag: 0.35,
     sideForceSlope: -0.65,
   },
-  propulsion: { shaftPower: 100_000, efficiency: 0.78, staticThrust: 2_750 },
+  propulsion: { shaftPower: 135_000, efficiency: 0.78, staticThrust: 3_350 },
   validity:
     "Concept trainer, subsonic island flight; no measured polar, structural validation, fuel burn, or component moment/inertia integration yet.",
 } as const;

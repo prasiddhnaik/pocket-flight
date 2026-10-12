@@ -4,6 +4,50 @@ import { terrainHeight, runways, runwayLocal } from "../src/terrain";
 import { missions, scoreFlight } from "../src/missions";
 const neutral = { pitch: 0, roll: 0, yaw: 0, throttle: 0, brake: false };
 describe("Finch flight envelope", () => {
+  it("binary keyboard rotation reaches the first checkpoint with climb margin", () => {
+    for (const hz of [30, 60, 120]) {
+      const p = new FlightPhysics();
+      p.reset();
+      let takeoff = false,
+        gateHeight = 0;
+      for (let i = 0; i < hz * 20; i++) {
+        p.step(1 / hz, {
+          ...neutral,
+          throttle: 1,
+          pitch: p.airspeed * 1.943844 >= p.profile.rotationKnots ? 1 : 0,
+        });
+        takeoff ||= p.events.some((e) => e.type === "takeoff");
+        if (!gateHeight && p.position.z <= 130) gateHeight = p.position.y;
+      }
+      expect(takeoff).toBe(true);
+      expect(gateHeight).toBeGreaterThan(35);
+      expect(gateHeight).toBeLessThan(65);
+      expect(p.position.y).toBeGreaterThan(55);
+      expect(p.grounded).toBe(false);
+      expect(p.stall).toBe(false);
+      expect(p.health).toBe(100);
+    }
+  });
+  it("beginner rotation assist tolerates holding the key early without bypassing the physical flight model", () => {
+    const p = new FlightPhysics();
+    p.reset();
+    for (let i = 0; i < 1200; i++)
+      p.step(1 / 60, { ...neutral, throttle: 1, pitch: 1 });
+    expect(p.grounded).toBe(false);
+    expect(p.position.y).toBeGreaterThan(55);
+    expect(p.stall).toBe(false);
+    expect(p.loadedMass).toBe(860);
+    expect(p.health).toBe(100);
+    const manual = new FlightPhysics();
+    manual.reset();
+    manual.beginnerAssist = false;
+    let maximumPitch = 0;
+    for (let i = 0; i < 1200 && !manual.crashed; i++) {
+      manual.step(1 / 60, { ...neutral, throttle: 1, pitch: 1 });
+      maximumPitch = Math.max(maximumPitch, manual.pitch);
+    }
+    expect(maximumPitch).toBeGreaterThan(0.45);
+  });
   it("takes off with full throttle and a gentle pull before the end of Palm Bay", () => {
     const p = new FlightPhysics();
     p.reset();

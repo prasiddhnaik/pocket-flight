@@ -1,8 +1,11 @@
 import { fileURLToPath } from "node:url";
+const check = process.argv[2] ?? "vfx";
+if (!["vfx", "takeoff"].includes(check))
+  throw new Error("Choose vfx or takeoff.");
 const root = fileURLToPath(new URL("../", import.meta.url));
 async function command(args: string[]) {
   const child = Bun.spawn(
-    ["bun", "node_modules/.bin/playwright-cli", "-s=vfx-check", ...args],
+    ["bun", "node_modules/.bin/playwright-cli", `-s=${check}-check`, ...args],
     { cwd: root, stdout: "pipe", stderr: "pipe" },
   );
   const [out, err, code] = await Promise.all([
@@ -19,20 +22,28 @@ try {
   await command(["open", "http://127.0.0.1:5175/"]);
   const out = await command([
     "run-code",
-    (await Bun.file(new URL("check-vfx-browser.js", import.meta.url)).text())
+    (
+      await Bun.file(
+        new URL(`check-${check}-browser.js`, import.meta.url),
+      ).text()
+    )
       .trim()
       .replace(/;$/, ""),
   ]);
-  await Bun.write(new URL("../output/vfx-browser.log", import.meta.url), out);
+  await Bun.write(
+    new URL(`../output/${check}-browser.log`, import.meta.url),
+    out,
+  );
   const match = out.match(/### Result\n([\s\S]*?)\n### Ran/);
-  if (!match) throw new Error("VFX check failed; see output/vfx-browser.log");
+  if (!match)
+    throw new Error(`${check} check failed; see output/${check}-browser.log`);
   const evidence = JSON.parse(match[1]);
   await Bun.write(
-    new URL("../output/vfx-browser-evidence.json", import.meta.url),
+    new URL(`../output/${check}-browser-evidence.json`, import.meta.url),
     JSON.stringify(evidence, null, 2),
   );
   console.log(
-    `${evidence.results.length} aircraft passed touchdown, smoke and impact checks; ${evidence.errors.length} browser errors.`,
+    `${evidence.results.length} aircraft passed ${check} browser checks; ${evidence.errors.length} browser errors.`,
   );
 } finally {
   await command(["close"]);

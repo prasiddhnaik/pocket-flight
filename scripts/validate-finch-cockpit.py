@@ -1,8 +1,11 @@
 """Read-only native-file reopen validation, separate from generation/export."""
-import bpy, math, json, bmesh
+import bpy, math, json, bmesh, sys
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
 from pathlib import Path
+sys.dont_write_bytecode = True
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from finch_wing_markings import validate_wing_markings
 ROOT=Path(__file__).resolve().parents[1]
 bpy.ops.wm.open_mainfile(filepath=str(ROOT/'assets/finch/Finch-U2-cockpit.blend'))
 required=['Cockpit','Canopy','PilotEye_Left','PilotEye_Right','ControlStick_Left',
@@ -38,5 +41,6 @@ evidence={'native_reopened':True,'nonfinite_vertices':nonfinite,'meshes':meshes,
           'triangles':triangles,'canopy_hinge_blender_m':list(hinge),'required_parts':required,
           'surround_mounting_samples':len(points),'surround_skin_gap_m':max(gaps),
           'surround_open_edges':open_edges}
+evidence['wing_markings'] = validate_wing_markings()
 (ROOT/'output/finch-cockpit-native-evidence.json').write_text(json.dumps(evidence,indent=2))
 print('FINCH_NATIVE_REOPEN_OK',json.dumps(evidence),flush=True)

@@ -1,17 +1,21 @@
 """Rebuild Finch's cabin from its preserved airframe in a background Blender process.
 
-Authoring metres: X right, +Y forward, +Z up. Only the Cockpit subtree is replaced.
+Authoring metres: X right, +Y forward, +Z up. Rebuild the Cockpit subtree and fit wing paint bands.
 Handbook: 13.1, 13.3, 13.4, 16.1, 16.2. This is an original concept trainer cabin.
 """
-import bpy, bmesh, math, json
+import bpy, bmesh, math, json, sys
 from pathlib import Path
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
+sys.dont_write_bytecode = True
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from finch_wing_markings import fit_wing_markings
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / 'assets/finch'
 bpy.ops.wm.open_mainfile(filepath=str(OUT / 'Finch-U2-base.blend'))
 bpy.context.preferences.filepaths.save_version = 0
+fit_wing_markings()
 old = bpy.data.objects['Cockpit']
 for o in list(old.children_recursive) + [old]:
     bpy.data.objects.remove(o, do_unlink=True)

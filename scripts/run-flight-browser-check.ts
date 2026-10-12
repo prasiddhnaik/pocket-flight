@@ -1,8 +1,9 @@
 import { fileURLToPath } from "node:url";
 const check = process.argv[2] ?? "vfx";
-if (!["vfx", "takeoff"].includes(check))
-  throw new Error("Choose vfx or takeoff.");
+if (!["vfx", "takeoff", "wing"].includes(check))
+  throw new Error("Choose vfx, takeoff or wing.");
 const root = fileURLToPath(new URL("../", import.meta.url));
+const url = process.env.FLIGHT_CHECK_URL ?? "http://127.0.0.1:5175/";
 async function command(args: string[]) {
   const child = Bun.spawn(
     ["bun", "node_modules/.bin/playwright-cli", `-s=${check}-check`, ...args],
@@ -16,10 +17,9 @@ async function command(args: string[]) {
   if (code) throw new Error(out + err);
   return out;
 }
-if (!(await fetch("http://127.0.0.1:5175/")).ok)
-  throw new Error("Start the game on port 5175.");
+if (!(await fetch(url)).ok) throw new Error(`Start the game at ${url}.`);
 try {
-  await command(["open", "http://127.0.0.1:5175/"]);
+  await command(["open", url]);
   const out = await command([
     "run-code",
     (

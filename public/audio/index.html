@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pocket Flight — Three original soundtracks</title>
+<style>
+body{max-width:800px;margin:54px auto;padding:0 24px;background:#fafbf7;color:#29392e;font:16px/1.7 system-ui,sans-serif}h1{font-size:38px;line-height:1.15;font-weight:600}h2{font-size:24px;margin:0 0 8px}p{max-width:700px}small{color:#627365}section{border-top:1px solid #dce2d8;padding:30px 0}audio{width:100%;margin:12px 0}a{color:#37694b}footer{font-size:13px;border-top:1px solid #dce2d8;padding-top:20px}table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:10px 8px;text-align:left;border-bottom:1px solid #dce2d8}@media(max-width:500px){h1{font-size:30px}td,th{padding:8px 4px}}
+</style>
+<main>
+<small>POCKET FLIGHT · ORIGINAL SOUNDTRACK COLLECTION</small>
+<h1>Three songs. Three different skies.</h1>
+<p>Different melodies, chord progressions, tempos, and instrument palettes. Each song has its own synchronized harmony, melody, and rhythm layers for adaptive playback in the game.</p>
+<section>
+<h2>01 · Coastlines</h2>
+<small>2:47 · 92 BPM · 4/4 · D major / B minor</small>
+<p>Warm felt-style keys and floating pads, a glassy upper melody, brushed percussion, and rounded bass. Spacious coastal electronica for unhurried exploration.</p>
+<audio controls preload="metadata" aria-label="Listen to Coastlines" src="coastlines/coastlines-listening.mp3"></audio>
+<a href="coastlines/coastlines-listening.mp3" download>Download Coastlines</a>
+</section>
+<section>
+<h2>02 · Blue Hour</h2>
+<small>2:00 · 72 BPM · 3/4 · E Dorian</small>
+<p>A nocturnal waltz: electric-piano suspensions, alternating plucked strings, and a slow bowed melody over sparse percussion. A darker, more intimate piece with room between the phrases.</p>
+<audio controls preload="metadata" aria-label="Listen to Blue Hour" src="blue-hour/blue-hour-listening.mp3"></audio>
+<a href="blue-hour/blue-hour-listening.mp3" download>Download Blue Hour</a>
+</section>
+<section>
+<h2>03 · Sunward</h2>
+<small>2:10 · 118 BPM · 4/4 · A major</small>
+<p>Bright analog arpeggios, a syncopated wooden lead, an offbeat bass pattern, and a driving kick. A deliberate breakdown gives way to a denser final reprise.</p>
+<audio controls preload="metadata" aria-label="Listen to Sunward" src="sunward/sunward-listening.mp3"></audio>
+<a href="sunward/sunward-listening.mp3" download>Download Sunward</a>
+</section>
+<section>
+<h2>Choose your flight music</h2>
+<p>Open <strong>Settings → Soundtrack</strong> in <a href="../">Pocket Flight</a> to choose a song. Your choice and music volume are remembered. New music fades in after its layers load, while the previous song fades out.</p>
+<table><thead><tr><th>Flight state</th><th>Arrangement</th></tr></thead><tbody>
+<tr><td>Menu</td><td>Harmony and a hint of melody.</td></tr>
+<tr><td>Runway / airborne</td><td>Rhythm joins, then grows with airspeed.</td></tr>
+<tr><td>Night / pause</td><td>Softer and more spacious.</td></tr>
+<tr><td>Warning</td><td>The music ducks to leave the aircraft clear.</td></tr>
+</tbody></table>
+</section>
+<footer>All three compositions and synthesized instruments were created for Pocket Flight. No third-party recordings or samples. The listening editions have introductions and closing fades; the game uses synchronized loop stems.</footer>
+</main>
+<script>const players=[...document.querySelectorAll('audio')];for(const player of players)player.addEventListener('play',()=>{for(const other of players)if(other!==player)other.pause()});</script>
+</html>

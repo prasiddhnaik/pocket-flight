@@ -5,7 +5,7 @@ export function refineAircraftMaterials(root: T.Object3D) {
   const finishes = new Map<T.Material, T.Material>();
   root.traverse((object) => {
     if (!(object instanceof T.Mesh)) return;
-    object.castShadow = object.receiveShadow = true;
+    object.castShadow = object.receiveShadow = !object.userData.cockpitDisplay;
     const finish = (source: T.Material) => {
       if (finishes.has(source)) return finishes.get(source)!;
       if (!(source instanceof T.MeshStandardMaterial)) return source;

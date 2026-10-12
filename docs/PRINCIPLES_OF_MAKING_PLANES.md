@@ -763,6 +763,8 @@ Keep the editable source and a compact aircraft manifest. Triangle count, export
 
 ## 17. How these principles apply to Pocket Flight today
 
+**Implementation update, 12 October 2026:** all four aircraft now use shared force and rigid-body rotation, measured main-wing references, geometry-derived attached lift, declared component mass/CG/inertia, estimated propulsion and fuel, and bounded physical actuators. The current source and verification record are in [Fleet dynamics validation](FLEET_DYNAMICS_VALIDATION.html). The September snapshot below records the earlier implementation and the gaps that motivated this work; its missing-mass and direct-attitude observations no longer describe the current runtime. Parameters without measured aircraft data remain explicit concept estimates.
+
 **Source snapshot:** local code inspected 30 September 2026. The checkout contains other uncommitted development work. This documentation task does not change, approve, or runtime-validate that work.
 
 `code-review-graph status` was attempted from the repository root, but the command was unavailable. The limited implementation observations below were checked directly against the source.

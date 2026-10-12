@@ -159,7 +159,9 @@ test("assist can be disabled and mass affects actual acceleration", () => {
   heavy.loadedMass *= 1.2;
   light.step(1 / 60, neutral);
   heavy.step(1 / 60, neutral);
-  expect(light.roll).toBeCloseTo(0.6, 10);
+  // Natural roll/yaw coupling remains active with the level assist off.
+  expect(light.angularVelocity.length()).toBeGreaterThan(0);
+  expect(Math.abs(light.roll - 0.6)).toBeLessThan(0.01);
   expect(light.velocity.y).toBeGreaterThan(heavy.velocity.y);
   expect(light.beginnerAssist).toBe(false);
   light.reset();

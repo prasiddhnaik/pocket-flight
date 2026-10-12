@@ -1,0 +1,27 @@
+$ tsc -p lab/tsconfig.json && vite build --config lab/vite.config.ts
+vite v7.3.6 building client environment for production...
+transforming...
+✓ 54 modules transformed.
+rendering chunks...
+computing gzip size...
+../output/wind-tunnel-build/index.html                                0.67 kB │ gzip:   0.43 kB
+../output/wind-tunnel-build/aircraft/stormbird-hx40.gltf             80.30 kB
+../output/wind-tunnel-build/assets/airflow-worker-DCHjQugA.js       119.11 kB
+../output/wind-tunnel-build/assets/validation.worker-Bb6XSqpu.js    210.65 kB
+../output/wind-tunnel-build/aircraft/finch-u2.glb                 4,797.67 kB
+../output/wind-tunnel-build/aircraft/stormbird-hx40-part-1.bin    4,881.46 kB
+../output/wind-tunnel-build/aircraft/stormbird-hx40-part-5.bin    5,716.94 kB
+../output/wind-tunnel-build/aircraft/stormbird-hx40-part-0.bin    6,278.76 kB
+../output/wind-tunnel-build/aircraft/stormbird-hx40-part-3.bin    7,649.30 kB
+../output/wind-tunnel-build/aircraft/stormbird-hx40-part-2.bin    7,732.18 kB
+../output/wind-tunnel-build/aircraft/peregrine-hx27.glb           7,755.97 kB
+../output/wind-tunnel-build/aircraft/stormbird-hx40-part-4.bin    7,842.24 kB
+../output/wind-tunnel-build/aircraft/aurelia-flight.glb           8,323.62 kB
+../output/wind-tunnel-build/assets/index-DLM42ruf.css                10.43 kB │ gzip:   3.02 kB
+../output/wind-tunnel-build/assets/index-C5X5BdZQ.js                944.24 kB │ gzip: 262.69 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 7.50s

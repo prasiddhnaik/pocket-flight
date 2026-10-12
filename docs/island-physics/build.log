@@ -1,0 +1,39 @@
+$ tsc -b && vite build
+vite v7.3.6 building client environment for production...
+transforming...
+✓ 1691 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                            1.07 kB │ gzip:   0.50 kB
+dist/stormbird.html                        2.30 kB │ gzip:   1.03 kB
+dist/civilian.html                         2.95 kB │ gzip:   1.25 kB
+dist/hangar.html                           3.74 kB │ gzip:   1.42 kB
+dist/scenery.html                          4.31 kB │ gzip:   1.46 kB
+dist/jet.html                              4.48 kB │ gzip:   1.65 kB
+dist/assets/stormbird-CIkevzJq.css         1.95 kB │ gzip:   0.85 kB
+dist/assets/civilian-6L4mG1Sc.css          2.85 kB │ gzip:   1.11 kB
+dist/assets/hangar-BmW2rM77.css            4.69 kB │ gzip:   1.66 kB
+dist/assets/jet-Dj51nlho.css               6.26 kB │ gzip:   2.12 kB
+dist/assets/ReplayStudio-9Yxyxj-C.css     17.52 kB │ gzip:   4.07 kB
+dist/assets/game-Cc9ewoxX.css             40.33 kB │ gzip:   9.16 kB
+dist/assets/RoomEnvironment-pew98qFS.js    2.02 kB │ gzip:   0.87 kB
+dist/assets/scenery-CTYShvJk.js            2.64 kB │ gzip:   1.37 kB
+dist/assets/stormbird-BUvdKjBe.js          3.12 kB │ gzip:   1.62 kB
+dist/assets/terrain-C8LOkWyL.js            3.13 kB │ gzip:   1.45 kB
+dist/assets/civilian-CaTtuArU.js           5.08 kB │ gzip:   2.42 kB
+dist/assets/hangar-DXc-fwQD.js             5.58 kB │ gzip:   2.56 kB
+dist/assets/jet-Cw7igDr3.js               11.13 kB │ gzip:   4.90 kB
+dist/assets/aircraft-BisQbM_h.js          18.78 kB │ gzip:   8.04 kB
+dist/assets/OrbitControls-D5WLv7m7.js     19.11 kB │ gzip:   4.33 kB
+dist/assets/world-_1M9u_XL.js             25.19 kB │ gzip:  10.47 kB
+dist/assets/index-ubx4AKv2.js             31.17 kB │ gzip:   8.83 kB
+dist/assets/jet-effects-BM7zx1oI.js       72.40 kB │ gzip:  26.09 kB
+dist/assets/ReplayStudio-CBmw8MKU.js      98.13 kB │ gzip:  29.45 kB
+dist/assets/game-gX-cfZE2.js             423.86 kB │ gzip: 122.38 kB
+dist/assets/GLTFLoader-CROFfIAL.js       637.98 kB │ gzip: 164.08 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 11.85s

@@ -10,6 +10,7 @@ from mathutils.bvhtree import BVHTree
 sys.dont_write_bytecode = True
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from finch_wing_markings import fit_wing_markings
+from finch_internal_systems import build_internal_systems
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / 'assets/finch'
@@ -457,6 +458,9 @@ label('Power legends','THR   MIX',(0,.275,.172),.008,ivory)
 box('Trim wheel',(0,.14,.09),(.08,.07,.105),rubber,bevel=.024)
 box('Console stowage',(0,-.02,.10),(.10,.19,.022),rubber,bevel=.01)
 
+internal_systems = build_internal_systems(group, box, mesh, tube, cylinder, label,
+    cockpit, body_surface, interp, frame, metal, rubber, ivory, red)
+
 # Convert and apply modifiers without changing any of the preserved airframe.
 for o in created:
     if o.type in {'CURVE','FONT'}:
@@ -512,6 +516,7 @@ obstacles=[]
 for name in ['Seat_Left','Seat_Right','InstrumentPanel','DashboardHousing']:
     obstacles.extend(bpy.data.objects[name].children_recursive)
 obstacles.extend([bpy.data.objects['Centre console'],bpy.data.objects['Throttle quadrant']])
+obstacles.extend(bpy.data.objects['RearCabinBulkhead'].children_recursive)
 fixed=bvh(obstacles);travel=[]
 for side in ['Left','Right']:
     node=bpy.data.objects['ControlStick_'+side]
@@ -543,6 +548,7 @@ if any(p['glass_furniture_intersections'] for p in canopy_travel):
     raise RuntimeError('Opening glazing intersects fixed cabin: '+str(canopy_travel))
 
 manifest={'revision':cockpit['revision'],'frame':'Blender metres X right +Y forward +Z up',
+          'internal_systems':internal_systems,
           'clearance_m':clearance,'pilot_eyes':eyes,'control_travel':travel,
           'canopy_travel':canopy_travel,
           'canopy_collision_scope':'Clear glazing versus furniture and fuselage; outer bonded boundary cell excluded',

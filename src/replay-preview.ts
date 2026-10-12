@@ -251,6 +251,7 @@ export class ReplayPreview {
         0,
         -model.bodyCompression(
           T.MathUtils.lerp(a.suspension, b.suspension, mix),
+          a.suspensionResolved === true,
         ),
         0,
       ).applyQuaternion(model.group.quaternion),
@@ -278,6 +279,29 @@ export class ReplayPreview {
         );
       model.effects.update(0, { ...initialJetInput(), lights: true });
     }
+    const attitude = new T.Euler().setFromQuaternion(
+      model.group.quaternion,
+      "YXZ",
+    );
+    model.displays?.update(
+      {
+        time: T.MathUtils.lerp(a.t, b.t, mix),
+        mode: "replay",
+        speed: T.MathUtils.lerp(a.speed, b.speed, mix),
+        altitude: T.MathUtils.lerp(a.p[1], b.p[1], mix),
+        pitch: attitude.x,
+        roll: attitude.z,
+        heading: -attitude.y,
+        verticalSpeed: b.t > a.t ? (b.p[1] - a.p[1]) / (b.t - a.t) : 0,
+        power: T.MathUtils.lerp(a.throttle, b.throttle, mix),
+        fuel: null,
+        x: model.group.position.x,
+        z: model.group.position.z,
+        engineOut: visual.engineOut,
+        stall: false,
+      },
+      true,
+    );
     const yaw = new T.Euler().setFromQuaternion(
       model.group.quaternion,
       "YXZ",

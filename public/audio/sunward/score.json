@@ -1,0 +1,18 @@
+{
+  "title": "Sunward",
+  "bpm": 118,
+  "bars": 64,
+  "beatsPerBar": 4,
+  "key": "A major",
+  "duration": 130.16950113378684,
+  "sampleRate": 44100,
+  "frames": 5740475,
+  "stems": [
+    "foundation",
+    "air",
+    "pulse"
+  ],
+  "fullMixPeakDb": -4.33080662457129,
+  "fullMixRmsDb": -18.578458363891905,
+  "composition": "Original deterministic synthesis; no third-party recordings or samples."
+}

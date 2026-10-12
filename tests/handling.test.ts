@@ -44,7 +44,7 @@ test("fleet handling differs and remains consistent across simulation steps", ()
   expect(banks.get("peregrine")!).toBeGreaterThan(banks.get("aurelia")! * 1.5);
   expect(banks.get("stormbird")!).toBeGreaterThan(banks.get("finch")! * 1.2);
 });
-test("beginner assist recovers a bank while manual flight retains it", () => {
+test("beginner assist levels the fleet faster than natural roll and yaw stability", () => {
   for (const id of ids) {
     const manual = airborne(id),
       assisted = airborne(id);
@@ -55,7 +55,8 @@ test("beginner assist recovers a bank while manual flight retains it", () => {
       assisted.step(1 / 60, neutral);
     }
     expect(Math.abs(assisted.roll)).toBeLessThan(0.06);
-    expect(Math.abs(manual.roll)).toBeGreaterThan(0.45);
+    expect(Math.abs(manual.roll)).toBeGreaterThan(0.2);
+    expect(Math.abs(manual.roll)).toBeGreaterThan(Math.abs(assisted.roll) * 4);
   }
 });
 test("Stormbird takes off with its deployed gear and new engine response", () => {

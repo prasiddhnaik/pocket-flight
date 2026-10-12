@@ -1,4 +1,5 @@
 import * as T from "three";
+import { CockpitDisplays, displayDemo } from "../src/cockpit-displays";
 import { refineAircraftMaterials } from "../src/aircraft-materials";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
@@ -74,6 +75,8 @@ export class TunnelScene {
   private mechanicalEnabled = false;
   private mechanicalProgramme: MechanismProgramme = "all";
   private mechanicalTime = 0;
+  private displayTime = 0;
+  private displays: CockpitDisplays | null = null;
   private revealMechanisms = false;
   private ghostShells = new Map<
     T.Mesh,
@@ -113,7 +116,8 @@ export class TunnelScene {
   private pitchRig: T.Object3D | undefined;
   private solution: Solution | null = null;
   private aircraftSize = 11;
-  private currentView: "test" | "top" | "rear" | "chamber" | "side" = "test";
+  private currentView:
+    "test" | "top" | "rear" | "chamber" | "side" | "displays" | "internal" | "cabin" = "test";
   private layers = initialLayers;
   private frame = 0;
   private ticket = 0;
@@ -246,7 +250,7 @@ export class TunnelScene {
         this.room = gltf.scene;
         this.room.traverse((o) => {
           if (!(o instanceof T.Mesh)) return;
-          o.castShadow = true;
+          o.castShadow = !o.userData.cockpitDisplay;
           o.receiveShadow = true;
           for (const m of Array.isArray(o.material)
             ? o.material
@@ -328,11 +332,16 @@ export class TunnelScene {
         disposeObject(gltf.scene);
         return;
       }
+      this.displays?.dispose();
+      this.displays = null;
       if (this.aircraft) {
         this.scene.remove(this.aircraft);
         disposeObject(this.aircraft);
       }
-      if (this.mechanicalAircraft) this.scene.remove(this.mechanicalAircraft);
+      if (this.mechanicalAircraft) {
+        this.scene.remove(this.mechanicalAircraft);
+        disposeObject(this.mechanicalAircraft);
+      }
       for (const { ghost } of this.ghostShells.values()) ghost.dispose();
       this.ghostShells.clear();
       if (this.mechanicalSource) disposeObject(this.mechanicalSource.model);
@@ -347,6 +356,8 @@ export class TunnelScene {
       // The analytical representation retains the existing aggressively batched path.
       this.mechanicalSource = { model: gltf.scene, clips: gltf.animations, id };
       refineAircraftMaterials(gltf.scene);
+      this.displays = new CockpitDisplays(gltf.scene, id);
+      this.displayTime = 0;
       model.add(gltf.scene.clone(true));
       model.position.copy(pivot);
       refineAircraftMaterials(model);
@@ -678,6 +689,7 @@ export class TunnelScene {
 
   getPerformanceDiagnostics() {
     return {
+      cockpitDisplays: this.displays?.diagnostics(),
       drawCalls: this.renderer.info.render.calls,
       triangles: this.renderer.info.render.triangles,
       geometries: this.renderer.info.memory.geometries,
@@ -843,8 +855,22 @@ export class TunnelScene {
     this.invalidateShadows();
   }
 
-  view(view: "test" | "top" | "rear" | "chamber" | "side") {
+  view(view: "test" | "top" | "rear" | "chamber" | "side" | "displays" | "internal" | "cabin") {
+    if (view === "displays") {
+      this.displayView();
+      return;
+    }
+    if (view === "internal") {
+      this.internalSystemsView();
+      return;
+    }
+    if (view === "cabin") {
+      this.rearCabinView();
+      return;
+    }
     this.camera.fov = 38;
+    this.camera.near = 0.1;
+    this.orbit.minDistance = 1.2;
     this.camera.updateProjectionMatrix();
     this.dirty = true;
     this.currentView = view;
@@ -1004,7 +1030,10 @@ export class TunnelScene {
   }
   focusMechanism(focus: "gear" | "controls" | "power" | "cockpit") {
     if (!this.mechanics) return;
+    this.currentView = "test";
     this.camera.fov = 38;
+    this.camera.near = 0.1;
+    this.orbit.minDistance = 1.2;
     this.camera.updateProjectionMatrix();
     const cabin = this.mechanicalAircraft?.getObjectByName("Cockpit");
     const bounds =
@@ -1044,6 +1073,37 @@ export class TunnelScene {
     this.orbit.update();
     this.dirty = true;
   }
+  displayView() {
+    const root = (
+      this.mechanicalEnabled ? this.mechanicalAircraft : this.aircraft
+    )?.getObjectByName("Cockpit_live_displays")?.parent;
+    if (!root || !this.displays) return;
+    this.currentView = "displays";
+    this.applyChamberView();
+    const target = this.displays.viewTarget(root);
+    this.camera.fov =
+      this.aircraftId === "finch"
+        ? 55
+        : this.aircraftId === "peregrine"
+          ? 106
+          : 92;
+    this.camera.near = 0.025;
+    this.camera.updateProjectionMatrix();
+    this.orbit.minDistance = 0.1;
+    const distance =
+      (target.width /
+        (2 *
+          Math.tan(T.MathUtils.degToRad(this.camera.fov / 2)) *
+          Math.min(1, this.camera.aspect))) *
+      1.08;
+    this.camera.position
+      .copy(target.center)
+      .addScaledVector(target.forward, distance)
+      .addScaledVector(target.up, target.width * 0.08);
+    this.orbit.target.copy(target.center);
+    this.orbit.update();
+    this.dirty = true;
+  }
   pilotView() {
     const eye = this.mechanicalAircraft?.getObjectByName("PilotEye_Left");
     if (!eye) return;
@@ -1057,12 +1117,47 @@ export class TunnelScene {
     this.dirty = true;
   }
 
+  internalSystemsView() {
+    const bay = this.mechanicalAircraft?.getObjectByName("InternalSystems");
+    if (!bay) return;
+    this.currentView = "internal";
+    this.applyChamberView();
+    this.camera.fov = 42;
+    this.camera.near = 0.025;
+    this.camera.updateProjectionMatrix();
+    this.orbit.minDistance = 0.1;
+    const box = new T.Box3().setFromObject(bay);
+    const target = box.getCenter(new T.Vector3());
+    const distance = box.getSize(new T.Vector3()).length() /
+      (2 * Math.tan(T.MathUtils.degToRad(this.camera.fov / 2)) * Math.min(1, this.camera.aspect)) * 1.1;
+    this.camera.position.copy(target).addScaledVector(new T.Vector3(1, -0.22, 0.85).normalize(), distance);
+    this.orbit.target.copy(target);
+    this.orbit.update();
+    this.dirty = true;
+  }
+
+  rearCabinView() {
+    const cabin = this.mechanicalAircraft?.getObjectByName("Cockpit");
+    if (!cabin) return;
+    this.currentView = "cabin";
+    this.applyChamberView();
+    this.camera.fov = 82;
+    this.camera.near = 0.01;
+    this.camera.updateProjectionMatrix();
+    this.orbit.minDistance = 0.05;
+    this.camera.position.copy(cabin.localToWorld(new T.Vector3(0, 0.23, 0.40)));
+    this.orbit.target.copy(cabin.localToWorld(new T.Vector3(0, 0.12, 0.94)));
+    this.orbit.update();
+    this.dirty = true;
+  }
+
   private tick = (time: number) => {
     if (this.dead) return;
     const dt = this.last ? Math.min(0.05, (time - this.last) / 1000) : 0;
     this.last = time;
     const animated = !document.hidden && !this.paused;
     if (animated) {
+      this.displayTime += dt;
       // Metres of visual travel: scaled real airspeed, with arc-length sampling
       // and tapered tails so the nose-to-tail direction is unambiguous.
       this.phase += dt * (this.solution?.conditions.speed ?? 30) * 0.18;
@@ -1077,6 +1172,35 @@ export class TunnelScene {
       }
     }
     this.orbit.update();
+    if (!document.hidden && this.displays && (animated || this.dirty)) {
+      const speed = this.solution?.conditions.speed ?? 0;
+      const state = this.mechanicalEnabled
+        ? displayDemo(this.mechanicalTime, speed)
+        : {
+            time: this.displayTime,
+            mode: "tunnel" as const,
+            speed,
+            altitude: 0,
+            pitch: T.MathUtils.degToRad(this.solution?.conditions.alpha ?? 0),
+            roll: 0,
+            heading: 0,
+            verticalSpeed: 0,
+            power: 0,
+            fuel: null,
+            x: 0,
+            z: 0,
+            engineOut: false,
+            stall: false,
+          };
+      if (
+        this.displays.update(
+          state,
+          this.camera.position.distanceTo(pivot) < 30,
+          this.paused && this.dirty,
+        )
+      )
+        this.dirty = true;
+    }
     if (
       !document.hidden &&
       (this.dirty ||
@@ -1098,6 +1222,7 @@ export class TunnelScene {
     cancelAnimationFrame(this.frame);
     this.resizeObserver.disconnect();
     this.orbit.dispose();
+    this.displays?.dispose();
     if (this.mechanicalSource && !this.mechanicalAircraft)
       disposeObject(this.mechanicalSource.model);
     disposeObject(this.scene);

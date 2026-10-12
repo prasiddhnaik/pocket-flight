@@ -1,0 +1,69 @@
+{
+  "capturedAt": "2026-10-12T23:19:28.974841+05:30",
+  "repository": "/Users/prasiddhnaik/Documents/blender skills/pocket-flight-site",
+  "head": "354288eb1c9505aa42723e5a35dfe951d7b7f503",
+  "branch": "codex/private-wind-tunnel",
+  "validation": "Read-only planning snapshot; no tests or browser checks run in this planning turn.",
+  "files": {
+    "src/physics.ts": {
+      "sha256": "1bec98ff6d10d44b66e3d071e9812a3c67cade658b3aabb6b0d9313183ea5391",
+      "bytes": 21669
+    },
+    "src/rigid-body.ts": {
+      "sha256": "6a650920ba45ee8adbf24c95a4b5c895e5ec4c89377e54834758ace9cf92108e",
+      "bytes": 843
+    },
+    "src/aircraft-design.ts": {
+      "sha256": "3908d7f4b77579c6b8ef9eef67033d68ebd73ff1c675630182dcb775c315f510",
+      "bytes": 8901
+    },
+    "src/aerodynamics.ts": {
+      "sha256": "f5cc1f5b106cd99505df95752d58a396699a2e587a492313ad18ffbc661fa4d3",
+      "bytes": 11177
+    },
+    "src/flight-trim.ts": {
+      "sha256": "528764e6f50410dea5d0a1deb58f183482adb11b728168e7e99a60c306448eb0",
+      "bytes": 2967
+    },
+    "src/game.ts": {
+      "sha256": "00ae5555d95b254c366ee4457f9fdba5de215342080e189e52d355d85c4adce4",
+      "bytes": 46496
+    },
+    "src/App.tsx": {
+      "sha256": "acda3987b7e578e867eef1005904ea7c41adb0182414bd5c7466ff41e58af351",
+      "bytes": 58563
+    },
+    "src/engine-map.ts": {
+      "sha256": "7be038c75dde7e2ae1e8570fcd090d64e2df768e13cd993ae490f05cb69b5f86",
+      "bytes": 1355
+    },
+    "src/flight-reference-data.ts": {
+      "sha256": "a594916bc75cdf13fd0f5ecfbfb6f0286826fc0effcfe3d613bdb75d21a15c9b",
+      "bytes": 3628
+    },
+    "src/landing-gear.ts": {
+      "sha256": "f3b3aadd2c759ea4e3b51f77097d470b7f7d226159e183a543ccb245b3b1b992",
+      "bytes": 2438
+    },
+    "src/flight-profiles.ts": {
+      "sha256": "754b2f6dfa8eb327dd316ef72d483deb552aec56b930d35957aef1a7fbb0ebff",
+      "bytes": 1358
+    },
+    "scripts/validate-fleet-dynamics.ts": {
+      "sha256": "8f202bd604941165923487cb2331babd9adcd0374b94c32dd5b94044674dd01e",
+      "bytes": 14932
+    },
+    "scripts/validate-flight-envelope.ts": {
+      "sha256": "7a866a28dad53ae0c94e45c286abf7cde2439a34f0ccf17e9da370342a42bcb3",
+      "bytes": 14224
+    },
+    "tests/fleet-dynamics.test.ts": {
+      "sha256": "4a7fdfc667140c4fe534760be8b6e06c99c5e2b94ca181d2c9d53bdff1c2475a",
+      "bytes": 8417
+    },
+    "tests/envelope-validation.test.ts": {
+      "sha256": "ede9f0b54edfc7b0ea063ca190c3f2f9c8ce482feb09cb356a2a1c79b0c18b0e",
+      "bytes": 4268
+    }
+  }
+}

@@ -1,81 +1,45 @@
+import { aircraftDesign } from "./aircraft-design";
+import { aircraftStallSpeed } from "./aerodynamics";
 import type { AircraftId } from "./aircraft";
-import { finchStallSpeed } from "./aerodynamics";
 
-const jet = {
-  thrust: 11,
-  drag: 0.0008,
-  lift: 0.0125,
-  stallSpeed: 25,
-  trimSpeed: 38,
-  controlSpeed: 36,
-  pitchRate: 0.54,
-  rollRate: 1.45,
-  pitchResponse: 6,
-  rollResponse: 5.5,
-  yawResponse: 4,
-  rudderRate: 0.3,
-  bankRecovery: 0.85,
-  engineResponse: 1.4,
-  speedFalloff: 170,
-  afterburner: 0.3,
-  gearDamage: 1,
-  rotationKnots: 65,
-  gearSpeed: 42,
-};
+// These are assist/spool settings, not substitutes for forces or inertia.
+function profile(
+  id: AircraftId,
+  pitchRate: number,
+  rollRate: number,
+  rudderRate: number,
+  bankRecovery: number,
+  engineResponse: number,
+  gearDamage = 1,
+) {
+  const design = aircraftDesign(id);
+  const stallSpeed = aircraftStallSpeed(design);
+  const departureStall = aircraftStallSpeed(
+    design,
+    design.nominal.mass,
+    1.225,
+    id === "finch" ? 0 : 0.65,
+  );
+  return {
+    pitchRate,
+    rollRate,
+    rudderRate,
+    bankRecovery,
+    engineResponse,
+    gearDamage,
+    stallSpeed,
+    trimSpeed: design.trimSpeed,
+    rotationKnots: Math.round(departureStall * 1.2 * 1.943844),
+    approachKnots: Math.round(departureStall * 1.35 * 1.943844),
+    gearSpeed: stallSpeed * 1.5,
+    afterburner: design.propulsion.dryThrust
+      ? design.propulsion.afterburningThrust / design.propulsion.dryThrust - 1
+      : 0,
+  };
+}
 export const flightProfiles = {
-  finch: {
-    ...jet,
-    pitchRate: 0.46,
-    rollRate: 1.05,
-    pitchResponse: 4.2,
-    rollResponse: 3.8,
-    yawResponse: 3.5,
-    rudderRate: 0.26,
-    bankRecovery: 1.05,
-    engineResponse: 3.5,
-    thrust: 8.5,
-    drag: 0.0016,
-    lift: 0.027,
-    // Finch forces use finchDesign; these values retain control/UI compatibility.
-    stallSpeed: finchStallSpeed(),
-    trimSpeed: 34,
-    controlSpeed: 30,
-    speedFalloff: 95,
-    afterburner: 0,
-    rotationKnots: Math.round(finchStallSpeed() * 1.2 * 1.943844),
-  },
-  peregrine: jet,
-  aurelia: {
-    ...jet,
-    pitchRate: 0.42,
-    rollRate: 0.88,
-    pitchResponse: 3,
-    rollResponse: 2.6,
-    yawResponse: 2.8,
-    rudderRate: 0.22,
-    bankRecovery: 0.8,
-    engineResponse: 1.1,
-    afterburner: 0,
-  },
-  stormbird: {
-    ...jet,
-    thrust: 15.5,
-    drag: 0.00064,
-    lift: 0.0105,
-    stallSpeed: 29,
-    trimSpeed: 42,
-    controlSpeed: 40,
-    pitchRate: 0.58,
-    rollRate: 1.65,
-    pitchResponse: 5.2,
-    rollResponse: 4.8,
-    yawResponse: 4.5,
-    bankRecovery: 0.75,
-    engineResponse: 1.6,
-    speedFalloff: 205,
-    afterburner: 0.35,
-    gearDamage: 0.65,
-    rotationKnots: 75,
-    gearSpeed: 46,
-  },
-} satisfies Record<AircraftId, typeof jet>;
+  finch: profile("finch", 0.46, 1.05, 0.26, 1.05, 3.5),
+  peregrine: profile("peregrine", 0.54, 1.45, 0.3, 0.85, 1.4),
+  aurelia: profile("aurelia", 0.42, 0.88, 0.22, 0.8, 1.1),
+  stormbird: profile("stormbird", 0.58, 1.65, 0.3, 0.75, 1.6, 0.65),
+};

@@ -7,6 +7,7 @@ export type SavedFrame = Omit<ReplayFrame, "p" | "q" | "debris"> & {
 };
 export type SavedReplay = {
   schemaVersion: 1;
+  flightModel?: string;
   id: string;
   name: string;
   aircraft: AircraftId;
@@ -27,6 +28,7 @@ export function validateReplay(value: unknown): value is SavedReplay {
   const r = value as SavedReplay;
   return (
     r.schemaVersion === 1 &&
+    (r.flightModel === undefined || typeof r.flightModel === "string") &&
     typeof r.id === "string" &&
     r.id.length > 0 &&
     typeof r.name === "string" &&
@@ -69,6 +71,12 @@ export function validateReplay(value: unknown): value is SavedReplay {
         Array.isArray(f.wings) &&
         f.wings.every((v) => typeof v === "boolean") &&
         (!f.jet || Object.values(f.jet).every(Number.isFinite)) &&
+        (f.gearPosition === undefined || (Number.isFinite(f.gearPosition) && f.gearPosition >= 0 && f.gearPosition <= 1)) &&
+        (f.flapPosition === undefined || (Number.isFinite(f.flapPosition) && f.flapPosition >= 0 && f.flapPosition <= 1)) &&
+        (f.automaticConfiguration === undefined || typeof f.automaticConfiguration === "boolean") &&
+        (f.suspensionResolved === undefined || typeof f.suspensionResolved === "boolean") &&
+        (f.elevatorTrim === undefined || (Number.isFinite(f.elevatorTrim) && Math.abs(f.elevatorTrim) <= 1)) &&
+        (f.simulationTick === undefined || (Number.isInteger(f.simulationTick) && f.simulationTick >= 0)) &&
         Array.isArray(f.debris) &&
         f.debris.every(
           (d) =>

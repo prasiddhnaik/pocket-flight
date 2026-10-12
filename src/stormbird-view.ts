@@ -2,6 +2,7 @@ import * as T from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import { makeAircraft } from "./aircraft";
+import { displayDemo } from "./cockpit-displays";
 import { initialJetInput } from "./jet-effects";
 import { STORMBIRD_CENTER } from "./stormbird-config";
 import "./stormbird-view.css";
@@ -102,6 +103,7 @@ document
   .forEach((b) => (b.onclick = () => showView(b.dataset.view as View)));
 const $ = (id: string) => document.querySelector<HTMLInputElement>("#" + id)!;
 const input = initialJetInput();
+const reduced = matchMedia("(prefers-reduced-motion: reduce)");
 function controls() {
   input.throttle = Number($("power").value) / 100;
   input.burner = $("burner").checked;
@@ -112,6 +114,12 @@ function controls() {
   input.yaw = input.roll * 0.4;
   input.flaps = input.gear ? 0.15 : 0;
   input.speed = input.gear ? 0 : input.throttle * 220;
+  if (reduced.matches)
+    aircraft.displays?.update(
+      { ...displayDemo(0, input.speed), power: input.throttle },
+      true,
+      true,
+    );
   $("power-value").textContent = `${Math.round(input.throttle * 100)}%`;
 }
 for (const id of ["power", "burner", "gear", "canopy", "surfaces"])
@@ -129,12 +137,19 @@ if (import.meta.env.DEV)
     input,
   };
 let previous = performance.now();
-const reduced = matchMedia("(prefers-reduced-motion: reduce)");
 function frame(now: number) {
   const dt = Math.min(0.05, (now - previous) / 1000);
   previous = now;
   aircraft.effects?.setReducedMotion(reduced.matches);
   aircraft.effects?.update(dt, input);
+  if (!document.hidden)
+    aircraft.displays?.update(
+      {
+        ...displayDemo(reduced.matches ? 0 : now / 1000, input.speed),
+        power: input.throttle,
+      },
+      camera.position.distanceTo(aircraft.group.position) < 30,
+    );
   orbit.update();
   renderer.render(scene, camera);
   requestAnimationFrame(frame);

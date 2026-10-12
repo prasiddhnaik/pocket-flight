@@ -2,6 +2,7 @@ import * as T from "three";
 import { StormbirdMechanisms } from "../src/stormbird-mechanisms";
 import type { LabAircraftId } from "./aircraft";
 import { FinchCockpit } from "./finch-cockpit";
+import { internalControlMount } from "./internal-control-link";
 
 export type MechanismProgramme =
   "all" | "gear" | "controls" | "power" | "cockpit";
@@ -297,6 +298,7 @@ export class AircraftMechanics {
     this.hardwareUpdates.push(() =>
       this.segment(slot, this.read(a, this.a), this.read(b, this.b), radius),
     );
+    return slot;
   }
   private ram(fixed: Anchor, moving: Anchor, radius: number) {
     const barrel = this.slot("alloy"),
@@ -527,6 +529,22 @@ export class AircraftMechanics {
       if (box.isEmpty()) continue;
       const hinge = this.native(node),
         parent = node.parent!;
+      if (this.id === "finch" && /^(Aileron|Flap)_/.test(node.name)) {
+        const mount = internalControlMount(this.root, node);
+        const fixed = this.anchor(parent, mount.fixed);
+        const moving = this.anchor(node, mount.moving);
+        const rod = this.slot("alloy");
+        this.hardwareUpdates.push(() =>
+          this.segment(rod, this.read(fixed, this.a), this.read(moving, this.b), 0.005),
+        );
+        const horn = this.fitting(node, mount.moving, 0.007, 0.020);
+        const bearing = this.fitting(parent, mount.fixed, 0.009, 0.025);
+        for (const slot of [rod, horn, bearing]) {
+          slot.pool.userData.internalControlInstances ??= [];
+          slot.pool.userData.internalControlInstances.push({ index: slot.index, control: node.name });
+        }
+        continue;
+      }
       point.x = hinge.x * 0.35 + point.x * 0.65;
       const vertical = node.name.startsWith("Rudder");
       if (vertical) {
@@ -957,6 +975,13 @@ export class AircraftMechanics {
       time: this.time,
       pose: this.pose,
       hardwareParts: this.partCount,
+      internalSystems: this.nodes.has("BellyFuelBay") ? {
+        rearBulkhead: this.nodes.has("RearCabinBulkhead"),
+        dryEquipmentBay: this.nodes.has("AftEquipmentBay"),
+        fuelEnvelopeLitres: this.nodes.get("BellyFuelBay")!.userData.envelope_litres,
+        usableFuelLitres: this.nodes.get("BellyFuelBay")!.userData.usable_fuel_litres,
+        fuelCentroid: this.nodes.get("BellyFuelBay")!.userData.fuel_centroid_glTF,
+      } : null,
       articulatedAssemblies: this.moving.size,
       fixedGear: this.id === "finch",
       actualGearExtension: this.id === "finch" ? 1 : this.pose.gear,

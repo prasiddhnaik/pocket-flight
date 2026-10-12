@@ -1,0 +1,5 @@
+$ bun scripts/calibrate-island.ts
+aurelia lift-off 50.6m/s (100% health) landing 100% health, stop 0.000m/s pole leftWing peak M0.560
+finch lift-off 31.0m/s (100% health) landing 100% health, stop 0.000m/s pole leftWing peak M0.495
+peregrine lift-off 50.0m/s (100% health) landing 100% health, stop 0.000m/s pole leftWing peak M0.628
+stormbird lift-off 53.5m/s (100% health) landing 100% health, stop 0.000m/s pole leftWing peak M0.668

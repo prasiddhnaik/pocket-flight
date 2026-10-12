@@ -1,4 +1,5 @@
 import * as T from "three";
+import { CockpitDisplays } from "./cockpit-displays";
 import { refineAircraftMaterials as prepareAircraftMaterials } from "./aircraft-materials";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { AureliaEffects } from "./aurelia-effects";
@@ -52,6 +53,7 @@ export function makeAircraft(paintIndex = 0, id: AircraftId = "finch") {
   const model = {
     group,
     id,
+    displays: null as CockpitDisplays | null,
     effects: null as JetEffects | AureliaEffects | null,
     cameraScale: id === "aurelia" ? 1.8 : id === "finch" ? 1 : 1.4,
     wings: [new T.Group(), new T.Group()] as T.Object3D[],
@@ -65,7 +67,8 @@ export function makeAircraft(paintIndex = 0, id: AircraftId = "finch") {
       selectedPaint = index;
       livery.forEach((material) => material.color.set(paints[index].color));
     },
-    bodyCompression(meters: number) {
+    bodyCompression(meters: number, suspensionResolved = false) {
+      if (suspensionResolved) return 0;
       // Finch has authored telescoping carriers. Stormbird contact already
       // includes its oleo stroke; the other jets have rigid exported legs.
       return id === "finch" ? T.MathUtils.clamp(meters, 0, 0.16) : 0;
@@ -92,6 +95,7 @@ export function makeAircraft(paintIndex = 0, id: AircraftId = "finch") {
     },
     dispose() {
       disposed = true;
+      model.displays?.dispose();
       disposeAircraft(group);
     },
   };
@@ -111,6 +115,7 @@ export function makeAircraft(paintIndex = 0, id: AircraftId = "finch") {
         return;
       }
       prepareAircraftMaterials(gltf.scene);
+      model.displays = new CockpitDisplays(gltf.scene, id);
       group.add(gltf.scene);
       const part = (name: string) => {
         const node = gltf.scene.getObjectByName(name);

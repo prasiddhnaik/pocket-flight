@@ -36,7 +36,8 @@ describe("Finch flight envelope", () => {
     expect(p.grounded).toBe(false);
     expect(p.position.y).toBeGreaterThan(55);
     expect(p.stall).toBe(false);
-    expect(p.loadedMass).toBe(860);
+    expect(p.loadedMass).toBeLessThan(860);
+    expect(p.loadedMass).toBeGreaterThan(859);
     expect(p.health).toBe(100);
     const manual = new FlightPhysics();
     manual.reset();
@@ -74,16 +75,24 @@ describe("Finch flight envelope", () => {
     const p = new FlightPhysics();
     p.reset(true);
     p.position.set(-260, 13, 410);
-    p.velocity.set(0, -1.4, -31);
-    p.pitch = 0.03;
+    const speed = p.stallSpeed * 1.35;
+    const a = p.design.aerodynamics;
+    const alpha =
+      ((p.loadedMass * 9.80665) /
+        (0.5 * 1.225 * speed ** 2 * p.design.geometry.wingArea) -
+        a.cl0) /
+      a.liftSlope;
+    p.velocity.set(0, -1.4, -speed);
+    p.pitch = alpha - Math.atan2(1.4, speed);
     p.throttle = 0.12;
     let landing = false;
-    for (let i = 0; i < 700; i++) {
+    for (let i = 0; i < 1200; i++) {
       p.step(1 / 60, {
         ...neutral,
         pitch: p.grounded
           ? 0
-          : ((p.position.y < 10.8 ? 0.12 : 0.03) - p.pitch) * 4,
+          : ((p.position.y < 10.8 ? alpha + 0.015 : alpha - 0.04) - p.pitch) *
+            4,
         throttle: p.grounded ? -1 : 0,
         brake: p.grounded,
       });
@@ -97,6 +106,7 @@ describe("Finch flight envelope", () => {
     expect(landing).toBe(true);
     expect(p.grounded).toBe(true);
     expect(p.velocity.length()).toBeLessThan(1);
+    expect(p.position.z).toBeGreaterThan(runways[0].z - runways[0].length / 2);
     expect(p.health).toBe(100);
   });
   it("stalls at low airspeed and loses altitude with the engine off", () => {

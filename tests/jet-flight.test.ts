@@ -53,14 +53,26 @@ test("Peregrine approach lands and brakes to a stop without damage", () => {
   const p = jet();
   p.reset(true);
   p.position.set(-260, 13, 410);
-  p.velocity.set(0, -1.2, -36);
-  p.pitch = -0.04;
-  p.throttle = 0.08;
+  p.gearPosition = 1;
+  p.flapPosition = 0.65;
+  const speed = p.stallSpeed * 1.35;
+  const a = p.design.aerodynamics;
+  const alpha =
+    ((p.loadedMass * 9.80665) /
+      (0.5 * 1.225 * speed ** 2 * p.design.geometry.wingArea) -
+      a.cl0 -
+      a.flapLift * p.flapPosition) /
+    a.liftSlope;
+  p.velocity.set(0, -1.2, -speed);
+  p.pitch = alpha - Math.atan2(1.2, speed);
+  p.throttle = p.enginePower = 0.08;
   let landed = false;
   for (let n = 0; n < 1200; n++) {
     p.step(1 / 60, {
       ...neutral,
-      pitch: p.grounded ? 0 : (-0.055 - p.pitch) * 4,
+      pitch: p.grounded
+        ? 0
+        : ((p.position.y < 11 ? alpha + 0.015 : alpha - 0.04) - p.pitch) * 4,
       throttle: p.grounded ? -1 : 0,
       brake: p.grounded,
     });

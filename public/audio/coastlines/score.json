@@ -1,0 +1,18 @@
+{
+  "title": "Coastlines",
+  "bpm": 92,
+  "bars": 64,
+  "beatsPerBar": 4,
+  "key": "D major / B minor",
+  "duration": 166.9565306122449,
+  "sampleRate": 44100,
+  "frames": 7362783,
+  "stems": [
+    "foundation",
+    "air",
+    "pulse"
+  ],
+  "fullMixPeakDb": -3.231295914118909,
+  "fullMixRmsDb": -19.139839883694126,
+  "composition": "Original deterministic synthesis; no third-party recordings or samples."
+}

@@ -28,6 +28,7 @@ export type JetInput = {
   gearSteering?: number;
   groundSpeed?: number;
   grounded?: boolean;
+  controlsResolved?: boolean;
 };
 type Point = [number, number, number];
 export type JetLayout = {
@@ -155,19 +156,19 @@ export class JetMotion {
     );
     const advance = (value: number, target: number, seconds: number) =>
       value + clamp(target - value, -dt / seconds, dt / seconds);
-    this.gear = this.#mechanical
-      ? i.gearPosition === undefined
+    this.gear = i.gearPosition === undefined
+      ? this.#mechanical
         ? advance(this.gear, i.gear ? 1 : 0, STORMBIRD_GEAR_SECONDS)
-        : clamp(i.gearPosition, 0, 1)
-      : approach(this.gear, i.gear ? 1 : 0, 1.35);
+        : approach(this.gear, i.gear ? 1 : 0, 1.35)
+      : clamp(i.gearPosition, 0, 1);
     const canopyTarget = i.canopy && this.rpm < 0.12 && this.speed < 2 ? 1 : 0;
     this.canopy = this.#mechanical
       ? advance(this.canopy, canopyTarget, 3.2)
       : approach(this.canopy, canopyTarget, 1.8);
     for (const key of ["roll", "pitch", "yaw"] as const)
-      this[key] = approach(this[key], clamp(i[key], -1, 1), 7);
+      this[key] = i.controlsResolved ? clamp(i[key], -1, 1) : approach(this[key], clamp(i[key], -1, 1), 7);
     this.gearSteering = i.gearSteering ?? this.yaw;
-    this.flaps = approach(this.flaps, clamp(i.flaps, 0, 1), 2);
+    this.flaps = i.controlsResolved ? clamp(i.flaps, 0, 1) : approach(this.flaps, clamp(i.flaps, 0, 1), 2);
     this.speed = approach(this.speed, Math.max(0, i.speed), 1.3);
     this.damage = approach(this.damage, clamp(i.damage, 0, 1), 2);
     const rate = i.throttle > previousRpm ? 0.85 : 0.55;

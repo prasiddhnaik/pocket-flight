@@ -1,5 +1,6 @@
-// Measured geometry; conceptual mass/propulsion and coefficient estimates.
-// See docs/FINCH_ENGINEERING.html for provenance and validity limits.
+// Measured geometry and conceptual mass/propulsion. The station-integrated
+// runtime wing uses the shared design in aircraft-design.ts; see
+// docs/FLEET_DYNAMICS_VALIDATION.html for current provenance and validity.
 export const finchDesign = {
   geometry: {
     span: 10.98,
@@ -22,8 +23,8 @@ export const finchDesign = {
     { name: "Baggage", mass: 35, center: [0, 0, 1.4] },
   ],
   aerodynamics: {
-    cl0: 0.24,
-    liftSlope: 5, // Per radian; estimated finite-wing slope, not an airfoil polar.
+    cl0: 0.1244436731,
+    liftSlope: 4.6479478799, // Per radian; private geometry solver fit, not a measured polar.
     clMax: 1.55,
     clMin: -1.25,
     cd0: 0.032, // Includes the permanently extended tricycle gear.
@@ -33,7 +34,7 @@ export const finchDesign = {
   },
   propulsion: { shaftPower: 135_000, efficiency: 0.78, staticThrust: 3_350 },
   validity:
-    "Concept trainer, subsonic island flight; no measured polar, structural validation, fuel burn, or component moment/inertia integration yet.",
+    "Concept trainer; shared mass/CG/inertia, moments, fuel and actuator model. Attached lift is geometry-derived; no measured polar or structural validation.",
 } as const;
 
 export const finchMass = finchDesign.massBudget.reduce(

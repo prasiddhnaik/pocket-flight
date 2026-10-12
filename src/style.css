@@ -301,63 +301,11 @@ h2 {
   border: 1px solid #57706d30;
   border-radius: 4px;
 }
-.world-label {
-  position: absolute;
-  left: 64%;
-  top: 57%;
-  display: flex;
-  gap: 13px;
-  align-items: flex-start;
-  color: #f8f6dc;
-  text-shadow: 0 1px 12px #16434a40;
-  pointer-events: none;
-}
-.label-line {
-  height: 54px;
-  width: 1px;
-  background: linear-gradient(#f8f6dc00, #f8f6dcaa);
-}
-.world-label h3 {
-  font-family: "DM Serif Display", Georgia, serif;
-  font-size: 26px;
-  font-weight: 400;
-  letter-spacing: -0.5px;
-  margin: 9px 0 5px;
-}
-.world-label > div > span:last-child {
-  font-size: 10px;
-  opacity: 0.8;
-}
 .tiny-label {
   font-size: 9px;
   font-weight: 600;
   letter-spacing: 1.65px;
   display: block;
-}
-.island-pin {
-  position: absolute;
-  top: 47%;
-  left: 52%;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: #fbf8e4d6;
-  backdrop-filter: blur(8px);
-  padding: 8px 10px;
-  border-radius: 5px;
-  box-shadow: 0 3px 10px #1d5a421a;
-}
-.island-pin span {
-  font-size: 8px;
-  letter-spacing: 1px;
-  font-weight: 600;
-}
-.pin-dot {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: #80a381;
-  margin-left: 5px;
 }
 .departure-board {
   position: absolute;
@@ -498,6 +446,27 @@ h2 {
 .footer-mark {
   font-size: 21px;
   opacity: 0.85;
+}
+.footer-location {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 0;
+  color: var(--ink);
+  font: inherit;
+  letter-spacing: inherit;
+}
+.footer-location:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.footer-location:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 4px;
+  border-radius: 3px;
+}
+.night .footer-location {
+  color: #f8f6dc;
 }
 .version {
   margin-left: 16px;
@@ -1468,6 +1437,13 @@ kbd {
   width: 25px;
   height: 25px;
 }
+.music-label { display: grid; gap: 5px; }
+.music-label small, .music-status { font-size: 10px; color: #647b67; }
+.music-volume { display: flex; align-items: center; gap: 12px; font-size: 11px; color: #496851; }
+.music-volume > span { min-width: 30px; text-align: right; }
+.music-volume input { width: clamp(75px, 18vw, 145px); accent-color: #6b8652; cursor: pointer; }
+.music-status button { text-decoration: underline; font-size: inherit; }
+.music-track-select { max-width: 60%; color: #496851; cursor: pointer; }
 @keyframes toast-in {
   from {
     opacity: 0;
@@ -1506,9 +1482,6 @@ kbd {
   .menu-footer {
     bottom: 33px;
   }
-  .world-label {
-    top: 60%;
-  }
 }
 @media (max-width: 1150px) {
   .header nav {
@@ -1528,13 +1501,6 @@ kbd {
   .hero {
     top: 23%;
   }
-  .world-label {
-    left: 64%;
-    top: 60%;
-  }
-  .world-label h3 {
-    font-size: 22px;
-  }
   .flight-center-bottom {
     max-width: 330px;
   }
@@ -1550,10 +1516,6 @@ kbd {
   }
   .aircraft-selection {
     padding-right: 0;
-  }
-  .island-pin {
-    left: 57%;
-    top: 42%;
   }
 }
 @media (max-width: 800px) {
@@ -1600,19 +1562,6 @@ kbd {
   }
   .hero-note {
     display: none;
-  }
-  .world-label {
-    left: 59%;
-    top: 62%;
-  }
-  .world-label h3 {
-    font-size: 19px;
-  }
-  .world-label .tiny-label {
-    font-size: 6px;
-  }
-  .world-label > div > span:last-child {
-    font-size: 8px;
   }
   .departure-board {
     left: 5%;
@@ -1662,9 +1611,6 @@ kbd {
     letter-spacing: 1px;
   }
   .version {
-    display: none;
-  }
-  .island-pin {
     display: none;
   }
   .flight-tools .wind-readout {
@@ -1834,24 +1780,6 @@ kbd {
   }
   .hero .text-button {
     font-size: 11px;
-  }
-  .world-label {
-    left: 49%;
-    top: 64%;
-  }
-  .world-label h3 {
-    font-size: 16px;
-    margin: 6px 0;
-  }
-  .world-label > div > span:last-child {
-    display: none;
-  }
-  .world-label .tiny-label {
-    font-size: 5px;
-    letter-spacing: 1px;
-  }
-  .label-line {
-    height: 36px;
   }
   .departure-board {
     bottom: 52px;
@@ -2257,9 +2185,6 @@ kbd {
   .menu-footer {
     bottom: 17px;
   }
-  .world-label {
-    top: 60%;
-  }
   .header {
     top: 24px;
   }
@@ -2283,19 +2208,12 @@ kbd {
   white-space: nowrap;
 }
 @media (max-width: 540px) {
-  .world-label {
-    display: none;
-  }
   .flight-plan h3 {
     gap: 6px;
   }
   .flight-plan h3 svg {
     flex-shrink: 0;
   }
-}
-
-.island-pin {
-  color: var(--ink);
 }
 
 /* A clean cinematic view and a download that stays available after encoding. */
@@ -2500,7 +2418,6 @@ button:disabled { cursor: not-allowed; }
   .launch-brief { margin-top: 12px; }
   .hero-buttons { margin-top: 12px; }
   .quick-help { margin-top: 8px; }
-  .world-label { display: none; }
 }
 @media (max-height: 700px) and (max-width: 540px) {
   .hero { top: 95px; }
@@ -2520,7 +2437,7 @@ button:disabled { cursor: not-allowed; }
   .header { top: 16px; }
   .hero { top: 85px; left: 5%; max-width: 52%; }
   h1 { font-size: 40px; margin-top: 12px; }
-  .hero > p, .world-label, .island-pin, .menu-footer { display: none; }
+  .hero > p, .menu-footer { display: none; }
   .launch-brief { margin-top: 14px; }
   .hero-buttons { margin-top: 14px; }
   .departure-board { top: 105px; bottom: auto; left: auto; right: 5%; width: 35%; grid-template-columns: 1fr; padding: 18px; gap: 16px; }
@@ -2546,3 +2463,12 @@ button:disabled { cursor: not-allowed; }
 @media (max-width: 800px) {
   .header-actions .replay-studio-entry { display: inline-flex; }
 }
+/* Compact configuration controls; the wider Settings redesign is deferred. */
+.configuration-readout { display:flex; flex-wrap:wrap; gap:5px 10px; margin-top:10px; font-size:10px; letter-spacing:.06em; color:var(--muted, #66736b); }
+.configuration-readout .envelope-warning { color:#a05c27; }
+.controls-settings { margin-top:24px; border-top:1px solid rgba(80,100,86,.2); padding-top:16px; }
+.controls-settings h3 { margin:0 0 8px; font-size:18px; }
+.controls-setting-note { font-size:13px; line-height:1.6; color:#637269; }
+.controls-help-button { display:flex; align-items:center; gap:8px; padding:9px 0; color:inherit; background:none; border:0; cursor:pointer; }
+.touch-configuration { display:flex; gap:6px; align-self:end; }
+.touch-configuration button { border:1px solid rgba(255,255,255,.45); border-radius:12px; background:rgba(27,51,43,.7); color:#fff6e6; padding:13px 10px; min-height:44px; min-width:60px; font-size:11px; touch-action:manipulation; }

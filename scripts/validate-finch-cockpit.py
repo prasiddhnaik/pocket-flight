@@ -9,7 +9,10 @@ from finch_wing_markings import validate_wing_markings
 ROOT=Path(__file__).resolve().parents[1]
 bpy.ops.wm.open_mainfile(filepath=str(ROOT/'assets/finch/Finch-U2-cockpit.blend'))
 required=['Cockpit','Canopy','PilotEye_Left','PilotEye_Right','ControlStick_Left',
-          'ControlStick_Right','Throttle','Canopy_ram_barrel_Left','Canopy_ram_piston_Right']
+          'ControlStick_Right','Throttle','Canopy_ram_barrel_Left','Canopy_ram_piston_Right',
+          'RearCabinBulkhead','InternalSystems','BellyFuelBay','AftEquipmentBay',
+          'Fitted rear cabin partition','Conformal belly fuel cell','Battery enclosure',
+          'Avionics equipment enclosure','Fuel pickup strainer','Fuel sump drain']
 for name in required:
     if name not in bpy.data.objects:raise RuntimeError('Missing '+name)
 bpy.context.view_layer.update()
@@ -42,5 +45,30 @@ evidence={'native_reopened':True,'nonfinite_vertices':nonfinite,'meshes':meshes,
           'surround_mounting_samples':len(points),'surround_skin_gap_m':max(gaps),
           'surround_open_edges':open_edges}
 evidence['wing_markings'] = validate_wing_markings()
+
+def object_surface(o):
+    o.data.calc_loop_triangles()
+    return BVHTree.FromPolygons([o.matrix_world@v.co for v in o.data.vertices],
+        [t.vertices for t in o.data.loop_triangles], all_triangles=True)
+
+tank=bpy.data.objects['Conformal belly fuel cell']
+bm=bmesh.new();bm.from_mesh(tank.data)
+if any(not e.is_manifold for e in bm.edges):raise RuntimeError('Fuel cell is not closed')
+litres=abs(bm.calc_volume(signed=True))*1000;bm.free()
+if abs(litres-tank['envelope_litres'])>.01:raise RuntimeError('Fuel volume changed on save')
+intersections=[]
+for group_name in ['BellyFuelBay','AftEquipmentBay','RearCabinBulkhead']:
+    for o in bpy.data.objects[group_name].children_recursive:
+        if o.type=='MESH' and surface.overlap(object_surface(o)):
+            intersections.append(o.name)
+if intersections:raise RuntimeError('Internal parts intersect fuselage: '+', '.join(intersections))
+if object_surface(tank).overlap(object_surface(bpy.data.objects['Cabin floor'])):
+    raise RuntimeError('Fuel cell intersects cabin floor')
+skin_gap=min(surface.find_nearest(tank.matrix_world@v.co)[3] for v in tank.data.vertices)
+if skin_gap<.012:raise RuntimeError('Fuel cell insufficient skin separation')
+evidence['internal_systems']={'closed_fuel_cell':True,'envelope_litres':litres,
+    'minimum_tank_skin_gap_m':skin_gap,'fuel_floor_intersections':0,
+    'bay_fuselage_intersections':0,'rear_bulkhead_present':True,
+    'fuel_centroid_glTF_m':list(bpy.data.objects['BellyFuelBay']['fuel_centroid_glTF'])}
 (ROOT/'output/finch-cockpit-native-evidence.json').write_text(json.dumps(evidence,indent=2))
 print('FINCH_NATIVE_REOPEN_OK',json.dumps(evidence),flush=True)

@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pocket Flight — redo and expansion backlog</title>
+<style>
+body{max-width:900px;margin:36px auto;padding:0 22px 60px;font:16px/1.6 system-ui,-apple-system,sans-serif;color:#222;background:#fff}h1{font-size:29px;line-height:1.25}h2{font-size:22px;margin-top:36px;border-bottom:1px solid #ccc;padding-bottom:8px}h3{font-size:18px;margin-top:24px}a{color:#174d83}table{border-collapse:collapse;width:100%}th,td{border:1px solid #ccc;padding:10px;text-align:left;vertical-align:top}th{background:#f5f5f5}.table-wrap{overflow:auto}.meta{color:#555}li{margin:8px 0}code{font-size:.9em;overflow-wrap:anywhere}@media(max-width:600px){body{padding:0 16px 40px}table{min-width:540px}}@media print{body{max-width:none;margin:0;padding:0;font-size:11pt}h2,h3{break-after:avoid}}
+</style>
+</head>
+<body>
+<header><h1>Pocket Flight redo and expansion backlog</h1><p class="meta">12 October 2026 · Confirmed later work · Queued for implementation</p><p>Keep requested redesigns and later expansions in one place. The first physics release stays subsonic around the island. This list records scope and dependencies; items are not marked implemented by being listed here.</p></header>
+<main>
+<section id="settings-redesign">
+<h2>1. Redesign Settings</h2>
+<p><strong>Status:</strong> requested by the user; queued. <strong>Purpose:</strong> make controls, assistance and other preferences easy to find and understand as the game gains more physical aircraft behavior.</p>
+<h3>Confirmed requirement: Settings → Controls</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Control</th><th>Behavior</th><th>State</th></tr></thead>
+<tbody>
+<tr><td>Automatic gear and flaps</td><td>On: the game commands deployment. Off: the player commands gear and flaps. Both use the same physical actuator and contact model.</td><td>Accepted toggle. Implementation default: automatic on for new players.</td></tr>
+<tr><td>Beginner flight assistance</td><td>Separate control for stabilization, coordinated-turn help and automatic trim. It does not change the gear/flap command mode.</td><td>Existing capability to integrate into Controls.</td></tr>
+<tr><td>Manual gear/flap actions</td><td>Show applicable actions and keyboard/touch bindings. Gear command changes deployment; flap commands select the aircraft's supported settings.</td><td>Required companion work for manual mode; exact bindings and flap presets to be set during implementation.</td></tr>
+</tbody></table></div>
+<h3>Redesign checklist</h3>
+<ul>
+<li>Bring the editable controls and their help into Settings → Controls, with useful entry points from the flight and pause screens.</li>
+<li>Make automatic/manual configuration and flight assistance clearly separate, with concise labels explaining their effect.</li>
+<li>Keep the control layout readable on desktop and mobile. Provide keyboard navigation, visible focus and accessible toggle states.</li>
+<li>Review the current mix of time of day, audio, soundtrack, fullscreen, assistance and paint. Propose a clear grouping before redesigning their presentation.</li>
+<li>Save preferences consistently, restore valid defaults and include a reset for control preferences.</li>
+<li>Prevent settings clicks and key presses from becoming flight commands. Preserve pause/focus behavior.</li>
+<li>Show actual configuration state during flight, including gear/flap transitions; update controls help and takeoff/landing prompts to match the selected mode.</li>
+</ul>
+<h3>Dependencies and delivery order</h3>
+<p>The configuration-mode setting and manual commands belong to the first flight-physics release. They require the common actuator command path and actual-state feedback. The wider settings redesign is a queued work item: refine its layout after the final set of first-release controls is known.</p>
+<p>Source starting points: <code>pocket-flight-site/src/App.tsx</code> currently has separate Controls and Settings panels; <code>src/game.ts</code> maps keyboard/touch commands; <code>src/physics.ts</code> automatically commands gear and approach flaps. Verify the current working tree before implementation because it contains active changes.</p>
+<h3>Acceptance criteria</h3>
+<ul>
+<li>A player can find the automatic gear/flap toggle under Settings → Controls and identify the selected mode.</li>
+<li>Changing configuration mode leaves the beginner-assistance preference unchanged, and vice versa.</li>
+<li>Manual mode preserves current configuration until the player commands a change. Automatic mode resumes through normal deployment rates.</li>
+<li>Preferences survive reload; unavailable aircraft actions are handled clearly.</li>
+<li>Settings, keyboard/touch actions, HUD configuration feedback and controls help agree.</li>
+</ul>
+</section>
+<section id="high-altitude-flight">
+<h2>2. High-altitude flight</h2>
+<p><strong>Status:</strong> requested by the user for a later expansion. <strong>Dependency:</strong> complete the island flight model and its recorded acceptance evidence first.</p>
+<ul>
+<li>Choose a higher-altitude gameplay envelope and world boundary suitable for the expanded flight experience.</li>
+<li>Review atmosphere, propulsion and aerodynamic data against that envelope. Existing altitude maps are a starting point, with their transfer assumptions checked for each fictional aircraft.</li>
+<li>Calibrate climb, trim, control authority, glide and fuel behavior across altitude and loading.</li>
+<li>Review camera, instruments, world scale, mission routes and floating-point precision as the flight space grows.</li>
+<li>Record numerical and in-app browser evidence for aircraft that support the expanded envelope.</li>
+</ul>
+<p>Exact altitude range, eligible aircraft and gameplay content will be planned when this expansion is scheduled.</p>
+</section>
+<section id="supersonic-flight">
+<h2>3. Supersonic flight</h2>
+<p><strong>Status:</strong> requested by the user for a later expansion. <strong>Dependency:</strong> a stable common flight/contact core and an explicitly selected high-speed aircraft envelope.</p>
+<ul>
+<li>Research and calibrate the appropriate compressibility, wave-drag, stability/control and installed-propulsion models.</li>
+<li>Define which aircraft support the new speed range and provide suitable data instead of treating current estimated drag rise as validation.</li>
+<li>Validate acceleration through the transition, trim/control response and deceleration back to the landing envelope.</li>
+<li>Check swept collision handling, time-step stability, world traversal and camera readability at the expanded speeds.</li>
+<li>Review audio, effects and mission scale once the accepted physical behavior is established.</li>
+</ul>
+<p>Exact Mach range and the relationship to the high-altitude expansion remain future planning decisions. Neither expansion is required for the first island release.</p>
+</section>
+</main>
+<footer><p>Related work: <a href="pocket-flight-physics-plan.html">custom flight physics plan</a>. Add further redo items here when they are requested.</p></footer>
+</body>
+</html>

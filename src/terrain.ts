@@ -137,18 +137,27 @@ export function groundAt(x: number, z: number) {
     const p = runwayLocal(x, z, r);
     return Math.abs(p.x) < r.width / 2 && Math.abs(p.z) < r.length / 2;
   });
+  return {
+    height: groundHeight(x, z),
+    runway,
+    water: terrainHeight(x, z) < 0.25,
+  };
+}
+
+// Same rendered surface, without the extra water query needed by wheel VFX.
+export function groundHeight(x: number, z: number) {
   let height = Math.max(0, terrainSurfaceHeight(x, z));
   for (const r of runways) {
     const p = runwayLocal(x, z, r);
     if (p.x >= 12 && p.x <= 76 && p.z >= 15 && p.z <= 125)
       height = Math.max(height, r.y + APRON_PAVEMENT_HEIGHT);
   }
-  if (runway) height = Math.max(height, runway.y + RUNWAY_PAVEMENT_HEIGHT);
-  return {
-    height,
-    runway,
-    water: terrainHeight(x, z) < 0.25,
-  };
+  for (const r of runways) {
+    const p = runwayLocal(x, z, r);
+    if (Math.abs(p.x) < r.width / 2 && Math.abs(p.z) < r.length / 2)
+      height = Math.max(height, r.y + RUNWAY_PAVEMENT_HEIGHT);
+  }
+  return height;
 }
 export function random(seed = 247) {
   return () => {
@@ -158,6 +167,33 @@ export function random(seed = 247) {
 }
 
 // Match PlaneGeometry's triangle interpolation for scenery placed on the mesh.
+const terrainVertices = new Float64Array((TERRAIN_SEGMENTS + 1) ** 2).fill(NaN);
+function vertexHeight(ix: number, iz: number) {
+  if (ix < 0 || iz < 0 || ix > TERRAIN_SEGMENTS || iz > TERRAIN_SEGMENTS)
+    return terrainHeight(
+      ix * terrainCell - WORLD_SIZE / 2,
+      iz * terrainCell - WORLD_SIZE / 2,
+    );
+  const index = iz * (TERRAIN_SEGMENTS + 1) + ix;
+  if (Number.isNaN(terrainVertices[index]))
+    terrainVertices[index] = terrainHeight(
+      ix * terrainCell - WORLD_SIZE / 2,
+      iz * terrainCell - WORLD_SIZE / 2,
+    );
+  return terrainVertices[index];
+}
+// A triangle cannot rise above its vertices. Use this conservative bound to
+// reject aircraft sweeps that are entirely above the local ground and pavement.
+export function maximumGroundHeight(x0: number, x1: number, z0: number, z1: number) {
+  const ix0 = Math.floor((x0 + WORLD_SIZE / 2) / terrainCell);
+  const ix1 = Math.floor((x1 + WORLD_SIZE / 2) / terrainCell) + 1;
+  const iz0 = Math.floor((z0 + WORLD_SIZE / 2) / terrainCell);
+  const iz1 = Math.floor((z1 + WORLD_SIZE / 2) / terrainCell) + 1;
+  let height = Math.max(0, ...runways.map((r) => r.y + Math.max(APRON_PAVEMENT_HEIGHT, RUNWAY_PAVEMENT_HEIGHT)));
+  for (let iz = iz0; iz <= iz1; iz++)
+    for (let ix = ix0; ix <= ix1; ix++) height = Math.max(height, vertexHeight(ix, iz));
+  return height;
+}
 export function terrainSurfaceHeight(x: number, z: number) {
   const gx = (x + WORLD_SIZE / 2) / terrainCell;
   const gz = (z + WORLD_SIZE / 2) / terrainCell;
@@ -165,14 +201,8 @@ export function terrainSurfaceHeight(x: number, z: number) {
     iz = Math.floor(gz);
   const u = gx - ix,
     v = gz - iz;
-  const x0 = ix * terrainCell - WORLD_SIZE / 2;
-  const z0 = iz * terrainCell - WORLD_SIZE / 2;
-  const b = terrainHeight(x0, z0 + terrainCell);
-  const c = terrainHeight(x0 + terrainCell, z0);
-  if (u + v <= 1) return terrainHeight(x0, z0) * (1 - u - v) + c * u + b * v;
-  return (
-    terrainHeight(x0 + terrainCell, z0 + terrainCell) * (u + v - 1) +
-    b * (1 - u) +
-    c * (1 - v)
-  );
+  const b = vertexHeight(ix, iz + 1);
+  const c = vertexHeight(ix + 1, iz);
+  if (u + v <= 1) return vertexHeight(ix, iz) * (1 - u - v) + c * u + b * v;
+  return vertexHeight(ix + 1, iz + 1) * (u + v - 1) + b * (1 - u) + c * (1 - v);
 }

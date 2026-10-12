@@ -1,0 +1,18 @@
+{
+  "title": "Blue Hour",
+  "bpm": 72,
+  "bars": 48,
+  "beatsPerBar": 3,
+  "key": "E Dorian",
+  "duration": 120,
+  "sampleRate": 44100,
+  "frames": 5292000,
+  "stems": [
+    "foundation",
+    "air",
+    "pulse"
+  ],
+  "fullMixPeakDb": -6.008145270838167,
+  "fullMixRmsDb": -21.488910806215884,
+  "composition": "Original deterministic synthesis; no third-party recordings or samples."
+}

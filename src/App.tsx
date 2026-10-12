@@ -8,6 +8,7 @@ import {
   Moon,
   Volume2,
   VolumeX,
+  Music2,
   Compass,
   Mountain,
   PlaneLanding,
@@ -37,6 +38,8 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { PocketFlight } from "./game";
+import { getMusicTrack, musicTracks } from "./music-tracks";
+import type { MusicTrackId } from "./music-tracks";
 import type { Snapshot } from "./game";
 import { missions } from "./missions";
 import type { Mission, FlightResult } from "./missions";
@@ -250,7 +253,17 @@ export default function App() {
     [instrumentsExpanded, setInstrumentsExpanded] = useState(false),
     [night, setNight] = useState(false),
     [sound, setSound] = useState(false),
+    [musicVolume, setMusicVolume] = useState(() => {
+      const value = read<number>("pocket-flight-music-volume", 0.62);
+      return Number.isFinite(value) ? Math.max(0, Math.min(1, value)) : 0.62;
+    }),
+    [musicStatus, setMusicStatus] = useState("idle"),
+    [musicTrack, setMusicTrack] = useState<MusicTrackId>(() => {
+      try { return getMusicTrack(localStorage.getItem("pocket-flight-music-track")).id; }
+      catch { return "coastlines"; }
+    }),
     [beginnerAssist, setBeginnerAssist] = useState(() => read("pocket-flight-assist", true)),
+    [automaticConfiguration, setAutomaticConfiguration] = useState(() => read("pocket-flight-auto-configuration", true)),
     [toast, setToast] = useState(""),
     [result, setResult] = useState<FlightResult | null>(null),
     [log, setLog] = useState<FlightResult[]>(() =>
@@ -281,9 +294,15 @@ export default function App() {
       instance = new PocketFlight(viewport.current, aircraftId);
       instance.setPaint(paint);
       instance.physics.beginnerAssist = beginnerAssist;
+      instance.physics.setAutomaticConfiguration(automaticConfiguration);
       instance.onSnapshot = (state) => {
         setSnapshot(state);
         setSound(instance.audio.enabled);
+        if (instance.audio.music) {
+          setMusicVolume(instance.audio.music.volume);
+          setMusicStatus(instance.audio.music.status);
+          setMusicTrack(instance.audio.music.track.id);
+        }
       };
       instance.onToast = (text) => {
         setToast(text);
@@ -369,7 +388,7 @@ export default function App() {
     setPanel(null);
     setResult(null);
     game.current?.start(m);
-    setSound(true);
+    setSound(game.current?.audio.enabled ?? false);
   };
   const changeAircraft = async (id: AircraftId) => {
     if (!game.current || switchingAircraft || id === aircraftId) return;
@@ -395,6 +414,22 @@ export default function App() {
     if (game.current) game.current.night = !night;
   };
   const toggleSound = () => setSound(game.current?.audio.toggle() ?? false);
+  const changeMusicVolume = (value: number) => {
+    const audio = game.current?.audio;
+    if (!audio) return;
+    audio.setMusicVolume(value);
+    if (value > 0 && !audio.enabled) audio.toggle();
+    setMusicVolume(audio.music?.volume ?? value);
+    setSound(audio.enabled);
+  };
+  const changeMusicTrack = (id: MusicTrackId) => {
+    const audio = game.current?.audio;
+    if (!audio) return;
+    audio.selectMusicTrack(id);
+    if (!audio.enabled && (audio.music?.volume ?? 0) > 0) audio.toggle();
+    setMusicTrack(audio.music?.track.id ?? id);
+    setSound(audio.enabled);
+  };
   const back = () => {
     resumeAfterPanel.current = false;
     game.current?.menu();
@@ -595,19 +630,6 @@ export default function App() {
               <CircleHelp size={16} /> First time here? See the controls
             </button>
           </section>
-          <div className="world-label">
-            <span className="label-line" />
-            <div>
-              <span className="tiny-label">YOUR OWN PIECE OF PARADISE</span>
-              <h3>Palm Bay archipelago</h3>
-              <span>Two airfields. A thousand scenic routes.</span>
-            </div>
-          </div>
-          <button className="island-pin" onClick={() => setPanel("missions")}>
-            <MapPin size={15} />
-            <span>PALM BAY AIRFIELD</span>
-            <span className="pin-dot" />
-          </button>
           <section className="departure-board">
             <button
               className="flight-plan"
@@ -706,7 +728,7 @@ export default function App() {
                         ? "Civilian jet · Animated systems"
                         : "Full throttle · Afterburners"}
                   </span>
-                  <span>Automatic landing gear</span>
+                  <span>{automaticConfiguration ? "Automatic gear and flaps" : "Manual gear and flaps · G / F"}</span>
                 </div>
               )}
             </div>
@@ -720,7 +742,14 @@ export default function App() {
             </div>
           </section>
           <footer className="menu-footer">
-            <span>MADE FOR THE JOY OF FLYING</span>
+            <button
+              className="footer-location"
+              onClick={() => setPanel("missions")}
+              aria-label="Palm Bay Airfield. Explore missions"
+            >
+              <MapPin size={12} aria-hidden="true" />
+              <span>PALM BAY AIRFIELD</span>
+            </button>
             <span className="footer-mark">✳</span>
             <span>
               POCKET FLIGHT{" "}
@@ -938,6 +967,13 @@ export default function App() {
                   <span>{Math.round(snapshot.health)}%</span>
                 </div>
               </div>
+              <div className="configuration-readout" aria-label="Aircraft configuration">
+                <span>{aircraftId === "finch" ? "GEAR FIXED" : snapshot.gearPosition > 0.995 ? "GEAR DOWN" : snapshot.gearPosition < 0.005 ? "GEAR UP" : `GEAR ${Math.round(snapshot.gearPosition * 100)}%`}</span>
+                {aircraftId !== "finch" && <span>FLAPS {Math.round(snapshot.flapPosition * 100)}%</span>}
+                {aircraftId !== "finch" && <span>{snapshot.automaticConfiguration ? "AUTO" : "MANUAL"}</span>}
+                {snapshot.speedProtection && <span className="envelope-warning">SPEED LIMIT</span>}
+                {!beginnerAssist && <span>TRIM {Math.round(snapshot.elevatorTrim * 100)}%</span>}
+              </div>
               {snapshot.health < 97 && (
                 <div className="damage-parts">
                   {Object.entries(snapshot.damage)
@@ -1039,6 +1075,16 @@ export default function App() {
               >
                 BRAKE
               </button>
+              {aircraftId !== "finch" && !automaticConfiguration && (
+                <div className="touch-configuration">
+                  <button onClick={() => game.current?.toggleGear()} aria-label="Toggle landing gear">GEAR</button>
+                  <button onClick={() => game.current?.cycleFlaps()} aria-label="Cycle flaps">FLAPS</button>
+                </div>
+              )}
+              {!beginnerAssist && <div className="touch-configuration">
+                <button onClick={() => game.current?.adjustTrim(-0.02)} aria-label="Decrease elevator trim">TRIM −</button>
+                <button onClick={() => game.current?.adjustTrim(0.02)} aria-label="Increase elevator trim">TRIM +</button>
+              </div>}
             </div>
           )}
           {mode === "replay" && (
@@ -1359,6 +1405,14 @@ export default function App() {
                       <kbd>RMB</kbd>
                     </span>
                   </div>
+                  {aircraftId !== "finch" && <div>
+                    <span><b>Gear / flaps</b><small>Manual mode: toggle gear / cycle flaps 0%, 65%, 100%. Set the mode in Settings → Controls.</small></span>
+                    <span><kbd>G</kbd><kbd>F</kbd></span>
+                  </div>}
+                  <div>
+                    <span><b>Elevator trim</b><small>With flight assist off: decrease / increase the neutral elevator command.</small></span>
+                    <span><kbd>[</kbd><kbd>]</kbd></span>
+                  </div>
                   <div>
                     <span>
                       <b>Pause / restart</b>
@@ -1377,9 +1431,8 @@ export default function App() {
                     power. At {rotationKnots} knots, gently hold ↓ or S to raise
                     the nose. Once airborne, release to let beginner assist
                     trim, if enabled.
-                    {aircraftId === "finch"
-                      ? " For landing, reduce power and approach at 55–65 knots."
-                      : " Landing gear retracts and deploys automatically. Reduce power gradually on approach."}{" "}
+                    {` For landing, reduce power and approach near ${flightProfiles[aircraftId].approachKnots} knots at standard loading.`}
+                    {aircraftId !== "finch" && (automaticConfiguration ? " Landing gear and approach flaps deploy automatically." : " Press G for gear down and F for approach flaps before landing.")}{" "}
                     Gently raise the nose just above the runway, then hold B
                     after touchdown.
                   </p>
@@ -1471,13 +1524,34 @@ export default function App() {
                 <div className="setting-row">
                   <span>
                     <Volume2 size={21} />
-                    <b>Engine & atmosphere</b>
+                    <b>All audio</b>
                   </span>
                   <button className="setting-toggle" onClick={toggleSound}>
                     {sound ? "Sound on" : "Sound off"}
                     {sound ? <Volume2 size={17} /> : <VolumeX size={17} />}
                   </button>
                 </div>
+                <div className="setting-row music-setting">
+                  <span>
+                    <Music2 size={21} />
+                    <span className="music-label"><b>Music volume</b><small>Original flight soundtrack</small></span>
+                  </span>
+                  <label className="music-volume">
+                    <span>{Math.round(musicVolume * 100)}%</span>
+                    <input type="range" aria-label="Music volume" min="0" max="100" step="1"
+                      value={Math.round(musicVolume * 100)} onChange={(event) => changeMusicVolume(Number(event.target.value) / 100)} />
+                  </label>
+                </div>
+                <div className="setting-row music-track-setting">
+                  <span><Music2 size={21} /><b>Soundtrack</b></span>
+                  <select className="setting-toggle music-track-select" aria-label="Soundtrack song" value={musicTrack}
+                    onChange={(event) => changeMusicTrack(event.target.value as MusicTrackId)}>
+                    {musicTracks.map((track) => <option key={track.id} value={track.id}>{track.title} · {track.bpm} BPM</option>)}
+                  </select>
+                </div>
+                <p className="music-status">{getMusicTrack(musicTrack).description}</p>
+                {musicStatus === "loading" && <p className="music-status" role="status">Preparing the soundtrack…</p>}
+                {musicStatus === "error" && <p className="music-status" role="status">Music could not load. <button onClick={() => changeMusicVolume(musicVolume || 0.62)}>Retry music</button></p>}
                 <div className="setting-row">
                   <span>
                     <Maximize size={21} />
@@ -1488,6 +1562,8 @@ export default function App() {
                     <ArrowUpRight size={17} />
                   </button>
                 </div>
+                <section className="controls-settings" aria-labelledby="controls-settings-title">
+                <h3 id="controls-settings-title">Controls</h3>
                 <div className="setting-row">
                   <span>
                     <Plane size={21} />
@@ -1506,6 +1582,22 @@ export default function App() {
                     {beginnerAssist ? "Assist on" : "Assist off"}
                   </button>
                 </div>
+                <div className="setting-row">
+                  <span><PlaneLanding size={21} /><b>Automatic gear and flaps</b></span>
+                  <button className="setting-toggle" aria-pressed={automaticConfiguration}
+                    aria-label="Automatic gear and flaps"
+                    onClick={() => {
+                      const enabled = !automaticConfiguration;
+                      setAutomaticConfiguration(enabled);
+                      save("pocket-flight-auto-configuration", enabled);
+                      game.current?.physics.setAutomaticConfiguration(enabled);
+                    }}>
+                    {automaticConfiguration ? "Automatic" : "Manual"}
+                  </button>
+                </div>
+                <p className="controls-setting-note">Manual: G toggles gear, F cycles flaps. Finch has fixed gear and no movable flaps. Flight assistance is a separate choice.</p>
+                <button className="controls-help-button" onClick={() => setPanel("controls")}>View flight controls <ArrowUpRight size={16} /></button>
+                </section>
                 {aircraftId === "finch" && (
                   <div className="setting-row paint-setting">
                     <span>
@@ -1533,8 +1625,9 @@ export default function App() {
                   <p>
                     Your paint, scores, and medals are saved in this browser.
                     Beginner assist adds gentle self-leveling, coordinated
-                    turns, automatic trim, and stall-recovery cues. Switching it
-                    off keeps the simplified pitch, roll, and yaw controls.
+                    turns, and automatic trim through the control surfaces.
+                    Switching it off gives direct elevator, aileron, and rudder
+                    control, with the aircraft’s natural stability and inertia.
                   </p>
                 </div>
               </>

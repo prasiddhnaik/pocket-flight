@@ -1,4 +1,5 @@
 import * as T from "three";
+import { displayDemo } from "./cockpit-displays";
 import { makeWorld } from "./world";
 import type { AircraftId, AircraftModel } from "./aircraft";
 import { initialJetInput } from "./jet-effects";
@@ -6,6 +7,8 @@ import type { JetMotion } from "./jet-effects";
 import { makeAircraft, disposeAircraft } from "./aircraft";
 import { FlightPhysics } from "./physics";
 import type { Controls } from "./physics";
+import type { ContactPart } from "./airframe-contact";
+import { ISLAND_FLIGHT_MODEL } from "./flight-envelope";
 import { missions, scoreFlight } from "./missions";
 import type { Mission, FlightResult } from "./missions";
 import { FlightAudio } from "./audio";
@@ -36,6 +39,11 @@ export type Snapshot = {
   hint: string;
   stall: boolean;
   grounded: boolean;
+  gearPosition: number;
+  flapPosition: number;
+  automaticConfiguration: boolean;
+  speedProtection: boolean;
+  elevatorTrim: number;
   damage: FlightPhysics["damage"];
   x: number;
   z: number;
@@ -52,6 +60,12 @@ export type Snapshot = {
   replayExport: ExportState;
 };
 export type ReplayFrame = {
+  gearPosition?: number;
+  flapPosition?: number;
+  automaticConfiguration?: boolean;
+  simulationTick?: number;
+  suspensionResolved?: boolean;
+  elevatorTrim?: number;
   p: T.Vector3;
   q: T.Quaternion;
   t: number;
@@ -119,6 +133,7 @@ export class PocketFlight {
   }
   setSuspended(value: boolean) {
     this.suspended = value;
+    this.audio.setVisible(!value && !document.hidden);
     if (value) this.audio.update(0, 0, false);
     this.keys.clear();
     this.last = performance.now();
@@ -127,6 +142,7 @@ export class PocketFlight {
     if (this.replay.duration < 1) return null;
     return {
       schemaVersion: 1,
+      flightModel: ISLAND_FLIGHT_MODEL,
       id: this.recordingId,
       name: this.mission.name,
       aircraft: this.recordingAircraft,
@@ -255,6 +271,8 @@ export class PocketFlight {
       if (e.code === "Escape" || e.code === "KeyP") this.stopReplay();
       return;
     }
+    if (e.code === "BracketLeft") this.adjustTrim(-0.02);
+    if (e.code === "BracketRight") this.adjustTrim(0.02);
     if (e.repeat) {
       this.keys.add(e.code);
       return;
@@ -268,7 +286,28 @@ export class PocketFlight {
     if (e.code === "KeyC") this.cycleCamera();
     if (e.code === "KeyR" && this.mode !== "menu") this.start(this.mission);
     if (e.code === "KeyM") this.audio.toggle();
+    if (e.code === "KeyG") this.toggleGear();
+    if (e.code === "KeyF") this.cycleFlaps();
   };
+  toggleGear() {
+    if (this.mode !== "playing") return;
+    if (!this.physics.jet) { this.onToast("Finch has fixed landing gear."); return; }
+    if (this.physics.automaticConfiguration) { this.onToast("For manual gear, turn off Automatic gear and flaps in Settings → Controls."); return; }
+    if (!this.physics.toggleGear()) this.onToast("Gear stays down while weight is on the wheels.");
+    else this.onToast(this.physics.gearCommand ? "Gear commanded down." : "Gear commanded up.");
+  }
+  cycleFlaps() {
+    if (this.mode !== "playing") return;
+    if (!this.physics.jet) { this.onToast("Finch has no movable flaps."); return; }
+    if (!this.physics.cycleFlaps()) this.onToast("For manual flaps, turn off Automatic gear and flaps in Settings → Controls.");
+    else this.onToast(`Flaps commanded ${Math.round(this.physics.flapCommand * 100)}%.`);
+  }
+  adjustTrim(change: number) {
+    if (this.mode !== "playing") return;
+    if (this.physics.beginnerAssist) { this.onToast("Flight assist handles trim. For manual trim, turn it off in Settings → Controls."); return; }
+    this.physics.elevatorTrim = T.MathUtils.clamp(this.physics.elevatorTrim + change, -1, 1);
+    this.onToast(`Elevator trim ${Math.round(this.physics.elevatorTrim * 100)}%.`);
+  }
   private keyup = (e: KeyboardEvent) => {
     this.keys.delete(e.code);
   };
@@ -277,6 +316,7 @@ export class PocketFlight {
     if (this.mode === "playing") this.pause();
   };
   private visibility = () => {
+    this.audio.setVisible(!document.hidden && !this.suspended);
     if (document.hidden) {
       this.blur();
       if (this.mode === "replay") {
@@ -353,24 +393,21 @@ export class PocketFlight {
       throttle: menu ? 0.45 : p.engineOut || p.crashed ? 0 : p.enginePower,
       speed: menu ? 50 : p.airspeed,
       grounded: !menu && p.grounded,
+      controlsResolved: !menu,
       groundSpeed: p.velocity.dot(
         new T.Vector3(0, 0, -1).applyQuaternion(p.quaternion),
       ),
-      ...(p.aircraftId === "stormbird" && !menu
+      ...(!menu
         ? {
             gearPosition: p.gearPosition,
             gearSteering: p.gearSteering,
           }
         : {}),
-      gear:
-        !menu &&
-        (p.grounded ||
-          p.position.y - terrainHeight(p.position.x, p.position.z) < 35 ||
-          p.airspeed < p.profile.gearSpeed),
+      gear: !menu && p.gearPosition > 0.5,
       damage: menu ? 0 : p.damage.engine,
     };
     input.burner = input.throttle > 0.9;
-    input.flaps = input.gear ? 0.35 : 0;
+    input.flaps = menu ? 0 : p.flapPosition;
     if ("setAtmosphericEffects" in effects)
       effects.setAtmosphericEffects(false);
     effects.setReducedMotion(this.reducedMotion);
@@ -388,11 +425,11 @@ export class PocketFlight {
     this.replayLive = this.replaySample = null;
     this.mission = mission;
     this.crashDelay = 0;
+    this.physics.strongWind = mission.id === "crosswind";
     this.physics.reset(mission.airStart, mission.short);
     this.aircraft.surfaces.reset();
     this.aircraft.propellerMotion.reset();
     this.aircraft.effects?.reset();
-    this.physics.strongWind = mission.id === "crosswind";
     this.physics.engineOut = mission.id === "emergency";
     if (this.physics.engineOut) {
       this.physics.throttle = 0;
@@ -401,7 +438,12 @@ export class PocketFlight {
     }
     if (mission.id === "canyon") {
       this.physics.position.set(95, 110, 470);
-      this.physics.velocity.set(0, 0, this.physics.jet ? -48 : -34);
+      this.physics.initializeAirStart(this.physics.jet ? Math.max(48, this.physics.stallSpeed * 1.4) : 34);
+    }
+    if (mission.id === "free") {
+      this.physics.position.y += 100;
+      this.physics.yaw = Math.PI;
+      this.physics.initializeAirStart(Math.max(this.physics.design.trimSpeed, this.physics.stallSpeed * 1.4));
     }
     this.aircraft.group.scale.setScalar(1);
     this.aircraft.group.visible = true;
@@ -448,10 +490,10 @@ export class PocketFlight {
         ? "You have the controls. Enjoy the view."
         : this.physics.jet
           ? this.aircraft.id === "stormbird"
-            ? "Hold Shift for thrust. Pull back with ↓ at 75 knots. Stormbird accelerates quickly; plan a longer approach."
+            ? `Hold Shift for thrust. Pull back with ↓ at ${this.physics.profile.rotationKnots} knots. Stormbird accelerates quickly; plan a longer approach.`
             : this.aircraft.id === "aurelia"
-              ? "Hold Shift for thrust. Pull back with ↓ at 65 knots. Landing gear operates automatically."
-              : "Hold Shift for thrust. Pull back with ↓ at 65 knots. Full power lights the afterburners."
+              ? `Hold Shift for thrust. Pull back with ↓ at ${this.physics.profile.rotationKnots} knots. ${this.physics.automaticConfiguration ? "Gear and flaps operate automatically." : "G toggles gear; F cycles flaps."}`
+              : `Hold Shift for thrust. Pull back with ↓ at ${this.physics.profile.rotationKnots} knots. Full power lights the afterburners.`
           : `Hold Shift to add throttle. Pull back with ↓ at ${this.physics.profile.rotationKnots} knots.`,
     );
     this.emit();
@@ -558,7 +600,7 @@ export class PocketFlight {
       this.ringGroup.add(ring);
     });
   }
-  private makeDebris(severity: number) {
+  private makeDebris(severity: number, struckPart?: ContactPart, point?: number[]) {
     const p = this.physics;
     const count = severity > 0.8 ? 14 : 5;
     for (let i = 0; i < count; i++) {
@@ -575,7 +617,7 @@ export class PocketFlight {
         }),
       );
       m.position
-        .copy(p.position)
+        .copy(point ? new T.Vector3().fromArray(point) : p.position)
         .add(
           new T.Vector3(
             (Math.random() - 0.5) * 4,
@@ -604,8 +646,9 @@ export class PocketFlight {
         life: 20,
       });
     }
-    if (severity > 0.8) {
-      const wing = this.aircraft.wings[1];
+    if (severity > 0.8 && (struckPart === "leftWing" || struckPart === "rightWing")) {
+      const wing = this.aircraft.wings[struckPart === "leftWing" ? 0 : 1];
+      if (!wing.visible) return;
       const part = wing.clone(true);
       part.traverse((object) => {
         if (object instanceof T.Mesh) {
@@ -628,8 +671,8 @@ export class PocketFlight {
         life: 30,
       });
       wing.visible = false;
-      this.aircraft.propeller.visible = false;
     }
+    if (p.damage.propeller > 0.8) this.aircraft.propeller.visible = false;
   }
   private finish(success: boolean) {
     if (this.mode !== "playing") return;
@@ -666,6 +709,12 @@ export class PocketFlight {
       p: p.position.clone(),
       q: p.quaternion.clone(),
       t: p.flightTime,
+      simulationTick: p.simulationTick,
+      suspensionResolved: true,
+      elevatorTrim: p.elevatorTrim,
+      gearPosition: p.gearPosition,
+      flapPosition: p.flapPosition,
+      automaticConfiguration: p.automaticConfiguration,
       worldTime: this.time,
       jet: this.aircraft.effects
         ? { ...this.aircraft.effects.motion }
@@ -735,6 +784,7 @@ export class PocketFlight {
         0,
         -this.aircraft.bodyCompression(
           T.MathUtils.lerp(a.suspension, b.suspension, mix),
+          a.suspensionResolved === true,
         ),
         0,
       ).applyQuaternion(model.quaternion),
@@ -760,6 +810,27 @@ export class PocketFlight {
       angle: T.MathUtils.lerp(a.propAngle, b.propAngle, mix),
       rpm: T.MathUtils.lerp(a.propRpm, b.propRpm, mix),
     });
+    const attitude = new T.Euler().setFromQuaternion(model.quaternion, "YXZ");
+    this.aircraft.displays?.update(
+      {
+        time: T.MathUtils.lerp(a.t, b.t, mix),
+        mode: "replay",
+        speed: T.MathUtils.lerp(a.speed, b.speed, mix),
+        altitude: T.MathUtils.lerp(a.p.y, b.p.y, mix),
+        pitch: attitude.x,
+        roll: attitude.z,
+        heading: -attitude.y,
+        verticalSpeed: b.t > a.t ? (b.p.y - a.p.y) / (b.t - a.t) : 0,
+        power: T.MathUtils.lerp(a.throttle, b.throttle, mix),
+        fuel: null,
+        x: model.position.x,
+        z: model.position.z,
+        engineOut: visual.engineOut,
+        stall: false,
+      },
+      this.camera.position.distanceTo(model.position) < 30,
+      snapCamera,
+    );
     this.world.update(
       T.MathUtils.lerp(a.worldTime, b.worldTime, mix),
       visual.night,
@@ -866,13 +937,13 @@ export class PocketFlight {
       }
       if (e.type === "impact") {
         this.vfx.impact(this.vfxInput(), e.severity);
-        this.makeDebris(e.severity);
+        this.makeDebris(e.severity, e.part, e.point);
         this.onToast("Hard impact. Check your aircraft and find a runway.");
         this.audio.chime(false);
       }
       if (e.type === "crash") {
         this.vfx.impact(this.vfxInput(), e.severity);
-        this.makeDebris(e.severity);
+        this.makeDebris(e.severity, e.part, e.point);
         this.crashDelay = 2.5;
         this.onToast("Heavy impact. Your flight recorder is still running.");
         return;
@@ -884,7 +955,7 @@ export class PocketFlight {
         this.landingSink = e.sink ?? 0;
         this.landingAccuracy = e.accuracy ?? 0;
         this.onToast(
-          `${e.sink! < 2 ? "Butter-smooth touchdown." : "Touchdown."} Hold B to brake.`,
+          `${e.part && e.part !== "gear" ? "Airframe touchdown. Assess the damage." : e.sink! < 2 ? "Butter-smooth touchdown." : "Touchdown."} Hold B to brake.`,
         );
       }
     }
@@ -992,7 +1063,7 @@ export class PocketFlight {
       model.position.add(
         new T.Vector3(
           0,
-          -this.aircraft.bodyCompression(p.suspension),
+          -this.aircraft.bodyCompression(p.suspension, true),
           0,
         ).applyQuaternion(quaternion),
       );
@@ -1091,9 +1162,10 @@ export class PocketFlight {
         this.previousPosition.copy(this.physics.position);
         this.previousQuaternion.copy(this.physics.quaternion);
         const input = this.controls();
-        if (!this.physics.crashed) this.aircraft.surfaces.update(input, 1 / 60);
         this.vfxVelocity.copy(this.physics.velocity);
         this.physics.step(1 / 60, input, this.world.obstacles);
+        if (!this.physics.crashed)
+          this.aircraft.surfaces.apply(this.physics.surfaces);
         this.vfxUp.set(0, 1, 0).applyQuaternion(this.physics.quaternion);
         this.vfxVelocity
           .subVectors(this.physics.velocity, this.vfxVelocity)
@@ -1127,6 +1199,31 @@ export class PocketFlight {
           dt,
         );
       this.updateJet(dt);
+      const p = this.physics;
+      const fuelCapacity = p.design.massBudget
+        .filter((part) => part.category === "fuel")
+        .reduce((sum, part) => sum + part.mass, 0);
+      this.aircraft.displays?.update(
+        this.mode === "menu"
+          ? displayDemo(this.time)
+          : {
+              time: p.flightTime,
+              mode: "flight",
+              speed: p.airspeed,
+              altitude: p.position.y,
+              pitch: p.pitch,
+              roll: p.roll,
+              heading: -p.yaw,
+              verticalSpeed: p.velocity.y,
+              power: p.enginePower,
+              fuel: fuelCapacity ? p.fuelKg / fuelCapacity : null,
+              x: p.position.x,
+              z: p.position.z,
+              engineOut: p.engineOut || p.crashed || p.fuelKg <= 0,
+              stall: p.stall,
+            },
+        this.camera.position.distanceTo(this.aircraft.group.position) < 30,
+      );
       if (this.mode === "playing") {
         this.recordReplay();
         if (this.physics.flightTime >= this.nextArchive) {
@@ -1185,6 +1282,18 @@ export class PocketFlight {
       sound?.speed ?? this.physics.airspeed,
       this.mode === "playing" || this.mode === "replay",
     );
+    this.audio.updateMusic({
+      mode: this.mode,
+      speed: sound?.speed ?? this.physics.airspeed,
+      grounded: sound
+        ? sound.p.y < terrainHeight(sound.p.x, sound.p.z) + 3
+        : this.physics.grounded,
+      night: sound?.night ?? this.night,
+      warning:
+        this.mode === "playing" &&
+        (this.physics.stall || this.physics.crashed || this.physics.engineOut),
+      visible: !document.hidden && !this.suspended,
+    });
     this.renderer.render(this.scene, this.camera);
     this.replayVideo.draw(this.renderer.domElement);
     if (this.mode === "replay" && this.replayEnded) {
@@ -1271,6 +1380,11 @@ export class PocketFlight {
             : "Arrow keys to fly · Shift / Ctrl throttle",
       stall: p.stall,
       grounded: p.grounded,
+      gearPosition: this.replaySample ? this.aircraft.effects?.motion.gear ?? this.replaySample.gearPosition ?? 1 : p.gearPosition,
+      flapPosition: this.replaySample ? this.aircraft.effects?.motion.flaps ?? this.replaySample.flapPosition ?? 0 : p.flapPosition,
+      automaticConfiguration: this.replaySample?.automaticConfiguration ?? p.automaticConfiguration,
+      speedProtection: p.speedProtectionActive,
+      elevatorTrim: this.replaySample?.elevatorTrim ?? p.elevatorTrim,
       damage: { ...p.damage },
       x: p.position.x,
       z: p.position.z,
@@ -1295,6 +1409,8 @@ export class PocketFlight {
     return {
       mode: this.mode,
       aircraft: this.aircraft.id,
+      cockpitDisplays: this.aircraft.displays?.diagnostics(),
+      music: this.audio.music?.getState() ?? null,
       position: p.position.toArray(),
       velocity: p.velocity.toArray(),
       speed: p.airspeed,
@@ -1312,6 +1428,18 @@ export class PocketFlight {
       triangles: this.renderer.info.render.triangles,
       enginePower: p.enginePower,
       beginnerAssist: p.beginnerAssist,
+      elevatorTrim: p.elevatorTrim,
+      flightModel: ISLAND_FLIGHT_MODEL,
+      automaticConfiguration: p.automaticConfiguration,
+      gearPosition: p.gearPosition,
+      gearTarget: p.gearTarget,
+      flapPosition: p.flapPosition,
+      flapTarget: p.flapCommand,
+      wingDamage: { ...p.wingDamage },
+      detachedWings: { ...p.detachedWings },
+      simulationTick: p.simulationTick,
+      speedProtection: p.speedProtectionActive,
+      wheelContacts: p.wheelContacts.map((c) => ({ index: c.index, loadNewtons: c.load, compression: c.compression, closingSpeed: c.closingSpeed, locked: c.locked, runway: c.runway })),
       aerodynamics: p.aerodynamics
         ? {
             alpha: p.aerodynamics.alpha,
@@ -1321,6 +1449,14 @@ export class PocketFlight {
             liftNewtons: p.aerodynamics.lift,
             dragNewtons: p.aerodynamics.drag,
             massKg: p.loadedMass,
+            cgMetres: p.massProperties.cg.toArray(),
+            inertiaKgM2: p.massProperties.inertia.toArray(),
+            angularVelocity: p.angularVelocity.toArray(),
+            momentsNewtonMetres: p.aerodynamics.moment.toArray(),
+            staticMargin: p.aerodynamics.staticMargin,
+            mach: p.aerodynamics.mach,
+            stallSpeedMetresPerSecond: p.stallSpeed,
+            fuelKg: p.fuelKg,
             stalled: p.stall,
           }
         : null,

@@ -1,3 +1,4 @@
+import { ValidationBench } from "./ValidationBench";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   aircraftCatalog,
@@ -399,6 +400,29 @@ export default function App() {
                   className="secondary"
                   onClick={() => {
                     setRevealMechanisms(false);
+                    scene.current?.rearCabinView();
+                  }}
+                >
+                  Rear bulkhead
+                </button>
+              )}
+              {id === "finch" && (
+                <button
+                  className="secondary"
+                  onClick={() => {
+                    setRevealMechanisms(true);
+                    setLayers((previous) => ({ ...previous, chamber: false }));
+                    scene.current?.internalSystemsView();
+                  }}
+                >
+                  Internal systems
+                </button>
+              )}
+              {id === "finch" && (
+                <button
+                  className="secondary"
+                  onClick={() => {
+                    setRevealMechanisms(false);
                     scene.current?.pilotView();
                   }}
                 >
@@ -418,7 +442,7 @@ export default function App() {
               Slow mechanical demonstration. Airflow and force overlays are
               hidden; readouts retain the neutral-wing reference.{" "}
               {id === "finch"
-                ? "Finch’s gear is fixed. The rebuilt cabin has a rear-hinged canopy, mounted gas supports, dual sticks, pedals and throttle. Pilot view uses the exported eye datum."
+                ? "Finch’s gear is fixed. Rear bulkhead shows the closed cabin partition. Internal systems reveals the underfloor fuel cell and separate aft equipment bay. Wing pushrods stay inside the skin."
                 : "Retractable gear, doors and pressure linkages cycle together."}
             </p>
           </>
@@ -430,6 +454,7 @@ export default function App() {
           <label className="field">
             Aircraft
             <select
+              aria-label="Aircraft"
               value={id}
               onChange={(e) => changeAircraft(e.target.value as LabAircraftId)}
               disabled={busy}
@@ -613,6 +638,14 @@ export default function App() {
             </div>
           )}
           <div className="camera-bar">
+            <button
+              onClick={() => {
+                setRevealMechanisms(false);
+                scene.current?.displayView();
+              }}
+            >
+              Instrument displays
+            </button>
             {(
               [
                 ["test", "Inspect"],
@@ -699,6 +732,7 @@ export default function App() {
           </div>
         </aside>
       </div>
+      <ValidationBench aircraft={id} />
       <div className="analysis-grid">
         <section className="panel plot">
           <p className="eyebrow">04 / SPAN LOADING</p>

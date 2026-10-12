@@ -10,6 +10,7 @@ import { missions, scoreFlight } from "./missions";
 import type { Mission, FlightResult } from "./missions";
 import { FlightAudio } from "./audio";
 import { terrainHeight, runways } from "./terrain";
+import { FlightVfx, type VfxInput } from "./flight-vfx";
 import { ReplayTimeline } from "./replay";
 import { ReplayVideoExport } from "./replay-export";
 import { ReplayLibrary } from "./replay-library";
@@ -173,9 +174,11 @@ export class PocketFlight {
     spin: T.Vector3;
     life: number;
   }[] = [];
-  private smoke: T.InstancedMesh;
-  private smokeDummy = new T.Object3D();
-  private smokeHistory: T.Vector3[] = [];
+  readonly vfx = new FlightVfx();
+  private vfxVelocity = new T.Vector3();
+  private vfxUp = new T.Vector3();
+  private vfxLoad = 1;
+  private vfxViewport = new T.Vector2();
   private result: FlightResult | null = null;
   private disposed = false;
   private reducedMotion = matchMedia("(prefers-reduced-motion: reduce)")
@@ -204,18 +207,7 @@ export class PocketFlight {
     );
     this.world = makeWorld(this.scene);
     this.scene.add(this.aircraft.group, this.ringGroup, this.camera);
-    this.smoke = new T.InstancedMesh(
-      new T.SphereGeometry(1, 8, 6),
-      new T.MeshBasicMaterial({
-        color: "#5f6a69",
-        transparent: true,
-        opacity: 0.22,
-        depthWrite: false,
-      }),
-      35,
-    );
-    this.smoke.count = 0;
-    this.scene.add(this.smoke);
+    this.scene.add(this.vfx.group);
     this.physics.reset();
     this.resize();
     window.addEventListener("resize", this.resize);
@@ -379,6 +371,8 @@ export class PocketFlight {
     };
     input.burner = input.throttle > 0.9;
     input.flaps = input.gear ? 0.35 : 0;
+    if ("setAtmosphericEffects" in effects)
+      effects.setAtmosphericEffects(false);
     effects.setReducedMotion(this.reducedMotion);
     effects.update(menu && this.reducedMotion ? 0 : dt, input);
   }
@@ -426,9 +420,11 @@ export class PocketFlight {
     this.previousPosition.copy(this.physics.position);
     this.previousQuaternion.copy(this.physics.quaternion);
     this.mode = "playing";
+    this.vfx.group.visible = true;
     this.replay.clear();
     this.replayClock = 0;
-    this.smokeHistory = [];
+    this.vfx.reset();
+    this.vfxVelocity.copy(this.physics.velocity);
     this.cameraMode = "chase";
     this.orbit = { x: 0, y: 0 };
     this.buildRings();
@@ -483,6 +479,7 @@ export class PocketFlight {
     if (this.mode === "replay") this.stopReplay();
     if (this.replayVideo.busy) this.replayVideo.cancel();
     this.mode = "menu";
+    this.vfx.group.visible = false;
     this.aircraft.surfaces.reset();
     this.ringGroup.visible = false;
     this.keys.clear();
@@ -767,7 +764,12 @@ export class PocketFlight {
       T.MathUtils.lerp(a.worldTime, b.worldTime, mix),
       visual.night,
     );
-    this.smoke.visible = false;
+    this.vfx.render(
+      T.MathUtils.lerp(a.t, b.t, mix),
+      this.renderer.getDrawingBufferSize(this.vfxViewport).y,
+      this.reducedMotion,
+      this.camera.aspect,
+    );
     const angle = this.replayClock * 0.1;
     const heading = new T.Euler().setFromQuaternion(model.quaternion, "YXZ").y;
     const offset = new T.Vector3(
@@ -785,6 +787,7 @@ export class PocketFlight {
   }
   playReplay() {
     if (!this.canReplay || this.replayVideo.busy) return;
+    this.vfx.group.visible = true;
     if (this.mode !== "replay") {
       this.replayLive = this.captureReplayFrame();
       this.replayReturnCamera = this.cameraMode;
@@ -821,12 +824,33 @@ export class PocketFlight {
     this.cameraMode = this.replayReturnCamera;
     if (this.replayLive) this.applyReplayVisuals(this.replayLive);
     this.world.update(this.time, this.night);
-    this.smoke.visible = true;
+    this.vfx.render(
+      this.physics.flightTime,
+      this.renderer.getDrawingBufferSize(this.vfxViewport).y,
+      this.reducedMotion,
+      this.camera.aspect,
+    );
     this.aircraft.group.position.copy(this.physics.position);
     this.aircraft.group.quaternion.copy(this.physics.quaternion);
     this.replaySample = this.replayLive = null;
     this.replayEnded = false;
     this.emit();
+  }
+  private vfxInput(): VfxInput {
+    const p = this.physics;
+    return {
+      id: this.aircraft.id,
+      time: p.flightTime,
+      position: p.position,
+      rotation: p.quaternion,
+      velocity: p.velocity,
+      wind: p.wind,
+      damage: p.damage.engine,
+      speed: p.airspeed,
+      grounded: p.grounded,
+      load: this.vfxLoad,
+      suspension: p.suspension,
+    };
   }
   private updateMission(previous: T.Vector3) {
     const p = this.physics;
@@ -841,16 +865,20 @@ export class PocketFlight {
         this.onToast("Beautiful. You’re flying.");
       }
       if (e.type === "impact") {
+        this.vfx.impact(this.vfxInput(), e.severity);
         this.makeDebris(e.severity);
         this.onToast("Hard impact. Check your aircraft and find a runway.");
         this.audio.chime(false);
       }
       if (e.type === "crash") {
+        this.vfx.impact(this.vfxInput(), e.severity);
         this.makeDebris(e.severity);
         this.crashDelay = 2.5;
         this.onToast("Heavy impact. Your flight recorder is still running.");
         return;
       }
+      if (e.type === "landing")
+        this.vfx.touchdown(this.vfxInput(), e.sink ?? 0);
       if (e.type === "landing" && e.runway) {
         this.landedAt = e.runway;
         this.landingSink = e.sink ?? 0;
@@ -1064,7 +1092,17 @@ export class PocketFlight {
         this.previousQuaternion.copy(this.physics.quaternion);
         const input = this.controls();
         if (!this.physics.crashed) this.aircraft.surfaces.update(input, 1 / 60);
+        this.vfxVelocity.copy(this.physics.velocity);
         this.physics.step(1 / 60, input, this.world.obstacles);
+        this.vfxUp.set(0, 1, 0).applyQuaternion(this.physics.quaternion);
+        this.vfxVelocity
+          .subVectors(this.physics.velocity, this.vfxVelocity)
+          .multiplyScalar(60);
+        this.vfxVelocity.y += 9.81;
+        this.vfxLoad = this.physics.grounded
+          ? 1
+          : Math.abs(this.vfxVelocity.dot(this.vfxUp) / 9.81);
+        this.vfx.step(1 / 60, this.vfxInput());
         this.updateMission(this.previousPosition);
         this.accumulator -= 1 / 60;
         if (this.mode !== "playing") {
@@ -1127,19 +1165,13 @@ export class PocketFlight {
         }
       }
     }
-    if (this.mode === "playing" && this.physics.damage.engine > 0.25) {
-      this.smokeHistory.unshift(this.physics.position.clone());
-      if (this.smokeHistory.length > 35) this.smokeHistory.pop();
-      this.smoke.count = this.smokeHistory.length;
-      this.smokeHistory.forEach((p, i) => {
-        p.y += dt * 1.8;
-        this.smokeDummy.position.copy(p);
-        this.smokeDummy.scale.setScalar(0.35 + i * 0.065);
-        this.smokeDummy.updateMatrix();
-        this.smoke.setMatrixAt(i, this.smokeDummy.matrix);
-      });
-      this.smoke.instanceMatrix.needsUpdate = true;
-    } else if (this.mode === "menu") this.smoke.count = 0;
+    if (this.mode !== "replay")
+      this.vfx.render(
+        this.physics.flightTime,
+        this.renderer.getDrawingBufferSize(this.vfxViewport).y,
+        this.reducedMotion,
+        this.camera.aspect,
+      );
     this.cameraUpdate(this.mode === "replay" ? elapsed : dt);
     const sound = this.replaySample;
     this.audio.update(
@@ -1276,6 +1308,7 @@ export class PocketFlight {
       roll: p.roll,
       fps: Math.round(this.fps),
       drawCalls: this.renderer.info.render.calls,
+      vfx: this.vfx.stats,
       triangles: this.renderer.info.render.triangles,
       enginePower: p.enginePower,
       beginnerAssist: p.beginnerAssist,
@@ -1313,6 +1346,7 @@ export class PocketFlight {
       this.contextmenu,
     );
     this.aircraft.dispose();
+    this.vfx.dispose();
     this.world.dispose();
     this.renderer.dispose();
     this.audio.dispose();

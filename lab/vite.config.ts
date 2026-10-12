@@ -14,6 +14,8 @@ const sharedFiles = Object.values(aircraftCatalog).flatMap((a) => {
 
 export default defineConfig({
   root,
+  // The lab and main game run concurrently with different entry points.
+  cacheDir: resolve(root, "../node_modules/.vite-lab"),
   publicDir: resolve(root, "public"),
   server: {
     host: "127.0.0.1",

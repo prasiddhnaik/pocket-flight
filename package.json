@@ -9,6 +9,7 @@
     "preview": "vite preview --host 0.0.0.0",
     "test": "bun test",
     "landing:check": "bun scripts/run-landing-browser-check.ts",
+    "vfx:check": "bun scripts/run-vfx-browser-check.ts",
     "finch:measure": "bun scripts/measure-finch.ts",
     "finch:cockpit": "bun scripts/build-finch-cockpit.ts",
     "finch:verify": "bun test tests/aerodynamics.test.ts tests/finch-geometry.test.ts tests/flight.test.ts",

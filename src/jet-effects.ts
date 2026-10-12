@@ -269,6 +269,7 @@ export class JetEffects {
   private trail: T.Points;
   private spriteMap = glowTexture();
   private reduced = false;
+  private atmosphericEffects = true;
   private nodes = new Map<string, T.Object3D>();
   constructor(
     readonly model: T.Group,
@@ -447,6 +448,10 @@ export class JetEffects {
     this.smoke = particles("Engine smoke and touchdown dust", 100, "#879096");
     this.trail = particles("Condensation and wingtip vortices", 480, "#dceaf0");
   }
+  setAtmosphericEffects(value: boolean) {
+    this.atmosphericEffects = value;
+    if (!value) this.smoke.visible = this.trail.visible = false;
+  }
   reset() {
     Object.assign(this.motion, new JetMotion(!!this.mechanisms));
     this.mechanisms?.reset();
@@ -469,8 +474,12 @@ export class JetEffects {
       if (o) o.rotation.z = this.motion.rotorAngle;
     }
     for (const w of this.wheels) {
-      const tire = this.mechanisms && stormbirdGeometry.wheels.find(t => t.name === w.name);
-      w.rotation.x = tire ? -this.motion.wheelDistance / tire.radius : this.motion.wheelAngle;
+      const tire =
+        this.mechanisms &&
+        stormbirdGeometry.wheels.find((t) => t.name === w.name);
+      w.rotation.x = tire
+        ? -this.motion.wheelDistance / tire.radius
+        : this.motion.wheelAngle;
     }
     const set = (name: string, axis: "x" | "y", v: number) => {
       const o = this.nodes.get(name);
@@ -574,6 +583,7 @@ export class JetEffects {
       if (kind === "landing") a *= s.gear * smooth(0, 0.15, s.rpm);
       sprite.material.opacity = a;
     }
+    if (!this.atmosphericEffects) return;
     this.smoke.visible = s.damage > 0.02 || this.motion.touchdownAge < 2.8;
     if (this.smoke.visible)
       this.particles(this.smoke, 100, (j) => {

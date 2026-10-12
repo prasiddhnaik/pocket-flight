@@ -1,0 +1,26 @@
+{
+  "units": "metres",
+  "designVersion": "premium-chamber-2",
+  "runtimeAxes": "X right, Y up, Z downstream",
+  "testSection": {
+    "width": 16,
+    "height": 12,
+    "length": 28
+  },
+  "aircraftPivot": [
+    0,
+    5.25,
+    0
+  ],
+  "fanPivot": [
+    0,
+    6,
+    20
+  ],
+  "meshObjects": 326,
+  "cutawayGroups": [
+    "Cutaway_NearWall",
+    "Cutaway_Roof"
+  ],
+  "note": "Concept chamber. Rounded-corner enclosure, structural portals and instrument hardware are visual; solver remains freestream and excludes walls/support interference."
+}

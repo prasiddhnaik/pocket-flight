@@ -246,16 +246,17 @@ export class ReplayPreview {
       new T.Quaternion().fromArray(b.q).normalize(),
       mix,
     );
-    if (replay.aircraft !== "stormbird")
-      model.group.position.add(
-        new T.Vector3(
-          0,
-          -Math.min(0.16, T.MathUtils.lerp(a.suspension, b.suspension, mix)),
-          0,
-        ).applyQuaternion(model.group.quaternion),
-      );
+    model.group.position.add(
+      new T.Vector3(
+        0,
+        -model.bodyCompression(
+          T.MathUtils.lerp(a.suspension, b.suspension, mix),
+        ),
+        0,
+      ).applyQuaternion(model.group.quaternion),
+    );
     model.gear.visible = visual.gearVisible;
-    model.gear.rotation.z = visual.gearDamage * 0.35;
+    model.gear.rotation.z = 0;
     model.propeller.visible = visual.propVisible;
     model.wings.forEach((wing, i) => (wing.visible = visual.wings[i]));
     model.setSuspension(T.MathUtils.lerp(a.suspension, b.suspension, mix));

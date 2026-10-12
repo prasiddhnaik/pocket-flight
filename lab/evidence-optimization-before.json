@@ -1,0 +1,335 @@
+{
+  "results": [
+    {
+      "id": "finch",
+      "active": {
+        "fps": 60.334329680086874,
+        "p95Ms": 17.299999999999955,
+        "drawCalls": 244,
+        "triangles": 144937,
+        "geometries": 286,
+        "textures": 5,
+        "flowBuilds": 3,
+        "solutionUpdateMs": 278.19999999925494,
+        "airflowUpdateMs": 0.5
+      },
+      "updates": [
+        {
+          "drawCalls": 244,
+          "triangles": 144937,
+          "geometries": 286,
+          "textures": 5,
+          "flowBuilds": 4,
+          "solutionUpdateMs": 269.0999999977648,
+          "airflowUpdateMs": 0.30000000074505806
+        },
+        {
+          "drawCalls": 244,
+          "triangles": 144937,
+          "geometries": 286,
+          "textures": 5,
+          "flowBuilds": 5,
+          "solutionUpdateMs": 270.30000000074506,
+          "airflowUpdateMs": 0.30000000074505806
+        },
+        {
+          "drawCalls": 244,
+          "triangles": 144937,
+          "geometries": 286,
+          "textures": 5,
+          "flowBuilds": 6,
+          "solutionUpdateMs": 263.1000000014901,
+          "airflowUpdateMs": 0.30000000074505806
+        },
+        {
+          "drawCalls": 244,
+          "triangles": 144937,
+          "geometries": 286,
+          "textures": 5,
+          "flowBuilds": 7,
+          "solutionUpdateMs": 259.80000000074506,
+          "airflowUpdateMs": 0.19999999925494194
+        },
+        {
+          "drawCalls": 244,
+          "triangles": 144937,
+          "geometries": 286,
+          "textures": 5,
+          "flowBuilds": 8,
+          "solutionUpdateMs": 259.79999999701977,
+          "airflowUpdateMs": 0.5999999977648258
+        }
+      ],
+      "angle": {
+        "drawCalls": 244,
+        "triangles": 144937,
+        "geometries": 286,
+        "textures": 5,
+        "flowBuilds": 9,
+        "solutionUpdateMs": 264.5,
+        "airflowUpdateMs": 0.19999999925494194
+      },
+      "paused": {
+        "fps": 59.080117055908545,
+        "p95Ms": 17.300000000000182,
+        "drawCalls": 245,
+        "triangles": 144949,
+        "geometries": 286,
+        "textures": 5,
+        "flowBuilds": 9,
+        "solutionUpdateMs": 264.5,
+        "airflowUpdateMs": 0.30000000074505806
+      }
+    },
+    {
+      "id": "peregrine",
+      "active": {
+        "fps": 60.114714317204516,
+        "p95Ms": 17.100000000000364,
+        "drawCalls": 315,
+        "triangles": 262570,
+        "geometries": 310,
+        "textures": 3,
+        "flowBuilds": 17,
+        "solutionUpdateMs": 397.30000000074506,
+        "airflowUpdateMs": 1.4000000022351742
+      },
+      "updates": [
+        {
+          "drawCalls": 315,
+          "triangles": 262570,
+          "geometries": 310,
+          "textures": 3,
+          "flowBuilds": 18,
+          "solutionUpdateMs": 414.30000000074506,
+          "airflowUpdateMs": 0.5
+        },
+        {
+          "drawCalls": 315,
+          "triangles": 262570,
+          "geometries": 310,
+          "textures": 3,
+          "flowBuilds": 19,
+          "solutionUpdateMs": 402.80000000074506,
+          "airflowUpdateMs": 0.30000000074505806
+        },
+        {
+          "drawCalls": 315,
+          "triangles": 262570,
+          "geometries": 310,
+          "textures": 3,
+          "flowBuilds": 20,
+          "solutionUpdateMs": 404.6000000014901,
+          "airflowUpdateMs": 0.4000000022351742
+        },
+        {
+          "drawCalls": 315,
+          "triangles": 262570,
+          "geometries": 310,
+          "textures": 3,
+          "flowBuilds": 21,
+          "solutionUpdateMs": 402.19999999925494,
+          "airflowUpdateMs": 0.30000000074505806
+        },
+        {
+          "drawCalls": 315,
+          "triangles": 262570,
+          "geometries": 310,
+          "textures": 3,
+          "flowBuilds": 22,
+          "solutionUpdateMs": 399.80000000074506,
+          "airflowUpdateMs": 0.4000000022351742
+        }
+      ],
+      "angle": {
+        "drawCalls": 315,
+        "triangles": 262570,
+        "geometries": 310,
+        "textures": 3,
+        "flowBuilds": 23,
+        "solutionUpdateMs": 398.3999999985099,
+        "airflowUpdateMs": 0.4000000022351742
+      },
+      "paused": {
+        "fps": 60.401196941075554,
+        "p95Ms": 17.30000000000109,
+        "drawCalls": 315,
+        "triangles": 262570,
+        "geometries": 310,
+        "textures": 3,
+        "flowBuilds": 23,
+        "solutionUpdateMs": 398.3999999985099,
+        "airflowUpdateMs": 0.3999999985098839
+      }
+    },
+    {
+      "id": "aurelia",
+      "active": {
+        "fps": 60.1877415792132,
+        "p95Ms": 17.200000000000728,
+        "drawCalls": 394,
+        "triangles": 218040,
+        "geometries": 378,
+        "textures": 3,
+        "flowBuilds": 31,
+        "solutionUpdateMs": 363.80000000074506,
+        "airflowUpdateMs": 0.5
+      },
+      "updates": [
+        {
+          "drawCalls": 394,
+          "triangles": 218040,
+          "geometries": 378,
+          "textures": 3,
+          "flowBuilds": 32,
+          "solutionUpdateMs": 367.5,
+          "airflowUpdateMs": 0.3999999985098839
+        },
+        {
+          "drawCalls": 394,
+          "triangles": 218040,
+          "geometries": 378,
+          "textures": 3,
+          "flowBuilds": 33,
+          "solutionUpdateMs": 360.30000000074506,
+          "airflowUpdateMs": 0.3999999985098839
+        },
+        {
+          "drawCalls": 394,
+          "triangles": 218040,
+          "geometries": 378,
+          "textures": 3,
+          "flowBuilds": 34,
+          "solutionUpdateMs": 359.79999999701977,
+          "airflowUpdateMs": 0.4000000022351742
+        },
+        {
+          "drawCalls": 394,
+          "triangles": 218040,
+          "geometries": 378,
+          "textures": 3,
+          "flowBuilds": 35,
+          "solutionUpdateMs": 360.19999999925494,
+          "airflowUpdateMs": 0.29999999701976776
+        },
+        {
+          "drawCalls": 394,
+          "triangles": 218040,
+          "geometries": 378,
+          "textures": 3,
+          "flowBuilds": 36,
+          "solutionUpdateMs": 360.30000000074506,
+          "airflowUpdateMs": 0.7000000029802322
+        }
+      ],
+      "angle": {
+        "drawCalls": 394,
+        "triangles": 218040,
+        "geometries": 378,
+        "textures": 3,
+        "flowBuilds": 37,
+        "solutionUpdateMs": 361.8999999985099,
+        "airflowUpdateMs": 0.5
+      },
+      "paused": {
+        "fps": 60.41123981597018,
+        "p95Ms": 17.200000000000728,
+        "drawCalls": 394,
+        "triangles": 218040,
+        "geometries": 378,
+        "textures": 3,
+        "flowBuilds": 37,
+        "solutionUpdateMs": 361.8999999985099,
+        "airflowUpdateMs": 0.4000000022351742
+      }
+    },
+    {
+      "id": "stormbird",
+      "active": {
+        "fps": 60.33766952670911,
+        "p95Ms": 17.200000000000728,
+        "drawCalls": 270,
+        "triangles": 1641140,
+        "geometries": 272,
+        "textures": 3,
+        "flowBuilds": 45,
+        "solutionUpdateMs": 366.6000000014901,
+        "airflowUpdateMs": 1
+      },
+      "updates": [
+        {
+          "drawCalls": 270,
+          "triangles": 1641140,
+          "geometries": 272,
+          "textures": 3,
+          "flowBuilds": 46,
+          "solutionUpdateMs": 384.5999999977648,
+          "airflowUpdateMs": 0.5
+        },
+        {
+          "drawCalls": 270,
+          "triangles": 1641140,
+          "geometries": 272,
+          "textures": 3,
+          "flowBuilds": 47,
+          "solutionUpdateMs": 366.4000000022352,
+          "airflowUpdateMs": 0.3999999985098839
+        },
+        {
+          "drawCalls": 270,
+          "triangles": 1641140,
+          "geometries": 272,
+          "textures": 3,
+          "flowBuilds": 48,
+          "solutionUpdateMs": 368.30000000074506,
+          "airflowUpdateMs": 0.3999999985098839
+        },
+        {
+          "drawCalls": 270,
+          "triangles": 1641140,
+          "geometries": 272,
+          "textures": 3,
+          "flowBuilds": 49,
+          "solutionUpdateMs": 370.5,
+          "airflowUpdateMs": 0.3999999985098839
+        },
+        {
+          "drawCalls": 270,
+          "triangles": 1641140,
+          "geometries": 272,
+          "textures": 3,
+          "flowBuilds": 50,
+          "solutionUpdateMs": 370.5,
+          "airflowUpdateMs": 0.4000000022351742
+        }
+      ],
+      "angle": {
+        "drawCalls": 270,
+        "triangles": 1641140,
+        "geometries": 272,
+        "textures": 3,
+        "flowBuilds": 51,
+        "solutionUpdateMs": 371.69999999925494,
+        "airflowUpdateMs": 0.4000000022351742
+      },
+      "paused": {
+        "fps": 60.19106521611655,
+        "p95Ms": 17.299999999999272,
+        "drawCalls": 270,
+        "triangles": 1641140,
+        "geometries": 272,
+        "textures": 3,
+        "flowBuilds": 51,
+        "solutionUpdateMs": 371.69999999925494,
+        "airflowUpdateMs": 0.5
+      }
+    }
+  ],
+  "errors": [],
+  "viewport": [
+    1440,
+    1000
+  ],
+  "renderer": "Chromium Metal",
+  "generatedAt": "2026-10-11T15:31:19.478Z"
+}

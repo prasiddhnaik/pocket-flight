@@ -267,7 +267,6 @@ export class JetEffects {
   private wheels: T.Object3D[] = [];
   private smoke: T.Points;
   private trail: T.Points;
-  private suspension = 0;
   private spriteMap = glowTexture();
   private reduced = false;
   private nodes = new Map<string, T.Object3D>();
@@ -457,9 +456,6 @@ export class JetEffects {
   }
   setSuspension(value: number) {
     this.mechanisms?.setSuspension(value);
-    const delta = value - this.suspension;
-    this.legs.forEach(({ pivot }) => (pivot.position.y += delta));
-    this.suspension = value;
   }
   setReducedMotion(value: boolean) {
     this.reduced = value;
@@ -529,12 +525,6 @@ export class JetEffects {
                   2;
           }
         }
-      const compression =
-        this.motion.touchdownAge < 2
-          ? Math.exp(-this.motion.touchdownAge * 3) *
-            Math.sin(this.motion.touchdownAge * 8) *
-            0.14
-          : 0;
       this.legs.forEach(({ pivot, side, nose }) => {
         const fold = 1 - smooth(0.03, 0.98, s.gear);
         pivot.rotation[nose ? "x" : "z"] = nose
@@ -542,9 +532,7 @@ export class JetEffects {
           : -side * fold * 1.2;
         pivot.position.y =
           (nose ? this.layout.noseGear[1] : this.layout.mainGear[1]) +
-          fold * 0.25 +
-          compression +
-          this.suspension;
+          fold * 0.25;
         pivot.visible = s.gear > 0.015;
       });
       const steering = this.nodes.get("Nose_steering");

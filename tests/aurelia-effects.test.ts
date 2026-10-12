@@ -38,3 +38,12 @@ test("fan phase never reverses on shutdown and paused replay does not advance it
   expect(e.motion.fanPhase).toBe(phase);
   expect(e.motion.burner).toBe(0);
 });
+
+test("touchdown compression never translates Aurelia's fixed gear mounts", () => {
+  const e = new AureliaEffects(gltf.scene, gltf.animations);
+  const gear = gltf.scene.getObjectByName("LandingGear")!;
+  const mounted = gear.position.clone();
+  e.setSuspension(0.16);
+  expect(gear.position.distanceTo(mounted)).toBeLessThan(0.00001);
+  e.setSuspension(0);
+});

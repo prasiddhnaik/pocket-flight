@@ -250,6 +250,7 @@ export default function App() {
     [instrumentsExpanded, setInstrumentsExpanded] = useState(false),
     [night, setNight] = useState(false),
     [sound, setSound] = useState(false),
+    [beginnerAssist, setBeginnerAssist] = useState(() => read("pocket-flight-assist", true)),
     [toast, setToast] = useState(""),
     [result, setResult] = useState<FlightResult | null>(null),
     [log, setLog] = useState<FlightResult[]>(() =>
@@ -279,6 +280,7 @@ export default function App() {
     try {
       instance = new PocketFlight(viewport.current, aircraftId);
       instance.setPaint(paint);
+      instance.physics.beginnerAssist = beginnerAssist;
       instance.onSnapshot = (state) => {
         setSnapshot(state);
         setSound(instance.audio.enabled);
@@ -1373,10 +1375,10 @@ export default function App() {
                   <p>
                     <b>Taking off in {aircraftName}</b>Hold Shift for full
                     power. At {rotationKnots} knots, gently hold ↓ or S to raise
-                    the nose. Once airborne, release to let the flight
-                    assistance trim.
+                    the nose. Once airborne, release to let beginner assist
+                    trim, if enabled.
                     {aircraftId === "finch"
-                      ? " For landing, use 25–40% power and approach at 55–65 knots."
+                      ? " For landing, reduce power and approach at 55–65 knots."
                       : " Landing gear retracts and deploys automatically. Reduce power gradually on approach."}{" "}
                     Gently raise the nose just above the runway, then hold B
                     after touchdown.
@@ -1486,6 +1488,24 @@ export default function App() {
                     <ArrowUpRight size={17} />
                   </button>
                 </div>
+                <div className="setting-row">
+                  <span>
+                    <Plane size={21} />
+                    <b>Beginner flight assist</b>
+                  </span>
+                  <button
+                    className="setting-toggle"
+                    aria-pressed={beginnerAssist}
+                    onClick={() => {
+                      const enabled = !beginnerAssist;
+                      setBeginnerAssist(enabled);
+                      save("pocket-flight-assist", enabled);
+                      if (game.current) game.current.physics.beginnerAssist = enabled;
+                    }}
+                  >
+                    {beginnerAssist ? "Assist on" : "Assist off"}
+                  </button>
+                </div>
                 {aircraftId === "finch" && (
                   <div className="setting-row paint-setting">
                     <span>
@@ -1512,8 +1532,9 @@ export default function App() {
                   <Heart size={23} />
                   <p>
                     Your paint, scores, and medals are saved in this browser.
-                    Flight assistance is built in: gentle self-leveling,
-                    coordinated turns, and automatic trim.
+                    Beginner assist adds gentle self-leveling, coordinated
+                    turns, automatic trim, and stall-recovery cues. Switching it
+                    off keeps the simplified pitch, roll, and yaw controls.
                   </p>
                 </div>
               </>

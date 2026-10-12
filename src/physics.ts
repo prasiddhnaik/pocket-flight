@@ -7,6 +7,14 @@ import { stormbirdContact } from "./stormbird-contact";
 import stormbirdGeometry from "./stormbird-geometry.json";
 import { STORMBIRD_GEAR_SECONDS } from "./stormbird-kinematics";
 import {
+  airDensity,
+  bodyAirflow,
+  finchAerodynamics,
+  finchThrust,
+  GRAVITY,
+} from "./aerodynamics";
+import { finchDesign, finchMass } from "./finch-design";
+import {
   peregrineWheels,
   aureliaWheels,
   finchWheels,
@@ -45,7 +53,6 @@ export class FlightPhysics {
     return gearContactHeight(
       this.position,
       this.quaternion,
-      this.damage.gear,
       this.aircraftId === "aurelia"
         ? aureliaWheels
         : this.jet
@@ -78,6 +85,7 @@ export class FlightPhysics {
   roll = 0;
   yaw = 0;
   throttle = 0;
+  enginePower = 0;
   airspeed = 0;
   grounded = true;
   crashed = false;
@@ -93,9 +101,13 @@ export class FlightPhysics {
   events: FlightEvent[] = [];
   strongWind = false;
   engineOut = false;
+  beginnerAssist = true;
+  loadedMass = finchMass;
+  aerodynamics: ReturnType<typeof finchAerodynamics> | null = null;
   private groundTime = 0;
   private pitchRate = 0;
   private rollRate = 0;
+  private yawRate = 0;
   reset(airStart = false, short = false) {
     const r = short ? runways[1] : runways[0];
     this.yaw = r.heading;
@@ -113,9 +125,11 @@ export class FlightPhysics {
       -Math.cos(this.yaw) * (airStart ? (this.jet ? 48 : 34) : 0),
     );
     this.throttle = airStart ? 0.46 : 0;
+    this.enginePower = this.throttle;
     this.grounded = !airStart;
     this.crashed = false;
     this.stall = false;
+    this.aerodynamics = null;
     this.damage = { gear: 0, wing: 0, engine: 0, propeller: 0 };
     this.distance = 0;
     this.flightTime = 0;
@@ -123,6 +137,7 @@ export class FlightPhysics {
     this.groundTime = 0;
     this.pitchRate = 0;
     this.rollRate = 0;
+    this.yawRate = 0;
     this.lastImpact = 0;
     this.events = [];
     this.engineOut = false;
@@ -179,6 +194,12 @@ export class FlightPhysics {
       0,
       1,
     );
+    this.enginePower = MathUtils.damp(
+      this.enginePower,
+      this.engineOut || this.crashed ? 0 : this.throttle,
+      this.profile.engineResponse,
+      dt,
+    );
     const prev = this.position.clone();
     const surface = groundAt(this.position.x, this.position.z);
     const gust = this.strongWind ? 7 : 1.5;
@@ -217,25 +238,53 @@ export class FlightPhysics {
       MathUtils.clamp(speed / this.profile.controlSpeed, 0.25, 1.2) *
       (1 - this.damage.wing * 0.55);
     const pitchTarget = input.pitch * this.profile.pitchRate * authority;
-    this.pitchRate = MathUtils.damp(this.pitchRate, pitchTarget, 5, dt);
+    this.pitchRate = MathUtils.damp(
+      this.pitchRate,
+      pitchTarget,
+      this.profile.pitchResponse,
+      dt,
+    );
     this.pitch += this.pitchRate * dt;
-    if (!input.pitch && !this.grounded)
-      this.pitch = MathUtils.damp(
-        this.pitch,
-        this.engineOut ? -0.065 : 0.025,
-        0.24,
-        dt,
+    if (!input.pitch && !this.grounded && this.beginnerAssist) {
+      const requiredCL =
+        (this.loadedMass * GRAVITY) /
+        Math.max(
+          1,
+          0.5 *
+            airDensity(this.position.y) *
+            speed ** 2 *
+            finchDesign.geometry.wingArea,
+        );
+      const trimAlpha = MathUtils.clamp(
+        (requiredCL - finchDesign.aerodynamics.cl0) /
+          finchDesign.aerodynamics.liftSlope,
+        -0.04,
+        0.23,
       );
+      const targetPitch = this.jet
+        ? this.engineOut
+          ? -0.065
+          : 0.025
+        : this.engineOut
+          ? -0.03
+          : trimAlpha;
+      this.pitch = MathUtils.damp(this.pitch, targetPitch, 0.24, dt);
+    }
     this.pitch = MathUtils.clamp(this.pitch, -0.85, 1.05);
     this.rollRate = MathUtils.damp(
       this.rollRate,
       -input.roll * this.profile.rollRate * authority,
-      4.5,
+      this.profile.rollResponse,
       dt,
     );
     this.roll += this.rollRate * dt;
-    if (!input.roll)
-      this.roll = MathUtils.damp(this.roll, 0, this.grounded ? 5 : 1.15, dt);
+    if (!input.roll && (this.grounded || this.beginnerAssist))
+      this.roll = MathUtils.damp(
+        this.roll,
+        0,
+        this.grounded ? 5 : this.profile.bankRecovery,
+        dt,
+      );
     this.roll = MathUtils.clamp(this.roll, -1.22, 1.22);
     if (this.grounded) {
       this.roll = MathUtils.damp(this.roll, 0, 9, dt);
@@ -249,62 +298,93 @@ export class FlightPhysics {
           : 0.23,
       );
     } else {
-      this.yaw +=
-        ((Math.tan(this.roll) * 9.81) / Math.max(speed, 19) -
-          input.yaw * 0.26) *
-        dt;
+      const coordinatedTurn = this.beginnerAssist
+        ? (Math.tan(this.roll) * GRAVITY) / Math.max(speed, 19)
+        : 0;
+      this.yawRate = MathUtils.damp(
+        this.yawRate,
+        coordinatedTurn - input.yaw * this.profile.rudderRate * authority,
+        this.profile.yawResponse,
+        dt,
+      );
+      this.yaw += this.yawRate * dt;
       this.roll += this.damage.wing * 0.07 * dt;
       this.pitch += Math.sin(this.flightTime * 2.1) * gust * 0.00055;
     }
     this.updateQuaternion();
     const forward = new Vector3(0, 0, -1).applyQuaternion(this.quaternion);
     const right = new Vector3(1, 0, 0).applyQuaternion(this.quaternion);
-    const dir = speed > 1 ? air.clone().divideScalar(speed) : forward.clone();
-    const pathAngle = Math.asin(MathUtils.clamp(dir.y, -1, 1));
-    const aoa = this.pitch - pathAngle;
-    this.stall =
-      !this.grounded &&
-      (speed < this.profile.stallSpeed || Math.abs(aoa) > 0.36);
-    const stalledFactor =
-      Math.abs(aoa) > 0.32
-        ? Math.max(0.16, 1 - (Math.abs(aoa) - 0.32) * 2.4)
-        : 1;
-    const liftScale = this.profile.lift;
-    const trim =
-      9.81 / (liftScale * Math.max(this.profile.trimSpeed, speed) ** 2);
-    const cl = MathUtils.clamp(trim + aoa * 3.7, -0.75, 1.65) * stalledFactor;
-    const lift = liftScale * speed * speed * cl * (1 - this.damage.wing * 0.62);
-    const drag =
-      (this.profile.drag +
-        0.0005 * cl * cl +
-        this.damage.gear * 0.002 +
-        this.damage.wing * 0.004 +
-        // Arcade acceleration coefficient; no measured drag polar is claimed.
-        (this.aircraftId === "stormbird" ? this.gearPosition * 0.00035 : 0) +
-        (this.stall ? 0.007 : 0)) *
-      speed *
-      speed;
-    const engine = this.engineOut
-      ? 0
-      : this.throttle *
-        this.profile.thrust *
-        (this.jet
-          ? (1 +
-              MathUtils.smoothstep(this.throttle, 0.88, 1) *
-                this.profile.afterburner) *
-            (1 - Math.min(0.6, speed / this.profile.speedFalloff))
-          : 1 - Math.min(0.65, speed / this.profile.speedFalloff)) *
-        (1 - this.damage.engine * 0.85) *
-        (1 - this.damage.propeller * (this.jet ? 0 : 0.8));
-    const liftDir = new Vector3().crossVectors(right, dir).normalize();
-    const accel = new Vector3(0, -9.81, 0)
-      .addScaledVector(liftDir, lift)
-      .addScaledVector(forward, engine)
-      .addScaledVector(dir, -drag);
-    // Damped sideslip and coordinated turns keep banked flight readable for new pilots.
-    const slip = air.dot(right);
-    accel.addScaledVector(right, -slip * 1.8);
-    if (this.stall) {
+    const accel = new Vector3(0, -GRAVITY, 0);
+    if (this.aircraftId === "finch") {
+      const aero = finchAerodynamics(
+        this.velocity,
+        this.wind,
+        this.quaternion,
+        this.position.y,
+        this.damage.wing,
+      );
+      this.aerodynamics = aero;
+      this.stall = !this.grounded && speed > 1 && aero.stalled;
+      const thrust = this.engineOut
+        ? 0
+        : finchThrust(speed, this.enginePower, aero.density) *
+          (1 - this.damage.engine * 0.85) *
+          (1 - this.damage.propeller * 0.8);
+      const damagedGearDrag =
+        aero.dynamicPressure *
+        finchDesign.geometry.wingArea *
+        this.damage.gear *
+        0.04;
+      accel
+        .addScaledVector(aero.force, 1 / this.loadedMass)
+        .addScaledVector(forward, thrust / this.loadedMass)
+        .addScaledVector(aero.direction, -damagedGearDrag / this.loadedMass);
+    } else {
+      const dir = speed > 1 ? air.clone().divideScalar(speed) : forward.clone();
+      const aoa = bodyAirflow(this.velocity, this.wind, this.quaternion).alpha;
+      this.stall =
+        !this.grounded &&
+        (speed < this.profile.stallSpeed || Math.abs(aoa) > 0.36);
+      const stalledFactor =
+        Math.abs(aoa) > 0.32
+          ? Math.max(0.16, 1 - (Math.abs(aoa) - 0.32) * 2.4)
+          : 1;
+      const liftScale = this.profile.lift;
+      const trim =
+        9.81 / (liftScale * Math.max(this.profile.trimSpeed, speed) ** 2);
+      const cl = MathUtils.clamp(trim + aoa * 3.7, -0.75, 1.65) * stalledFactor;
+      const lift =
+        liftScale * speed * speed * cl * (1 - this.damage.wing * 0.62);
+      const drag =
+        (this.profile.drag +
+          0.0005 * cl * cl +
+          this.damage.gear * 0.002 +
+          this.damage.wing * 0.004 +
+          // Arcade acceleration coefficient; no measured drag polar is claimed.
+          (this.aircraftId === "stormbird" ? this.gearPosition * 0.00035 : 0) +
+          (this.stall ? 0.007 : 0)) *
+        speed *
+        speed;
+      const engine = this.engineOut
+        ? 0
+        : this.enginePower *
+          this.profile.thrust *
+          (1 +
+            MathUtils.smoothstep(this.enginePower, 0.88, 1) *
+              this.profile.afterburner) *
+          (1 - Math.min(0.6, speed / this.profile.speedFalloff)) *
+          (1 - this.damage.engine * 0.85);
+      const liftDir = new Vector3().crossVectors(right, dir).normalize();
+      accel
+        .addScaledVector(liftDir, lift)
+        .addScaledVector(forward, engine)
+        .addScaledVector(dir, -drag);
+      this.aerodynamics = null;
+      // Legacy jets still use acceleration tuning, with explicit sideslip assistance.
+      if (this.beginnerAssist)
+        accel.addScaledVector(right, -air.dot(right) * 1.8);
+    }
+    if (this.stall && this.beginnerAssist) {
       this.pitch -= dt * 0.09;
       this.roll += Math.sin(this.flightTime * 5) * dt * 0.03;
     }
@@ -329,12 +409,12 @@ export class FlightPhysics {
     const touchedGround = this.position.y <= bottom;
     if (this.position.y <= bottom) {
       const slopeX =
-        (terrainHeight(this.position.x + 2, this.position.z) -
-          terrainHeight(this.position.x - 2, this.position.z)) /
+        (groundAt(this.position.x + 2, this.position.z).height -
+          groundAt(this.position.x - 2, this.position.z).height) /
         4;
       const slopeZ =
-        (terrainHeight(this.position.x, this.position.z + 2) -
-          terrainHeight(this.position.x, this.position.z - 2)) /
+        (groundAt(this.position.x, this.position.z + 2).height -
+          groundAt(this.position.x, this.position.z - 2).height) /
         4;
       const closingSpeed =
         Math.max(
@@ -351,9 +431,12 @@ export class FlightPhysics {
           if (!contact.downlocked || !contact.wheelSupported)
             this.impact(1.1, "gear");
         }
-        const bank = Math.abs(this.roll),
-          rough = next.runway ? 0 : 0.15;
-        const severity = Math.max(0, (sink - 2.7) / 9) + bank * 0.6 + rough;
+        const bank = Math.abs(this.roll);
+        // A modest one-wheel touchdown or level grass is not a gear failure.
+        // Surface roughness amplifies actual impact load, not every contact.
+        const severity =
+          Math.max(0, (closingSpeed - 2.7) / 9) * (next.runway ? 1 : 1.25) +
+          Math.max(0, bank - 0.12) * 0.6;
         if (next.water) {
           this.impact(1.1, "propeller");
         } else if (sink > 12 || bank > 0.95 || this.pitch < -0.3) {

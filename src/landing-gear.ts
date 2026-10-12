@@ -11,18 +11,14 @@ export const finchWheels = [
 const axle = new Vector3(),
   offset = new Vector3(),
   orientation = new Quaternion();
-const bendAxis = new Vector3(0, 0, 1),
-  bend = new Quaternion();
 
 export function gearContactHeight(
   position: Vector3,
   rotation: Quaternion,
-  damage = 0,
   wheels = finchWheels,
 ) {
-  orientation
-    .copy(rotation)
-    .multiply(bend.setFromAxisAngle(bendAxis, damage * 0.35));
+  // Damage changes performance, not the position of fixed gear attachments.
+  orientation.copy(rotation);
   axle.set(1, 0, 0).applyQuaternion(orientation);
   const radialHeight = Math.sqrt(Math.max(0, 1 - axle.y * axle.y));
   let height = -Infinity;

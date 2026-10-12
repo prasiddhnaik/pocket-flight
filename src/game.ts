@@ -358,14 +358,18 @@ export class PocketFlight {
     const input = {
       ...initialJetInput(),
       ...this.aircraft.surfaces.snapshot(),
-      throttle: menu ? 0.45 : p.engineOut || p.crashed ? 0 : p.throttle,
+      throttle: menu ? 0.45 : p.engineOut || p.crashed ? 0 : p.enginePower,
       speed: menu ? 50 : p.airspeed,
       grounded: !menu && p.grounded,
-      groundSpeed: p.velocity.dot(new T.Vector3(0,0,-1).applyQuaternion(p.quaternion)),
-      ...(p.aircraftId === "stormbird" && !menu ? {
-        gearPosition: p.gearPosition,
-        gearSteering: p.gearSteering,
-      } : {}),
+      groundSpeed: p.velocity.dot(
+        new T.Vector3(0, 0, -1).applyQuaternion(p.quaternion),
+      ),
+      ...(p.aircraftId === "stormbird" && !menu
+        ? {
+            gearPosition: p.gearPosition,
+            gearSteering: p.gearSteering,
+          }
+        : {}),
       gear:
         !menu &&
         (p.grounded ||
@@ -450,9 +454,9 @@ export class PocketFlight {
           ? this.aircraft.id === "stormbird"
             ? "Hold Shift for thrust. Pull back with ↓ at 75 knots. Stormbird accelerates quickly; plan a longer approach."
             : this.aircraft.id === "aurelia"
-            ? "Hold Shift for thrust. Pull back with ↓ at 65 knots. Landing gear operates automatically."
-            : "Hold Shift for thrust. Pull back with ↓ at 65 knots. Full power lights the afterburners."
-          : "Hold Shift to add throttle. Pull back with ↓ at 45 knots.",
+              ? "Hold Shift for thrust. Pull back with ↓ at 65 knots. Landing gear operates automatically."
+              : "Hold Shift for thrust. Pull back with ↓ at 65 knots. Full power lights the afterburners."
+          : `Hold Shift to add throttle. Pull back with ↓ at ${this.physics.profile.rotationKnots} knots.`,
     );
     this.emit();
   }
@@ -703,7 +707,7 @@ export class PocketFlight {
       a.effects.update(0, { ...initialJetInput(), lights: true });
     }
     a.gear.visible = frame.gearVisible;
-    a.gear.rotation.z = frame.gearDamage * 0.35;
+    a.gear.rotation.z = 0;
     a.propeller.visible = frame.propVisible;
     a.propellerMotion.apply({ angle: frame.propAngle, rpm: frame.propRpm });
     a.wings.forEach((w, i) => (w.visible = frame.wings[i]));
@@ -729,10 +733,12 @@ export class PocketFlight {
     model.scale.setScalar(1);
     model.position.lerpVectors(a.p, b.p, mix);
     model.quaternion.slerpQuaternions(a.q, b.q, mix);
-    if (this.aircraft.id !== "stormbird") model.position.add(
+    model.position.add(
       new T.Vector3(
         0,
-        -Math.min(0.16, T.MathUtils.lerp(a.suspension, b.suspension, mix)),
+        -this.aircraft.bodyCompression(
+          T.MathUtils.lerp(a.suspension, b.suspension, mix),
+        ),
         0,
       ).applyQuaternion(model.quaternion),
     );
@@ -943,14 +949,24 @@ export class PocketFlight {
     } else {
       // Physics advances at 60 Hz; interpolate its poses for smooth rendering at any refresh rate.
       const alpha = this.mode === "playing" ? this.accumulator * 60 : 1;
-      const position = this.renderPosition.lerpVectors(this.previousPosition, p.position, alpha);
-      const quaternion = this.renderQuaternion.slerpQuaternions(this.previousQuaternion, p.quaternion, alpha);
+      const position = this.renderPosition.lerpVectors(
+        this.previousPosition,
+        p.position,
+        alpha,
+      );
+      const quaternion = this.renderQuaternion.slerpQuaternions(
+        this.previousQuaternion,
+        p.quaternion,
+        alpha,
+      );
       model.scale.setScalar(1);
       model.position.copy(position);
-      if (this.aircraft.id !== "stormbird") model.position.add(
-        new T.Vector3(0, -Math.min(0.16, p.suspension), 0).applyQuaternion(
-          quaternion,
-        ),
+      model.position.add(
+        new T.Vector3(
+          0,
+          -this.aircraft.bodyCompression(p.suspension),
+          0,
+        ).applyQuaternion(quaternion),
       );
       this.aircraft.setSuspension(p.suspension);
       model.quaternion.copy(quaternion);
@@ -962,10 +978,10 @@ export class PocketFlight {
             (this.aircraft.id === "stormbird"
               ? new T.Vector3().fromArray(STORMBIRD_PILOT_EYE)
               : this.aircraft.id === "aurelia"
-              ? new T.Vector3(0, 1.265, -5.83)
-              : this.physics.jet
-                ? new T.Vector3(0, 1.855, -6.68)
-                : new T.Vector3(-0.3, 1.01, 0.1)
+                ? new T.Vector3(0, 1.265, -5.83)
+                : this.physics.jet
+                  ? new T.Vector3(0, 1.855, -6.68)
+                  : new T.Vector3(-0.3, 1.01, 0.1)
             ).applyQuaternion(quaternion),
           );
         this.camera.quaternion.copy(quaternion);
@@ -1064,7 +1080,7 @@ export class PocketFlight {
       else
         this.aircraft.propellerMotion.update(
           {
-            throttle: this.mode === "menu" ? 0.45 : this.physics.throttle,
+            throttle: this.mode === "menu" ? 0.45 : this.physics.enginePower,
             airspeed: this.physics.airspeed,
             damage: this.mode === "menu" ? 0 : this.physics.damage.propeller,
             engineOut: this.mode !== "menu" && this.physics.engineOut,
@@ -1081,8 +1097,7 @@ export class PocketFlight {
         }
       }
     }
-    this.aircraft.gear.rotation.z =
-      this.mode === "menu" ? 0 : this.physics.damage.gear * 0.35;
+    this.aircraft.gear.rotation.z = 0;
     for (let i = 0; i < this.rings.length; i++) {
       const ring = this.rings[i];
       ring.visible = i >= this.ringIndex;
@@ -1134,7 +1149,7 @@ export class PocketFlight {
           : sound.throttle
         : this.physics.engineOut
           ? 0
-          : this.physics.throttle,
+          : this.physics.enginePower,
       sound?.speed ?? this.physics.airspeed,
       this.mode === "playing" || this.mode === "replay",
     );
@@ -1154,10 +1169,9 @@ export class PocketFlight {
     if (this.mode === "menu") return "A little escape awaits.";
     if (this.mission.id === "free") return "The islands are yours. Go explore.";
     if (!this.airborne)
-      return this.physics.airspeed < 23
-        ? this.physics.jet
-          ? `Throttle up. Pull back at ${this.physics.profile.rotationKnots} knots.`
-          : "Throttle up. Pull back at 45 knots."
+      return this.physics.airspeed * 1.943844 <
+        this.physics.profile.rotationKnots
+        ? `Throttle up. Pull back at ${this.physics.profile.rotationKnots} knots.`
         : "Gently pull back to lift off.";
     if (this.ringIndex < this.mission.rings.length)
       return `Fly through checkpoint ${this.ringIndex + 1} of ${this.mission.rings.length}`;
@@ -1263,6 +1277,20 @@ export class PocketFlight {
       fps: Math.round(this.fps),
       drawCalls: this.renderer.info.render.calls,
       triangles: this.renderer.info.render.triangles,
+      enginePower: p.enginePower,
+      beginnerAssist: p.beginnerAssist,
+      aerodynamics: p.aerodynamics
+        ? {
+            alpha: p.aerodynamics.alpha,
+            beta: p.aerodynamics.beta,
+            density: p.aerodynamics.density,
+            dynamicPressure: p.aerodynamics.dynamicPressure,
+            liftNewtons: p.aerodynamics.lift,
+            dragNewtons: p.aerodynamics.drag,
+            massKg: p.loadedMass,
+            stalled: p.stall,
+          }
+        : null,
     };
   }
   dispose() {

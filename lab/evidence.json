@@ -1,0 +1,2950 @@
+{
+  "generatedAt": "2026-10-11T16:23:34.429Z",
+  "chamber": {
+    "units": "metres",
+    "designVersion": "premium-chamber-2",
+    "runtimeAxes": "X right, Y up, Z downstream",
+    "testSection": {
+      "width": 16,
+      "height": 12,
+      "length": 28
+    },
+    "aircraftPivot": [
+      0,
+      5.25,
+      0
+    ],
+    "fanPivot": [
+      0,
+      6,
+      20
+    ],
+    "meshObjects": 326,
+    "cutawayGroups": [
+      "Cutaway_NearWall",
+      "Cutaway_Roof"
+    ],
+    "note": "Concept chamber. Rounded-corner enclosure, structural portals and instrument hardware are visual; solver remains freestream and excludes walls/support interference."
+  },
+  "chamberExport": {
+    "meshCount": 326,
+    "triangles": 135472,
+    "dimensions": [
+      21.100000381469727,
+      15.100000143051147,
+      51
+    ]
+  },
+  "benchmark": {
+    "cl": 0.33494403032799225,
+    "cdi": 0.004408394861316477,
+    "liftSlopeErrorPercent": 4.5622600416807995,
+    "inducedDragErrorPercent": 1.190132726727633
+  },
+  "fleet": [
+    {
+      "id": "finch",
+      "asset": "finch-u2.glb",
+      "revision": "b880679bd9cf8551b092db072968db372c5d1b93076de447d26f4170a7a53036",
+      "clearance": [
+        {
+          "alpha": -8,
+          "margin": {
+            "side": 2.510000228881836,
+            "floor": 3.3535283549632844,
+            "ceiling": 4.3299174126103,
+            "ends": 9.660527093922175
+          }
+        },
+        {
+          "alpha": 0,
+          "margin": {
+            "side": 2.510000228881836,
+            "floor": 3.882999911084528,
+            "ceiling": 4.894999980926514,
+            "ends": 9.809999942779541
+          }
+        },
+        {
+          "alpha": 8,
+          "margin": {
+            "side": 2.510000228881836,
+            "floor": 3.313168160993898,
+            "ceiling": 4.370277606579686,
+            "ends": 9.59261063037379
+          }
+        }
+      ],
+      "convergence": {
+        "rows": [
+          {
+            "panelCount": 24,
+            "cl": 0.45611546687474364,
+            "cdi": 0.008475645644641878,
+            "residual": 2.6645352591003756e-16
+          },
+          {
+            "panelCount": 48,
+            "cl": 0.4513766435290341,
+            "cdi": 0.008500393033836923,
+            "residual": 1.8503717077085944e-15
+          },
+          {
+            "panelCount": 96,
+            "cl": 0.448931648995718,
+            "cdi": 0.008511415980724212,
+            "residual": 1.924386576016938e-15
+          },
+          {
+            "panelCount": 144,
+            "cl": 0.4481020752853821,
+            "cdi": 0.008514397196183594,
+            "residual": 4.618527782440651e-15
+          }
+        ],
+        "liftChangePercent": 0.18513052183648104,
+        "dragChangePercent": 0.0350138170758391
+      },
+      "experiment": {
+        "schemaVersion": 1,
+        "solver": "horseshoe-vlm-1.0",
+        "generatedAt": "2026-10-11T16:23:34.192Z",
+        "aircraft": "Finch U–2 main wing",
+        "geometryRevision": "b880679bd9cf8551b092db072968db372c5d1b93076de447d26f4170a7a53036",
+        "assumptions": [
+          "Spanwise integration of the exported main-wing/control-surface outer chord envelope (includes merged root fillets), plus a 1 m fuselage-covered strip at the measured root chord. 800 midpoint slices per half-wing; internal chordwise hinge gaps filled; spanwise control gaps remain.",
+          "Nominal authoring section: 1.5% sinusoidal camber. Thin-airfoil approximation; no measured polar.",
+          "Leading-edge height as lifting-surface datum; zero twist/incidence assumed. Symmetric reconstruction.",
+          "One chordwise horseshoe row, cosine spacing, straight wake, incompressible attached flow.",
+          "Wing only; fuselage, tail, gear, propeller, viscous drag, stall and chamber walls excluded."
+        ],
+        "geometry": {
+          "name": "Finch U–2 main wing",
+          "revision": "b880679bd9cf8551b092db072968db372c5d1b93076de447d26f4170a7a53036",
+          "stations": [
+            {
+              "x": 0,
+              "y": -0.13587342446968542,
+              "leading": -0.843596432284029,
+              "chord": 1.9645409352953411,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 0.501,
+              "y": -0.13587342446968542,
+              "leading": -0.843596432284029,
+              "chord": 1.9645409352953411,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 0.578921875,
+              "y": -0.13687036357630777,
+              "leading": -0.8357969620257676,
+              "chord": 1.9249526406419317,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 0.65684375,
+              "y": -0.1404448255774612,
+              "leading": -0.827033774938939,
+              "chord": 1.884421305134993,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 0.734765625,
+              "y": -0.13785571655560575,
+              "leading": -0.8148052309138359,
+              "chord": 1.8436316141574918,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 0.8126875,
+              "y": -0.13154253668651056,
+              "leading": -0.7995267724640344,
+              "chord": 1.8007462062312722,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 0.890609375,
+              "y": -0.1261926298753332,
+              "leading": -0.7887512420076062,
+              "chord": 1.7658190073041076,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 0.9685312500000001,
+              "y": -0.12075982272341075,
+              "leading": -0.7825174918400688,
+              "chord": 1.753150250196752,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 1.046453125,
+              "y": -0.11589686021413352,
+              "leading": -0.7762837416725316,
+              "chord": 1.7404814930893964,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 1.1243750000000001,
+              "y": -0.11103389770485628,
+              "leading": -0.7700499915049943,
+              "chord": 1.7278127359820408,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 1.202296875,
+              "y": -0.10617093519557907,
+              "leading": -0.763816241337457,
+              "chord": 1.7151439788746852,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 1.28021875,
+              "y": -0.10130797268630186,
+              "leading": -0.7575824911699197,
+              "chord": 1.7024752217673296,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 1.3581406249999999,
+              "y": -0.09644501017702461,
+              "leading": -0.7513487410023825,
+              "chord": 1.689806464659974,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 1.4360625,
+              "y": -0.09158204766774737,
+              "leading": -0.7451149908348451,
+              "chord": 1.6771377075526182,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 1.5139843750000002,
+              "y": -0.08671908515847015,
+              "leading": -0.7388812406673078,
+              "chord": 1.6644689504452626,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 1.59190625,
+              "y": -0.08185612264919291,
+              "leading": -0.7326474904997705,
+              "chord": 1.651800193337907,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 1.669828125,
+              "y": -0.07699316013991571,
+              "leading": -0.7264137403322333,
+              "chord": 1.6391314362305514,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 1.74775,
+              "y": -0.07213019763063849,
+              "leading": -0.7201799901646959,
+              "chord": 1.6264806294706635,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 1.8256718749999998,
+              "y": -0.06726723512136125,
+              "leading": -0.7139462399971588,
+              "chord": 1.6139825327894173,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 1.9035937500000002,
+              "y": -0.06240427261208401,
+              "leading": -0.7077124898296214,
+              "chord": 1.6014844361081706,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 1.9815156250000001,
+              "y": -0.057541310102806796,
+              "leading": -0.7014787396620841,
+              "chord": 1.5889863394269241,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 2.0594375,
+              "y": -0.05267834759352957,
+              "leading": -0.6952449894945468,
+              "chord": 1.5764882427456777,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 2.137359375,
+              "y": -0.04781538508425235,
+              "leading": -0.6890112393270096,
+              "chord": 1.5639901460644314,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 2.21528125,
+              "y": -0.042952422574975134,
+              "leading": -0.6827774891594722,
+              "chord": 1.5514920493831847,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 2.2932031250000002,
+              "y": -0.03808946006569788,
+              "leading": -0.676543738991935,
+              "chord": 1.5389939527019383,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 2.371125,
+              "y": -0.03322649755642066,
+              "leading": -0.6703099888243976,
+              "chord": 1.5264958560206918,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 2.449046875,
+              "y": -0.028363535047143434,
+              "leading": -0.6640762386568604,
+              "chord": 1.5139977593394456,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 2.52696875,
+              "y": -0.026338300269294276,
+              "leading": -0.6578424884893231,
+              "chord": 1.5014996626581991,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 2.604890625,
+              "y": -0.021584427288690033,
+              "leading": -0.6516087383217859,
+              "chord": 1.4890015659769529,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 2.6828125,
+              "y": -0.016830554308085797,
+              "leading": -0.6453749881542485,
+              "chord": 1.4760472183944837,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 2.7607343749999997,
+              "y": -0.012076681327481565,
+              "leading": -0.6391412379867113,
+              "chord": 1.4605893550378046,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 2.83865625,
+              "y": -0.007322808346877301,
+              "leading": -0.6329074878191739,
+              "chord": 1.4456162436719904,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 2.916578125,
+              "y": -0.002568935366273062,
+              "leading": -0.6266737376516367,
+              "chord": 1.4315391948880116,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 2.9945,
+              "y": 0.0046590060176687625,
+              "leading": -0.6204399874840993,
+              "chord": 1.4174621461040329,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 3.072421875,
+              "y": 0.009490162641835359,
+              "leading": -0.6142062373165621,
+              "chord": 1.4033850973200543,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 3.1503437499999998,
+              "y": 0.01432131926600197,
+              "leading": -0.6079724871490249,
+              "chord": 1.3893080485360756,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 3.228265625,
+              "y": 0.019152475890168594,
+              "leading": -0.6017387369814875,
+              "chord": 1.3752309997520968,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 3.3061875,
+              "y": 0.02398363251433519,
+              "leading": -0.5955049868139503,
+              "chord": 1.361153950968118,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 3.384109375,
+              "y": 0.03197928317697865,
+              "leading": -0.589271236646413,
+              "chord": 1.3470769021841393,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 3.46203125,
+              "y": 0.036693347615645494,
+              "leading": -0.5830374864788757,
+              "chord": 1.3329998534001606,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 3.539953125,
+              "y": 0.04140741205431233,
+              "leading": -0.5768037363113384,
+              "chord": 1.3189228046161818,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 3.617875,
+              "y": 0.046121476492979194,
+              "leading": -0.5705699861438011,
+              "chord": 1.3109937193388999,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 3.695796875,
+              "y": 0.05083554093164604,
+              "leading": -0.5643362359762638,
+              "chord": 1.304144631663914,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 3.77371875,
+              "y": 0.05554960537031287,
+              "leading": -0.5581024858087266,
+              "chord": 1.297295543988928,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 3.851640625,
+              "y": 0.0602636698089797,
+              "leading": -0.5518687356411893,
+              "chord": 1.290446456313942,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 3.9295625,
+              "y": 0.06497773424764655,
+              "leading": -0.545634985473652,
+              "chord": 1.283597368638956,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 4.007484375,
+              "y": 0.0696917986863134,
+              "leading": -0.5394012353061147,
+              "chord": 1.2767482809639699,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 4.08540625,
+              "y": 0.07581626547486857,
+              "leading": -0.5331674851385774,
+              "chord": 1.269899193288984,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 4.1633281250000005,
+              "y": 0.08053830167365039,
+              "leading": -0.5269337349710401,
+              "chord": 1.263050105613998,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 4.24125,
+              "y": 0.08526033787243219,
+              "leading": -0.5206999848035028,
+              "chord": 1.256201017939012,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 4.319171875,
+              "y": 0.08998237407121401,
+              "leading": -0.5144662346359655,
+              "chord": 1.249351930264026,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 4.39709375,
+              "y": 0.09470441026999578,
+              "leading": -0.5082324844684283,
+              "chord": 1.2409043122578385,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 4.475015625,
+              "y": 0.09942644646877763,
+              "leading": -0.5019987343008909,
+              "chord": 1.2309664453634117,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 4.5529375000000005,
+              "y": 0.10414848266755945,
+              "leading": -0.49576498413335357,
+              "chord": 1.2161853071227582,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 4.630859375,
+              "y": 0.10887051886634125,
+              "leading": -0.4895312339658164,
+              "chord": 1.1961940910584952,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 4.70878125,
+              "y": 0.11359255506512307,
+              "leading": -0.4832974837982791,
+              "chord": 1.1696578580092614,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 4.786703125000001,
+              "y": 0.11831459126390491,
+              "leading": -0.4770637336307417,
+              "chord": 1.132671764266571,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 4.864625,
+              "y": 0.12303662746268669,
+              "leading": -0.4708299834632045,
+              "chord": 1.087170458208738,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 4.942546875000001,
+              "y": 0.1277586636614685,
+              "leading": -0.4645962332956672,
+              "chord": 1.066586090498744,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 5.02046875,
+              "y": 0.13248069986025032,
+              "leading": -0.45836248312812994,
+              "chord": 1.0664397195816775,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 5.098390625,
+              "y": 0.13559270384869865,
+              "leading": -0.45212873296059264,
+              "chord": 1.0694072987170475,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 5.176312500000001,
+              "y": 0.1405577940211397,
+              "leading": -0.4458949827930553,
+              "chord": 1.0626572521906472,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 5.254234375,
+              "y": 0.14552288419358064,
+              "leading": -0.43966123262551804,
+              "chord": 1.02884294649842,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 5.332156250000001,
+              "y": 0.15048797436602165,
+              "leading": -0.43342748245798074,
+              "chord": 0.9419927513275994,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 5.410078125,
+              "y": 0.15398100328622558,
+              "leading": -0.4271937322904435,
+              "chord": 0.7499695861754427,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 5.488,
+              "y": 0.15909142809551385,
+              "leading": -0.4209599821229062,
+              "chord": 0.3766851048888574,
+              "zeroLiftAlpha": -1.5304250400458586
+            }
+          ],
+          "assumptions": [
+            "Spanwise integration of the exported main-wing/control-surface outer chord envelope (includes merged root fillets), plus a 1 m fuselage-covered strip at the measured root chord. 800 midpoint slices per half-wing; internal chordwise hinge gaps filled; spanwise control gaps remain.",
+            "Nominal authoring section: 1.5% sinusoidal camber. Thin-airfoil approximation; no measured polar.",
+            "Leading-edge height as lifting-surface datum; zero twist/incidence assumed. Symmetric reconstruction.",
+            "One chordwise horseshoe row, cosine spacing, straight wake, incompressible attached flow.",
+            "Wing only; fuselage, tail, gear, propeller, viscous drag, stall and chamber walls excluded."
+          ]
+        },
+        "units": {
+          "speed": "m/s",
+          "density": "kg/m³",
+          "angle": "degrees",
+          "lift": "N",
+          "inducedDrag": "N",
+          "spanPosition": "m",
+          "spanLoading": "N/m",
+          "circulation": "m²/s"
+        },
+        "reference": {
+          "area": 16.12924218045623,
+          "span": 10.976,
+          "aspectRatio": 7.469202498923129
+        },
+        "results": [
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": -8
+            },
+            "panelCount": 96,
+            "cl": -0.5229514057897023,
+            "cdi": 0.01154967659649301,
+            "lift": -4649.688942266423,
+            "inducedDrag": 102.69100142559424,
+            "dynamicPressure": 551.25,
+            "residual": 2.176037128265307e-15,
+            "efficiency": 1.0090872977891983
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": -7
+            },
+            "panelCount": 96,
+            "cl": -0.44245907350237373,
+            "cdi": 0.008267874118214748,
+            "lift": -3934.0119152423636,
+            "inducedDrag": 73.5116923635792,
+            "dynamicPressure": 551.25,
+            "residual": 1.8503717077085944e-15,
+            "efficiency": 1.0090861583212398
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": -6
+            },
+            "panelCount": 96,
+            "cl": -0.3617940571467095,
+            "cdi": 0.005528040469079065,
+            "lift": -3216.7995119019656,
+            "inducedDrag": 49.151160809412936,
+            "dynamicPressure": 551.25,
+            "residual": 2.028007391648619e-15,
+            "efficiency": 1.0090845050140163
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": -5
+            },
+            "panelCount": 96,
+            "cl": -0.28098092806811126,
+            "cdi": 0.0033342884396895234,
+            "lift": -2498.27020209108,
+            "inducedDrag": 29.64597459096538,
+            "dynamicPressure": 551.25,
+            "residual": 1.2656542480726785e-15,
+            "efficiency": 1.0090818901844545
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": -4
+            },
+            "panelCount": 96,
+            "cl": -0.20004430272855087,
+            "cdi": 0.0016900669268220664,
+            "lift": -1778.6428567980256,
+            "inducedDrag": 15.026798693595746,
+            "dynamicPressure": 551.25,
+            "residual": 9.251858538542972e-16,
+            "efficiency": 1.0090771332998036
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": -3
+            },
+            "panelCount": 96,
+            "cl": -0.11900883520815717,
+            "cdi": 0.0005981564950533838,
+            "lift": -1058.1366814833632,
+            "inducedDrag": 5.318355797504054,
+            "dynamicPressure": 551.25,
+            "residual": 4.255854927729767e-16,
+            "efficiency": 1.0090657832228143
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": -2
+            },
+            "panelCount": 96,
+            "cl": -0.03789920969534515,
+            "cdi": 0.00006066575228785613,
+            "lift": -336.97114930779435,
+            "inducedDrag": 0.539394051654107,
+            "dynamicPressure": 551.25,
+            "residual": 1.8781272833242231e-16,
+            "efficiency": 1.0090033627469313
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": -1
+            },
+            "panelCount": 96,
+            "cl": 0.04325986703222739,
+            "cdi": 0.00007902854367100404,
+            "lift": 384.63406572149285,
+            "inducedDrag": 0.7026621241711601,
+            "dynamicPressure": 551.25,
+            "residual": 1.7208456881689927e-16,
+            "efficiency": 1.0091652211469901
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": 0
+            },
+            "panelCount": 96,
+            "cl": 0.12444367313358363,
+            "cdi": 0.0006540019673804862,
+            "lift": 1106.4591556656542,
+            "inducedDrag": 5.814891560254052,
+            "dynamicPressure": 551.25,
+            "residual": 5.403085386509095e-16,
+            "efficiency": 1.0091192284385204
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": 1
+            },
+            "panelCount": 96,
+            "cl": 0.20562747923493976,
+            "cdi": 0.001785665214784348,
+            "lift": 1828.2842456098144,
+            "inducedDrag": 15.876786469738319,
+            "dynamicPressure": 551.25,
+            "residual": 8.733754460384564e-16,
+            "efficiency": 1.0091091824806548
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": 2
+            },
+            "panelCount": 96,
+            "cl": 0.28678655596251246,
+            "cdi": 0.0034734192364519623,
+            "lift": 2549.8894606391027,
+            "inducedDrag": 30.883020557517725,
+            "dynamicPressure": 551.25,
+            "residual": 1.2508512744110098e-15,
+            "efficiency": 1.0091047846259535
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": 3
+            },
+            "panelCount": 96,
+            "cl": 0.3678961814753247,
+            "cdi": 0.005715987234496896,
+            "lift": 3271.054992814674,
+            "inducedDrag": 50.82224150108518,
+            "dynamicPressure": 551.25,
+            "residual": 1.5543122344752192e-15,
+            "efficiency": 1.009102317504706
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": 4
+            },
+            "panelCount": 96,
+            "cl": 0.448931648995718,
+            "cdi": 0.008511415980724212,
+            "lift": 3991.561168129333,
+            "inducedDrag": 75.67708267050304,
+            "dynamicPressure": 551.25,
+            "residual": 1.924386576016938e-15,
+            "efficiency": 1.0091007389514137
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": 5
+            },
+            "panelCount": 96,
+            "cl": 0.5298682743352786,
+            "cdi": 0.011857077959048586,
+            "lift": 4711.188513422389,
+            "inducedDrag": 105.42418217716694,
+            "dynamicPressure": 551.25,
+            "residual": 2.102022259956963e-15,
+            "efficiency": 1.009099642466878
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": 6
+            },
+            "panelCount": 96,
+            "cl": 0.6106814034138772,
+            "cdi": 0.015749674329645347,
+            "lift": 5429.717823233278,
+            "inducedDrag": 140.03420922879815,
+            "dynamicPressure": 551.25,
+            "residual": 2.9161858113487444e-15,
+            "efficiency": 1.0090988366942208
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": 7
+            },
+            "panelCount": 96,
+            "cl": 0.6913464197695411,
+            "cdi": 0.02018523871129511,
+            "lift": 6146.930226573673,
+            "inducedDrag": 179.47189775919549,
+            "dynamicPressure": 551.25,
+            "residual": 2.960594732333751e-15,
+            "efficiency": 1.0090982197201261
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": 8
+            },
+            "panelCount": 96,
+            "cl": 0.7718387520568697,
+            "cdi": 0.025159141777386318,
+            "lift": 6862.607253597732,
+            "inducedDrag": 223.69608729241875,
+            "dynamicPressure": 551.25,
+            "residual": 3.552713678800501e-15,
+            "efficiency": 1.0090977322836876
+          }
+        ]
+      },
+      "referenceResult": {
+        "cl": 0.448931648995718,
+        "cdi": 0.008511415980724212,
+        "lift": 3991.561168129333,
+        "inducedDrag": 75.67708267050304
+      }
+    },
+    {
+      "id": "peregrine",
+      "asset": "peregrine-hx27.glb",
+      "revision": "489cd7f96f157f9dbd3837fdd14209f292f94b356b639a2120305cabfbfcba7f",
+      "clearance": [
+        {
+          "alpha": -8,
+          "margin": {
+            "side": 1.055999612808228,
+            "floor": 2.1270084423773703,
+            "ceiling": 1.5433634790657322,
+            "ends": 2.5927268427593333
+          }
+        },
+        {
+          "alpha": 0,
+          "margin": {
+            "side": 1.055999612808228,
+            "floor": 3.638109906669689,
+            "ceiling": 2.843999919891358,
+            "ends": 3.029573550172943
+          }
+        },
+        {
+          "alpha": 8,
+          "margin": {
+            "side": 1.055999612808228,
+            "floor": 2.315147345153461,
+            "ceiling": 1.3552245762896433,
+            "ends": 2.9120052435627297
+          }
+        }
+      ],
+      "convergence": {
+        "rows": [
+          {
+            "panelCount": 24,
+            "cl": 0.33152045805835395,
+            "cdi": 0.008992051417515962,
+            "residual": 3.108624468950438e-16
+          },
+          {
+            "panelCount": 48,
+            "cl": 0.32819609103184905,
+            "cdi": 0.009031861583221933,
+            "residual": 1.0954200509634878e-15
+          },
+          {
+            "panelCount": 96,
+            "cl": 0.3263248420072008,
+            "cdi": 0.009041502437410864,
+            "residual": 2.930988785010413e-15
+          },
+          {
+            "panelCount": 144,
+            "cl": 0.3257061893212191,
+            "cdi": 0.009045050487670713,
+            "residual": 6.7501559897209515e-15
+          }
+        ],
+        "liftChangePercent": 0.1899419496052571,
+        "dragChangePercent": 0.03922642847251645
+      },
+      "experiment": {
+        "schemaVersion": 1,
+        "solver": "horseshoe-vlm-1.0",
+        "generatedAt": "2026-10-11T16:23:34.269Z",
+        "aircraft": "Peregrine HX–27 main wing",
+        "geometryRevision": "489cd7f96f157f9dbd3837fdd14209f292f94b356b639a2120305cabfbfcba7f",
+        "assumptions": [
+          "Main-wing and neutral control-surface outer chord envelope extracted from the runtime export. Root fillets included where merged. Decorative hardware and seals excluded.",
+          "Runtime scale 0.7, vertical offset -1.6099999999999999 m. Centreline-covered strip reconstructed using measured root chord.",
+          "Symmetric wing reconstruction; maximum sampled left/right chord difference 0.000e+0 m.",
+          "Leading-edge height as lifting-surface datum; zero geometric twist/incidence assumed. No separate winglet panels.",
+          "Nominal authoring section: 1.5% sinusoidal camber, checked in the adjacent editable build source. Thin-airfoil approximation; no measured polar. Separate leading-edge extensions excluded from this main-wing model.",
+          "One chordwise horseshoe row, cosine span spacing, straight fixed wake. Steady incompressible attached flow.",
+          "Wing only: fuselage, tail, gear, engines, viscous drag, stall and chamber walls excluded."
+        ],
+        "geometry": {
+          "name": "Peregrine HX–27 main wing",
+          "revision": "489cd7f96f157f9dbd3837fdd14209f292f94b356b639a2120305cabfbfcba7f",
+          "stations": [
+            {
+              "x": 0,
+              "y": 1.1200548550263134,
+              "leading": -2.449545454506046,
+              "chord": 5.599545454506046,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 1.0509999999999997,
+              "y": 1.1200548550263134,
+              "leading": -2.449545454506046,
+              "chord": 5.599545454506046,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 1.1430468758344647,
+              "y": 1.1233835865813835,
+              "leading": -2.407705961862994,
+              "chord": 5.557705961862994,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 1.2350937516689298,
+              "y": 1.1267307428007278,
+              "leading": -2.3658664692199416,
+              "chord": 5.515866469219942,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 1.3271406275033948,
+              "y": 1.130077899020072,
+              "leading": -2.3240269765768895,
+              "chord": 5.474026976576889,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 1.4191875033378598,
+              "y": 1.1334250552394163,
+              "leading": -2.2821874839338374,
+              "chord": 5.432187483933838,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 1.5112343791723248,
+              "y": 1.1367722114587604,
+              "leading": -2.240347991290785,
+              "chord": 5.390347991290785,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 1.6032812550067899,
+              "y": 1.1401193676781047,
+              "leading": -2.198508498647733,
+              "chord": 5.348508498647733,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 1.6953281308412549,
+              "y": 1.1434665238974488,
+              "leading": -2.1566690060046807,
+              "chord": 5.306669006004681,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 1.78737500667572,
+              "y": 1.1462026664227207,
+              "leading": -2.114829513361628,
+              "chord": 5.264829513361628,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 1.879421882510185,
+              "y": 1.1496153991203921,
+              "leading": -2.047568877117402,
+              "chord": 5.197568877117401,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 1.97146875834465,
+              "y": 1.150673016321823,
+              "leading": -1.966351059167347,
+              "chord": 5.1163510591673464,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 2.063515634179115,
+              "y": 1.1522973711317173,
+              "leading": -1.8851332412172916,
+              "chord": 5.0351332412172916,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 2.15556251001358,
+              "y": 1.1539217259416115,
+              "leading": -1.803915423267237,
+              "chord": 4.953915423267237,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 2.247609385848045,
+              "y": 1.1555460807515054,
+              "leading": -1.7226976053171823,
+              "chord": 4.872697605317182,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 2.33965626168251,
+              "y": 1.1571704355613996,
+              "leading": -1.6414797873671272,
+              "chord": 4.791479787367127,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 2.4317031375169753,
+              "y": 1.1587947903712938,
+              "leading": -1.560261969417072,
+              "chord": 4.710261969417072,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 2.52375001335144,
+              "y": 1.1604191451811878,
+              "leading": -1.4790441514670172,
+              "chord": 4.629044151467017,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 2.615796889185905,
+              "y": 1.162043499991082,
+              "leading": -1.3978263335169625,
+              "chord": 4.547826333516962,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 2.70784376502037,
+              "y": 1.1636678548009762,
+              "leading": -1.3166085155669074,
+              "chord": 4.466608515566907,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 2.7998906408548354,
+              "y": 1.1652922096108704,
+              "leading": -1.2353906976168523,
+              "chord": 4.385390697616852,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 2.8919375166893,
+              "y": 1.1669165644207644,
+              "leading": -1.1541728796667976,
+              "chord": 4.3041728796667975,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 2.983984392523765,
+              "y": 1.168245354553417,
+              "leading": -1.0729550617167427,
+              "chord": 4.222955061716743,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 3.0760312683582303,
+              "y": 1.1707566787749133,
+              "leading": -0.9777784419598248,
+              "chord": 4.144286230590485,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 3.168078144192695,
+              "y": 1.1719639800773891,
+              "leading": -0.8771021655151052,
+              "chord": 4.066621679962408,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 3.2601250200271603,
+              "y": 1.1736898574562291,
+              "leading": -0.7764258890703852,
+              "chord": 3.9889571293343318,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 3.3521718958616256,
+              "y": 1.1754157348350693,
+              "leading": -0.6757496126256652,
+              "chord": 3.911292578706255,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 3.4442187716960904,
+              "y": 1.1771416122139096,
+              "leading": -0.5750733361809457,
+              "chord": 3.833628028078179,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 3.536265647530555,
+              "y": 1.1788674895927496,
+              "leading": -0.4743970597362262,
+              "chord": 3.7559634774501025,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 3.6283125233650204,
+              "y": 1.1805933669715898,
+              "leading": -0.37372078329150615,
+              "chord": 3.678298926822026,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 3.7203593991994857,
+              "y": 1.18231924435043,
+              "leading": -0.27304450684678616,
+              "chord": 3.600634376193949,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 3.8124062750339505,
+              "y": 1.18404512172927,
+              "leading": -0.1723682304020666,
+              "chord": 3.5229698255658732,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 3.9044531508684153,
+              "y": 1.1857709991081102,
+              "leading": -0.07169195395734704,
+              "chord": 3.4453052749377964,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 3.9965000267028805,
+              "y": 1.1874968764869502,
+              "leading": 0.028984322487372927,
+              "chord": 3.3676407243097204,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 4.088546902537345,
+              "y": 1.1888224469971547,
+              "leading": 0.12966059893209247,
+              "chord": 3.2899761736816435,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 4.180593778371811,
+              "y": 1.1912340400393058,
+              "leading": 0.22938824239820005,
+              "chord": 3.2195844662144806,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 4.272640654206276,
+              "y": 1.193479171433065,
+              "leading": 0.32833863830938725,
+              "chord": 3.1551516487412177,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 4.36468753004074,
+              "y": 1.1946937447893626,
+              "leading": 0.4272890342205735,
+              "chord": 3.090718831267955,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 4.456734405875206,
+              "y": 1.1965346805503971,
+              "leading": 0.5262394301317618,
+              "chord": 3.026286013794692,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 4.548781281709671,
+              "y": 1.1983756163114316,
+              "leading": 0.625189826042948,
+              "chord": 2.96185319632143,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 4.640828157544135,
+              "y": 1.2002165520724661,
+              "leading": 0.7241402219541343,
+              "chord": 2.8974203788481674,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 4.732875033378601,
+              "y": 1.2020574878335006,
+              "leading": 0.8230906178653226,
+              "chord": 2.832987561374904,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 4.8249219092130655,
+              "y": 1.203898423594535,
+              "leading": 0.9220410137765087,
+              "chord": 2.7685547439016425,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 4.916968785047531,
+              "y": 1.2057393593555694,
+              "leading": 1.020991409687696,
+              "chord": 2.704121926428379,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 5.009015660881996,
+              "y": 1.207580295116604,
+              "leading": 1.1199418055988832,
+              "chord": 2.6396891089551167,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 5.10106253671646,
+              "y": 1.2094212308776384,
+              "leading": 1.2188922015100696,
+              "chord": 2.575256291481854,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 5.1931094125509265,
+              "y": 1.211262166638673,
+              "leading": 1.3178425974212578,
+              "chord": 2.510823474008591,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 5.285156288385391,
+              "y": 1.2131031023997074,
+              "leading": 1.4167929933324441,
+              "chord": 2.4463906565353284,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 5.377203164219855,
+              "y": 1.214029208426001,
+              "leading": 1.5157433892436305,
+              "chord": 2.381957839062067,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 5.469250040054321,
+              "y": 1.2164212497238953,
+              "leading": 1.6146937851548187,
+              "chord": 2.3175250215888035,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 5.561296915888786,
+              "y": 1.218680876706983,
+              "leading": 1.7152090185325384,
+              "chord": 2.2462460222504492,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 5.653343791723252,
+              "y": 1.2206834754784919,
+              "leading": 1.8187617435592722,
+              "chord": 2.161677962107011,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 5.745390667557716,
+              "y": 1.2226860742500005,
+              "leading": 1.9223144685860039,
+              "chord": 2.077109901963575,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 5.837437543392181,
+              "y": 1.2246886730215092,
+              "leading": 2.025867193612736,
+              "chord": 1.9925418418201386,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 5.929484419226647,
+              "y": 1.2254903577368534,
+              "leading": 2.1294199186394693,
+              "chord": 1.9079737816767008,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 6.021531295061111,
+              "y": 1.2272162488317477,
+              "leading": 2.2329726436662014,
+              "chord": 1.8234057215332635,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 6.113578170895575,
+              "y": 1.228942139926642,
+              "leading": 2.336525368692933,
+              "chord": 1.7388376613898275,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 6.205625046730042,
+              "y": 1.2306680310215363,
+              "leading": 2.440078093719667,
+              "chord": 1.6542696012463893,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 6.297671922564506,
+              "y": 1.2323939221164306,
+              "leading": 2.5436308187463985,
+              "chord": 1.5697015411029533,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 6.389718798398972,
+              "y": 1.234119813211325,
+              "leading": 2.6471835437731324,
+              "chord": 1.4851334809595151,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 6.481765674233436,
+              "y": 1.2349657117780517,
+              "leading": 2.750736268799864,
+              "chord": 1.4005654208160792,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 6.573812550067901,
+              "y": 1.2371730775221081,
+              "leading": 2.854288993826596,
+              "chord": 1.3159973606726418,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 6.665859425902367,
+              "y": 1.2396246626800456,
+              "leading": 2.9567655434446642,
+              "chord": 1.2287813335750606,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 6.757906301736831,
+              "y": 1.2420830775497398,
+              "leading": 3.054072230006488,
+              "chord": 1.128844678947667,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 6.849953177571296,
+              "y": 1.2441229538476475,
+              "leading": 3.151378916568312,
+              "chord": 1.0289080243202733,
+              "zeroLiftAlpha": -1.5304250400458586
+            },
+            {
+              "x": 6.942000053405762,
+              "y": 1.245896942507045,
+              "leading": 3.373571349863994,
+              "chord": 0.6241428354226906,
+              "zeroLiftAlpha": -1.5304250400458586
+            }
+          ],
+          "assumptions": [
+            "Main-wing and neutral control-surface outer chord envelope extracted from the runtime export. Root fillets included where merged. Decorative hardware and seals excluded.",
+            "Runtime scale 0.7, vertical offset -1.6099999999999999 m. Centreline-covered strip reconstructed using measured root chord.",
+            "Symmetric wing reconstruction; maximum sampled left/right chord difference 0.000e+0 m.",
+            "Leading-edge height as lifting-surface datum; zero geometric twist/incidence assumed. No separate winglet panels.",
+            "Nominal authoring section: 1.5% sinusoidal camber, checked in the adjacent editable build source. Thin-airfoil approximation; no measured polar. Separate leading-edge extensions excluded from this main-wing model.",
+            "One chordwise horseshoe row, cosine span spacing, straight fixed wake. Steady incompressible attached flow.",
+            "Wing only: fuselage, tail, gear, engines, viscous drag, stall and chamber walls excluded."
+          ]
+        },
+        "units": {
+          "speed": "m/s",
+          "density": "kg/m³",
+          "angle": "degrees",
+          "lift": "N",
+          "inducedDrag": "N",
+          "spanPosition": "m",
+          "spanLoading": "N/m",
+          "circulation": "m²/s"
+        },
+        "reference": {
+          "area": 52.00011983852427,
+          "span": 13.884000106811524,
+          "aspectRatio": 3.707019513888354
+        },
+        "results": [
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": -8
+            },
+            "panelCount": 96,
+            "cl": -0.38041423541094255,
+            "cdi": 0.01228722510257893,
+            "lift": -10904.59918859434,
+            "inducedDrag": 352.2141192716367,
+            "dynamicPressure": 551.25,
+            "residual": 3.671137468093851e-15,
+            "efficiency": 1.0113115352504547
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": -7
+            },
+            "panelCount": 96,
+            "cl": -0.32188139405736965,
+            "cdi": 0.008796948273850008,
+            "lift": -9226.75142445693,
+            "inducedDrag": 252.16510340499167,
+            "dynamicPressure": 551.25,
+            "residual": 3.3454720475371383e-15,
+            "efficiency": 1.01131154228799
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": -6
+            },
+            "panelCount": 96,
+            "cl": -0.2632229793865751,
+            "cdi": 0.005882851529812511,
+            "lift": -7545.304092885863,
+            "inducedDrag": 168.63232772905116,
+            "dynamicPressure": 551.25,
+            "residual": 4.7961634663806766e-15,
+            "efficiency": 1.0113115524436778
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": -5
+            },
+            "panelCount": 96,
+            "cl": -0.20445685931990526,
+            "cdi": 0.0035493076939924336,
+            "lift": -5860.769379026909,
+            "inducedDrag": 101.74113951906078,
+            "dynamicPressure": 551.25,
+            "residual": 1.8577731945394287e-15,
+            "efficiency": 1.0113115683726726
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": -4
+            },
+            "panelCount": 96,
+            "cl": -0.14560093458681259,
+            "cdi": 0.0017999837857542171,
+            "lift": -4173.660408472358,
+            "inducedDrag": 51.59665412734921,
+            "dynamicPressure": 551.25,
+            "residual": 2.2722564570661535e-15,
+            "efficiency": 1.0113115969374615
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": -3
+            },
+            "panelCount": 96,
+            "cl": -0.08667313327212081,
+            "cdi": 0.0006378363016176596,
+            "lift": -2484.4910909580303,
+            "inducedDrag": 18.283619721965525,
+            "dynamicPressure": 551.25,
+            "residual": 9.103828801926283e-16,
+            "efficiency": 1.011311662989316
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": -2
+            },
+            "panelCount": 96,
+            "cl": -0.027691405354956768,
+            "cdi": 0.0000651073618539192,
+            "lift": -793.7759638213912,
+            "inducedDrag": 1.8663068285991466,
+            "dynamicPressure": 551.25,
+            "residual": 2.4424906541753446e-16,
+            "efficiency": 1.0113119778851838
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": -1
+            },
+            "panelCount": 96,
+            "cl": 0.03132628275898707,
+            "cdi": 0.00008332172713191262,
+            "lift": 897.969964731507,
+            "inducedDrag": 2.388422812551767,
+            "dynamicPressure": 551.25,
+            "residual": 3.182639337258782e-16,
+            "efficiency": 1.0113109714813648
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": 0
+            },
+            "panelCount": 96,
+            "cl": 0.09036195371019407,
+            "cdi": 0.0006932846889266058,
+            "lift": 2590.2313725025174,
+            "inducedDrag": 19.873051407151635,
+            "dynamicPressure": 551.25,
+            "residual": 9.399888275159659e-16,
+            "efficiency": 1.0113113247869956
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": 1
+            },
+            "panelCount": 96,
+            "cl": 0.1493976246614009,
+            "cdi": 0.0018950808363360906,
+            "lift": 4282.492780273524,
+            "inducedDrag": 54.32261736448359,
+            "dynamicPressure": 551.25,
+            "residual": 1.4506914188435379e-15,
+            "efficiency": 1.011311393846309
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": 2
+            },
+            "panelCount": 96,
+            "cl": 0.20841531277534495,
+            "cdi": 0.0036880737008867085,
+            "lift": 5974.238708826428,
+            "inducedDrag": 105.71887627370448,
+            "dynamicPressure": 551.25,
+            "residual": 2.2500519965736505e-15,
+            "efficiency": 1.01131142323804
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": 3
+            },
+            "panelCount": 96,
+            "cl": 0.267397040692509,
+            "cdi": 0.0060709062798357276,
+            "lift": 7664.953835963067,
+            "inducedDrag": 174.02292956154895,
+            "dynamicPressure": 551.25,
+            "residual": 3.4935017841538257e-15,
+            "efficiency": 1.0113114395071758
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": 4
+            },
+            "panelCount": 96,
+            "cl": 0.3263248420072008,
+            "cdi": 0.009041502437410864,
+            "lift": 9354.123153477394,
+            "inducedDrag": 259.1752646589529,
+            "dynamicPressure": 551.25,
+            "residual": 2.930988785010413e-15,
+            "efficiency": 1.0113114498350484
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": 5
+            },
+            "panelCount": 96,
+            "cl": 0.38518076674029345,
+            "cdi": 0.01259706918235621,
+            "lift": 11041.232124031945,
+            "inducedDrag": 361.095820287058,
+            "dynamicPressure": 551.25,
+            "residual": 3.671137468093851e-15,
+            "efficiency": 1.0113114569716528
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": 6
+            },
+            "panelCount": 96,
+            "cl": 0.44394688680696326,
+            "cdi": 0.016734099819086395,
+            "lift": 12725.7668378909,
+            "inducedDrag": 479.68407678525386,
+            "dynamicPressure": 551.25,
+            "residual": 4.736951571734001e-15,
+            "efficiency": 1.0113114621967352
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": 7
+            },
+            "panelCount": 96,
+            "cl": 0.5026053014777577,
+            "cdi": 0.02144837796868674,
+            "lift": 14407.214169461964,
+            "inducedDrag": 614.8191713734129,
+            "dynamicPressure": 551.25,
+            "residual": 4.4704980458239636e-15,
+            "efficiency": 1.0113114661864702
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": 8
+            },
+            "panelCount": 96,
+            "cl": 0.5611381428313311,
+            "cdi": 0.02673498245493627,
+            "lift": 16085.061933599387,
+            "inducedDrag": 766.3600382100633,
+            "dynamicPressure": 551.25,
+            "residual": 5.477100254817439e-15,
+            "efficiency": 1.0113114693317664
+          }
+        ]
+      },
+      "referenceResult": {
+        "cl": 0.3263248420072008,
+        "cdi": 0.009041502437410864,
+        "lift": 9354.123153477394,
+        "inducedDrag": 259.1752646589529
+      }
+    },
+    {
+      "id": "aurelia",
+      "asset": "aurelia-flight.glb",
+      "revision": "a9a430919c0609e8af506cfd2ac9fa5ade31ec3efe89d9f8b6f51d81b4a5eb20",
+      "clearance": [
+        {
+          "alpha": -8,
+          "margin": {
+            "side": 0.509000062942504,
+            "floor": 2.755682580457977,
+            "ceiling": 1.6301643128309422,
+            "ends": 4.621758337301488
+          }
+        },
+        {
+          "alpha": 0,
+          "margin": {
+            "side": 0.509000062942504,
+            "floor": 3.9833883913045645,
+            "ceiling": 2.762499895095825,
+            "ends": 5.089999580383299
+          }
+        },
+        {
+          "alpha": 8,
+          "margin": {
+            "side": 0.509000062942504,
+            "floor": 2.8245733092327274,
+            "ceiling": 1.5612735840561918,
+            "ends": 5.000432826685428
+          }
+        }
+      ],
+      "convergence": {
+        "rows": [
+          {
+            "panelCount": 24,
+            "cl": 0.29615289297574754,
+            "cdi": 0.0038673288311573176,
+            "residual": 1.4802973661668753e-16
+          },
+          {
+            "panelCount": 48,
+            "cl": 0.294904228507271,
+            "cdi": 0.003909797828961096,
+            "residual": 5.033011044967376e-16
+          },
+          {
+            "panelCount": 96,
+            "cl": 0.29372609311802284,
+            "cdi": 0.004032815770443437,
+            "residual": 1.6949404842610724e-15
+          },
+          {
+            "panelCount": 144,
+            "cl": 0.29310077840827564,
+            "cdi": 0.004022775890076102,
+            "residual": 2.264854970235319e-15
+          }
+        ],
+        "liftChangePercent": 0.2133446090259642,
+        "dragChangePercent": 0.2495759306925879
+      },
+      "experiment": {
+        "schemaVersion": 1,
+        "solver": "horseshoe-vlm-1.0",
+        "generatedAt": "2026-10-11T16:23:34.333Z",
+        "aircraft": "Aurelia S32 main wing",
+        "geometryRevision": "a9a430919c0609e8af506cfd2ac9fa5ade31ec3efe89d9f8b6f51d81b4a5eb20",
+        "assumptions": [
+          "Main-wing and neutral control-surface outer chord envelope extracted from the runtime export. Root fillets included where merged. Decorative hardware and seals excluded.",
+          "Runtime scale 0.55, vertical offset -1.265 m. Centreline-covered strip reconstructed using measured root chord.",
+          "Symmetric wing reconstruction; maximum sampled left/right chord difference 0.000e+0 m.",
+          "Leading-edge height as lifting-surface datum; zero geometric twist/incidence assumed. No separate winglet panels.",
+          "Section camber is unverified. Symmetric-section zero-lift angle is an explicit default assumption. Vertical winglets are not resolved as separate lifting surfaces.",
+          "One chordwise horseshoe row, cosine span spacing, straight fixed wake. Steady incompressible attached flow.",
+          "Wing only: fuselage, tail, gear, engines, viscous drag, stall and chamber walls excluded."
+        ],
+        "geometry": {
+          "name": "Aurelia S32 main wing",
+          "revision": "a9a430919c0609e8af506cfd2ac9fa5ade31ec3efe89d9f8b6f51d81b4a5eb20",
+          "stations": [
+            {
+              "x": 0,
+              "y": 0.2310799800949065,
+              "leading": -1.6496799998931886,
+              "chord": 3.904719947597504,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 0.7435000131130219,
+              "y": 0.2310799800949065,
+              "leading": -1.6496799998931886,
+              "chord": 3.904719947597504,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 0.8488984494246543,
+              "y": 0.2378095098149297,
+              "leading": -1.6159524890156978,
+              "chord": 3.8752083906570682,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 0.9542968857362868,
+              "y": 0.24455500394916463,
+              "leading": -1.5822249781382067,
+              "chord": 3.845696833716632,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 1.059695322047919,
+              "y": 0.2513004980833995,
+              "leading": -1.5484974672607157,
+              "chord": 3.816185276776196,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 1.1650937583595515,
+              "y": 0.2580459922176344,
+              "leading": -1.5147699563832246,
+              "chord": 3.7866737198357603,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 1.270492194671184,
+              "y": 0.26479148635186933,
+              "leading": -1.4810424455057336,
+              "chord": 3.7571621628953245,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 1.3758906309828163,
+              "y": 0.2706490120542636,
+              "leading": -1.4473149346282428,
+              "chord": 3.7276506059548886,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 1.481289067294449,
+              "y": 0.27895832614006877,
+              "leading": -1.399012773794235,
+              "chord": 3.6783072543514956,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 1.5866875036060812,
+              "y": 0.28709268586042347,
+              "leading": -1.3353345575274205,
+              "chord": 3.6080416318888062,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 1.6920859399177135,
+              "y": 0.29356440582728915,
+              "leading": -1.2716563412606057,
+              "chord": 3.5377760094261173,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 1.7974843762293462,
+              "y": 0.30103013145322793,
+              "leading": -1.2079781249937906,
+              "chord": 3.4675103869634274,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 1.9028828125409785,
+              "y": 0.30849585707916666,
+              "leading": -1.144299908726976,
+              "chord": 3.3972447645007384,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 2.0082812488526107,
+              "y": 0.3159615827051054,
+              "leading": -1.0806216924601613,
+              "chord": 3.3269791420380486,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 2.1136796851642434,
+              "y": 0.3234273083310441,
+              "leading": -1.0169434761933465,
+              "chord": 3.2567135195753596,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 2.2190781214758757,
+              "y": 0.33089303395698283,
+              "leading": -0.9532652599265317,
+              "chord": 3.1864478971126697,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 2.324476557787508,
+              "y": 0.33835875958292155,
+              "leading": -0.889587043659717,
+              "chord": 3.1161822746499808,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 2.4298749940991407,
+              "y": 0.34582448520886033,
+              "leading": -0.8259088273929021,
+              "chord": 3.045916652187291,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 2.535273430410773,
+              "y": 0.35329021083479906,
+              "leading": -0.7622306111260873,
+              "chord": 2.975651029724602,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 2.640671866722405,
+              "y": 0.35986755231460166,
+              "leading": -0.6985523948592726,
+              "chord": 2.9053854072619125,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 2.746070303034038,
+              "y": 0.3681897299537568,
+              "leading": -0.6348741785924576,
+              "chord": 2.9888742939870503,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 2.85146873934567,
+              "y": 0.37798717535881243,
+              "leading": -0.5580895804526902,
+              "chord": 2.77838332509622,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 2.9568671756573024,
+              "y": 0.38784175516113195,
+              "leading": -0.4807973963370542,
+              "chord": 2.7221708248923844,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 3.062265611968935,
+              "y": 0.39769633496345147,
+              "leading": -0.4035052122214182,
+              "chord": 2.6659583246885488,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 3.1676640482805674,
+              "y": 0.407550914765771,
+              "leading": -0.32621302810578257,
+              "chord": 2.6097458244847136,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 3.2730624845921996,
+              "y": 0.41557563602338266,
+              "leading": -0.2489208439901467,
+              "chord": 2.553533324280878,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 3.3784609209038323,
+              "y": 0.4250614946213244,
+              "leading": -0.1716286598745106,
+              "chord": 2.497320824077043,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 3.4838593572154646,
+              "y": 0.43454735321926613,
+              "leading": -0.09433647575887472,
+              "chord": 2.441108323873207,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 3.589257793527097,
+              "y": 0.44403321181720784,
+              "leading": -0.017044291643239062,
+              "chord": 2.384895823669372,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 3.6946562298387295,
+              "y": 0.45351907041514955,
+              "leading": 0.060247892472397035,
+              "chord": 2.328683323465536,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 3.800054666150362,
+              "y": 0.46300492901309126,
+              "leading": 0.1375400765880328,
+              "chord": 2.272470823261701,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 3.905453102461994,
+              "y": 0.47249078761103297,
+              "leading": 0.21483226070366862,
+              "chord": 2.216258323057865,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 4.010851538773627,
+              "y": 0.48197664620897473,
+              "leading": 0.29212444481930505,
+              "chord": 2.160045822854029,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 4.1162499750852595,
+              "y": 0.4900551665508839,
+              "leading": 0.3694166289349408,
+              "chord": 2.103833322650194,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 4.221648411396892,
+              "y": 0.5000637784123432,
+              "leading": 0.4467088130505766,
+              "chord": 2.047620822446359,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 4.327046847708524,
+              "y": 0.5100723902738025,
+              "leading": 0.5240009971662124,
+              "chord": 1.9914083222425236,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 4.432445284020156,
+              "y": 0.5204499628781795,
+              "leading": 0.6023746924777498,
+              "chord": 1.9386806868785251,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 4.5378437203317885,
+              "y": 0.5316571429303117,
+              "leading": 0.6831801634190069,
+              "chord": 1.893788762714279,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 4.643242156643422,
+              "y": 0.5428643229824441,
+              "leading": 0.7639856343602649,
+              "chord": 1.8488968385500326,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 4.748640592955054,
+              "y": 0.5540715030345764,
+              "leading": 0.8447911053015222,
+              "chord": 1.804004914385786,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 4.854039029266686,
+              "y": 0.5652786830867087,
+              "leading": 0.9255965762427794,
+              "chord": 1.7591129902215399,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 4.959437465578318,
+              "y": 0.5764858631388411,
+              "leading": 1.0064020471840367,
+              "chord": 1.7142210660572936,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 5.064835901889951,
+              "y": 0.5859459484520511,
+              "leading": 1.0872075181252938,
+              "chord": 1.6693291418930476,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 5.170234338201583,
+              "y": 0.596876156317442,
+              "leading": 1.168012989066551,
+              "chord": 1.6244372177288011,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 5.275632774513215,
+              "y": 0.6078063641828327,
+              "leading": 1.2488184600078083,
+              "chord": 1.5795452935645549,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 5.381031210824848,
+              "y": 0.6187365720482237,
+              "leading": 1.3296239309490663,
+              "chord": 1.5346533694003084,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 5.486429647136481,
+              "y": 0.6281527076725957,
+              "leading": 1.4104294018903234,
+              "chord": 1.489761445236062,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 5.591828083448113,
+              "y": 0.6394832987765331,
+              "leading": 1.4912348728315807,
+              "chord": 1.4448695210718157,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 5.697226519759745,
+              "y": 0.6508138898804703,
+              "leading": 1.5720403437728379,
+              "chord": 1.3999775969075696,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 5.802624956071377,
+              "y": 0.6621444809844077,
+              "leading": 1.6528458147140952,
+              "chord": 1.3550856727433234,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 5.90802339238301,
+              "y": 0.6741592112582188,
+              "leading": 1.7341884990360938,
+              "chord": 1.3096394775750086,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 6.013421828694643,
+              "y": 0.6886216983475835,
+              "leading": 1.8174532597016528,
+              "chord": 1.2622101762089846,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 6.118820265006275,
+              "y": 0.7030841854369478,
+              "leading": 1.900718020367211,
+              "chord": 1.2147808748429614,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 6.224218701317907,
+              "y": 0.7175466725263124,
+              "leading": 1.9839827810327693,
+              "chord": 1.1673515734769375,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 6.32961713762954,
+              "y": 0.732009159615677,
+              "leading": 2.067247541698327,
+              "chord": 1.119922272110914,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 6.435015573941172,
+              "y": 0.7464716467050415,
+              "leading": 2.1505123023638855,
+              "chord": 1.0724929707448907,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 6.540414010252804,
+              "y": 0.7594221256954229,
+              "leading": 2.233777063029444,
+              "chord": 1.0250636693788668,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 6.645812446564437,
+              "y": 0.7725337058904036,
+              "leading": 2.3170418236950026,
+              "chord": 0.977634368012843,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 6.7512108828760695,
+              "y": 0.7871279126294495,
+              "leading": 2.400306584360561,
+              "chord": 0.9302050666468191,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 6.856609319187702,
+              "y": 0.8017221193684951,
+              "leading": 2.4835713450261188,
+              "chord": 0.8827757652807962,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 6.962007755499334,
+              "y": 0.8163163261075409,
+              "leading": 2.566836105691677,
+              "chord": 0.8353464639147723,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 7.067406191810966,
+              "y": 0.8487969364903495,
+              "leading": 2.656418637555841,
+              "chord": 0.7728094283685034,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 7.172804628122599,
+              "y": 0.8852378430057405,
+              "leading": 2.74776388759965,
+              "chord": 0.7060571914710607,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 7.278203064434232,
+              "y": 0.9230225668763739,
+              "leading": 2.8391091376434607,
+              "chord": 0.6393049545736167,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 7.383601500745864,
+              "y": 1.0721364671639702,
+              "leading": 2.975274037688001,
+              "chord": 0.5419105661960013,
+              "zeroLiftAlpha": 0
+            },
+            {
+              "x": 7.488999937057496,
+              "y": 1.653159754478291,
+              "leading": 3.2885713760218,
+              "chord": 0.3339287079015403,
+              "zeroLiftAlpha": 0
+            }
+          ],
+          "assumptions": [
+            "Main-wing and neutral control-surface outer chord envelope extracted from the runtime export. Root fillets included where merged. Decorative hardware and seals excluded.",
+            "Runtime scale 0.55, vertical offset -1.265 m. Centreline-covered strip reconstructed using measured root chord.",
+            "Symmetric wing reconstruction; maximum sampled left/right chord difference 0.000e+0 m.",
+            "Leading-edge height as lifting-surface datum; zero geometric twist/incidence assumed. No separate winglet panels.",
+            "Section camber is unverified. Symmetric-section zero-lift angle is an explicit default assumption. Vertical winglets are not resolved as separate lifting surfaces.",
+            "One chordwise horseshoe row, cosine span spacing, straight fixed wake. Steady incompressible attached flow.",
+            "Wing only: fuselage, tail, gear, engines, viscous drag, stall and chamber walls excluded."
+          ]
+        },
+        "units": {
+          "speed": "m/s",
+          "density": "kg/m³",
+          "angle": "degrees",
+          "lift": "N",
+          "inducedDrag": "N",
+          "spanPosition": "m",
+          "spanLoading": "N/m",
+          "circulation": "m²/s"
+        },
+        "reference": {
+          "area": 35.46675365089911,
+          "span": 14.977999874114992,
+          "aspectRatio": 6.325373966762857
+        },
+        "results": [
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": -8
+            },
+            "panelCount": 96,
+            "cl": -0.5860211822356182,
+            "cdi": 0.016052768910062024,
+            "lift": -11457.328233638325,
+            "inducedDrag": 313.84845469182505,
+            "dynamicPressure": 551.25,
+            "residual": 2.9013828376870757e-15,
+            "efficiency": 1.076565839687653
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": -7
+            },
+            "panelCount": 96,
+            "cl": -0.5131596278871151,
+            "cdi": 0.012309156357836755,
+            "lift": -10032.808490854975,
+            "inducedDrag": 240.6569061768293,
+            "dynamicPressure": 551.25,
+            "residual": 3.315866100213801e-15,
+            "efficiency": 1.0765658396876545
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": -6
+            },
+            "panelCount": 96,
+            "cl": -0.4401417601448684,
+            "cdi": 0.009055417474964267,
+            "lift": -8605.232657415307,
+            "inducedDrag": 177.0429012608207,
+            "dynamicPressure": 551.25,
+            "residual": 2.3684757858670005e-15,
+            "efficiency": 1.0765658396876545
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": -5
+            },
+            "panelCount": 96,
+            "cl": -0.3669898209587329,
+            "cdi": 0.006295516441073288,
+            "lift": -7175.035586747435,
+            "inducedDrag": 123.08394380980317,
+            "dynamicPressure": 551.25,
+            "residual": 2.2500519965736505e-15,
+            "efficiency": 1.0765658396876547
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": -4
+            },
+            "panelCount": 96,
+            "cl": -0.29372609311802284,
+            "cdi": 0.004032815770443437,
+            "lift": -5742.652930733704,
+            "inducedDrag": 78.84577450169026,
+            "dynamicPressure": 551.25,
+            "residual": 1.6949404842610724e-15,
+            "efficiency": 1.0765658396876543
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": -3
+            },
+            "panelCount": 96,
+            "cl": -0.22037289346396072,
+            "cdi": 0.0022700722152995626,
+            "lift": -4308.521007006948,
+            "inducedDrag": 44.38229073141643,
+            "dynamicPressure": 551.25,
+            "residual": 1.0658141036401502e-15,
+            "efficiency": 1.0765658396876547
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": -2
+            },
+            "panelCount": 96,
+            "cl": -0.1469525660917491,
+            "cdi": 0.0010094334071337754,
+            "lift": -2873.076666043873,
+            "inducedDrag": 19.735480945262992,
+            "dynamicPressure": 551.25,
+            "residual": 8.511709855459534e-16,
+            "efficiency": 1.0765658396876545
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": -1
+            },
+            "panelCount": 96,
+            "cl": -0.07348747554434451,
+            "cdi": 0.00025243524014730684,
+            "lift": -1436.7571580962037,
+            "inducedDrag": 4.935373484404436,
+            "dynamicPressure": 551.25,
+            "residual": 3.904284303265134e-16,
+            "efficiency": 1.0765658396876536
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": 0
+            },
+            "panelCount": 96,
+            "cl": 0,
+            "cdi": 0,
+            "lift": 0,
+            "inducedDrag": 0,
+            "dynamicPressure": 551.25,
+            "residual": 0,
+            "efficiency": null
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": 1
+            },
+            "panelCount": 96,
+            "cl": 0.07348747554434451,
+            "cdi": 0.00025243524014730684,
+            "lift": 1436.7571580962037,
+            "inducedDrag": 4.935373484404436,
+            "dynamicPressure": 551.25,
+            "residual": 3.904284303265134e-16,
+            "efficiency": 1.0765658396876536
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": 2
+            },
+            "panelCount": 96,
+            "cl": 0.1469525660917491,
+            "cdi": 0.0010094334071337754,
+            "lift": 2873.076666043873,
+            "inducedDrag": 19.735480945262992,
+            "dynamicPressure": 551.25,
+            "residual": 8.511709855459534e-16,
+            "efficiency": 1.0765658396876545
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": 3
+            },
+            "panelCount": 96,
+            "cl": 0.22037289346396072,
+            "cdi": 0.0022700722152995626,
+            "lift": 4308.521007006948,
+            "inducedDrag": 44.38229073141643,
+            "dynamicPressure": 551.25,
+            "residual": 1.0658141036401502e-15,
+            "efficiency": 1.0765658396876547
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": 4
+            },
+            "panelCount": 96,
+            "cl": 0.29372609311802284,
+            "cdi": 0.004032815770443437,
+            "lift": 5742.652930733704,
+            "inducedDrag": 78.84577450169026,
+            "dynamicPressure": 551.25,
+            "residual": 1.6949404842610724e-15,
+            "efficiency": 1.0765658396876543
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": 5
+            },
+            "panelCount": 96,
+            "cl": 0.3669898209587329,
+            "cdi": 0.006295516441073288,
+            "lift": 7175.035586747435,
+            "inducedDrag": 123.08394380980317,
+            "dynamicPressure": 551.25,
+            "residual": 2.2500519965736505e-15,
+            "efficiency": 1.0765658396876547
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": 6
+            },
+            "panelCount": 96,
+            "cl": 0.4401417601448684,
+            "cdi": 0.009055417474964267,
+            "lift": 8605.232657415307,
+            "inducedDrag": 177.0429012608207,
+            "dynamicPressure": 551.25,
+            "residual": 2.3684757858670005e-15,
+            "efficiency": 1.0765658396876545
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": 7
+            },
+            "panelCount": 96,
+            "cl": 0.5131596278871151,
+            "cdi": 0.012309156357836755,
+            "lift": 10032.808490854975,
+            "inducedDrag": 240.6569061768293,
+            "dynamicPressure": 551.25,
+            "residual": 3.315866100213801e-15,
+            "efficiency": 1.0765658396876545
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": 8
+            },
+            "panelCount": 96,
+            "cl": 0.5860211822356182,
+            "cdi": 0.016052768910062024,
+            "lift": 11457.328233638325,
+            "inducedDrag": 313.84845469182505,
+            "dynamicPressure": 551.25,
+            "residual": 2.9013828376870757e-15,
+            "efficiency": 1.076565839687653
+          }
+        ]
+      },
+      "referenceResult": {
+        "cl": 0.29372609311802284,
+        "cdi": 0.004032815770443437,
+        "lift": 5742.652930733704,
+        "inducedDrag": 78.84577450169026
+      }
+    },
+    {
+      "id": "stormbird",
+      "asset": "stormbird-hx40.gltf",
+      "revision": "7adb7cc95f9066e35baaed95259ce873033e594abfe8cfa4d581c851d67a0c00",
+      "clearance": [
+        {
+          "alpha": -8,
+          "margin": {
+            "side": 1.3000001907348633,
+            "floor": 1.9501029232213716,
+            "ceiling": 3.1400742940983726,
+            "ends": 4.263525209874839
+          }
+        },
+        {
+          "alpha": 0,
+          "margin": {
+            "side": 1.3000001907348633,
+            "floor": 3.249999994039536,
+            "ceiling": 4.244243144989014,
+            "ends": 4.520000457763672
+          }
+        },
+        {
+          "alpha": 8,
+          "margin": {
+            "side": 1.3000001907348633,
+            "floor": 2.140909152260456,
+            "ceiling": 2.9492680650592895,
+            "ends": 4.333912958888993
+          }
+        }
+      ],
+      "convergence": {
+        "rows": [
+          {
+            "panelCount": 24,
+            "cl": 0.259424546306092,
+            "cdi": 0.00628293919903406,
+            "residual": 3.9968028886505636e-16
+          },
+          {
+            "panelCount": 48,
+            "cl": 0.25587921006732306,
+            "cdi": 0.006266518974270172,
+            "residual": 8.881784197001252e-16
+          },
+          {
+            "panelCount": 96,
+            "cl": 0.2540874912709705,
+            "cdi": 0.006257811161759507,
+            "residual": 4.4704980458239636e-15
+          },
+          {
+            "panelCount": 144,
+            "cl": 0.25345863817220304,
+            "cdi": 0.006253392166848575,
+            "residual": 5.255055649892408e-15
+          }
+        ],
+        "liftChangePercent": 0.2481087657151492,
+        "dragChangePercent": 0.07066556507296766
+      },
+      "experiment": {
+        "schemaVersion": 1,
+        "solver": "horseshoe-vlm-1.0",
+        "generatedAt": "2026-10-11T16:23:34.423Z",
+        "aircraft": "Stormbird HX–40 main wing",
+        "geometryRevision": "7adb7cc95f9066e35baaed95259ce873033e594abfe8cfa4d581c851d67a0c00",
+        "assumptions": [
+          "Main-wing and neutral control-surface outer chord envelope extracted from the runtime export. Root fillets included where merged. Decorative hardware and seals excluded.",
+          "Gross main-wing stations come from the CAD design sheet, verified against exported outer sections. Covered wing reconstructed across fuselage cutouts; separate inlet/root fairings excluded.",
+          "Runtime scale 1, vertical offset -2 m. Centreline-covered strip reconstructed using measured root chord.",
+          "Symmetric wing reconstruction; maximum sampled left/right chord difference 5.206e-10 m.",
+          "Leading-edge height as lifting-surface datum; zero geometric twist/incidence assumed. No separate winglet panels.",
+          "Nominal authoring section: 0.4% sinusoidal camber from the aircraft design sheet. Thin-airfoil approximation; no measured polar.",
+          "One chordwise horseshoe row, cosine span spacing, straight fixed wake. Steady incompressible attached flow.",
+          "Wing only: fuselage, tail, gear, engines, viscous drag, stall and chamber walls excluded."
+        ],
+        "geometry": {
+          "name": "Stormbird HX–40 main wing",
+          "revision": "7adb7cc95f9066e35baaed95259ce873033e594abfe8cfa4d581c851d67a0c00",
+          "stations": [
+            {
+              "x": 0,
+              "y": 0.029999999999999805,
+              "leading": -1.95,
+              "chord": 6.22,
+              "zeroLiftAlpha": -0.4081133440122291
+            },
+            {
+              "x": 0.65,
+              "y": 0.029999999999999805,
+              "leading": -1.95,
+              "chord": 6.22,
+              "zeroLiftAlpha": -0.4081133440122291
+            },
+            {
+              "x": 1.85,
+              "y": 0.029999999999999805,
+              "leading": -1.3,
+              "chord": 5.49,
+              "zeroLiftAlpha": -0.4081133440122291
+            },
+            {
+              "x": 6.7,
+              "y": 0.029999999999999805,
+              "leading": 2.33,
+              "chord": 1.36,
+              "zeroLiftAlpha": -0.4081133440122291
+            }
+          ],
+          "assumptions": [
+            "Main-wing and neutral control-surface outer chord envelope extracted from the runtime export. Root fillets included where merged. Decorative hardware and seals excluded.",
+            "Gross main-wing stations come from the CAD design sheet, verified against exported outer sections. Covered wing reconstructed across fuselage cutouts; separate inlet/root fairings excluded.",
+            "Runtime scale 1, vertical offset -2 m. Centreline-covered strip reconstructed using measured root chord.",
+            "Symmetric wing reconstruction; maximum sampled left/right chord difference 5.206e-10 m.",
+            "Leading-edge height as lifting-surface datum; zero geometric twist/incidence assumed. No separate winglet panels.",
+            "Nominal authoring section: 0.4% sinusoidal camber from the aircraft design sheet. Thin-airfoil approximation; no measured polar.",
+            "One chordwise horseshoe row, cosine span spacing, straight fixed wake. Steady incompressible attached flow.",
+            "Wing only: fuselage, tail, gear, engines, viscous drag, stall and chamber walls excluded."
+          ]
+        },
+        "units": {
+          "speed": "m/s",
+          "density": "kg/m³",
+          "angle": "degrees",
+          "lift": "N",
+          "inducedDrag": "N",
+          "spanPosition": "m",
+          "spanLoading": "N/m",
+          "circulation": "m²/s"
+        },
+        "reference": {
+          "area": 55.36050000000001,
+          "span": 13.4,
+          "aspectRatio": 3.243467815500221
+        },
+        "results": [
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": -8
+            },
+            "panelCount": 96,
+            "cl": -0.4364282556290456,
+            "cdi": 0.01846212145394752,
+            "lift": -13318.68865322067,
+            "inducedDrag": 563.4173414566332,
+            "dynamicPressure": 551.25,
+            "residual": 3.552713678800501e-15,
+            "efficiency": 1.0124757995956926
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": -7
+            },
+            "panelCount": 96,
+            "cl": -0.3792390468292475,
+            "cdi": 0.013940616360346283,
+            "lift": -11573.418367659795,
+            "inducedDrag": 425.432419974344,
+            "dynamicPressure": 551.25,
+            "residual": 3.552713678800501e-15,
+            "efficiency": 1.012475799595691
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": -6
+            },
+            "panelCount": 96,
+            "cl": -0.32192714727171146,
+            "cdi": 0.010045489067226451,
+            "lift": -9824.403869890242,
+            "inducedDrag": 306.56296775028727,
+            "dynamicPressure": 551.25,
+            "residual": 2.5165055224836883e-15,
+            "efficiency": 1.0124757995956928
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": -5
+            },
+            "panelCount": 96,
+            "cl": -0.26451001471623514,
+            "cdi": 0.006781724177183079,
+            "lift": -8072.177926671098,
+            "inducedDrag": 206.96110227265785,
+            "dynamicPressure": 551.25,
+            "residual": 2.6645352591003757e-15,
+            "efficiency": 1.0124757995956917
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": -4
+            },
+            "panelCount": 96,
+            "cl": -0.20700513897760758,
+            "cdi": 0.0041535375137973715,
+            "lift": -6317.274282998878,
+            "inducedDrag": 126.75547983483442,
+            "dynamicPressure": 551.25,
+            "residual": 1.9909999574944474e-15,
+            "efficiency": 1.012475799595691
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": -3
+            },
+            "panelCount": 96,
+            "cl": -0.1494300365980409,
+            "cdi": 0.0021643709123727838,
+            "lift": -4560.227499523572,
+            "inducedDrag": 66.05113656179546,
+            "dynamicPressure": 551.25,
+            "residual": 1.4358884451818692e-15,
+            "efficiency": 1.0124757995956937
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": -2
+            },
+            "panelCount": 96,
+            "cl": -0.09180224551146234,
+            "cdi": 0.000816887953545103,
+            "lift": -2801.572789716318,
+            "inducedDrag": 24.929358210668816,
+            "dynamicPressure": 551.25,
+            "residual": 7.993605777301127e-16,
+            "efficiency": 1.0124757995956932
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": -1
+            },
+            "panelCount": 96,
+            "cl": -0.03413931970128982,
+            "cdi": 0.00011297064498670196,
+            "lift": -1041.8458568381945,
+            "inducedDrag": 3.447578904722206,
+            "dynamicPressure": 551.25,
+            "residual": 3.1271281860275245e-16,
+            "efficiency": 1.0124757995956926
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": 0
+            },
+            "panelCount": 96,
+            "cl": 0.023541176146681424,
+            "cdi": 0.00005371705527020787,
+            "lift": 718.4172692401819,
+            "inducedDrag": 1.639308924855347,
+            "dynamicPressure": 551.25,
+            "residual": 2.1371793224034264e-16,
+            "efficiency": 1.0124757995956915
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": 1
+            },
+            "panelCount": 96,
+            "cl": 0.08122167199465269,
+            "cdi": 0.0006394399027965323,
+            "lift": 2478.680395318559,
+            "inducedDrag": 19.514091647245547,
+            "dynamicPressure": 551.25,
+            "residual": 8.659739592076221e-16,
+            "efficiency": 1.0124757995956932
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": 2
+            },
+            "panelCount": 96,
+            "cl": 0.13888459780482515,
+            "cdi": 0.001869666101528813,
+            "lift": 4238.407328196681,
+            "inducedDrag": 57.05748968029434,
+            "dynamicPressure": 551.25,
+            "residual": 1.5765166949677222e-15,
+            "efficiency": 1.0124757995956926
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": 3
+            },
+            "panelCount": 96,
+            "cl": 0.19651238889140377,
+            "cdi": 0.0037431372641080094,
+            "lift": 5997.062038003936,
+            "inducedDrag": 114.23110021844539,
+            "dynamicPressure": 551.25,
+            "residual": 1.8207657603852566e-15,
+            "efficiency": 1.0124757995956926
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": 4
+            },
+            "panelCount": 96,
+            "cl": 0.2540874912709705,
+            "cdi": 0.006257811161759507,
+            "lift": 7754.108821479244,
+            "inducedDrag": 190.97259959484873,
+            "dynamicPressure": 551.25,
+            "residual": 4.4704980458239636e-15,
+            "efficiency": 1.0124757995956937
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": 5
+            },
+            "panelCount": 96,
+            "cl": 0.3115923670095981,
+            "cdi": 0.009410864139234427,
+            "lift": 9509.012465151465,
+            "inducedDrag": 287.19581697927333,
+            "dynamicPressure": 551.25,
+            "residual": 3.049412574303763e-15,
+            "efficiency": 1.0124757995956915
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": 6
+            },
+            "panelCount": 96,
+            "cl": 0.369009499565074,
+            "cdi": 0.013198694481865498,
+            "lift": 11261.238408370597,
+            "inducedDrag": 402.79083713215243,
+            "dynamicPressure": 551.25,
+            "residual": 3.4046839421838135e-15,
+            "efficiency": 1.0124757995956908
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": 7
+            },
+            "panelCount": 96,
+            "cl": 0.4263213991226104,
+            "cdi": 0.017616926730657956,
+            "lift": 13010.252906140162,
+            "inducedDrag": 537.6241320902652,
+            "dynamicPressure": 551.25,
+            "residual": 4.292862361883938e-15,
+            "efficiency": 1.0124757995956912
+          },
+          {
+            "conditions": {
+              "speed": 30,
+              "density": 1.225,
+              "alpha": 8
+            },
+            "panelCount": 96,
+            "cl": 0.48351060792240846,
+            "cdi": 0.02266041694017979,
+            "lift": 14755.523191701035,
+            "inducedDrag": 691.538721624274,
+            "dynamicPressure": 551.25,
+            "residual": 4.766557519057338e-15,
+            "efficiency": 1.0124757995956923
+          }
+        ]
+      },
+      "referenceResult": {
+        "cl": 0.2540874912709705,
+        "cdi": 0.006257811161759507,
+        "lift": 7754.108821479244,
+        "inducedDrag": 190.97259959484873
+      }
+    }
+  ]
+}

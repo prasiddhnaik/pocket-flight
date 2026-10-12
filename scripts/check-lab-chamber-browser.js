@@ -1,0 +1,54 @@
+async (page) => {
+  const evidence = { checks: [], aircraft: [], errors: [], generatedAt: new Date().toISOString() };
+  page.on('pageerror', (e) => evidence.errors.push(String(e)));
+  page.on('console', (m) => { if (m.type() === 'error') evidence.errors.push(m.text()); });
+  const state = () => page.evaluate(() => window.windTunnel.getState());
+  const assert = (ok, message) => { if (!ok) throw new Error(message); evidence.checks.push(message); };
+  const ready = (name) => page.getByRole('status').filter({ hasText: `${name} ready` }).waitFor();
+  await page.reload();
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await ready('Finch U–2');
+  await page.waitForFunction(() => window.windTunnel.getState().performance.chamber.ready);
+  const inspection = await state();
+  assert(inspection.performance.chamber.cutawaySections.length === 2 && inspection.performance.chamber.cutawaySections.every((s) => !s.visible), 'Inspection exposes the aircraft by hiding the near wall and roof');
+  await page.screenshot({ path: 'output/premium-chamber-inspect.png' });
+  for (const [id, name] of [['finch', 'Finch U–2'], ['peregrine', 'Peregrine HX–27'], ['aurelia', 'Aurelia S32'], ['stormbird', 'Stormbird HX–40']]) {
+    await page.getByRole('combobox', { name: 'Aircraft', exact: true }).selectOption(id);
+    await ready(name);
+    await page.getByRole('button', { name: 'Full chamber', exact: true }).click();
+    const s = await state();
+    assert(s.aircraft === id && s.performance.chamber.view === 'chamber' && s.performance.chamber.cutawaySections.every((section) => section.visible), `${name} displays the complete enclosure`);
+    assert(s.airflow.pathCount === 122 && s.airflow.rejected === 0, `${name} retains wingtip-width airflow and mesh clearance`);
+    await page.waitForTimeout(600);
+    await page.screenshot({ path: `output/premium-chamber-${id}-full.png` });
+    evidence.aircraft.push({ id, performance: (await state()).performance });
+  }
+  await page.getByRole('combobox', { name: 'Aircraft', exact: true }).selectOption('finch');
+  await ready('Finch U–2');
+  await page.getByRole('button', { name: 'Full chamber', exact: true }).click();
+  await page.getByRole('checkbox', { name: 'Surface-aware airflow', exact: true }).uncheck();
+  await page.getByRole('checkbox', { name: 'Force directions', exact: true }).uncheck();
+  await page.waitForTimeout(700);
+  await page.screenshot({ path: 'output/premium-chamber-full.png' });
+  await page.getByRole('button', { name: 'Pause flow animation', exact: true }).click();
+  await page.waitForTimeout(800);
+  const before = (await state()).performance.renderedFrames;
+  await page.waitForTimeout(400);
+  assert((await state()).performance.renderedFrames === before, 'The complete chamber stops rendering when paused and settled');
+  await page.getByRole('button', { name: 'Inspect', exact: true }).click();
+  await page.waitForTimeout(600);
+  const after = await state();
+  assert(after.performance.renderedFrames > before && after.performance.chamber.cutawaySections.every((s) => !s.visible), 'Changing view redraws a paused chamber and restores the inspection cutaway');
+  await page.getByRole('button', { name: 'Full chamber', exact: true }).click();
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.waitForTimeout(800);
+  await page.locator('.viewport').screenshot({ path: 'output/premium-chamber-mobile.png' });
+  assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), 'The chamber controls fit a 390-pixel mobile viewport');
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.getByRole('button', { name: 'Resume flow animation', exact: true }).click();
+  await page.getByRole('checkbox', { name: 'Surface-aware airflow', exact: true }).check();
+  await page.getByRole('checkbox', { name: 'Force directions', exact: true }).check();
+  await page.getByRole('button', { name: 'Inspect', exact: true }).click();
+  assert(evidence.errors.length === 0, 'No browser or shader errors during chamber checks');
+  return evidence;
+}

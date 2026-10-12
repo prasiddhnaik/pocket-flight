@@ -12,3 +12,6 @@ assets/finch/**/*.blend1
 .DS_Store
 .env
 .env.*
+
+# Local browser installation and launch configuration.
+.playwright/

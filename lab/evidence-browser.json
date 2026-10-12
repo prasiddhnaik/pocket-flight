@@ -1,0 +1,167 @@
+{
+  "aircraft": [
+    {
+      "airflow": {
+        "rejected": 0,
+        "checkedSegments": 9797,
+        "direction": "Inlet → nose → tail → downstream extraction fan",
+        "model": "Mesh-envelope routing with circulation-based approximate wake roll-up; illustrative full-aircraft airflow, not CFD.",
+        "pathCount": 84,
+        "alpha": 4,
+        "emitterCount": 233,
+        "visualTravel": 5.21964,
+        "motionScale": 0.18,
+        "firstHead": [
+          -6.1904449462890625,
+          -0.9076270461082458,
+          -2.6942641735076904
+        ]
+      },
+      "id": "finch",
+      "status": "Finch U–2 ready",
+      "revision": "b880679bd9cf8551b092db072968db372c5d1b93076de447d26f4170a7a53036",
+      "conditions": {
+        "speed": 30,
+        "density": 1.225,
+        "alpha": 4
+      },
+      "panelCount": 96,
+      "cl": 0.4489316489957181,
+      "cdi": 0.008511415980724206,
+      "lift": 3991.5611681293335,
+      "inducedDrag": 75.677082670503,
+      "dynamicPressure": 551.25,
+      "residual": 1.924386576016938e-15,
+      "efficiency": 1.0091007389514146
+    },
+    {
+      "airflow": {
+        "rejected": 0,
+        "checkedSegments": 14846,
+        "direction": "Inlet → nose → tail → downstream extraction fan",
+        "model": "Mesh-envelope routing with circulation-based approximate wake roll-up; illustrative full-aircraft airflow, not CFD.",
+        "pathCount": 84,
+        "alpha": 4,
+        "emitterCount": 363,
+        "visualTravel": 10.259459999999995,
+        "motionScale": 0.18,
+        "firstHead": [
+          -7.602742671966553,
+          0.21774472296237946,
+          -4.722566604614258
+        ]
+      },
+      "id": "peregrine",
+      "status": "Peregrine HX–27 ready",
+      "revision": "489cd7f96f157f9dbd3837fdd14209f292f94b356b639a2120305cabfbfcba7f",
+      "conditions": {
+        "speed": 30,
+        "density": 1.225,
+        "alpha": 4
+      },
+      "panelCount": 96,
+      "cl": 0.3263248420072008,
+      "cdi": 0.009041502437410876,
+      "lift": 9354.123153477394,
+      "inducedDrag": 259.17526465895327,
+      "dynamicPressure": 551.25,
+      "residual": 2.930988785010413e-15,
+      "efficiency": 1.011311449835047
+    },
+    {
+      "airflow": {
+        "rejected": 0,
+        "checkedSegments": 13488,
+        "direction": "Inlet → nose → tail → downstream extraction fan",
+        "model": "Mesh-envelope routing with circulation-based approximate wake roll-up; illustrative full-aircraft airflow, not CFD.",
+        "pathCount": 84,
+        "alpha": 4,
+        "emitterCount": 360,
+        "visualTravel": 15.93053999999999,
+        "motionScale": 0.18,
+        "firstHead": [
+          -7.633420467376709,
+          -0.07496049255132675,
+          2.9751644134521484
+        ]
+      },
+      "id": "aurelia",
+      "status": "Aurelia S32 ready",
+      "revision": "a9a430919c0609e8af506cfd2ac9fa5ade31ec3efe89d9f8b6f51d81b4a5eb20",
+      "conditions": {
+        "speed": 30,
+        "density": 1.225,
+        "alpha": 4
+      },
+      "panelCount": 96,
+      "cl": 0.2937260931180227,
+      "cdi": 0.004032815770443441,
+      "lift": 5742.652930733702,
+      "inducedDrag": 78.84577450169034,
+      "dynamicPressure": 551.25,
+      "residual": 1.4580929056743722e-15,
+      "efficiency": 1.0765658396876523
+    },
+    {
+      "airflow": {
+        "rejected": 0,
+        "checkedSegments": 13628,
+        "direction": "Inlet → nose → tail → downstream extraction fan",
+        "model": "Mesh-envelope routing with circulation-based approximate wake roll-up; illustrative full-aircraft airflow, not CFD.",
+        "pathCount": 84,
+        "alpha": 4,
+        "emitterCount": 360,
+        "visualTravel": 21.061079999999976,
+        "motionScale": 0.18,
+        "firstHead": [
+          -7.432593822479248,
+          0.3258262872695923,
+          7.496363639831543
+        ]
+      },
+      "id": "stormbird",
+      "status": "Stormbird HX–40 ready",
+      "revision": "7adb7cc95f9066e35baaed95259ce873033e594abfe8cfa4d581c851d67a0c00",
+      "conditions": {
+        "speed": 30,
+        "density": 1.225,
+        "alpha": 4
+      },
+      "panelCount": 96,
+      "cl": 0.25408749127097063,
+      "cdi": 0.006257811161759509,
+      "lift": 7754.108821479248,
+      "inducedDrag": 190.9725995948488,
+      "dynamicPressure": 551.25,
+      "residual": 4.618527782440651e-15,
+      "efficiency": 1.0124757995956943
+    }
+  ],
+  "checks": [
+    "Finch U–2 loads and computes lift",
+    "Finch U–2 airflow clears its mesh and includes a wake",
+    "Peregrine HX–27 loads and computes lift",
+    "Peregrine HX–27 airflow clears its mesh and includes a wake",
+    "Aurelia S32 loads and computes lift",
+    "Aurelia S32 airflow clears its mesh and includes a wake",
+    "Stormbird HX–40 loads and computes lift",
+    "Stormbird HX–40 airflow clears its mesh and includes a wake",
+    "17-case angle sweep completes",
+    "Four refinement levels converge below 1% at reference condition",
+    "Matched-condition comparison covers all four aircraft",
+    "JSON export includes 17 cases, complete geometry and matching revision",
+    "CSV export identifies aircraft, conditions and coefficients",
+    "Unsupported angle withholds results and disables export",
+    "Negative angle produces downward lift",
+    "Browser airspeed changes scale lift by V squared and preserve CL",
+    "Browser density changes scale forces linearly",
+    "Analysis lattice and wing isolation controls update scene state",
+    "Pause control freezes flow animation state",
+    "Section override changes geometry input and export revision",
+    "Mobile layout has no horizontal overflow",
+    "Mobile aircraft selector switches geometry and model",
+    "No browser exceptions or error console messages during acceptance run"
+  ],
+  "errors": [],
+  "generatedAt": "2026-10-11T15:40:17.268Z"
+}

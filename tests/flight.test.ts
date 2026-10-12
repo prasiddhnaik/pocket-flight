@@ -8,11 +8,14 @@ describe("Finch flight envelope", () => {
     const p = new FlightPhysics();
     p.reset();
     let tookOff = false;
-    for (let i = 0; i < 700; i++) {
+    for (let i = 0; i < 1200; i++) {
       p.step(1 / 60, {
         ...neutral,
         throttle: 1,
-        pitch: p.airspeed > 23 && p.pitch < 0.13 ? 0.3 : 0,
+        pitch:
+          p.airspeed * 1.943844 > p.profile.rotationKnots && p.pitch < 0.15
+            ? 0.3
+            : 0,
       });
       if (!p.grounded) {
         tookOff = true;
@@ -27,14 +30,16 @@ describe("Finch flight envelope", () => {
     const p = new FlightPhysics();
     p.reset(true);
     p.position.set(-260, 13, 410);
-    p.velocity.set(0, -1.4, -26);
-    p.pitch = -0.04;
+    p.velocity.set(0, -1.4, -31);
+    p.pitch = 0.03;
     p.throttle = 0.12;
     let landing = false;
     for (let i = 0; i < 700; i++) {
       p.step(1 / 60, {
         ...neutral,
-        pitch: p.grounded ? 0 : (-0.055 - p.pitch) * 4,
+        pitch: p.grounded
+          ? 0
+          : ((p.position.y < 10.8 ? 0.12 : 0.03) - p.pitch) * 4,
         throttle: p.grounded ? -1 : 0,
         brake: p.grounded,
       });

@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Finch U–2 — Engineering baseline</title>
+<style>
+  body{font:16px/1.6 system-ui,sans-serif;color:#202b31;background:#fafaf7;margin:0}main{max-width:1000px;margin:auto;padding:36px 24px}h1{font-size:32px;line-height:1.2}h2{font-size:22px;margin-top:32px}p{max-width:85ch}.meta{color:#58636a}.status{border-left:4px solid #52796f;background:#edf3ee;padding:16px}table{width:100%;border-collapse:collapse;font-size:14px}td,th{text-align:left;vertical-align:top;border-bottom:1px solid #d7dddd;padding:10px}th{background:#eef0ed}code{background:#eef0ed;padding:2px 5px}a{color:#205c75}.scroll{overflow:auto}li{margin:8px 0}small{color:#58636a}
+</style>
+<main>
+<p class="meta">Pocket Flight · 11 October 2026 · First implementation milestone</p>
+<h1>Finch U–2 engineering baseline</h1>
+<div class="status"><strong>Physical force model implemented; aerodynamic accuracy remains provisional.</strong><br>Finch now uses measured runtime wing geometry, body-frame airflow, forces in newtons, a conceptual mass budget, density-dependent lift and propulsion, induced drag, and an angle-of-attack stall curve. Beginner assist is on by default and can be switched off in Settings.</div>
+<p>The user selected Finch as the first aircraft and physical flight with optional beginner assist. This work applies the <a href="PRINCIPLES_OF_MAKING_PLANES.md">aircraft-design handbook</a>, especially sections 4, 5, 7, 8, 17, and 19. The existing asset is measured and tied to its force model. No new GLB or CAD rebuild is delivered in this milestone.</p>
+<h2>Measured geometry</h2>
+<p>Measurements come from the actual <code>public/assets/finch-u2.glb</code> loaded at runtime scale 1. The frame is metres: X right, Y up, −Z forward. The previous authoring source in the adjacent Pocket Flight checkout was inspected for context; the current runtime export is the measurement authority.</p>
+<div class="scroll"><table><thead><tr><th>Quantity</th><th>Result</th><th>Evidence</th></tr></thead><tbody>
+<tr><td>Span / length / height</td><td>10.980 / 8.090 / 3.222 m</td><td>Imported GLB bounds; includes external fittings.</td></tr>
+<tr><td>Exposed projected wing area</td><td>14.160 m²</td><td>Exported wing and control-surface outer chord envelope; merged root fillets included.</td></tr>
+<tr><td>Declared reference wing area S</td><td>16.125 m²</td><td>Exposed area plus a 1 m centreline strip at measured 1.965 m root chord.</td></tr>
+<tr><td>Aspect ratio b²/S</td><td>7.477</td><td>Calculated from the measured span and declared reference area.</td></tr>
+<tr><td>Mean aerodynamic chord</td><td>1.530 m</td><td>Spanwise chord-squared integration divided by S.</td></tr>
+<tr><td>Area-weighted quarter-chord Z</td><td>−0.285 m</td><td>Geometric datum; not a measured whole-aircraft aerodynamic centre.</td></tr>
+<tr><td>Wheel centres</td><td>Main: (±1.220, −1.090, 0.550) m<br>Nose: (0, −1.120, −2.120) m</td><td>World positions of actual GLB pivots match the simulator contact datums.</td></tr>
+</tbody></table></div>
+<p>The measurement workflow integrates 800 midpoint sections per half-wing. It fills internal chordwise hinge gaps and retains spanwise gaps. Root fillets are merged into the exported paint mesh, so this reference-area convention explicitly includes them. This is a gross planform estimate, not an aerodynamic solver. Details and stations are saved in <a href="finch-geometry.json">finch-geometry.json</a>.</p>
+<h2>Conceptual loading and propulsion</h2>
+<p>These values are proposed engineering inputs for this fictional trainer, not measured masses or manufacturer specifications. The mass budget is explicit so it can be revised instead of hidden inside a lift multiplier.</p>
+<div class="scroll"><table><thead><tr><th>Component</th><th>Mass</th><th>Centre (X, Y, Z), m</th></tr></thead><tbody>
+<tr><td>Fuselage and cabin</td><td>220 kg</td><td>(0, 0, 0)</td></tr>
+<tr><td>Wing structure</td><td>140 kg</td><td>(0, 0, 0.100)</td></tr>
+<tr><td>Engine and propeller</td><td>110 kg</td><td>(0, 0.025, −2.600)</td></tr>
+<tr><td>Avionics</td><td>25 kg</td><td>(0, 0.200, −0.700)</td></tr>
+<tr><td>Landing gear</td><td>45 kg</td><td>(0, −0.900, 0)</td></tr>
+<tr><td>Empennage</td><td>35 kg</td><td>(0, 0.300, 3.400)</td></tr>
+<tr><td>Two occupants</td><td>170 kg</td><td>(0, 0, −0.180)</td></tr>
+<tr><td>Fuel</td><td>80 kg</td><td>(0, −0.050, 0)</td></tr>
+<tr><td>Baggage</td><td>35 kg</td><td>(0, 0, 1.400)</td></tr>
+<tr><td><strong>Total and calculated CG</strong></td><td><strong>860 kg</strong></td><td><strong>(0, −0.031, −0.177)</strong></td></tr>
+</tbody></table></div>
+<p>The geometric ground-load estimate places approximately 27.2% of static weight on the nose gear at this CG. This only checks support geometry. The translation model uses loaded mass; the CG is recorded for the next moment-model milestone and does not yet change pitch stability.</p>
+<p>Propulsion assumes 100 kW shaft power, 0.78 propeller efficiency, and a 2,750 N static-thrust cap. Thrust is bounded by both that cap and available power divided by airspeed. A naturally aspirated density correction is applied. The propeller model does not yet include an RPM/pitch efficiency map, slipstream, torque, or fuel consumption.</p>
+<h2>What now governs flight</h2>
+<div class="scroll"><table><thead><tr><th>Behavior</th><th>Implementation</th><th>Boundary</th></tr></thead><tbody>
+<tr><td>Airflow</td><td>World velocity minus wind, transformed into aircraft coordinates. α = atan2(−bodyVy, −bodyVz); β = asin(bodyVx / V).</td><td>Whole-aircraft reference flow; local rotating-surface flow is not modeled.</td></tr>
+<tr><td>Lift and acceleration</td><td>q = ½ρV²; L = qSCL; aerodynamic force divided by loaded mass.</td><td>Lift remains perpendicular to air-relative velocity; no speed-dependent lift-coefficient trim term.</td></tr>
+<tr><td>Drag</td><td>CD = CD0 + CL²/(πARe), plus separation, sideslip, and damage estimates.</td><td>CD0 = 0.032 includes Finch's fixed extended gear; e = 0.8 is assumed.</td></tr>
+<tr><td>Stall</td><td>CL0 = 0.24, lift slope 5/rad, CLmax = 1.55, CLmin = −1.25. Continuous transition to a flat-plate estimate after critical α.</td><td>Positive stall onset about 15.0°. These are estimated whole-aircraft coefficients; no validated custom-airfoil polar exists.</td></tr>
+<tr><td>Atmosphere</td><td>Dry ISA tropospheric density at aircraft altitude, applied to dynamic pressure and engine power.</td><td>Temperature departures and humidity are not simulated. HUD speed remains true airspeed.</td></tr>
+<tr><td>Assist</td><td>Optional self-leveling, coordinated-turn yaw, automatic pitch trim and scripted stall-recovery corrections.</td><td>Disabling assist retains simplified rate-controlled pitch/roll/yaw. It is not a full unassisted six-degree-of-freedom simulation.</td></tr>
+</tbody></table></div>
+<p>The equations follow <a href="https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/lift-equation/">NASA's lift equation</a> and <a href="https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/induced-drag-coefficient/">NASA's induced-drag relationship</a>. These references support the relationships, not Finch's selected coefficients.</p>
+<h2>Calculated envelope checks</h2>
+<div class="scroll"><table><thead><tr><th>Condition</th><th>Calculated result</th><th>Interpretation</th></tr></thead><tbody>
+<tr><td>860 kg, sea-level density, clean fixed-gear configuration, 1 g</td><td>45.63 knots TAS stall estimate</td><td>From weight, density, S and assumed CLmax.</td></tr>
+<tr><td>Rotation guidance</td><td>55 knots</td><td>Rounded 1.2 × sea-level stall estimate; takeoff script validates runway clearance separately.</td></tr>
+<tr><td>Same loading at 1,800 m ISA altitude</td><td>49.83 knots TAS stall estimate</td><td>Density decreases; this is a true-speed comparison, not an indicated-speed claim.</td></tr>
+<tr><td>Ideal sustained level turn at 2 g</td><td>64.52 knots TAS stall estimate</td><td>√2 × one-g estimate. A bank alone does not establish this load factor.</td></tr>
+</tbody></table></div>
+<h2>Repeatable workflow</h2>
+<ol>
+<li>Run <code>bun run finch:measure</code> after any asset change. Reconcile dimensions, reference area, chord, and wheel datums with <code>src/finch-design.ts</code>.</li>
+<li>Revise the conceptual loading budget and propulsion assumptions, keeping units and provenance explicit.</li>
+<li>Run <code>bun run finch:verify</code> for force relationships, bank/wind invariance, stall, power limits, asset consistency, takeoff, landing, glide and damage.</li>
+<li>Run <code>bun test --timeout 30000</code> and <code>bun run build</code>; distinguish pre-existing scenery failures from flight regressions.</li>
+<li>Fly the browser aircraft with real controls. Check assist persistence, takeoff, turns, recovery, approach and replay before approving handling.</li>
+</ol>
+<h2>Verification record</h2>
+<p id="verification">Focused Finch checks: 22 passed; the expanded flight, control-surface and replay set returned 39 passed. Production build passed with the existing large-chunk warning. The broader suite returned 80 passed and one timeout in the existing runway/terrain test; this test also timed out before the changes, and an isolated rerun still timed out. The browser loaded Finch and displayed the new assist control. Persistence and keyboard flight verification remain incomplete after the browser session returned to a blank page. This is not a completed gameplay acceptance test.</p>
+<h2>Remaining accuracy work</h2>
+<ol>
+<li>Choose or substantiate airfoil sections and obtain Reynolds/configuration-specific polars. Validate wing incidence, twist/washout, and actual surface hinge geometry.</li>
+<li>Implement component force locations, CG-dependent moments, inertia, rotational damping, trim, and a declared stability model. Current rate controls are a simplification.</li>
+<li>Connect actual flap deflection and control-surface state to forces and moments; include propulsion spool/slipstream effects.</li>
+<li>Validate cruise trim, climb, glide ratio, turns, stall recovery, multiple loading cases and landing distances against a mission design sheet.</li>
+</ol>
+<p>Peregrine, Aurelia, and Stormbird retain their legacy acceleration profiles. They now share the body-frame angle-of-attack correction and assist switch, but have not received Finch's physical sizing model. The civilian jet's shared afterburner profile remains outstanding fleet work.</p>
+<small>Local, uncommitted implementation in pocket-flight-site. No deployment or engineering certification is implied.</small>
+</main>
+</html>

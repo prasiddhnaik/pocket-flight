@@ -14,7 +14,7 @@ test("Aurelia starts with all six tires clear of both runways", () => {
     const p = jet();
     p.reset(false, short);
     expect(p.position.y).toBeCloseTo(
-      gearContactHeight(p.position, p.quaternion, 0, aureliaWheels),
+      gearContactHeight(p.position, p.quaternion, aureliaWheels),
       6,
     );
     for (const wheel of aureliaWheels) {

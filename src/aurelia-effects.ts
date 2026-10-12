@@ -72,9 +72,9 @@ export class AureliaEffects {
   reset() {
     Object.assign(this.motion, new JetMotion(), { fanPhase: 0 });
   }
-  setSuspension(value: number) {
-    const gear = this.root.getObjectByName("LandingGear");
-    if (gear) gear.position.y = value;
+  setSuspension(_value: number) {
+    // No separate lower oleo carriers in this rig: translating LandingGear
+    // separates its hinges and door mounts from the fuselage.
   }
   update(dt: number, input: JetInput) {
     this.motion.update(dt, { ...input, burner: false });

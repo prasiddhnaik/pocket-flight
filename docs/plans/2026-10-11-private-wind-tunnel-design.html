@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Private aerodynamic test lab — Design</title>
+<style>body{font:16px/1.6 system-ui;color:#263139;background:#fafaf7;margin:0}main{max-width:940px;margin:auto;padding:32px 24px}h1{font-size:30px;line-height:1.2}h2{font-size:21px;margin-top:28px}table{width:100%;border-collapse:collapse}td,th{text-align:left;vertical-align:top;padding:10px;border-bottom:1px solid #d9dfde}th{background:#edf1ee}code{background:#edf1ee;padding:2px 4px}a{color:#205d77}.note{border-left:4px solid #416d76;background:#edf3f3;padding:14px}.meta{color:#657077}.scroll{overflow:auto}li{margin:7px 0}</style>
+<main>
+<p class="meta">11 October 2026 · Design for review · Pocket Flight aircraft research</p>
+<h1>Private aerodynamic test lab</h1>
+<p class="note"><strong>Purpose:</strong> test the aircraft's aerodynamics so we can improve its geometry and flight data. This is a local research tool for the user and Codex. It is separate from the player-facing game.</p>
+<h2>Agreed scope</h2>
+<p>The supported fleet is Finch, Peregrine, Aurelia and Stormbird. The user expanded the scope during implementation. The user selected geometry-based wing analysis. We will load each aircraft’s actual exported geometry, build a numerical lifting-surface representation, run controlled experiments, and display results in a modeled enclosed wind tunnel. The chamber makes the experiment inspectable; the solver and its validation produce the evidence.</p>
+<h2>Analysis approach</h2>
+<p>Start with a steady, incompressible vortex-lattice wing model. It predicts attached-flow lift distribution and induced drag from wing planform, incidence and the stated camber treatment. This provides a meaningful step beyond reproducing the game's existing coefficient estimates. <a href="https://web.mit.edu/drela/Public/web/avl/">MIT's AVL documentation</a> provides a reference for lifting-surface analysis; <a href="https://software.nasa.gov/software/LAR-18774-1">NASA's modified vortex-lattice model</a> explains why viscous section data is needed for nonlinear lift and stall.</p>
+<p>A browser coefficient bench would be faster to build but would only test our current assumptions. Full viscous CFD would address more aircraft and tunnel effects, but requires a suitable volume mesh, boundary conditions, solver convergence, and more substantial validation. Geometry-based wing analysis is the selected first stage.</p>
+<div class="scroll"><table><thead><tr><th>First version calculates</th><th>First version does not establish</th></tr></thead><tbody>
+<tr><td>Wing lift coefficient and force in newtons</td><td>Measured real-aircraft performance</td></tr>
+<tr><td>Spanwise circulation and lift distribution</td><td>Boundary-layer transition or separation</td></tr>
+<tr><td>Induced drag coefficient and force</td><td>Fuselage, gear, or skin-friction drag</td></tr>
+<tr><td>Wing-induced velocity field and downwash</td><td>A whole-aircraft viscous flow field</td></tr>
+<tr><td>Repeatable angle-of-attack sweeps and density/speed scaling</td><td>Stall onset, post-stall recovery, or tunnel-wall corrections</td></tr>
+</tbody></table></div>
+<p>Use a conservative small-angle operating range initially. Results outside the declared range must show an unsupported-condition state. The custom wing's camber assumptions and geometric extraction conventions accompany each result. No stall prediction will be invented from a linear solver.</p>
+<h2>Private interface and experiments</h2>
+<ul>
+<li>A separate local entry point launched with Bun, with its own Vite configuration and build output. No game navigation link or player feature is added.</li>
+<li>Orbitable 3D chamber, selectable full-size aircraft models, adjustable pitch rig, and a clearly identified wing-analysis overlay.</li>
+<li>Controls for airspeed, angle of attack, and atmosphere/density. The aircraft's pose and the numerical input use the same angle state.</li>
+<li>Readouts for dynamic pressure, wing lift, induced drag, CL, CDi, lift distribution, and solver status. Units are always visible.</li>
+<li>Automatic angle sweeps, convergence checks, and CSV/JSON export containing geometry revision, model assumptions, conditions, and results.</li>
+<li>Flow lines derived from the computed wing velocity field. Decorative fan motion is distinct from calculated aerodynamic evidence.</li>
+</ul>
+<h2>3D environment</h2>
+<p>Model an industrial test chamber with a contraction inlet, flow-straightener grid, observation windows, instrumented support rig, service rails, structural ribs, and a downstream fan/diffuser. Cool neutral metal, warm task lighting, and restrained cyan measurement accents make the aircraft and flow readable. This palette gives the room a technical identity while keeping force overlays legible.</p>
+<p>Save an editable Blender source and a compact GLB environment. Use a cutaway or transparent observation wall for the default camera. The decorative chamber dimensions must fit all four aircraft and their test angles. The initial numerical boundary is freestream; enclosure wall effects remain explicitly excluded.</p>
+<h2>Module boundaries</h2>
+<div class="scroll"><table><thead><tr><th>Module</th><th>Responsibility</th></tr></thead><tbody>
+<tr><td>Geometry extraction</td><td>Read the actual GLB, measure wing sections, and produce a traceable analysis surface. Reuse the existing Finch measurement workflow where appropriate.</td></tr>
+<tr><td>Wing solver</td><td>Panel construction, vortex influence matrix, circulation solution, force integration, induced drag, and numerical diagnostics.</td></tr>
+<tr><td>Experiment runner</td><td>Single-condition analysis, parameter sweeps, convergence comparisons, and exports.</td></tr>
+<tr><td>3D lab</td><td>Environment, aircraft rig, camera, solver-derived flow visualization, and numerical overlays.</td></tr>
+<tr><td>Private controls</td><td>Conditions, run controls, results, validity indicators, and file export.</td></tr>
+</tbody></table></div>
+<p>The lab reads shared aircraft assets but remains independent of flight missions, game state, replay, and player progression. Unsupported or ill-conditioned geometry must produce a useful error, not plausible-looking fabricated measurements.</p>
+<h2>Acceptance evidence</h2>
+<ol>
+<li>Geometry extraction matches runtime span, area, chord and coordinate conventions. The analysis surface is visible over the loaded wing for inspection.</li>
+<li>A symmetric flat wing gives approximately zero lift at zero incidence and a symmetric lift distribution. Positive and negative incidence produce the correct force signs.</li>
+<li>A benchmark wing agrees with accepted attached-flow theory within a documented tolerance; increasing panel resolution shows convergence. Check the linear-system residual.</li>
+<li>Force scales with density and speed squared; dimensionless coefficients remain consistent at identical nondimensional conditions.</li>
+<li>Induced drag is nonnegative and is checked against the ideal finite-wing relationship, using the declared conventions.</li>
+<li>The visual flow uses the computed vortex field. Solver-invalid cases are visibly flagged. The screen does not label induced drag as total drag.</li>
+<li>The browser loads without WebGL/runtime errors, controls change the visible experiment, sweep/export work, and the room remains usable at desktop and narrower widths.</li>
+<li>The Blender source, exported GLB, test evidence, and an HTML verification report are preserved locally.</li>
+</ol>
+<h2>Later work</h2>
+<p>Add tail and other lifting surfaces, control deflections, validated airfoil polars, viscous drag estimates, stability derivatives and whole-aircraft moments. Introduce tunnel-wall corrections or CFD only with appropriate boundary conditions and validation. Feed accepted results into aircraft design data through an explicit reviewed change, rather than silently retuning the game.</p>
+</main></html>

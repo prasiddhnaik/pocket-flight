@@ -1,0 +1,392 @@
+{
+  "results": [
+    {
+      "id": "finch",
+      "before": {
+        "mode": "playing",
+        "aircraft": "finch",
+        "position": [
+          -259.9992589414677,
+          80.89470010782847,
+          827.1631974522084
+        ],
+        "velocity": [
+          0.014858575309276293,
+          -1.4272095567796494,
+          -34.06996910071916
+        ],
+        "speed": 34.59790423485613,
+        "grounded": false,
+        "crashed": false,
+        "health": 100,
+        "ring": 0,
+        "mission": "free",
+        "throttle": 0.46,
+        "pitch": -0.01237043453326656,
+        "roll": 0,
+        "fps": 35,
+        "drawCalls": 243,
+        "triangles": 856960,
+        "enginePower": 0.46,
+        "beginnerAssist": true,
+        "aerodynamics": {
+          "alpha": 0.026939155009965552,
+          "beta": -0.019102737593347168,
+          "density": 1.2155119430697034,
+          "dynamicPressure": 727.4930005584145,
+          "liftNewtons": 4393.762389721335,
+          "dragNewtons": 464.4527684933272,
+          "massKg": 860,
+          "stalled": false
+        }
+      },
+      "bank": {
+        "mode": "playing",
+        "aircraft": "finch",
+        "position": [
+          -259.93825329855275,
+          80.02417637932399,
+          812.8766880592764
+        ],
+        "velocity": [
+          0.4174273124863661,
+          -2.4516720419446267,
+          -34.5176697303258
+        ],
+        "speed": 35.14251163607622,
+        "grounded": false,
+        "crashed": false,
+        "health": 100,
+        "ring": 0,
+        "mission": "free",
+        "throttle": 0.6266666666666674,
+        "pitch": 0.009039386534988363,
+        "roll": -0.2608004376120789,
+        "fps": 47,
+        "drawCalls": 232,
+        "triangles": 833854,
+        "enginePower": 0.5414995671585713,
+        "beginnerAssist": true,
+        "aerodynamics": {
+          "alpha": 0.0813570520007309,
+          "beta": 0.005644241685923899,
+          "density": 1.2156117195510021,
+          "dynamicPressure": 750.6378810229991,
+          "liftNewtons": 7828.241180465928,
+          "dragNewtons": 656.887756675217,
+          "massKg": 860,
+          "stalled": false
+        }
+      },
+      "recovered": {
+        "mode": "playing",
+        "aircraft": "finch",
+        "position": [
+          -254.22001457847657,
+          76.63972693444035,
+          744.5653240573396
+        ],
+        "velocity": [
+          4.705803923276228,
+          -1.2950403254294343,
+          -36.5618616118295
+        ],
+        "speed": 37.476774508192854,
+        "grounded": false,
+        "crashed": false,
+        "health": 100,
+        "ring": 0,
+        "mission": "free",
+        "throttle": 0.6266666666666674,
+        "pitch": 0.03021483862265442,
+        "roll": -0.07998449289259739,
+        "fps": 57,
+        "drawCalls": 242,
+        "triangles": 830590,
+        "enginePower": 0.6265627034501852,
+        "beginnerAssist": true,
+        "aerodynamics": {
+          "alpha": 0.06525248848249034,
+          "beta": -0.014478852138907048,
+          "density": 1.2160097104324108,
+          "dynamicPressure": 853.9480647361128,
+          "liftNewtons": 7795.529345071479,
+          "dragNewtons": 676.4983159782091,
+          "massKg": 860,
+          "stalled": false
+        }
+      }
+    },
+    {
+      "id": "peregrine",
+      "before": {
+        "mode": "playing",
+        "aircraft": "peregrine",
+        "position": [
+          -259.9967293992799,
+          80.93508964815263,
+          826.7950130462183
+        ],
+        "velocity": [
+          0.07756949986943226,
+          -0.9575912428933264,
+          -48.11951369314253
+        ],
+        "speed": 48.610799622796165,
+        "grounded": false,
+        "crashed": false,
+        "health": 100,
+        "ring": 0,
+        "mission": "free",
+        "throttle": 0.46,
+        "pitch": -0.014078081177285085,
+        "roll": 0,
+        "fps": 40,
+        "drawCalls": 266,
+        "triangles": 937025,
+        "enginePower": 0.46,
+        "beginnerAssist": true,
+        "aerodynamics": null
+      },
+      "bank": {
+        "mode": "playing",
+        "aircraft": "peregrine",
+        "position": [
+          -259.90877662251347,
+          80.6963162815184,
+          813.085153246962
+        ],
+        "velocity": [
+          0.6107362168564969,
+          -0.7291253363033002,
+          -48.629471112959656
+        ],
+        "speed": 49.144062450948574,
+        "grounded": false,
+        "crashed": false,
+        "health": 100,
+        "ring": 0,
+        "mission": "free",
+        "throttle": 0.5733333333333337,
+        "pitch": -0.005585362579418499,
+        "roll": -0.25449973643857865,
+        "fps": 49,
+        "drawCalls": 267,
+        "triangles": 925938,
+        "enginePower": 0.48086575417370037,
+        "beginnerAssist": true,
+        "aerodynamics": null
+      },
+      "recovered": {
+        "mode": "playing",
+        "aircraft": "peregrine",
+        "position": [
+          -251.25592713895378,
+          82.35469047032882,
+          699.2284976159647
+        ],
+        "velocity": [
+          6.0940262151132405,
+          0.5748784652606909,
+          -52.45508063517409
+        ],
+        "speed": 53.41138388605602,
+        "grounded": false,
+        "crashed": false,
+        "health": 100,
+        "ring": 0,
+        "mission": "free",
+        "throttle": 0.5733333333333337,
+        "pitch": -0.0020368791713750115,
+        "roll": -0.07896990184117417,
+        "fps": 60,
+        "drawCalls": 263,
+        "triangles": 918939,
+        "enginePower": 0.5693709009000975,
+        "beginnerAssist": true,
+        "aerodynamics": null
+      }
+    },
+    {
+      "id": "aurelia",
+      "before": {
+        "mode": "playing",
+        "aircraft": "aurelia",
+        "position": [
+          -259.9967293992799,
+          80.93508964815263,
+          826.7950130462183
+        ],
+        "velocity": [
+          0.07756949986943226,
+          -0.9575912428933264,
+          -48.11951369314253
+        ],
+        "speed": 48.610799622796165,
+        "grounded": false,
+        "crashed": false,
+        "health": 100,
+        "ring": 0,
+        "mission": "free",
+        "throttle": 0.46,
+        "pitch": -0.014078081177285085,
+        "roll": 0,
+        "fps": 52,
+        "drawCalls": 353,
+        "triangles": 921962,
+        "enginePower": 0.46,
+        "beginnerAssist": true,
+        "aerodynamics": null
+      },
+      "bank": {
+        "mode": "playing",
+        "aircraft": "aurelia",
+        "position": [
+          -259.733404799539,
+          80.55639826590367,
+          800.0483505047268
+        ],
+        "velocity": [
+          1.0264461956572877,
+          -0.3515954111101661,
+          -49.12894283355513
+        ],
+        "speed": 49.6663470663059,
+        "grounded": false,
+        "crashed": false,
+        "health": 100,
+        "ring": 0,
+        "mission": "free",
+        "throttle": 0.680000000000001,
+        "pitch": 0.00718774698406474,
+        "roll": -0.2784881298875759,
+        "fps": 45,
+        "drawCalls": 653,
+        "triangles": 1816884,
+        "enginePower": 0.5164446170961211,
+        "beginnerAssist": true,
+        "aerodynamics": null
+      },
+      "recovered": {
+        "mode": "playing",
+        "aircraft": "aurelia",
+        "position": [
+          -241.93644143565766,
+          82.42795119589205,
+          628.3127298053836
+        ],
+        "velocity": [
+          8.501713355518186,
+          0.728539543071967,
+          -56.03990496367443
+        ],
+        "speed": 57.315985901927704,
+        "grounded": false,
+        "crashed": false,
+        "health": 100,
+        "ring": 0,
+        "mission": "free",
+        "throttle": 0.680000000000001,
+        "pitch": 0.028242119159250054,
+        "roll": -0.052113814814685584,
+        "fps": 32,
+        "drawCalls": 639,
+        "triangles": 1793410,
+        "enginePower": 0.6755011656359832,
+        "beginnerAssist": true,
+        "aerodynamics": null
+      }
+    },
+    {
+      "id": "stormbird",
+      "before": {
+        "mode": "playing",
+        "aircraft": "stormbird",
+        "position": [
+          -259.99326005814646,
+          80.90296642700437,
+          825.1770713537568
+        ],
+        "velocity": [
+          0.11331748496720036,
+          -0.9480473827382647,
+          -48.39241092921774
+        ],
+        "speed": 48.851528225398475,
+        "grounded": false,
+        "crashed": false,
+        "health": 100,
+        "ring": 0,
+        "mission": "free",
+        "throttle": 0.46,
+        "pitch": -0.013451658476843441,
+        "roll": 0,
+        "fps": 36,
+        "drawCalls": 226,
+        "triangles": 2330465,
+        "enginePower": 0.46,
+        "beginnerAssist": true,
+        "aerodynamics": null
+      },
+      "bank": {
+        "mode": "playing",
+        "aircraft": "stormbird",
+        "position": [
+          -259.89662688052334,
+          80.66388753636014,
+          811.2995758951686
+        ],
+        "velocity": [
+          0.6417752424480242,
+          -0.7387703032512161,
+          -49.50734728178691
+        ],
+        "speed": 49.98932141118585,
+        "grounded": false,
+        "crashed": false,
+        "health": 100,
+        "ring": 0,
+        "mission": "free",
+        "throttle": 0.5733333333333337,
+        "pitch": -0.004174951611219253,
+        "roll": -0.26647415048557405,
+        "fps": 46,
+        "drawCalls": 226,
+        "triangles": 2327577,
+        "enginePower": 0.4834194783377019,
+        "beginnerAssist": true,
+        "aerodynamics": null
+      },
+      "recovered": {
+        "mode": "playing",
+        "aircraft": "stormbird",
+        "position": [
+          -245.36664346601185,
+          82.33598769489413,
+          658.2681901003067
+        ],
+        "velocity": [
+          8.46135270562232,
+          -0.15414303321163192,
+          -60.127872614938454
+        ],
+        "speed": 61.29520225639021,
+        "grounded": false,
+        "crashed": false,
+        "health": 100,
+        "ring": 0,
+        "mission": "free",
+        "throttle": 0.5733333333333337,
+        "pitch": -0.0034420115122085317,
+        "roll": -0.07605826026747668,
+        "fps": 42,
+        "drawCalls": 223,
+        "triangles": 2320173,
+        "enginePower": 0.572286762745574,
+        "beginnerAssist": true,
+        "aerodynamics": null
+      }
+    }
+  ],
+  "errors": []
+}

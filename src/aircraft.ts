@@ -1,4 +1,5 @@
 import * as T from "three";
+import { refineAircraftMaterials as prepareAircraftMaterials } from "./aircraft-materials";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { AureliaEffects } from "./aurelia-effects";
 import { JetEffects } from "./jet-effects";
@@ -16,37 +17,7 @@ export const paints = [
   { name: "Midnight", color: "#526980", dark: "#2a3b50" },
 ];
 export const AIRCRAFT_URL = "/assets/finch-u2.glb";
-export function prepareAircraftMaterials(root: T.Object3D) {
-  root.traverse((object) => {
-    if (!(object instanceof T.Mesh)) return;
-    object.castShadow = true;
-    object.receiveShadow = true;
-    const materials = Array.isArray(object.material)
-      ? object.material
-      : [object.material];
-    for (const material of materials) {
-      if (!(material instanceof T.MeshStandardMaterial)) continue;
-      material.envMapIntensity = 0.8;
-      if (material.name.startsWith("Glass")) {
-        material.transparent = true;
-        material.opacity = 0.34;
-        material.depthWrite = false;
-        material.color.set("#88b3bd");
-        material.envMapIntensity = 1.1;
-        material.side = T.DoubleSide;
-        object.castShadow = false;
-        object.renderOrder = 3;
-        if (material instanceof T.MeshPhysicalMaterial) {
-          // Alpha glazing gives consistent visibility of the modeled cockpit on mobile too.
-          material.transmission = 0;
-          material.roughness = 0.09;
-          material.metalness = 0.18;
-          material.clearcoat = 0.9;
-        }
-      }
-    }
-  });
-}
+export { refineAircraftMaterials as prepareAircraftMaterials } from "./aircraft-materials";
 export function disposeAircraft(root: T.Object3D, disposeTextures = true) {
   const materials = new Set<T.Material>();
   const textures = new Set<T.Texture>();
@@ -94,12 +65,15 @@ export function makeAircraft(paintIndex = 0, id: AircraftId = "finch") {
       selectedPaint = index;
       livery.forEach((material) => material.color.set(paints[index].color));
     },
+    bodyCompression(meters: number) {
+      // Finch has authored telescoping carriers. Stormbird contact already
+      // includes its oleo stroke; the other jets have rigid exported legs.
+      return id === "finch" ? T.MathUtils.clamp(meters, 0, 0.16) : 0;
+    },
     setSuspension(meters: number) {
       const travel = T.MathUtils.clamp(meters, 0, 0.16);
       if (model.effects) {
-        model.effects.setSuspension(
-          travel / (id === "aurelia" ? 0.55 : id === "stormbird" ? 1 : JET_SCALE),
-        );
+        model.effects.setSuspension(id === "stormbird" ? travel : 0);
         return;
       }
       for (const name of [
@@ -126,10 +100,10 @@ export function makeAircraft(paintIndex = 0, id: AircraftId = "finch") {
       id === "stormbird"
         ? "/assets/stormbird-hx40.gltf"
         : id === "aurelia"
-        ? "/assets/aurelia-flight.glb"
-        : id === "peregrine"
-          ? "/assets/peregrine-hx27.glb"
-          : AIRCRAFT_URL,
+          ? "/assets/aurelia-flight.glb"
+          : id === "peregrine"
+            ? "/assets/peregrine-hx27.glb"
+            : AIRCRAFT_URL,
     )
     .then((gltf) => {
       if (disposed) {
@@ -147,22 +121,6 @@ export function makeAircraft(paintIndex = 0, id: AircraftId = "finch") {
       model.gear = part("LandingGear");
       if (id === "stormbird") {
         gltf.scene.position.y = -STORMBIRD_CENTER;
-        gltf.scene.traverse((node) => {
-          if (!(node instanceof T.Mesh)) return;
-          for (const material of Array.isArray(node.material) ? node.material : [node.material]) {
-            if (!(material instanceof T.MeshStandardMaterial)) continue;
-            material.envMapIntensity = 0.35;
-            if (material.name === "Stormbird alloy 0") {
-              material.metalness = 0.12;
-              material.roughness = 0.6;
-            }
-            if (material.name.startsWith("Glass")) {
-              material.opacity = 0.30;
-              material.color.set("#8ca9b2");
-              material.side = T.FrontSide;
-            }
-          }
-        });
         model.effects = new JetEffects(gltf.scene, stormbirdLayout);
         return;
       }

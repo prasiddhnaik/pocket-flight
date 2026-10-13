@@ -29,7 +29,7 @@ export function valueAngle(s: Scale, value: number) {
 }
 
 export function ticks(min: number, max: number, step: number) {
-  const count = Math.round((max - min) / step);
+  const count = Math.floor((max - min) / step + 1e-9);
   return Array.from({ length: count + 1 }, (_, i) => Math.round((min + i * step) * 1000) / 1000);
 }
 

@@ -24,6 +24,20 @@ describe("hud geometry", () => {
     expect(ticks(-2000, 2000, 1000)).toEqual([-2000, -1000, 0, 1000, 2000]);
     expect(ticks(0, 1, 0.25)).toEqual([0, 0.25, 0.5, 0.75, 1]);
   });
+  test("ticks stop at the last on-grid value for non-divisible ranges", () => {
+    expect(ticks(0, 180, 40)).toEqual([0, 40, 80, 120, 160]);
+    expect(ticks(0, 450, 100)).toEqual([0, 100, 200, 300, 400]);
+  });
+  test("every aircraft's major and minor airspeed ticks stay within its maximum", () => {
+    for (const id of ["finch", "peregrine", "aurelia", "stormbird"] as const) {
+      const s = airspeedScale(id);
+      for (const step of [s.majorStep, s.minorStep]) {
+        for (const tick of ticks(0, s.max, step)) {
+          expect(tick).toBeLessThanOrEqual(s.max);
+        }
+      }
+    }
+  });
   test("unwrapHeading takes the short way through north", () => {
     expect(unwrapHeading(359, 1)).toBe(361);
     expect(unwrapHeading(1, 359)).toBe(-1);

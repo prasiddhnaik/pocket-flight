@@ -44,7 +44,7 @@ h1,h2,h3{line-height:1.25}h2{margin-top:34px}table{border-collapse:collapse;widt
 <h2>4. Simulation clock</h2>
 <h3>Stepped mode — default</h3>
 <p>The aircraft advances only when an agent requests a step. A request applies precise commands or the active pilot maneuver for a bounded amount of simulation time. Physics uses its existing 120 Hz substeps inside the common 60 Hz game update. Mission logic, events, replay, control surfaces and simulated aircraft animations advance through that same update.</p>
-<p>Each request is rounded to whole physics ticks, is limited to five simulated seconds, and returns the actual time advanced. Work is chunked so cancellation and human takeover can interrupt it. Rendering and UI remain responsive between steps. A crash or completed flight can end a request early.</p>
+<p>Each request is rounded to whole 60 Hz game-update ticks, is limited to five simulated seconds, and returns the actual time advanced. Each game-update tick includes the existing 120 Hz physics substeps. Work is chunked so cancellation and human takeover can interrupt it. Rendering and UI remain responsive between steps. A crash or completed flight can end a request early.</p>
 <h3>Live mode — optional</h3>
 <p>The same command source or pilot controller advances with the normal game clock. Precise command holds have an explicit duration; when their duration ends, live flight pauses and reports expiration. A maneuver has a simulation-time deadline and explicit running, completed, failed or cancelled status. Normal page visibility and pause behavior still apply.</p>
 <p>Switching clocks resets render accumulator timing so elapsed wall time cannot become an unexpected physics jump. Agent thinking time has no effect on stepped flight time.</p>

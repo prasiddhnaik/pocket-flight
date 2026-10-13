@@ -16,3 +16,5 @@ assets/finch/**/*.blend1
 # Local browser installation and launch configuration.
 .playwright/
 __pycache__/
+
+.superpowers/

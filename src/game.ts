@@ -6,6 +6,7 @@ import { initialJetInput } from "./jet-effects";
 import type { JetMotion } from "./jet-effects";
 import { makeAircraft, disposeAircraft } from "./aircraft";
 import { FlightPhysics } from "./physics";
+import { instrumentData, type InstrumentData } from "./hud/instrument-data";
 import type { Controls } from "./physics";
 import type { ContactPart } from "./airframe-contact";
 import { ISLAND_FLIGHT_MODEL } from "./flight-envelope";
@@ -58,6 +59,7 @@ export type Snapshot = {
   replayTrimmed: boolean;
   exportSupported: boolean;
   replayExport: ExportState;
+  instruments: InstrumentData;
 };
 export type ReplayFrame = {
   gearPosition?: number;
@@ -1399,6 +1401,7 @@ export class PocketFlight {
       replayTrimmed: this.replay.trimmed,
       exportSupported: this.replayVideo.supported,
       replayExport: this.replayVideo.state,
+      instruments: instrumentData(p, this.aircraft.propellerMotion.snapshot().rpm),
     });
   }
   get canReplay() {

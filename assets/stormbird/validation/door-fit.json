@@ -1,0 +1,307 @@
+{
+  "document_hash": "5c0c4a0fb9ec718307b115746871987b289d2f74470e67d8cd43251cec873b97",
+  "units": "mm",
+  "threshold_mm3": 0.1,
+  "poses": [
+    {
+      "part": "Nose_door_Left_skin",
+      "open_fraction": 0,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Nose_door_Left_skin",
+      "open_fraction": 0.25,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Nose_door_Left_skin",
+      "open_fraction": 0.5,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Nose_door_Left_skin",
+      "open_fraction": 0.75,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Nose_door_Left_skin",
+      "open_fraction": 1,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Nose_door_Left_rib",
+      "open_fraction": 0,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Nose_door_Left_rib",
+      "open_fraction": 0.25,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Nose_door_Left_rib",
+      "open_fraction": 0.5,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Nose_door_Left_rib",
+      "open_fraction": 0.75,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Nose_door_Left_rib",
+      "open_fraction": 1,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Nose_door_Right_skin",
+      "open_fraction": 0,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Nose_door_Right_skin",
+      "open_fraction": 0.25,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Nose_door_Right_skin",
+      "open_fraction": 0.5,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Nose_door_Right_skin",
+      "open_fraction": 0.75,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Nose_door_Right_skin",
+      "open_fraction": 1,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Nose_door_Right_rib",
+      "open_fraction": 0,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Nose_door_Right_rib",
+      "open_fraction": 0.25,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Nose_door_Right_rib",
+      "open_fraction": 0.5,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Nose_door_Right_rib",
+      "open_fraction": 0.75,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Nose_door_Right_rib",
+      "open_fraction": 1,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Main_door_Left_Left_skin",
+      "open_fraction": 0,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Main_door_Left_Left_skin",
+      "open_fraction": 0.25,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Main_door_Left_Left_skin",
+      "open_fraction": 0.5,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Main_door_Left_Left_skin",
+      "open_fraction": 0.75,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Main_door_Left_Left_skin",
+      "open_fraction": 1,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Main_door_Left_Left_rib",
+      "open_fraction": 0,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Main_door_Left_Left_rib",
+      "open_fraction": 0.25,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Main_door_Left_Left_rib",
+      "open_fraction": 0.5,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Main_door_Left_Left_rib",
+      "open_fraction": 0.75,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Main_door_Left_Left_rib",
+      "open_fraction": 1,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Main_door_Left_Right_skin",
+      "open_fraction": 0,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Main_door_Left_Right_skin",
+      "open_fraction": 0.25,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Main_door_Left_Right_skin",
+      "open_fraction": 0.5,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Main_door_Left_Right_skin",
+      "open_fraction": 0.75,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Main_door_Left_Right_skin",
+      "open_fraction": 1,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Main_door_Left_Right_rib",
+      "open_fraction": 0,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Main_door_Left_Right_rib",
+      "open_fraction": 0.25,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Main_door_Left_Right_rib",
+      "open_fraction": 0.5,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Main_door_Left_Right_rib",
+      "open_fraction": 0.75,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Main_door_Left_Right_rib",
+      "open_fraction": 1,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Main_door_Right_Left_skin",
+      "open_fraction": 0,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Main_door_Right_Left_skin",
+      "open_fraction": 0.25,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Main_door_Right_Left_skin",
+      "open_fraction": 0.5,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Main_door_Right_Left_skin",
+      "open_fraction": 0.75,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Main_door_Right_Left_skin",
+      "open_fraction": 1,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Main_door_Right_Left_rib",
+      "open_fraction": 0,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Main_door_Right_Left_rib",
+      "open_fraction": 0.25,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Main_door_Right_Left_rib",
+      "open_fraction": 0.5,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Main_door_Right_Left_rib",
+      "open_fraction": 0.75,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Main_door_Right_Left_rib",
+      "open_fraction": 1,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Main_door_Right_Right_skin",
+      "open_fraction": 0,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Main_door_Right_Right_skin",
+      "open_fraction": 0.25,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Main_door_Right_Right_skin",
+      "open_fraction": 0.5,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Main_door_Right_Right_skin",
+      "open_fraction": 0.75,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Main_door_Right_Right_skin",
+      "open_fraction": 1,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Main_door_Right_Right_rib",
+      "open_fraction": 0,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Main_door_Right_Right_rib",
+      "open_fraction": 0.25,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Main_door_Right_Right_rib",
+      "open_fraction": 0.5,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Main_door_Right_Right_rib",
+      "open_fraction": 0.75,
+      "airframe_overlap_mm3": 0
+    },
+    {
+      "part": "Main_door_Right_Right_rib",
+      "open_fraction": 1,
+      "airframe_overlap_mm3": 0
+    }
+  ]
+}

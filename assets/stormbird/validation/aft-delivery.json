@@ -1,0 +1,32 @@
+{
+  "revision": "2026-10-01 rear airframe correction",
+  "document_hash": "4ee04de106ff6b99b3de64d34e4ba9d69da0e726084877b9165aa37cb1977315",
+  "hashes": {
+    "assets/stormbird/STEP/Stormbird-HX40.step": "4ee04de106ff6b99b3de64d34e4ba9d69da0e726084877b9165aa37cb1977315",
+    "public/assets/stormbird-hx40.glb": "eb8818597d9dcc4dc835cf189b771f595a1a195954c33616ecebc45e17eeac03",
+    "dist/assets/stormbird-hx40.glb": "eb8818597d9dcc4dc835cf189b771f595a1a195954c33616ecebc45e17eeac03",
+    "assets/stormbird/GLB/Stormbird-HX40-game.glb": "eb8818597d9dcc4dc835cf189b771f595a1a195954c33616ecebc45e17eeac03"
+  },
+  "solids": {
+    "count": 679,
+    "invalid": []
+  },
+  "surface_pairs": 46,
+  "overlap_threshold_mm3": 0.1,
+  "rear_visibility_samples": 360,
+  "unblocked_rear_samples": 0,
+  "fit_record": "aft-airframe-fit.json",
+  "export_audit": "export-audit.json",
+  "reviewed_snapshots": [
+    "../renders/aft-rear-corrected.png",
+    "../renders/aft-quarter-corrected.png",
+    "../renders/aft-front-corrected.png",
+    "../renders/aft-game-rear-corrected.png"
+  ],
+  "production_build": "TypeScript/Vite passed; existing bundle-size warning",
+  "prior_evidence": "Earlier gear, door, seat and intake records retain original document hashes; no new runtime mechanism checks.",
+  "flight_tests_run": false,
+  "runtime_aircraft_tests_run": false,
+  "aerodynamic_or_structural_validation": false,
+  "airworthiness_established": false
+}

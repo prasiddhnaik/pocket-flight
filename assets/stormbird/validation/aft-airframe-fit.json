@@ -1,0 +1,614 @@
+{
+  "document_hash": "4ee04de106ff6b99b3de64d34e4ba9d69da0e726084877b9165aa37cb1977315",
+  "units": "mm",
+  "threshold_mm3": 0.1,
+  "pairs": [
+    {
+      "parts": [
+        "Wing_skin_Left",
+        "Flap_Left"
+      ],
+      "overlap_mm3": 0
+    },
+    {
+      "parts": [
+        "Wing_skin_Left",
+        "Aileron_Left"
+      ],
+      "overlap_mm3": 0
+    },
+    {
+      "parts": [
+        "Wing_skin_Left",
+        "Wingtip_identification_Left"
+      ],
+      "overlap_mm3": 0
+    },
+    {
+      "parts": [
+        "Wing_skin_Left",
+        "Elevator_Left"
+      ],
+      "overlap_mm3": 0
+    },
+    {
+      "parts": [
+        "Wing_skin_Left",
+        "Tailplane_Left"
+      ],
+      "overlap_mm3": 0
+    },
+    {
+      "parts": [
+        "Tailplane_Left",
+        "Elevator_Left"
+      ],
+      "overlap_mm3": 0
+    },
+    {
+      "parts": [
+        "Fin_Left",
+        "Rudder_Left"
+      ],
+      "overlap_mm3": 0
+    },
+    {
+      "parts": [
+        "Flap_Left",
+        "Fuselage"
+      ],
+      "overlap_mm3": 0
+    },
+    {
+      "parts": [
+        "Aileron_Left",
+        "Fuselage"
+      ],
+      "overlap_mm3": 0
+    },
+    {
+      "parts": [
+        "Elevator_Left",
+        "Fuselage"
+      ],
+      "overlap_mm3": 0
+    },
+    {
+      "parts": [
+        "Rudder_Left",
+        "Fuselage"
+      ],
+      "overlap_mm3": 0
+    },
+    {
+      "parts": [
+        "Tailplane_Left",
+        "Engine_core_case_Left"
+      ],
+      "overlap_mm3": 0
+    },
+    {
+      "parts": [
+        "Tailplane_Left",
+        "Exhaust_liner_Left"
+      ],
+      "overlap_mm3": 0
+    },
+    {
+      "parts": [
+        "Tailplane_Left",
+        "Turbine_case_Left"
+      ],
+      "overlap_mm3": 0
+    },
+    {
+      "parts": [
+        "Elevator_Left",
+        "Engine_core_case_Left"
+      ],
+      "overlap_mm3": 0
+    },
+    {
+      "parts": [
+        "Elevator_Left",
+        "Exhaust_liner_Left"
+      ],
+      "overlap_mm3": 0
+    },
+    {
+      "parts": [
+        "Elevator_Left",
+        "Turbine_case_Left"
+      ],
+      "overlap_mm3": 0
+    },
+    {
+      "parts": [
+        "Fin_Left",
+        "Engine_core_case_Left"
+      ],
+      "overlap_mm3": 0
+    },
+    {
+      "parts": [
+        "Fin_Left",
+        "Exhaust_liner_Left"
+      ],
+      "overlap_mm3": 0
+    },
+    {
+      "parts": [
+        "Fin_Left",
+        "Turbine_case_Left"
+      ],
+      "overlap_mm3": 0
+    },
+    {
+      "parts": [
+        "Rudder_Left",
+        "Engine_core_case_Left"
+      ],
+      "overlap_mm3": 0
+    },
+    {
+      "parts": [
+        "Rudder_Left",
+        "Exhaust_liner_Left"
+      ],
+      "overlap_mm3": 0
+    },
+    {
+      "parts": [
+        "Rudder_Left",
+        "Turbine_case_Left"
+      ],
+      "overlap_mm3": 0
+    },
+    {
+      "parts": [
+        "Wing_skin_Right",
+        "Flap_Right"
+      ],
+      "overlap_mm3": 0
+    },
+    {
+      "parts": [
+        "Wing_skin_Right",
+        "Aileron_Right"
+      ],
+      "overlap_mm3": 0
+    },
+    {
+      "parts": [
+        "Wing_skin_Right",
+        "Wingtip_identification_Right"
+      ],
+      "overlap_mm3": 0
+    },
+    {
+      "parts": [
+        "Wing_skin_Right",
+        "Elevator_Right"
+      ],
+      "overlap_mm3": 0
+    },
+    {
+      "parts": [
+        "Wing_skin_Right",
+        "Tailplane_Right"
+      ],
+      "overlap_mm3": 0
+    },
+    {
+      "parts": [
+        "Tailplane_Right",
+        "Elevator_Right"
+      ],
+      "overlap_mm3": 0
+    },
+    {
+      "parts": [
+        "Fin_Right",
+        "Rudder_Right"
+      ],
+      "overlap_mm3": 0
+    },
+    {
+      "parts": [
+        "Flap_Right",
+        "Fuselage"
+      ],
+      "overlap_mm3": 0
+    },
+    {
+      "parts": [
+        "Aileron_Right",
+        "Fuselage"
+      ],
+      "overlap_mm3": 0
+    },
+    {
+      "parts": [
+        "Elevator_Right",
+        "Fuselage"
+      ],
+      "overlap_mm3": 0
+    },
+    {
+      "parts": [
+        "Rudder_Right",
+        "Fuselage"
+      ],
+      "overlap_mm3": 0
+    },
+    {
+      "parts": [
+        "Tailplane_Right",
+        "Engine_core_case_Right"
+      ],
+      "overlap_mm3": 0
+    },
+    {
+      "parts": [
+        "Tailplane_Right",
+        "Exhaust_liner_Right"
+      ],
+      "overlap_mm3": 0
+    },
+    {
+      "parts": [
+        "Tailplane_Right",
+        "Turbine_case_Right"
+      ],
+      "overlap_mm3": 0
+    },
+    {
+      "parts": [
+        "Elevator_Right",
+        "Engine_core_case_Right"
+      ],
+      "overlap_mm3": 0
+    },
+    {
+      "parts": [
+        "Elevator_Right",
+        "Exhaust_liner_Right"
+      ],
+      "overlap_mm3": 0
+    },
+    {
+      "parts": [
+        "Elevator_Right",
+        "Turbine_case_Right"
+      ],
+      "overlap_mm3": 0
+    },
+    {
+      "parts": [
+        "Fin_Right",
+        "Engine_core_case_Right"
+      ],
+      "overlap_mm3": 0
+    },
+    {
+      "parts": [
+        "Fin_Right",
+        "Exhaust_liner_Right"
+      ],
+      "overlap_mm3": 0
+    },
+    {
+      "parts": [
+        "Fin_Right",
+        "Turbine_case_Right"
+      ],
+      "overlap_mm3": 0
+    },
+    {
+      "parts": [
+        "Rudder_Right",
+        "Engine_core_case_Right"
+      ],
+      "overlap_mm3": 0
+    },
+    {
+      "parts": [
+        "Rudder_Right",
+        "Exhaust_liner_Right"
+      ],
+      "overlap_mm3": 0
+    },
+    {
+      "parts": [
+        "Rudder_Right",
+        "Turbine_case_Right"
+      ],
+      "overlap_mm3": 0
+    }
+  ],
+  "engines": [
+    {
+      "name": "Left",
+      "blade_count": 48,
+      "blade_root_embed_mm3": 5834.14904052095,
+      "blade_neighbor_overlap_mm3": 0,
+      "blade_neighbor_gap_mm": 5.836474496001878,
+      "blade_case_gap_mm": 1.4567878020671008,
+      "tail_root_embed_mm3": 43709028.274424836,
+      "fin_root_embed_mm3": 58264456.80261059,
+      "spool_shaft_embed_mm3": 55379576.18917307,
+      "combustor_mounts": [
+        {
+          "name": "Combustor_dome_support_Left_0",
+          "inner_liner_embed_mm3": 6111.81958129661,
+          "spool_embed_mm3": 4795.197150155939
+        },
+        {
+          "name": "Combustor_dome_support_Left_1",
+          "inner_liner_embed_mm3": 6111.931539388612,
+          "spool_embed_mm3": 4797.937107320344
+        },
+        {
+          "name": "Combustor_dome_support_Left_2",
+          "inner_liner_embed_mm3": 6112.596900845326,
+          "spool_embed_mm3": 4811.384705435639
+        },
+        {
+          "name": "Combustor_dome_support_Left_3",
+          "inner_liner_embed_mm3": 6113.031061386253,
+          "spool_embed_mm3": 4821.943672035057
+        },
+        {
+          "name": "Combustor_dome_support_Left_4",
+          "inner_liner_embed_mm3": 6112.870932807182,
+          "spool_embed_mm3": 4819.1358531186725
+        },
+        {
+          "name": "Combustor_dome_support_Left_5",
+          "inner_liner_embed_mm3": 6112.397121431211,
+          "spool_embed_mm3": 4805.699210031178
+        },
+        {
+          "name": "Combustor_dome_support_Left_6",
+          "inner_liner_embed_mm3": 6111.9652293505505,
+          "spool_embed_mm3": 4794.9968202169375
+        },
+        {
+          "name": "Combustor_dome_support_Left_7",
+          "inner_liner_embed_mm3": 6112.080618428459,
+          "spool_embed_mm3": 4797.738872491533
+        },
+        {
+          "name": "Combustor_dome_support_Left_8",
+          "inner_liner_embed_mm3": 6112.576631559925,
+          "spool_embed_mm3": 4811.102213447761
+        },
+        {
+          "name": "Combustor_dome_support_Left_9",
+          "inner_liner_embed_mm3": 6113.051269704551,
+          "spool_embed_mm3": 4822.008655415935
+        },
+        {
+          "name": "Combustor_dome_support_Left_10",
+          "inner_liner_embed_mm3": 6112.8931302470155,
+          "spool_embed_mm3": 4819.193831491415
+        },
+        {
+          "name": "Combustor_dome_support_Left_11",
+          "inner_liner_embed_mm3": 6112.273208458241,
+          "spool_embed_mm3": 4805.89866079372
+        },
+        {
+          "name": "Combustor_outer_mount_Left_-3.2_0",
+          "outer_liner_embed_mm3": 1810.6782207908166,
+          "core_case_embed_mm3": 2497.548077890704
+        },
+        {
+          "name": "Combustor_outer_mount_Left_-3.2_1",
+          "outer_liner_embed_mm3": 1838.584625713368,
+          "core_case_embed_mm3": 2497.539840698702
+        },
+        {
+          "name": "Combustor_outer_mount_Left_-3.2_2",
+          "outer_liner_embed_mm3": 1852.3425122280826,
+          "core_case_embed_mm3": 2497.535969848244
+        },
+        {
+          "name": "Combustor_outer_mount_Left_-3.2_3",
+          "outer_liner_embed_mm3": 1810.6654050983161,
+          "core_case_embed_mm3": 2497.548087102562
+        },
+        {
+          "name": "Combustor_outer_mount_Left_-3.2_4",
+          "outer_liner_embed_mm3": 1838.5490139451213,
+          "core_case_embed_mm3": 2497.5402946379145
+        },
+        {
+          "name": "Combustor_outer_mount_Left_-3.2_5",
+          "outer_liner_embed_mm3": 1852.3437013295422,
+          "core_case_embed_mm3": 2497.535329554344
+        },
+        {
+          "name": "Combustor_outer_mount_Left_-4.5_0",
+          "outer_liner_embed_mm3": 1810.678220585019,
+          "core_case_embed_mm3": 2497.5480782962613
+        },
+        {
+          "name": "Combustor_outer_mount_Left_-4.5_1",
+          "outer_liner_embed_mm3": 1838.5846271165988,
+          "core_case_embed_mm3": 2497.5403089178394
+        },
+        {
+          "name": "Combustor_outer_mount_Left_-4.5_2",
+          "outer_liner_embed_mm3": 1852.34251234482,
+          "core_case_embed_mm3": 2497.5364968449876
+        },
+        {
+          "name": "Combustor_outer_mount_Left_-4.5_3",
+          "outer_liner_embed_mm3": 1810.6654035117026,
+          "core_case_embed_mm3": 2497.5480866879207
+        },
+        {
+          "name": "Combustor_outer_mount_Left_-4.5_4",
+          "outer_liner_embed_mm3": 1838.5490121950183,
+          "core_case_embed_mm3": 2497.540570338435
+        },
+        {
+          "name": "Combustor_outer_mount_Left_-4.5_5",
+          "outer_liner_embed_mm3": 1852.3437012639806,
+          "core_case_embed_mm3": 2497.5366125243554
+        }
+      ]
+    },
+    {
+      "name": "Right",
+      "blade_count": 48,
+      "blade_root_embed_mm3": 5834.14904052875,
+      "blade_neighbor_overlap_mm3": 0,
+      "blade_neighbor_gap_mm": 5.836474496001878,
+      "blade_case_gap_mm": 1.4567878020671008,
+      "tail_root_embed_mm3": 43738344.59803512,
+      "fin_root_embed_mm3": 58192160.032739565,
+      "spool_shaft_embed_mm3": 55379576.189183064,
+      "combustor_mounts": [
+        {
+          "name": "Combustor_dome_support_Right_0",
+          "inner_liner_embed_mm3": 6111.965590576603,
+          "spool_embed_mm3": 4795.005923020227
+        },
+        {
+          "name": "Combustor_dome_support_Right_1",
+          "inner_liner_embed_mm3": 6112.415555275413,
+          "spool_embed_mm3": 4805.726736323252
+        },
+        {
+          "name": "Combustor_dome_support_Right_2",
+          "inner_liner_embed_mm3": 6112.90818716252,
+          "spool_embed_mm3": 4819.081034467177
+        },
+        {
+          "name": "Combustor_dome_support_Right_3",
+          "inner_liner_embed_mm3": 6113.035031370908,
+          "spool_embed_mm3": 4821.919223814015
+        },
+        {
+          "name": "Combustor_dome_support_Right_4",
+          "inner_liner_embed_mm3": 6112.590316290405,
+          "spool_embed_mm3": 4811.355741478895
+        },
+        {
+          "name": "Combustor_dome_support_Right_5",
+          "inner_liner_embed_mm3": 6111.934601125482,
+          "spool_embed_mm3": 4797.922246142492
+        },
+        {
+          "name": "Combustor_dome_support_Right_6",
+          "inner_liner_embed_mm3": 6111.818160582049,
+          "spool_embed_mm3": 4795.204327687277
+        },
+        {
+          "name": "Combustor_dome_support_Right_7",
+          "inner_liner_embed_mm3": 6112.267962669777,
+          "spool_embed_mm3": 4805.908088677416
+        },
+        {
+          "name": "Combustor_dome_support_Right_8",
+          "inner_liner_embed_mm3": 6112.903197254796,
+          "spool_embed_mm3": 4819.2665535377655
+        },
+        {
+          "name": "Combustor_dome_support_Right_9",
+          "inner_liner_embed_mm3": 6113.0512702991755,
+          "spool_embed_mm3": 4822.003073350338
+        },
+        {
+          "name": "Combustor_dome_support_Right_10",
+          "inner_liner_embed_mm3": 6112.5640517819365,
+          "spool_embed_mm3": 4811.138002947484
+        },
+        {
+          "name": "Combustor_dome_support_Right_11",
+          "inner_liner_embed_mm3": 6112.083707934329,
+          "spool_embed_mm3": 4797.716788777343
+        },
+        {
+          "name": "Combustor_outer_mount_Right_-3.2_0",
+          "outer_liner_embed_mm3": 1810.6687071495521,
+          "core_case_embed_mm3": 2497.548083013346
+        },
+        {
+          "name": "Combustor_outer_mount_Right_-3.2_1",
+          "outer_liner_embed_mm3": 1852.325094723366,
+          "core_case_embed_mm3": 2497.53591746854
+        },
+        {
+          "name": "Combustor_outer_mount_Right_-3.2_2",
+          "outer_liner_embed_mm3": 1838.5923580298584,
+          "core_case_embed_mm3": 2497.540353958617
+        },
+        {
+          "name": "Combustor_outer_mount_Right_-3.2_3",
+          "outer_liner_embed_mm3": 1810.6817355902995,
+          "core_case_embed_mm3": 2497.5481095633795
+        },
+        {
+          "name": "Combustor_outer_mount_Right_-3.2_4",
+          "outer_liner_embed_mm3": 1852.3492103410367,
+          "core_case_embed_mm3": 2497.535959727136
+        },
+        {
+          "name": "Combustor_outer_mount_Right_-3.2_5",
+          "outer_liner_embed_mm3": 1838.564060263747,
+          "core_case_embed_mm3": 2497.5395654924037
+        },
+        {
+          "name": "Combustor_outer_mount_Right_-4.5_0",
+          "outer_liner_embed_mm3": 1810.6687062770625,
+          "core_case_embed_mm3": 2497.548083418943
+        },
+        {
+          "name": "Combustor_outer_mount_Right_-4.5_1",
+          "outer_liner_embed_mm3": 1852.3250953291008,
+          "core_case_embed_mm3": 2497.5356856833578
+        },
+        {
+          "name": "Combustor_outer_mount_Right_-4.5_2",
+          "outer_liner_embed_mm3": 1838.5923589942824,
+          "core_case_embed_mm3": 2497.5402512559963
+        },
+        {
+          "name": "Combustor_outer_mount_Right_-4.5_3",
+          "outer_liner_embed_mm3": 1810.6817356336283,
+          "core_case_embed_mm3": 2497.5481091488364
+        },
+        {
+          "name": "Combustor_outer_mount_Right_-4.5_4",
+          "outer_liner_embed_mm3": 1852.3492104866898,
+          "core_case_embed_mm3": 2497.5361094574346
+        },
+        {
+          "name": "Combustor_outer_mount_Right_-4.5_5",
+          "outer_liner_embed_mm3": 1838.5640586741852,
+          "core_case_embed_mm3": 2497.5405270682613
+        }
+      ]
+    }
+  ],
+  "solids": {
+    "count": 679,
+    "invalid": []
+  },
+  "scope": "Static native fit and projected rear-view occlusion only; no flight, airflow or runtime aircraft tests.",
+  "transfer_sha256": "654a746feeb866ac3c70d03e03e137e97514c2ee0b75c1b431a6ac7b1880f8b0",
+  "rear_visibility": {
+    "samples": 360,
+    "unblocked": [],
+    "radii_m": [
+      0.08,
+      0.16,
+      0.22,
+      0.3,
+      0.38
+    ]
+  }
+}

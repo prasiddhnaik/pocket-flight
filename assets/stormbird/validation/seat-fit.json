@@ -1,0 +1,592 @@
+{
+  "design": {
+    "recline_degrees": 10,
+    "pan_width_mm": 500
+  },
+  "seats": [
+    {
+      "name": "Rear",
+      "parts": 42,
+      "size_mm": [
+        510.0,
+        718.2310407103046,
+        1023.7306400680386
+      ],
+      "headrest_glazing_gap_mm": 108.305,
+      "unmounted": [],
+      "links": [
+        {
+          "part": "Seat_rail_-1_Rear",
+          "mount": "Cockpit_pressure_floor",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Seat_rail_1_Rear",
+          "mount": "Cockpit_pressure_floor",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Seat_carriage_-1_Rear",
+          "mount": "Seat_rail_-1_Rear",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Seat_floor_bolt_-1_3.665_Rear",
+          "mount": "Seat_rail_-1_Rear",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Seat_floor_bolt_-1_4.165_Rear",
+          "mount": "Seat_rail_-1_Rear",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Seat_carriage_1_Rear",
+          "mount": "Seat_rail_1_Rear",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Seat_floor_bolt_1_3.665_Rear",
+          "mount": "Seat_rail_1_Rear",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Seat_floor_bolt_1_4.165_Rear",
+          "mount": "Seat_rail_1_Rear",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Seat_pan_Rear",
+          "mount": "Seat_carriage_-1_Rear",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Seat_back_rail_-1_Rear",
+          "mount": "Seat_pan_Rear",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Seat_back_rail_1_Rear",
+          "mount": "Seat_pan_Rear",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Seat_cushion_Rear",
+          "mount": "Seat_pan_Rear",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Seat_thigh_bolster_-1_Rear",
+          "mount": "Seat_pan_Rear",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Seat_hip_guard_-1_Rear",
+          "mount": "Seat_pan_Rear",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Seat_thigh_bolster_1_Rear",
+          "mount": "Seat_pan_Rear",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Seat_hip_guard_1_Rear",
+          "mount": "Seat_pan_Rear",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Seat_back_Rear",
+          "mount": "Seat_pan_Rear",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Seat_handle_foot_-1_Rear",
+          "mount": "Seat_pan_Rear",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Seat_handle_foot_1_Rear",
+          "mount": "Seat_pan_Rear",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Back_lumbar_Rear",
+          "mount": "Seat_back_Rear",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Back_cushion_Rear",
+          "mount": "Seat_back_Rear",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Seat_back_bolster_-1_Rear",
+          "mount": "Seat_back_Rear",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Seat_back_bolster_1_Rear",
+          "mount": "Seat_back_Rear",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Seat_headbox_Rear",
+          "mount": "Seat_back_Rear",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Harness_return_-1_Rear",
+          "mount": "Seat_cushion_Rear",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Harness_lap_anchor_-1_Rear",
+          "mount": "Seat_thigh_bolster_-1_Rear",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Harness_lap_-0.2_Rear",
+          "mount": "Seat_cushion_Rear",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Harness_lap_-0.11_Rear",
+          "mount": "Seat_cushion_Rear",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Harness_return_1_Rear",
+          "mount": "Seat_cushion_Rear",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Harness_lap_anchor_1_Rear",
+          "mount": "Seat_thigh_bolster_1_Rear",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Harness_lap_0.2_Rear",
+          "mount": "Seat_cushion_Rear",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Harness_lap_0.11_Rear",
+          "mount": "Seat_cushion_Rear",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Harness_buckle_Rear",
+          "mount": "Seat_cushion_Rear",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Seat_firing_handle_Rear",
+          "mount": "Seat_cushion_Rear",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Headrest_Rear",
+          "mount": "Seat_headbox_Rear",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Harness_shoulder_-1_Rear",
+          "mount": "Back_lumbar_Rear",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Harness_shoulder_anchor_-1_Rear",
+          "mount": "Seat_headbox_Rear",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Harness_shoulder_1_Rear",
+          "mount": "Back_lumbar_Rear",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Harness_shoulder_anchor_1_Rear",
+          "mount": "Seat_headbox_Rear",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Harness_release_Rear",
+          "mount": "Harness_buckle_Rear",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Harness_adjuster_-1_Rear",
+          "mount": "Harness_shoulder_-1_Rear",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Harness_adjuster_1_Rear",
+          "mount": "Harness_shoulder_1_Rear",
+          "gap_mm": 0.0
+        }
+      ]
+    },
+    {
+      "name": "Pilot",
+      "parts": 42,
+      "size_mm": [
+        510.0,
+        718.231040710305,
+        1023.7306400680382
+      ],
+      "headrest_glazing_gap_mm": 193.745,
+      "unmounted": [],
+      "links": [
+        {
+          "part": "Seat_rail_-1_Pilot",
+          "mount": "Cockpit_pressure_floor",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Seat_rail_1_Pilot",
+          "mount": "Cockpit_pressure_floor",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Seat_carriage_-1_Pilot",
+          "mount": "Seat_rail_-1_Pilot",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Seat_floor_bolt_-1_5.245_Pilot",
+          "mount": "Seat_rail_-1_Pilot",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Seat_floor_bolt_-1_5.745_Pilot",
+          "mount": "Seat_rail_-1_Pilot",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Seat_carriage_1_Pilot",
+          "mount": "Seat_rail_1_Pilot",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Seat_floor_bolt_1_5.245_Pilot",
+          "mount": "Seat_rail_1_Pilot",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Seat_floor_bolt_1_5.745_Pilot",
+          "mount": "Seat_rail_1_Pilot",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Seat_pan_Pilot",
+          "mount": "Seat_carriage_-1_Pilot",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Seat_back_rail_-1_Pilot",
+          "mount": "Seat_pan_Pilot",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Seat_back_rail_1_Pilot",
+          "mount": "Seat_pan_Pilot",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Seat_cushion_Pilot",
+          "mount": "Seat_pan_Pilot",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Seat_thigh_bolster_-1_Pilot",
+          "mount": "Seat_pan_Pilot",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Seat_hip_guard_-1_Pilot",
+          "mount": "Seat_pan_Pilot",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Seat_thigh_bolster_1_Pilot",
+          "mount": "Seat_pan_Pilot",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Seat_hip_guard_1_Pilot",
+          "mount": "Seat_pan_Pilot",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Seat_back_Pilot",
+          "mount": "Seat_pan_Pilot",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Seat_handle_foot_-1_Pilot",
+          "mount": "Seat_pan_Pilot",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Seat_handle_foot_1_Pilot",
+          "mount": "Seat_pan_Pilot",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Back_lumbar_Pilot",
+          "mount": "Seat_back_Pilot",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Back_cushion_Pilot",
+          "mount": "Seat_back_Pilot",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Seat_back_bolster_-1_Pilot",
+          "mount": "Seat_back_Pilot",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Seat_back_bolster_1_Pilot",
+          "mount": "Seat_back_Pilot",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Seat_headbox_Pilot",
+          "mount": "Seat_back_Pilot",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Harness_return_-1_Pilot",
+          "mount": "Seat_cushion_Pilot",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Harness_lap_anchor_-1_Pilot",
+          "mount": "Seat_thigh_bolster_-1_Pilot",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Harness_lap_-0.2_Pilot",
+          "mount": "Seat_cushion_Pilot",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Harness_lap_-0.11_Pilot",
+          "mount": "Seat_cushion_Pilot",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Harness_return_1_Pilot",
+          "mount": "Seat_cushion_Pilot",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Harness_lap_anchor_1_Pilot",
+          "mount": "Seat_thigh_bolster_1_Pilot",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Harness_lap_0.2_Pilot",
+          "mount": "Seat_cushion_Pilot",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Harness_lap_0.11_Pilot",
+          "mount": "Seat_cushion_Pilot",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Harness_buckle_Pilot",
+          "mount": "Seat_cushion_Pilot",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Seat_firing_handle_Pilot",
+          "mount": "Seat_cushion_Pilot",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Headrest_Pilot",
+          "mount": "Seat_headbox_Pilot",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Harness_shoulder_-1_Pilot",
+          "mount": "Back_lumbar_Pilot",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Harness_shoulder_anchor_-1_Pilot",
+          "mount": "Seat_headbox_Pilot",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Harness_shoulder_1_Pilot",
+          "mount": "Back_lumbar_Pilot",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Harness_shoulder_anchor_1_Pilot",
+          "mount": "Seat_headbox_Pilot",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Harness_release_Pilot",
+          "mount": "Harness_buckle_Pilot",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Harness_adjuster_-1_Pilot",
+          "mount": "Harness_shoulder_-1_Pilot",
+          "gap_mm": 0.0
+        },
+        {
+          "part": "Harness_adjuster_1_Pilot",
+          "mount": "Harness_shoulder_1_Pilot",
+          "gap_mm": 0.0
+        }
+      ]
+    }
+  ],
+  "canopy_poses": [
+    {
+      "degrees": 0,
+      "overlap_mm3": 0
+    },
+    {
+      "degrees": 5,
+      "overlap_mm3": 0
+    },
+    {
+      "degrees": 15,
+      "overlap_mm3": 0
+    },
+    {
+      "degrees": 30,
+      "overlap_mm3": 0
+    },
+    {
+      "degrees": 45,
+      "overlap_mm3": 0
+    },
+    {
+      "degrees": 55,
+      "overlap_mm3": 0
+    }
+  ],
+  "actuator_poses": [
+    {
+      "name": "Canopy_actuator_Left_barrel",
+      "degrees": 0,
+      "overlap_mm3": 0
+    },
+    {
+      "name": "Canopy_actuator_Left_piston",
+      "degrees": 0,
+      "overlap_mm3": 0
+    },
+    {
+      "name": "Canopy_actuator_Right_barrel",
+      "degrees": 0,
+      "overlap_mm3": 0
+    },
+    {
+      "name": "Canopy_actuator_Right_piston",
+      "degrees": 0,
+      "overlap_mm3": 0
+    },
+    {
+      "name": "Canopy_actuator_Left_barrel",
+      "degrees": 30,
+      "overlap_mm3": 0
+    },
+    {
+      "name": "Canopy_actuator_Left_piston",
+      "degrees": 30,
+      "overlap_mm3": 0
+    },
+    {
+      "name": "Canopy_actuator_Right_barrel",
+      "degrees": 30,
+      "overlap_mm3": 0
+    },
+    {
+      "name": "Canopy_actuator_Right_piston",
+      "degrees": 30,
+      "overlap_mm3": 0
+    },
+    {
+      "name": "Canopy_actuator_Left_barrel",
+      "degrees": 55,
+      "overlap_mm3": 0
+    },
+    {
+      "name": "Canopy_actuator_Left_piston",
+      "degrees": 55,
+      "overlap_mm3": 0
+    },
+    {
+      "name": "Canopy_actuator_Right_barrel",
+      "degrees": 55,
+      "overlap_mm3": 0
+    },
+    {
+      "name": "Canopy_actuator_Right_piston",
+      "degrees": 55,
+      "overlap_mm3": 0
+    }
+  ],
+  "fixed_clearances": [
+    {
+      "name": "Instrument_pedestal_Rear",
+      "overlap_mm3": 0
+    },
+    {
+      "name": "Side_console_Rear_-1",
+      "overlap_mm3": 0
+    },
+    {
+      "name": "Side_console_Rear_1",
+      "overlap_mm3": 0
+    },
+    {
+      "name": "Stick_pedestal_Rear",
+      "overlap_mm3": 0
+    },
+    {
+      "name": "Stick_shaft_Rear",
+      "overlap_mm3": 0
+    },
+    {
+      "name": "Stick_grip_Rear",
+      "overlap_mm3": 0
+    },
+    {
+      "name": "Instrument_pedestal_Pilot",
+      "overlap_mm3": 0
+    },
+    {
+      "name": "Side_console_Pilot_-1",
+      "overlap_mm3": 0
+    },
+    {
+      "name": "Side_console_Pilot_1",
+      "overlap_mm3": 0
+    },
+    {
+      "name": "Stick_pedestal_Pilot",
+      "overlap_mm3": 0
+    },
+    {
+      "name": "Stick_shaft_Pilot",
+      "overlap_mm3": 0
+    },
+    {
+      "name": "Stick_grip_Pilot",
+      "overlap_mm3": 0
+    }
+  ]
+}

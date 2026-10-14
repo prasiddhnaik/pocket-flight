@@ -1,0 +1,61 @@
+{
+  "cad_document_hash": "5c0c4a0fb9ec718307b115746871987b289d2f74470e67d8cd43251cec873b97",
+  "game_glb_sha256": "ed4983227e156caac42fe5c9f022714e3272cb9d75602e4c4669f39eaf231d5f",
+  "wheel_pivots_matched": 4,
+  "retained_native_geometry_evidence": {
+    "solids": 503,
+    "gear_poses": 15,
+    "door_component_poses": 60,
+    "mounts": 12
+  },
+  "new_static_ground_envelopes": [
+    {
+      "compression_m": 0,
+      "pitch_contact_degrees": 11.8099,
+      "pitch_limiting_point": [
+        1.28,
+        1.28,
+        7.36
+      ],
+      "bank_contact_degrees": 22.9081,
+      "bank_limiting_point": [
+        -6.700000000000001,
+        1.9730780189782087,
+        2.6969120676870055
+      ]
+    },
+    {
+      "compression_m": 0.08,
+      "pitch_contact_degrees": 11.0865,
+      "pitch_limiting_point": [
+        1.28,
+        1.28,
+        7.36
+      ],
+      "bank_contact_degrees": 22.0699,
+      "bank_limiting_point": [
+        -6.700000000000001,
+        1.9730780189782087,
+        2.6969120676870055
+      ]
+    },
+    {
+      "compression_m": 0.16,
+      "pitch_contact_degrees": 10.3545,
+      "pitch_limiting_point": [
+        1.5907960688803526e-15,
+        1.2564348876548685,
+        7.234360806822243
+      ],
+      "bank_contact_degrees": 21.2217,
+      "bank_limiting_point": [
+        -6.700000000000001,
+        1.9730780189782087,
+        2.6969120676870055
+      ]
+    }
+  ],
+  "flight_tests_run": false,
+  "runtime_mechanisms_exercised": false,
+  "collision_limits": "Neutral airframe hull, rigid tire profiles and sampled terrain contact. No swept controls, deflected tires or uneven-ground tip-over analysis."
+}

@@ -1,0 +1,32 @@
+{
+  "revision": "2026-10-01 intake correction",
+  "document_hash": "8327d7a3e1495e091c1123ab4bfac5dede1ac5816dfcb0392aa8f9823b43ea53",
+  "hashes": {
+    "assets/stormbird/STEP/Stormbird-HX40.step": "8327d7a3e1495e091c1123ab4bfac5dede1ac5816dfcb0392aa8f9823b43ea53",
+    "public/assets/stormbird-hx40.glb": "17f84578e79f26891349b2332a841aec7f957f69b3a5328e6f5585d5cd926da8",
+    "dist/assets/stormbird-hx40.glb": "17f84578e79f26891349b2332a841aec7f957f69b3a5328e6f5585d5cd926da8",
+    "assets/stormbird/GLB/Stormbird-HX40-game.glb": "17f84578e79f26891349b2332a841aec7f957f69b3a5328e6f5585d5cd926da8"
+  },
+  "solids": {
+    "count": 527,
+    "invalid": []
+  },
+  "compressor_check": "compressor-fit.json",
+  "passage_samples": 1152,
+  "blocked_passage_samples": 0,
+  "rotor_blades_per_engine": 24,
+  "snapshots_reviewed": [
+    "../renders/intake-front-corrected.png",
+    "../renders/compressor-faces-corrected.png",
+    "../renders/intake-game-corrected.png"
+  ],
+  "retained_gear_check": {
+    "document_hash": "15bf4b5ba1863b274f366f6bc06199f2941d32a3f115a3675f69e445f9db95fa",
+    "scope": "Before final wing-root mouth and wall trims; fuselage, core, gear and mount geometry unchanged by those trims. Earlier 15-pose static gear check retained as dated evidence."
+  },
+  "export_audit": "export-audit.json",
+  "production_build": "TypeScript/Vite passed; existing bundle-size warning",
+  "flight_tests_run": false,
+  "runtime_aircraft_tests_run": false,
+  "airworthiness_established": false
+}

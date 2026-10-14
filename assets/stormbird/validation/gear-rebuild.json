@@ -1,0 +1,264 @@
+{
+  "document_hash": "15bf4b5ba1863b274f366f6bc06199f2941d32a3f115a3675f69e445f9db95fa",
+  "units": "mm",
+  "interference_threshold_mm3": 0.1,
+  "wheels": [
+    {
+      "name": "Nose_gear_tire_-1",
+      "ground_gap_mm": 0.0,
+      "diameter_mm": 550.0
+    },
+    {
+      "name": "Nose_gear_tire_1",
+      "ground_gap_mm": 0.0,
+      "diameter_mm": 550.0
+    },
+    {
+      "name": "Main_gear_Left_tire_-1",
+      "ground_gap_mm": -0.0,
+      "diameter_mm": 740.0
+    },
+    {
+      "name": "Main_gear_Right_tire_1",
+      "ground_gap_mm": -0.0,
+      "diameter_mm": 740.0
+    }
+  ],
+  "mounts": [
+    {
+      "name": "Nose_gear_bearing_-1",
+      "host": "Fuselage",
+      "embedded_mm3": 818043.081,
+      "airframe_contacts_mm3": {
+        "Fuselage": 818043.081
+      }
+    },
+    {
+      "name": "Nose_gear_bearing_1",
+      "host": "Fuselage",
+      "embedded_mm3": 818043.081,
+      "airframe_contacts_mm3": {
+        "Fuselage": 818043.081
+      }
+    },
+    {
+      "name": "Nose_gear_brace_mount",
+      "host": "Fuselage",
+      "embedded_mm3": 365602.845,
+      "airframe_contacts_mm3": {
+        "Fuselage": 365602.845
+      }
+    },
+    {
+      "name": "Nose_gear_actuator_mount",
+      "host": "Fuselage",
+      "embedded_mm3": 46181.412,
+      "airframe_contacts_mm3": {
+        "Fuselage": 46181.412
+      }
+    },
+    {
+      "name": "Main_gear_Left_bearing_-1",
+      "host": "Fuselage",
+      "embedded_mm3": 77492.383,
+      "airframe_contacts_mm3": {
+        "Fuselage": 77492.383
+      }
+    },
+    {
+      "name": "Main_gear_Left_bearing_1",
+      "host": "Fuselage",
+      "embedded_mm3": 51661.588,
+      "airframe_contacts_mm3": {
+        "Fuselage": 51661.588
+      }
+    },
+    {
+      "name": "Main_gear_Left_brace_mount",
+      "host": "Fuselage",
+      "embedded_mm3": 269391.57,
+      "airframe_contacts_mm3": {
+        "Fuselage": 269391.57
+      }
+    },
+    {
+      "name": "Main_gear_Left_actuator_mount",
+      "host": "Fuselage",
+      "embedded_mm3": 46181.412,
+      "airframe_contacts_mm3": {
+        "Fuselage": 46181.412
+      }
+    },
+    {
+      "name": "Main_gear_Right_bearing_-1",
+      "host": "Fuselage",
+      "embedded_mm3": 51661.588,
+      "airframe_contacts_mm3": {
+        "Fuselage": 51661.588
+      }
+    },
+    {
+      "name": "Main_gear_Right_bearing_1",
+      "host": "Fuselage",
+      "embedded_mm3": 77492.383,
+      "airframe_contacts_mm3": {
+        "Fuselage": 77492.383
+      }
+    },
+    {
+      "name": "Main_gear_Right_brace_mount",
+      "host": "Fuselage",
+      "embedded_mm3": 269391.57,
+      "airframe_contacts_mm3": {
+        "Fuselage": 269391.57
+      }
+    },
+    {
+      "name": "Main_gear_Right_actuator_mount",
+      "host": "Fuselage",
+      "embedded_mm3": 46181.412,
+      "airframe_contacts_mm3": {
+        "Fuselage": 46181.412
+      }
+    }
+  ],
+  "poses": [
+    {
+      "leg": "Nose_gear",
+      "phase": 0,
+      "degrees": 0,
+      "collisions_mm3": {}
+    },
+    {
+      "leg": "Nose_gear",
+      "phase": 0.25,
+      "degrees": -1.4713248184322558,
+      "collisions_mm3": {}
+    },
+    {
+      "leg": "Nose_gear",
+      "phase": 0.5,
+      "degrees": -38.88054094665665,
+      "collisions_mm3": {}
+    },
+    {
+      "leg": "Nose_gear",
+      "phase": 0.75,
+      "degrees": -83.33333333333333,
+      "collisions_mm3": {}
+    },
+    {
+      "leg": "Nose_gear",
+      "phase": 1,
+      "degrees": -90,
+      "collisions_mm3": {}
+    },
+    {
+      "leg": "Main_gear_Left",
+      "phase": 0,
+      "degrees": 0,
+      "collisions_mm3": {}
+    },
+    {
+      "leg": "Main_gear_Left",
+      "phase": 0.25,
+      "degrees": -5.416224735090421,
+      "collisions_mm3": {}
+    },
+    {
+      "leg": "Main_gear_Left",
+      "phase": 0.5,
+      "degrees": -48.02036819688593,
+      "collisions_mm3": {}
+    },
+    {
+      "leg": "Main_gear_Left",
+      "phase": 0.75,
+      "degrees": -87.25807363272743,
+      "collisions_mm3": {}
+    },
+    {
+      "leg": "Main_gear_Left",
+      "phase": 1,
+      "degrees": -90,
+      "collisions_mm3": {}
+    },
+    {
+      "leg": "Main_gear_Right",
+      "phase": 0,
+      "degrees": 0,
+      "collisions_mm3": {}
+    },
+    {
+      "leg": "Main_gear_Right",
+      "phase": 0.25,
+      "degrees": -5.416224735090421,
+      "collisions_mm3": {}
+    },
+    {
+      "leg": "Main_gear_Right",
+      "phase": 0.5,
+      "degrees": -48.02036819688593,
+      "collisions_mm3": {}
+    },
+    {
+      "leg": "Main_gear_Right",
+      "phase": 0.75,
+      "degrees": -87.25807363272743,
+      "collisions_mm3": {}
+    },
+    {
+      "leg": "Main_gear_Right",
+      "phase": 1,
+      "degrees": -90,
+      "collisions_mm3": {}
+    }
+  ],
+  "solids": {
+    "count": 527,
+    "invalid": []
+  },
+  "engine_bay_roof_overlaps_mm3": {},
+  "door_mounts": [
+    {
+      "name": "Main_door_Left_Left_mount_-2.803",
+      "fuselage_embedding_mm3": 80424.374,
+      "engine_overlap_mm3": 0
+    },
+    {
+      "name": "Main_door_Left_Left_mount_-1.017",
+      "fuselage_embedding_mm3": 80424.374,
+      "engine_overlap_mm3": 0
+    },
+    {
+      "name": "Main_door_Left_Right_mount_-2.803",
+      "fuselage_embedding_mm3": 10293.156,
+      "engine_overlap_mm3": 0
+    },
+    {
+      "name": "Main_door_Left_Right_mount_-1.017",
+      "fuselage_embedding_mm3": 9330.361,
+      "engine_overlap_mm3": 0
+    },
+    {
+      "name": "Main_door_Right_Left_mount_-2.803",
+      "fuselage_embedding_mm3": 10296.434,
+      "engine_overlap_mm3": 0
+    },
+    {
+      "name": "Main_door_Right_Left_mount_-1.017",
+      "fuselage_embedding_mm3": 9330.232,
+      "engine_overlap_mm3": 0
+    },
+    {
+      "name": "Main_door_Right_Right_mount_-2.803",
+      "fuselage_embedding_mm3": 80424.374,
+      "engine_overlap_mm3": 0
+    },
+    {
+      "name": "Main_door_Right_Right_mount_-1.017",
+      "fuselage_embedding_mm3": 80424.374,
+      "engine_overlap_mm3": 0
+    }
+  ]
+}

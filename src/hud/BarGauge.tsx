@@ -38,6 +38,7 @@ export function BarGauge({ label, fraction, readout, tone = "green", segments, p
         {...(onDrag
           ? {
               role: "slider",
+              "aria-orientation": "vertical",
               tabIndex: 0,
               "aria-valuemin": 0,
               "aria-valuemax": 100,

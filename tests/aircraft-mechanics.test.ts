@@ -11,18 +11,20 @@ import { loadGeometryOnly } from "../scripts/geometry-loader";
 import { AureliaEffects } from "../src/aurelia-effects";
 import { initialJetInput } from "../src/jet-effects";
 
-test("Aurelia tester stows all six wheels at the same native pose as flight, and scrubs back to gear down", async () => {
+test("Aurelia tester stows all four wheels at the same native pose as flight, and scrubs back to gear down", async () => {
   const asset = new URL("../public/assets/aurelia-flight.glb", import.meta.url);
   const { scene, animations } = await loadGeometryOnly(asset, true);
   const flight = await loadGeometryOnly(asset, true);
   const rig = new AircraftMechanics(scene, "aurelia", animations);
+  for (const root of rig.getMovingRoots()) batchStaticMeshes(root);
+  batchStaticMeshes(scene);
   const effects = new AureliaEffects(flight.scene, flight.animations);
   const wheels: T.Object3D[] = [];
   scene.traverse((node) => {
     if (!(node instanceof T.Mesh) && /^(Main|Nose)_wheel_/.test(node.name))
       wheels.push(node);
   });
-  expect(wheels).toHaveLength(6);
+  expect(wheels).toHaveLength(4);
   rig.apply(mechanismPose(0, "gear"), 0);
   const down = wheels.map((w) => w.getWorldPosition(new T.Vector3()));
   rig.apply(mechanismPose(16, "gear"), 16);
@@ -45,6 +47,33 @@ test("Aurelia tester stows all six wheels at the same native pose as flight, and
       wheel.getWorldPosition(new T.Vector3()).distanceTo(down[index]),
     ).toBeLessThan(1e-5),
   );
+  // Revisiting the sealed endpoint must not leave the native one-shot action
+  // paused at frame zero after scrubbing back to gear down.
+  for (let cycle = 0; cycle < 3; cycle++) {
+    rig.apply(mechanismPose(18, "gear"), 18);
+    rig.apply(mechanismPose(18, "gear"), 18);
+    for (const wheel of wheels)
+      expect(
+        wheel
+          .getWorldPosition(new T.Vector3())
+          .distanceTo(
+            flight.scene
+              .getObjectByName(wheel.name)!
+              .getWorldPosition(new T.Vector3()),
+          ),
+      ).toBeLessThan(1e-5);
+    for (const name of [
+      "Main_door_hinge_-1",
+      "Main_door_hinge_1",
+      ...[-1, 1].flatMap((side) =>
+        [0, 1].map((leaf) => `Main_tire_door_hinge_${side}_${leaf}`),
+      ),
+    ])
+      expect(Math.abs(scene.getObjectByName(name)!.rotation.z)).toBeLessThan(
+        1e-5,
+      );
+    rig.apply(mechanismPose(0, "gear"), 0);
+  }
 });
 
 test("mechanical programmes are periodic, bounded and independently selectable", () => {

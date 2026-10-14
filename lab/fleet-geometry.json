@@ -988,10 +988,10 @@
   {
     "id": "aurelia",
     "name": "Aurelia S32",
-    "revision": "2b1c0aaebcb5d2d6bea884d57991b25c60b9c705da5b6341a3168a12f44170c9",
+    "revision": "bdafee7a46472e9b5a2afe960d9ed8ffea159c40fe2a72bd95db75f3e9329c0d",
     "dimensions": [
       14.981999874114992,
-      5.277009330290831,
+      5.254111713599611,
       17.325000524520874
     ],
     "scale": 0.55,

@@ -9,7 +9,7 @@ import {
 } from "./landing-gear";
 import geometry from "./stormbird-geometry.json";
 import { gearEase, gearPhase } from "./stormbird-kinematics";
-import { aureliaGearFold } from "./aurelia-motion";
+import { AURELIA_MAIN_GEAR, aureliaGearFold } from "./aurelia-motion";
 
 export type ContactPart =
   "gear" | "body" | "leftWing" | "rightWing" | "tail" | "engine" | "propeller";
@@ -68,12 +68,12 @@ export function wheelPose(id: AircraftId, index: number, extension: number) {
     const nose = index < 2;
     const pivot = new Vector3(
       center.x,
-      (2.35 - 2.3) * 0.55,
+      ((nose ? 2.35 : AURELIA_MAIN_GEAR.pivotY) - 2.3) * 0.55,
       (nose ? -10.65 : 1.1) * 0.55,
     );
     const q = new Quaternion().setFromAxisAngle(
-      new Vector3(1, 0, 0),
-      aureliaGearFold(extension, nose),
+      new Vector3(nose ? 1 : 0, 0, nose ? 0 : 1),
+      aureliaGearFold(extension, nose) * (nose ? 1 : Math.sign(center.x)),
     );
     center.sub(pivot).applyQuaternion(q).add(pivot);
     axle.applyQuaternion(q);

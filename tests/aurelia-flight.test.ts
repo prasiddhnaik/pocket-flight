@@ -9,7 +9,7 @@ function jet() {
   p.reset();
   return p;
 }
-test("Aurelia starts with all six tires clear of both runways", () => {
+test("Aurelia starts with all four tires clear of both runways", () => {
   for (const short of [false, true]) {
     const p = jet();
     p.reset(false, short);

@@ -18,6 +18,14 @@ export function controlCheck(time: number) {
 // The native curves finish folding below the cabin before the doors close.
 // Frame 123 at 24 fps is the sealed endpoint used by flight and inspection.
 export const AURELIA_GEAR_STOW_TIME = 123 / 24;
+// Native coordinates: a dedicated light-jet main leg folds inboard and lays
+// its single wheel flat below the pressure floor. Nose gear retains its aft fold.
+export const AURELIA_MAIN_GEAR = {
+  x: 3.1,
+  pivotY: 2.08,
+  contactY: 0.51,
+  z: 1.1,
+} as const;
 
 function gearRamp(value: number, start: number, end: number) {
   const t = Math.max(0, Math.min(1, (value - start) / (end - start)));
@@ -27,8 +35,7 @@ function gearRamp(value: number, start: number, end: number) {
 /** Shared by the offline native curves and the flight contact geometry. */
 export function aureliaGearFold(extension: number, nose: boolean) {
   return (
-    ((-(nose ? 77.1 : 72.5) * Math.PI) / 180) *
-    gearRamp(1 - extension, 0.1, 0.78)
+    ((-(nose ? 77.1 : 90) * Math.PI) / 180) * gearRamp(1 - extension, 0.1, 0.78)
   );
 }
 

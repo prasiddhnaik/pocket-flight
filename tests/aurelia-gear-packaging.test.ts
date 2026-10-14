@@ -4,8 +4,11 @@ import { loadGeometryOnly } from "../scripts/geometry-loader";
 import { AURELIA_GEAR_STOW_TIME } from "../src/aurelia-motion";
 import {
   aureliaBays,
+  aureliaPanels,
   bayCeilingHeight,
   bellyDoorHeight,
+  fairingFullness,
+  makeAureliaGearBays,
 } from "../scripts/aurelia-gear-bays";
 import { wheelPose } from "../src/airframe-contact";
 import { AircraftMechanics } from "../lab/mechanics";
@@ -34,6 +37,33 @@ async function aircraft() {
   };
 }
 
+test("the rebuilt GLB has no retired gear nodes or animation targets outside its scene hierarchy", async () => {
+  const bytes = new Uint8Array(
+    await Bun.file(
+      new URL("../public/assets/aurelia-flight.glb", import.meta.url),
+    ).arrayBuffer(),
+  );
+  const length = new DataView(bytes.buffer).getUint32(12, true);
+  const doc = JSON.parse(
+    new TextDecoder().decode(bytes.slice(20, 20 + length)),
+  ) as {
+    nodes: { children?: number[] }[];
+    scenes: { nodes: number[] }[];
+    animations: { channels: { target: { node: number } }[] }[];
+  };
+  const reachable = new Set<number>();
+  function visit(index: number) {
+    if (reachable.has(index)) return;
+    reachable.add(index);
+    doc.nodes[index].children?.forEach(visit);
+  }
+  doc.scenes.forEach((scene) => scene.nodes.forEach(visit));
+  expect(reachable.size).toBe(doc.nodes.length);
+  for (const animation of doc.animations)
+    for (const channel of animation.channels)
+      expect(reachable.has(channel.target.node)).toBe(true);
+});
+
 // Indexed meshes can retain unused authoring vertices after removing a panel.
 // Clearance concerns the triangles that actually render, not those orphan vertices.
 function surfaceBounds(node: T.Object3D) {
@@ -52,14 +82,38 @@ function surfaceBounds(node: T.Object3D) {
   return bounds;
 }
 
-test("all six Aurelia wheels stay below the passenger floor throughout retraction", async () => {
+// A curved, wide door can share a bounding box with a wheel without touching
+// it. Inspect its rendered triangles inside that coarse envelope.
+function surfaceIntersectsBox(node: T.Object3D, box: T.Box3) {
+  let intersects = false;
+  const triangle = new T.Triangle();
+  node.traverse((mesh) => {
+    if (!(mesh instanceof T.Mesh) || intersects) return;
+    const p = mesh.geometry.getAttribute("position"),
+      ix = mesh.geometry.index;
+    for (let i = 0; i < (ix?.count ?? p.count); i += 3) {
+      [triangle.a, triangle.b, triangle.c].forEach((v, j) =>
+        v
+          .fromBufferAttribute(p, ix ? ix.getX(i + j) : i + j)
+          .applyMatrix4(mesh.matrixWorld),
+      );
+      if (box.intersectsTriangle(triangle)) {
+        intersects = true;
+        break;
+      }
+    }
+  });
+  return intersects;
+}
+
+test("all four Aurelia wheels stay below the passenger floor throughout retraction", async () => {
   const { scene, pose } = await aircraft();
   const wheels: T.Object3D[] = [];
   scene.traverse((n) => {
     if (!(n instanceof T.Mesh) && /^(Main|Nose)_wheel_/.test(n.name))
       wheels.push(n);
   });
-  expect(wheels).toHaveLength(6);
+  expect(wheels).toHaveLength(4);
   for (let step = 0; step <= 100; step++) {
     pose(step / 100);
     for (const wheel of wheels) {
@@ -103,7 +157,14 @@ test("stowed wheels fit sealed bays and belly doors cover every tire from below"
       }
     });
     const doors = name.startsWith("Main")
-      ? [scene.getObjectByName(doorName)!]
+      ? [
+          scene.getObjectByName(doorName)!,
+          ...[0, 1].map((leaf) =>
+            scene.getObjectByName(
+              `Main_tire_door_hinge_${name.includes("Left") ? -1 : 1}_${leaf}`,
+            )!,
+          ),
+        ]
       : [
           scene.getObjectByName("Nose_door_hinge_1")!,
           scene.getObjectByName("Nose_door_hinge_-1")!,
@@ -191,7 +252,7 @@ test("tester door actuators mount on the inner face of the closed belly panels",
       checked++;
     }
   });
-  expect(checked).toBe(8);
+  expect(checked).toBe(16);
 });
 
 test("belly doors stay clear of the actual tire surfaces throughout travel and close only after folding", async () => {
@@ -199,6 +260,9 @@ test("belly doors stay clear of the actual tire surfaces throughout travel and c
   const doors = [
     "Main_door_hinge_-1",
     "Main_door_hinge_1",
+    ...[-1, 1].flatMap((side) =>
+      [0, 1].map((leaf) => `Main_tire_door_hinge_${side}_${leaf}`),
+    ),
     "Nose_door_hinge_-1",
     "Nose_door_hinge_1",
   ].map((n) => scene.getObjectByName(n)!);
@@ -212,8 +276,13 @@ test("belly doors stay clear of the actual tire surfaces throughout travel and c
     pose(extension);
     for (const door of doors) {
       const bounds = surfaceBounds(door);
-      for (const wheel of wheels)
-        expect(bounds.intersectsBox(surfaceBounds(wheel))).toBe(false);
+      for (const wheel of wheels) {
+        const wheelBounds = surfaceBounds(wheel);
+        expect(
+          bounds.intersectsBox(wheelBounds) &&
+            surfaceIntersectsBox(door, wheelBounds),
+        ).toBe(false);
+      }
       if (extension > 0.18)
         expect(Math.abs(door.rotation.z)).toBeGreaterThan(1.6);
       if (extension === 0) expect(Math.abs(door.rotation.z)).toBeLessThan(1e-5);
@@ -221,15 +290,13 @@ test("belly doors stay clear of the actual tire surfaces throughout travel and c
   }
 });
 
-test("flight contact geometry follows all six rendered wheel centres through the new aft fold", async () => {
+test("flight contact geometry follows the four rendered wheels through nose and inboard main folds", async () => {
   const { scene, pose } = await aircraft();
   const names = [
     "Nose_wheel_-1",
     "Nose_wheel_1",
-    "Main_wheel_Left_-027",
-    "Main_wheel_Left_027",
-    "Main_wheel_Right_-027",
-    "Main_wheel_Right_027",
+    "Main_wheel_Left",
+    "Main_wheel_Right",
   ];
   for (let step = 0; step <= 100; step++) {
     const extension = step / 100;
@@ -244,6 +311,20 @@ test("flight contact geometry follows all six rendered wheel centres through the
       expect(
         rendered.distanceTo(wheelPose("aurelia", index, extension).center),
       ).toBeLessThan(0.0005);
+      const axle = new T.Vector3(1, 0, 0).applyQuaternion(
+        scene.getObjectByName(name)!.getWorldQuaternion(new T.Quaternion()),
+      );
+      expect(
+        axle.distanceTo(wheelPose("aurelia", index, extension).axle),
+      ).toBeLessThan(0.0005);
+      if (extension === 0 && index >= 2) {
+        // A flat tire fits an underfloor wing-root bay; an upright tire doesn't.
+        expect(Math.abs(axle.y)).toBeGreaterThan(0.999);
+        expect(
+          surfaceBounds(scene.getObjectByName(name)!).getSize(new T.Vector3())
+            .y,
+        ).toBeLessThan(0.42);
+      }
     });
   }
 });
@@ -251,17 +332,18 @@ test("flight contact geometry follows all six rendered wheel centres through the
 test("closed doors follow the continuous belly skin with a narrow perimeter seam", async () => {
   const { scene, pose } = await aircraft();
   pose(0);
-  for (const bay of aureliaBays) {
+  for (const panel of aureliaPanels) {
+    const bay = panel.bay;
     const fairing = scene.getObjectByName("Integrated_belly_fairing") as T.Mesh;
     const p = fairing.geometry.getAttribute("position");
-    for (const x of [bay.x - bay.half, bay.x + bay.half]) {
+    for (const x of [panel.minX, panel.maxX]) {
       const join = new T.Vector3();
       let distance = Infinity;
       for (let i = 0; i < p.count; i++) {
         const v = new T.Vector3()
           .fromBufferAttribute(p, i)
           .applyMatrix4(fairing.matrixWorld);
-        const d = Math.hypot(v.x - x, v.z - bay.front);
+        const d = Math.hypot(v.x - x, v.z - panel.front);
         if (d < distance) {
           distance = d;
           join.copy(v);
@@ -270,19 +352,62 @@ test("closed doors follow the continuous belly skin with a narrow perimeter seam
       expect(distance).toBeLessThan(0.00001);
       expect(Math.abs(join.y - bellyDoorHeight(bay, x))).toBeLessThan(0.00001);
     }
-    for (const side of bay.side ? [bay.side] : [-1, 1]) {
-      const door = scene.getObjectByName(`${bay.name}_door_${side}`) as T.Mesh;
-      const vertices = door.geometry.getAttribute("position");
-      // First half is the outer skin; the second half is the inner sandwich face.
-      for (let i = 0; i < vertices.count / 2; i++) {
-        const v = new T.Vector3()
-          .fromBufferAttribute(vertices, i)
-          .applyMatrix4(door.matrixWorld);
-        expect(Math.abs(v.y - bellyDoorHeight(bay, v.x))).toBeLessThan(0.00001);
-      }
-      const bounds = surfaceBounds(door);
-      expect(bounds.min.z - bay.front).toBeCloseTo(0.003, 5);
-      expect(bay.back - bounds.max.z).toBeCloseTo(0.003, 5);
+    const door = scene.getObjectByName(panel.name) as T.Mesh;
+    const vertices = door.geometry.getAttribute("position");
+    for (let i = 0; i < vertices.count / 2; i++) {
+      const v = new T.Vector3()
+        .fromBufferAttribute(vertices, i)
+        .applyMatrix4(door.matrixWorld);
+      expect(Math.abs(v.y - bellyDoorHeight(bay, v.x))).toBeLessThan(0.00001);
+    }
+    const bounds = surfaceBounds(door);
+    expect(bounds.min.z - panel.front).toBeCloseTo(0.003, 5);
+    expect(panel.back - bounds.max.z).toBeCloseTo(0.003, 5);
+  }
+});
+
+test("main gear canoe tapers into the wing roots and keeps a shallow centre belly", () => {
+  const bay = aureliaBays[0];
+  expect(fairingFullness(bay, bay.front)).toBeCloseTo(1, 8);
+  expect(fairingFullness(bay, bay.front - 2.35)).toBeCloseTo(0, 8);
+  expect(fairingFullness(bay, bay.back + 3.25)).toBeCloseTo(0, 8);
+
+  const fairing = makeAureliaGearBays().getObjectByName(
+    "Integrated_belly_fairing",
+  ) as T.Mesh;
+  const p = fairing.geometry.getAttribute("position");
+  let centre: T.Vector3 | undefined;
+  let centreDistance = Infinity;
+  for (let i = 0; i < p.count; i++) {
+    const point = new T.Vector3().fromBufferAttribute(p, i);
+    const distance = Math.hypot(point.x, point.z - (bay.front + bay.back) / 2);
+    if (distance < centreDistance) {
+      centreDistance = distance;
+      centre = point;
+    }
+  }
+  expect(centre).toBeDefined();
+  // The belly between the two wells follows the fuselage, not a full-width
+  // lowered panel. The old pan sat at about 1.18 m across this whole section.
+  expect(centre!.y).toBeGreaterThan(1.75);
+});
+
+test("each compact main door is shorter than its tire diameter", async () => {
+  const { scene, pose } = await aircraft();
+  pose(0);
+  for (const side of [-1, 1]) {
+    const wheel = scene.getObjectByName(
+      `Main_wheel_${side < 0 ? "Left" : "Right"}`,
+    )!;
+    const diameter = surfaceBounds(wheel).getSize(new T.Vector3()).z;
+    const panels = aureliaPanels.filter((p) => p.bay.side === side);
+    expect(panels).toHaveLength(3);
+    for (const panel of panels) {
+      const size = surfaceBounds(scene.getObjectByName(panel.name)!).getSize(
+        new T.Vector3(),
+      );
+      expect(size.z).toBeLessThan(diameter * 0.65);
+      expect(size.x * 0.55).toBeLessThan(0.7);
     }
   }
 });

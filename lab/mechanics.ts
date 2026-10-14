@@ -944,12 +944,18 @@ export class AircraftMechanics {
   }
 
   private captureRest() {
-    this.rest = [...this.moving].map((node) => ({
-      node,
-      position: node.position.clone(),
-      quaternion: node.quaternion.clone(),
-      scale: node.scale.clone(),
-    }));
+    // The native mixer owns these transforms. Resetting them before setTime
+    // breaks held poses: Three skips writing a track whose value hasn't changed.
+    this.rest = [...this.moving]
+      .filter(
+        (node) => !this.mixer || !/retraction_hinge|door_hinge/.test(node.name),
+      )
+      .map((node) => ({
+        node,
+        position: node.position.clone(),
+        quaternion: node.quaternion.clone(),
+        scale: node.scale.clone(),
+      }));
   }
   apply(pose: MechanismPose, time: number) {
     this.pose = { ...pose };
@@ -1079,6 +1085,25 @@ export class AircraftMechanics {
       articulatedAssemblies: this.moving.size,
       fixedGear: this.id === "finch",
       actualGearExtension: this.id === "finch" ? 1 : this.pose.gear,
+      nativeGear:
+        this.id === "aurelia"
+          ? {
+              mainLeft: this.nodes.get("Main_gear_Left_retraction_hinge")
+                ?.rotation.z,
+              mainRight: this.nodes.get("Main_gear_Right_retraction_hinge")
+                ?.rotation.z,
+              wheelDoors: [-1, 1].flatMap((side) =>
+                [0, 1].map(
+                  (leaf) =>
+                    this.nodes.get(`Main_tire_door_hinge_${side}_${leaf}`)
+                      ?.rotation.z,
+                ),
+              ),
+              doors: [-1, 1].map(
+                (side) => this.nodes.get(`Main_door_hinge_${side}`)?.rotation.z,
+              ),
+            }
+          : null,
       cockpit: this.cockpit?.diagnostics() ?? null,
     };
   }

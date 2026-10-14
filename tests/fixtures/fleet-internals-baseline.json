@@ -166,45 +166,45 @@
       "asset": "aurelia-flight.glb",
       "fields": {
         "nodes": {
-          "count": 300,
-          "sha256": "33a9c1292c0bd9c1f838e1792dd05a6e749c36342bedc2d0d2403dde2b4dec8c"
+          "count": 296,
+          "sha256": "40af3449b2a8498c1ec42c5df80e9c26bc8b28f09b217dcef3556578e84d1df2"
         },
         "meshes": {
-          "count": 225,
-          "sha256": "c670fe2dca75459fc66056094f8f93d5733d1bbfd3748818b1bb154ff26b28ab"
+          "count": 241,
+          "sha256": "c22753e407f7087b5f0dfa46c2a43e92c04859102d38726a0fce30da96a18cd2"
         },
         "accessors": {
-          "count": 858,
-          "sha256": "4decb7cf9248828548015bb7f2d267aca116f8ca8f532a407907ac7bdc33a294"
+          "count": 910,
+          "sha256": "a81260f68c4558ecba1d010f15d526e8a5022653a24c39b7633973d8a2e7e1a2"
         },
         "bufferViews": {
-          "count": 858,
-          "sha256": "aa9e6cfc4c32735c24e67685683a3816cade251a0f558a3a1ed7dcef09158b0c"
+          "count": 910,
+          "sha256": "a0eb850b5c4e44a6642cdaf6adadf6cf0c190c18aa3636baf3c29b639f73b9f2"
         },
         "materials": {
-          "count": 20,
-          "sha256": "3a7c311a0677318f184e808e766e008ece54c2c533082e16eb5424abd78eb07f"
+          "count": 22,
+          "sha256": "89f2a2e6a68cf7a7bd9bbc36695a447106b25d69055a6e58ed1ace530321e54e"
         },
         "buffers": {
           "count": 2,
-          "sha256": "ea7ae8865fb584fa4d96fe23fed9fda445b99b9c8597bbd4d6ac0aa719a8bf03"
+          "sha256": "7f34709de5a1d0b0077da47b0bca24e16a3589384b62f1b949976696444ae7d4"
         }
       },
       "buffers": [
         {
           "byteLength": 8116124,
-          "sha256": "48ce7eb185d13aa12f40f5b722260c77340e39c19ed61f2f86c0ea7e24061255"
+          "sha256": "d1fe5d14400a4c1a61caff3c2815e1dd5d2ca704447556eb9f7f80380bae22f7"
         },
         {
           "uri": "aurelia-gear-bays.bin",
-          "byteLength": 720264,
-          "sha256": "d7a98da3ec765939af97c9129076e8ce0e488d1ba3795cc7c65c232ea42d3cb4"
+          "byteLength": 1275816,
+          "sha256": "8dd020741a45096d10e4b0b036b66687eb2328a9f22da29faab7eed959bfc714"
         }
       ],
       "sceneRoots": [
-        275
+        249
       ],
-      "animationsSha256": "cb43163f4ce67a7c7ca5c87c6f6e3fec730567db654d22b14ee983df1043ae0b",
+      "animationsSha256": "0ee6cf6436157f1c7a7bf524f95bb4eb1a82d58b136ace25f2f47d5ebfae1077",
       "anchors": {
         "Wing_Left": {
           "matrix": [
@@ -328,7 +328,7 @@
         }
       },
       "approvedRepair": "2026-10-13: removed ten exposed decorative wing barrels; retained fuel caps, all original transforms and animations",
-      "gearRepair": "Aft-folding underfloor bays, fixed mounts and sequenced closing doors; 2026-10-13"
+      "gearRepair": "Single-wheel inboard-folding mains, shallow wing-body canoe and sequenced closing doors; 2026-10-14"
     },
     "stormbird": {
       "asset": "stormbird-hx40.gltf",

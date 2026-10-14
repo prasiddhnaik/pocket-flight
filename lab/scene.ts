@@ -1078,6 +1078,22 @@ export class TunnelScene {
       const canopy = cabin?.getObjectByName("Canopy");
       if (canopy) box.union(new T.Box3().setFromObject(canopy));
     }
+    const aureliaGear = focus === "gear" && this.aircraftId === "aurelia";
+    if (aureliaGear) {
+      // Frame both fixed wells as well as the moving legs. A stowed single
+      // wheel is a small target inside the skin, so the old close-up ended
+      // inside the belly instead of showing the closed doors and fairing.
+      for (const name of [
+        "MainBay_Left",
+        "MainBay_Right",
+        "Main_gear_Left",
+        "Main_door_hinge_-1",
+        "Main_door_hinge_1",
+      ]) {
+        const part = this.mechanicalAircraft?.getObjectByName(name);
+        if (part) box.union(new T.Box3().setFromObject(part));
+      }
+    }
     const target = box.getCenter(new T.Vector3()),
       size = box.getSize(new T.Vector3());
     const distance = Math.max(
@@ -1087,7 +1103,13 @@ export class TunnelScene {
     this.camera.position.copy(
       new T.Vector3(
         1,
-        focus === "gear" ? -0.15 : focus === "cockpit" ? 0.45 : 0.25,
+        aureliaGear
+          ? -0.6
+          : focus === "gear"
+            ? -0.15
+            : focus === "cockpit"
+              ? 0.45
+              : 0.25,
         focus === "power" &&
           (this.aircraftId === "peregrine" || this.aircraftId === "stormbird")
           ? 0.9

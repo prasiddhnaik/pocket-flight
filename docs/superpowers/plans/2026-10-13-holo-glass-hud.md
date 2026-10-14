@@ -969,8 +969,8 @@ const cuts: Record<WarningId | "chime", Cut> = {
   fuelLow: { video: "Jqt2kg7IUt8", from: 14.79, to: 15.9, says: "Fuel low (F/A-18)" },
   chime: { video: "Jqt2kg7IUt8", from: 28.33, to: 28.73, says: "caution tone (F/A-18)" },
 };
-// Trim rumble and hiss, even out loudness, and fade the edges so cuts never click.
-const FILTER = "highpass=f=200,lowpass=f=6000,loudnorm=I=-16:TP=-1.5:LRA=7,afade=t=in:d=0.01,areverse,afade=t=in:d=0.04,areverse";
+// Trim rumble and hiss, even out loudness, limit peaks clear of 0 dBFS, and fade edges so cuts never click.
+const FILTER = "highpass=f=200,lowpass=f=6000,loudnorm=I=-16:TP=-1.5:LRA=7,aresample=22050,alimiter=limit=0.6:level=false,afade=t=in:d=0.01,areverse,afade=t=in:d=0.04,areverse";
 
 const out = fileURLToPath(new URL("../public/audio/betty/", import.meta.url));
 const cache = `${tmpdir()}/betty-src/`;

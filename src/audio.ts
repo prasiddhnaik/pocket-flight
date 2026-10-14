@@ -13,6 +13,9 @@ export class FlightAudio {
   music: FlightMusic | null = null;
   enabled = false;
   jet = false;
+  private voiceGain: GainNode | null = null;
+  private voiceSources: AudioBufferSourceNode[] = [];
+  private voiceCache = new Map<string, Promise<AudioBuffer | null>>();
   start() {
     if (!this.context) {
       const ctx = (this.context = new AudioContext());
@@ -78,6 +81,49 @@ export class FlightAudio {
       /* Optional persistence. */
     }
     return this.enabled;
+  }
+  // Voice clips are optional; a missing or undecodable file resolves to null.
+  loadVoice(url: string) {
+    const ctx = this.context;
+    if (!ctx) return Promise.resolve(null);
+    let clip = this.voiceCache.get(url);
+    if (!clip) {
+      clip = fetch(url)
+        .then((r) => (r.ok ? r.arrayBuffer() : Promise.reject(new Error(`${r.status}`))))
+        .then((data) => ctx.decodeAudioData(data))
+        .catch(() => null);
+      this.voiceCache.set(url, clip);
+    }
+    return clip;
+  }
+  playVoice(buffers: AudioBuffer[]) {
+    const ctx = this.context;
+    if (!ctx || !this.master) return;
+    this.stopVoice();
+    if (!this.voiceGain) {
+      this.voiceGain = ctx.createGain();
+      this.voiceGain.gain.value = 0.9;
+      this.voiceGain.connect(this.master);
+    }
+    let at = ctx.currentTime + 0.02;
+    this.voiceSources = buffers.map((buffer) => {
+      const source = ctx.createBufferSource();
+      source.buffer = buffer;
+      source.connect(this.voiceGain!);
+      source.start(at);
+      at += buffer.duration;
+      return source;
+    });
+  }
+  stopVoice() {
+    for (const source of this.voiceSources) {
+      try {
+        source.stop();
+      } catch {
+        /* Already stopped. */
+      }
+    }
+    this.voiceSources = [];
   }
   setMusicVolume(value: number) {
     this.start();

@@ -7,6 +7,7 @@ import { Betty } from "../betty";
 import { flightProfiles } from "../flight-profiles";
 import { aircraftNames, climbReadout, formatClock } from "../flight-ui";
 import { BarGauge } from "./BarGauge";
+import { isNewFlight } from "./boot";
 import { CompassRose } from "./CompassRose";
 import { Dial } from "./Dial";
 import { airspeedScale, clamp01 } from "./geometry";
@@ -33,17 +34,25 @@ export type FlightHudProps = {
 
 type BootPhase = "off" | "sweep" | "return";
 
-function useBoot(mode: Snapshot["mode"]) {
+function useBoot(mode: Snapshot["mode"], time: number) {
   const [phase, setPhase] = useState<BootPhase>("off");
-  const previous = useRef<Snapshot["mode"]>("menu");
+  const [flight, setFlight] = useState<{ mode: Snapshot["mode"]; time: number; key: number | null }>({
+    mode: "menu", time: 0, key: null,
+  });
+  // Derive the key before effects so StrictMode can replay the same timers.
+  if (flight.mode !== mode || flight.time !== time) {
+    setFlight({
+      mode, time,
+      key: isNewFlight(flight.mode, flight.time, mode, time)
+        ? (flight.key ?? 0) + 1
+        : mode === "playing" ? flight.key : null,
+    });
+  }
   useEffect(() => {
-    const was = previous.current;
-    previous.current = mode;
-    if (mode !== "playing" || prefersReducedMotion()) {
+    if (flight.key === null || prefersReducedMotion()) {
       setPhase("off");
       return;
     }
-    if (was === "playing" || was === "paused") return;
     setPhase("sweep");
     const back = setTimeout(() => setPhase("return"), 550);
     const done = setTimeout(() => setPhase("off"), 1200);
@@ -51,7 +60,7 @@ function useBoot(mode: Snapshot["mode"]) {
       clearTimeout(back);
       clearTimeout(done);
     };
-  }, [mode]);
+  }, [flight.key]);
   return phase;
 }
 
@@ -59,7 +68,7 @@ export function FlightHud({
   game, snapshot: s, mission, aircraftId, beginnerAssist, automaticConfiguration,
   sound, voiceWarnings, map, onToggleSound, onOpenControls,
 }: FlightHudProps) {
-  const boot = useBoot(s.mode);
+  const boot = useBoot(s.mode, s.time);
   const sweeping = boot === "sweep";
   const latch = useRef(freshLatch());
   const betty = useRef<Betty | null>(null);
@@ -77,10 +86,11 @@ export function FlightHud({
       s.time,
     );
     latch.current = r.latch;
-    setWarnings(r.active);
+    setWarnings((previous) => previous.length === r.active.length && previous.every((id, i) => id === r.active[i])
+      ? previous : r.active);
     if (betty.current) {
       betty.current.enabled = voiceWarnings;
-      betty.current.update(r.active, performance.now() / 1000);
+      betty.current.update(s.crashed ? [] : r.active, performance.now() / 1000);
     }
   }, [s, game, jet, profile.approachKnots, voiceWarnings]);
 

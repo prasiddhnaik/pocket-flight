@@ -26,6 +26,8 @@ export function TouchControls({ game, aircraftId, automaticConfiguration, beginn
     <div className="touch-controls">
       <div
         className="touch-stick"
+        role="group"
+        aria-label="Flight stick: drag to pitch and roll"
         onPointerDown={(e) => {
           e.currentTarget.setPointerCapture(e.pointerId);
           steer(e);

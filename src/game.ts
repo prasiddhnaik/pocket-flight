@@ -39,6 +39,7 @@ export type Snapshot = {
   objective: string;
   hint: string;
   stall: boolean;
+  crashed: boolean;
   grounded: boolean;
   gearPosition: number;
   flapPosition: number;
@@ -1381,6 +1382,7 @@ export class PocketFlight {
             ? "SHIFT throttle · ↓ pull back · B brake"
             : "Arrow keys to fly · Shift / Ctrl throttle",
       stall: p.stall,
+      crashed: p.crashed,
       grounded: p.grounded,
       gearPosition: this.replaySample ? this.aircraft.effects?.motion.gear ?? this.replaySample.gearPosition ?? 1 : p.gearPosition,
       flapPosition: this.replaySample ? this.aircraft.effects?.motion.flaps ?? this.replaySample.flapPosition ?? 0 : p.flapPosition,

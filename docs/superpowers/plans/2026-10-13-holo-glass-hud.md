@@ -4,9 +4,9 @@
 
 **Goal:** Replace Pocket Flight's in-flight HUD with animated Holo Glass analog instruments, a compass rose, strobing warnings and a Betty-style voice warning system.
 
-**Architecture:** Pure TypeScript modules (geometry, springs, instrument data, warnings, callout scheduling) carry all logic and are unit-tested with `bun test`. Thin React + SVG components render the instruments; a single HUD-local `requestAnimationFrame` spring driver animates needles by writing transforms through refs, so the 10 Hz snapshot never re-renders per frame. Betty plays pre-generated, radio-filtered clips through the existing `FlightAudio` AudioContext.
+**Architecture:** Pure TypeScript modules (geometry, springs, instrument data, warnings, callout scheduling) carry all logic and are unit-tested with `bun test`. Thin React + SVG components render the instruments; a single HUD-local `requestAnimationFrame` spring driver animates needles by writing transforms through refs, so the 10 Hz snapshot never re-renders per frame. Betty plays real cockpit warning recordings, cut once from public web videos, through the existing `FlightAudio` AudioContext.
 
-**Tech Stack:** React 19, TypeScript (strict), Vite 7, SVG, CSS, Web Audio, bun test, Playwright (verification), ffmpeg + OpenAI TTS (one-off clip generation).
+**Tech Stack:** React 19, TypeScript (strict), Vite 7, SVG, CSS, Web Audio, bun test, Playwright (verification), yt-dlp + ffmpeg (one-off clip fetch).
 
 **Spec:** `docs/superpowers/specs/2026-10-13-holo-glass-hud-design.html`
 
@@ -21,7 +21,7 @@
 - Warning strobe period 0.35 s (≈2.9 flashes/s) — never faster than 3 flashes per second.
 - `prefers-reduced-motion: reduce` → no springs (snap), no boot-up, no strobe, no shake; warnings solid red.
 - Altitude is not displayed anywhere.
-- Betty clips live in `public/audio/betty/` as mp3; the game never calls OpenAI at runtime; missing clips must leave Betty silent, never throw.
+- Betty clips live in `public/audio/betty/` as mp3; the game never fetches audio from the web at runtime; missing clips must leave Betty silent, never throw.
 - Preview server for verification: `bunx vite --port 5199 --strictPort` inside the worktree (user approved this one server).
 
 ## Review Focus
@@ -695,7 +695,7 @@ git commit -m "feat(hud): evaluate flight warnings with priority and hysteresis"
 
 **Interfaces:**
 - Consumes: `WarningId`, `warningOrder` (Task 4); `FlightAudio`.
-- Produces: `repeatSeconds`, `bettyFiles`, `bettyLines`, `CHIME_SECONDS = 0.4`, `type CalloutState`, `idleCallouts()`, `planCallout(state, active, now, durationOf): { callout: { id: WarningId; chime: boolean } | null; stop: boolean; state: CalloutState }`, `class Betty { enabled: boolean; constructor(audio: FlightAudio, base?: string); update(active: WarningId[], now: number): void; silence(): void }`. `FlightAudio.loadVoice(url): Promise<AudioBuffer | null>`, `FlightAudio.playVoice(buffers: AudioBuffer[]): void`, `FlightAudio.stopVoice(): void`.
+- Produces: `repeatSeconds`, `bettyFiles`, `CHIME_SECONDS = 0.4`, `type CalloutState`, `idleCallouts()`, `planCallout(state, active, now, durationOf): { callout: { id: WarningId; chime: boolean } | null; stop: boolean; state: CalloutState }`, `class Betty { enabled: boolean; constructor(audio: FlightAudio, base?: string); update(active: WarningId[], now: number): void; silence(): void }`. `FlightAudio.loadVoice(url): Promise<AudioBuffer | null>`, `FlightAudio.playVoice(buffers: AudioBuffer[]): void`, `FlightAudio.stopVoice(): void`.
 
 - [ ] **Step 1: Write the failing tests** — `tests/betty.test.ts`
 
@@ -761,11 +761,6 @@ export const repeatSeconds: Record<WarningId, number | null> = {
 export const bettyFiles: Record<WarningId | "chime", string> = {
   pullUp: "pull-up", stall: "stall", overspeed: "overspeed", landingGear: "landing-gear",
   bankAngle: "bank-angle", bingoFuel: "bingo-fuel", damage: "damage", fuelLow: "fuel-low", chime: "chime",
-};
-export const bettyLines: Record<WarningId, string> = {
-  pullUp: "Pull up. Pull up.", stall: "Stall. Stall.", overspeed: "Overspeed. Overspeed.",
-  landingGear: "Landing gear.", bankAngle: "Bank angle. Bank angle.", bingoFuel: "Bingo fuel.",
-  damage: "Warning. Damage.", fuelLow: "Fuel low.",
 };
 export const CHIME_SECONDS = 0.4;
 
@@ -910,19 +905,19 @@ git commit -m "feat(audio): add Betty voice warning scheduler and voice playback
 
 ---
 
-### Task 6: Generate Betty clips
+### Task 6: Fetch Betty clips from the web
+
+Ruling R4 (user decision, 2026-10-14): Betty uses real cockpit warning recordings cut from public YouTube videos, not AI TTS. The F/A-18 Hornet "Betty" covers pull up, bingo, fuel low and damage ("Flight controls"). Clips the Hornet lacks come from airliner voices: stall from Airbus, bank angle from the Boeing 757 GPWS, landing gear from the Boeing 717 voice, and overspeed from the real 737NG overspeed clacker. The controller has already verified every timestamp below by transcription.
 
 **Files:**
-- Create: `scripts/generate-betty.ts`, `public/audio/betty/*.mp3`
-- Modify: `package.json` (add script `"betty:generate": "bun scripts/generate-betty.ts"`)
+- Create: `scripts/fetch-betty.ts`, `public/audio/betty/*.mp3`
+- Modify: `package.json` (add script `"betty:fetch": "bun scripts/fetch-betty.ts"`)
 - Test: `tests/betty-assets.test.ts`
 
 **Interfaces:**
-- Consumes: `bettyFiles`, `bettyLines`, `warningOrder`.
+- Consumes: `bettyFiles`, `WarningId`.
 
-- [ ] **Step 1: Confirm the current OpenAI TTS model and voice names** — check `https://platform.openai.com/docs/guides/text-to-speech` (WebFetch). Use the newest model that accepts an `instructions` field (expected `gpt-4o-mini-tts`) and a female-sounding voice (expected `shimmer`; fall back to `nova`). Update the two constants below if the docs differ.
-
-- [ ] **Step 2: Write the asset test** — `tests/betty-assets.test.ts`
+- [ ] **Step 1: Write the asset test** — `tests/betty-assets.test.ts`
 
 ```ts
 import { describe, expect, test } from "bun:test";
@@ -946,79 +941,73 @@ describe("betty clips", () => {
 });
 ```
 
-- [ ] **Step 3: Run to verify failure** — Run: `bun test tests/betty-assets.test.ts`. Expected: FAIL (files missing).
+- [ ] **Step 2: Run to verify failure** — Run: `bun test tests/betty-assets.test.ts`. Expected: FAIL (files missing).
 
-- [ ] **Step 4: Write the generator** — `scripts/generate-betty.ts`
+- [ ] **Step 3: Write the fetch script** — `scripts/fetch-betty.ts`
 
 ```ts
-// One-off generator for the Betty voice clips. The game only ever loads the committed mp3 files.
-// Usage: OPENAI_API_KEY=... bun scripts/generate-betty.ts
+// One-off fetch of the Betty voice clips from public cockpit-warning videos.
+// The game only ever loads the committed mp3 files. Needs yt-dlp and ffmpeg on PATH.
+// Usage: bun run betty:fetch
 import { mkdir } from "node:fs/promises";
-import { bettyFiles, bettyLines } from "../src/betty";
-import { warningOrder } from "../src/hud/warnings";
+import { tmpdir } from "node:os";
+import { bettyFiles } from "../src/betty";
+import type { WarningId } from "../src/hud/warnings";
 
-const MODEL = "gpt-4o-mini-tts";
-const VOICE = "shimmer";
-const STYLE =
-  "Calm, flat, clipped female cockpit warning voice. Even pitch, no emotion, crisp consonants, brisk military delivery.";
-// Cockpit intercom: telephone band, hard compression, a little saturation, trimmed silence.
-const RADIO = [
-  "highpass=f=300", "lowpass=f=3400",
-  "acompressor=threshold=-20dB:ratio=6:attack=3:release=80",
-  "asoftclip=type=tanh", "volume=1.6",
-  "silenceremove=start_periods=1:start_threshold=-45dB:stop_periods=1:stop_threshold=-45dB",
-].join(",");
-const OUT = ["-ac", "1", "-ar", "24000", "-b:a", "48k"];
+type Cut = { video: string; from: number; to: number; says: string };
+// YouTube video id and the seconds holding each callout.
+const cuts: Record<WarningId | "chime", Cut> = {
+  pullUp: { video: "Jqt2kg7IUt8", from: 3.22, to: 4.33, says: "Pull up, pull up (F/A-18)" },
+  stall: { video: "RwNKP_vVKJw", from: 2.85, to: 4.3, says: "Stall, stall (Airbus)" },
+  overspeed: { video: "8kafXP3s1jo", from: 0.48, to: 2.48, says: "overspeed clacker (737NG)" },
+  landingGear: { video: "r0AK4yxBGnM", from: 28.68, to: 29.72, says: "Landing gear (717)" },
+  bankAngle: { video: "tp5qNbYyxZ4", from: 17.85, to: 20.3, says: "Bank angle, bank angle (757)" },
+  bingoFuel: { video: "Jqt2kg7IUt8", from: 16.85, to: 19.25, says: "Bingo, bingo (F/A-18)" },
+  damage: { video: "Jqt2kg7IUt8", from: 11.68, to: 14.22, says: "Flight controls, flight controls (F/A-18)" },
+  fuelLow: { video: "Jqt2kg7IUt8", from: 14.79, to: 15.9, says: "Fuel low (F/A-18)" },
+  chime: { video: "Jqt2kg7IUt8", from: 28.33, to: 28.73, says: "caution tone (F/A-18)" },
+};
+// Trim rumble and hiss, even out loudness, and fade the edges so cuts never click.
+const FILTER = "highpass=f=200,lowpass=f=6000,loudnorm=I=-16:TP=-1.5:LRA=7,afade=t=in:d=0.01,areverse,afade=t=in:d=0.04,areverse";
 
 const out = new URL("../public/audio/betty/", import.meta.url).pathname;
+const cache = `${tmpdir()}/betty-src/`;
 await mkdir(out, { recursive: true });
+await mkdir(cache, { recursive: true });
 
-async function ffmpeg(args: string[]) {
-  const child = Bun.spawn(["ffmpeg", "-y", "-loglevel", "error", ...args], { stderr: "inherit" });
-  if (await child.exited) throw new Error(`ffmpeg failed: ${args.join(" ")}`);
+async function run(cmd: string[]) {
+  const child = Bun.spawn(cmd, { stdout: "ignore", stderr: "inherit" });
+  if (await child.exited) throw new Error(`failed: ${cmd.join(" ")}`);
 }
 
-// Two-tone master-caution chime, synthesised locally.
-await ffmpeg([
-  "-f", "lavfi", "-i", "sine=frequency=1000:duration=0.13",
-  "-f", "lavfi", "-i", "sine=frequency=750:duration=0.13",
-  "-filter_complex", "[0][1]concat=n=2:v=0:a=1,afade=t=out:st=0.22:d=0.04,volume=0.45",
-  ...OUT, `${out}${bettyFiles.chime}.mp3`,
-]);
-
-const key = process.env.OPENAI_API_KEY;
-if (!key) {
-  console.log("OPENAI_API_KEY is not set: wrote the chime only.");
-  process.exit(0);
+for (const video of new Set(Object.values(cuts).map((c) => c.video))) {
+  if (await Bun.file(`${cache}${video}.wav`).exists()) continue;
+  await run(["yt-dlp", "-q", "--no-update", "-x", "--audio-format", "wav", "-o", `${cache}%(id)s.%(ext)s`, `https://www.youtube.com/watch?v=${video}`]);
 }
-for (const id of warningOrder) {
-  const res = await fetch("https://api.openai.com/v1/audio/speech", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ model: MODEL, voice: VOICE, input: bettyLines[id], instructions: STYLE, response_format: "wav" }),
-  });
-  if (!res.ok) throw new Error(`${id}: ${res.status} ${await res.text()}`);
-  const raw = `/tmp/betty-${id}.wav`;
-  await Bun.write(raw, await res.arrayBuffer());
-  await ffmpeg(["-i", raw, "-af", RADIO, ...OUT, `${out}${bettyFiles[id]}.mp3`]);
-  console.log(`wrote ${bettyFiles[id]}.mp3`);
+for (const [id, c] of Object.entries(cuts) as [WarningId | "chime", Cut][]) {
+  await run([
+    "ffmpeg", "-y", "-loglevel", "error", "-ss", String(c.from), "-to", String(c.to), "-i", `${cache}${c.video}.wav`,
+    "-ac", "1", "-ar", "22050", "-af", FILTER, "-b:a", "48k", `${out}${bettyFiles[id]}.mp3`,
+  ]);
+  console.log(`wrote ${bettyFiles[id]}.mp3: ${c.says}`);
 }
 ```
 
-Add to `package.json` scripts: `"betty:generate": "bun scripts/generate-betty.ts",`
+Add to `package.json` scripts: `"betty:fetch": "bun scripts/fetch-betty.ts",`
 
-- [ ] **Step 5: Generate** — Ask the user for their OpenAI API key (via the T3 `request_secret` flow if the key can be injected into the environment, otherwise ask them to run the command themselves). Run: `OPENAI_API_KEY=… bun run betty:generate`. Expected: `wrote …mp3` for 8 clips. Without a key, only `chime.mp3` is written and Betty stays silent for voice lines — record that as a pending item and continue with Task 7.
+- [ ] **Step 4: Fetch** — Run: `bun run betty:fetch`. Expected: `wrote …mp3` for 9 files. If `/tmp/betty-src/` already holds the source wavs, they are reused.
 
-- [ ] **Step 6: Listen and verify** — Run: `bun test tests/betty-assets.test.ts` (Expected: PASS) and `for f in public/audio/betty/*.mp3; do ffprobe -v error -show_entries format=duration -of csv=p=0 "$f"; done` (Expected: each 0.3–2.2 s). Play two clips with `afplay public/audio/betty/pull-up.mp3` and confirm the radio-filtered female voice.
+- [ ] **Step 5: Verify** — Run: `bun test tests/betty-assets.test.ts` (Expected: PASS) and `for f in public/audio/betty/*.mp3; do ffprobe -v error -show_entries format=duration -of csv=p=0 "$f"; done` (Expected: chime ≈0.4 s, the others 1.0–2.6 s).
 
-- [ ] **Step 7: Commit**
+- [ ] **Step 6: Commit**
 
 ```bash
-git add scripts/generate-betty.ts package.json public/audio/betty tests/betty-assets.test.ts
-git commit -m "feat(audio): generate radio-filtered Betty voice clips"
+git add scripts/fetch-betty.ts package.json public/audio/betty tests/betty-assets.test.ts
+git commit -m "feat(audio): add Betty voice clips cut from real cockpit recordings"
 ```
 
 ---
+
 
 ### Task 7: Instrument components and Holo Glass styles
 
@@ -2154,7 +2143,7 @@ and next to `toggleSound`:
                     {voiceWarnings ? <Volume2 size={17} /> : <VolumeX size={17} />}
                   </button>
                 </div>
-                <p className="music-status">Voice warnings: AI-generated.</p>
+                <p className="music-status">Voice warnings: real cockpit recordings.</p>
 ```
 
 - [ ] **Step 8: Verify** — Run: `bun test && bunx tsc -b`. Expected: all tests pass (new HUD tests plus the existing suite), no new tsc errors.

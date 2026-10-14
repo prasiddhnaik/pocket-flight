@@ -18,9 +18,18 @@ describe("warnings", () => {
   });
   test("pull up needs low height and under six seconds to impact", () => {
     expect(run({ agl: 300, verticalSpeed: -20 }).active).toEqual(["pullUp"]);
-    expect(run({ agl: 300, verticalSpeed: -5 }).active).toEqual([]);
+    expect(run({ agl: 300, verticalSpeed: -10 }).active).toEqual([]);
     expect(run({ agl: 900, verticalSpeed: -60 }).active).toEqual([]);
     expect(run({ agl: 300, verticalSpeed: -20, grounded: true }).active).toEqual([]);
+  });
+  test("pull up stays silent on a normal gear-down approach", () => {
+    expect(run({ gearPosition: 1, grounded: false, agl: 50, verticalSpeed: -3 }).active).not.toContain("pullUp");
+  });
+  test("pull up warns on a steep gear-down descent", () => {
+    expect(run({ gearPosition: 1, grounded: false, agl: 100, verticalSpeed: -10 }).active).toContain("pullUp");
+  });
+  test("pull up still warns on a shallow gear-up descent near the ground", () => {
+    expect(run({ gearPosition: 0, grounded: false, agl: 50, verticalSpeed: -3 }).active).toContain("pullUp");
   });
   test("active warnings are sorted by priority", () => {
     const r = run({ agl: 200, verticalSpeed: -15, stall: true, roll: 1.2, speedProtection: true });

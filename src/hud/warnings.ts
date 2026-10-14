@@ -37,7 +37,9 @@ export function evaluateWarnings(s: WarningInput, latch: WarningLatch, now: numb
   if (s.mode !== "playing") return { active: [] as WarningId[], latch: next };
   const airborne = !s.grounded;
   const on = new Set<WarningId>();
-  if (airborne && s.agl < 500 && secondsToImpact(s.agl, s.verticalSpeed) < 6) on.add("pullUp");
+  // Gear-down approaches need a steeper sink rate to warrant a pull-up warning.
+  const sinkFloor = s.gearPosition >= 0.5 ? -6 : -0.5;
+  if (airborne && s.agl < 500 && s.verticalSpeed < sinkFloor && secondsToImpact(s.agl, s.verticalSpeed) < 6) on.add("pullUp");
   if (s.stall) on.add("stall");
   if (s.speedProtection) on.add("overspeed");
   if (s.jet && airborne && s.gearPosition < 0.5 && s.agl < 500 && s.verticalSpeed < 0 && s.speed < s.approachKnots * 1.2)

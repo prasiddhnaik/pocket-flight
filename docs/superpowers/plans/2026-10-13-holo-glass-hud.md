@@ -922,9 +922,10 @@ Ruling R4 (user decision, 2026-10-14): Betty uses real cockpit warning recording
 ```ts
 import { describe, expect, test } from "bun:test";
 import { existsSync, statSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { bettyFiles } from "../src/betty";
 
-const dir = new URL("../public/audio/betty/", import.meta.url).pathname;
+const dir = fileURLToPath(new URL("../public/audio/betty/", import.meta.url));
 const files = Object.values(bettyFiles).map((f) => `${dir}${f}.mp3`);
 
 describe("betty clips", () => {
@@ -951,6 +952,7 @@ describe("betty clips", () => {
 // Usage: bun run betty:fetch
 import { mkdir } from "node:fs/promises";
 import { tmpdir } from "node:os";
+import { fileURLToPath } from "node:url";
 import { bettyFiles } from "../src/betty";
 import type { WarningId } from "../src/hud/warnings";
 
@@ -970,7 +972,7 @@ const cuts: Record<WarningId | "chime", Cut> = {
 // Trim rumble and hiss, even out loudness, and fade the edges so cuts never click.
 const FILTER = "highpass=f=200,lowpass=f=6000,loudnorm=I=-16:TP=-1.5:LRA=7,afade=t=in:d=0.01,areverse,afade=t=in:d=0.04,areverse";
 
-const out = new URL("../public/audio/betty/", import.meta.url).pathname;
+const out = fileURLToPath(new URL("../public/audio/betty/", import.meta.url));
 const cache = `${tmpdir()}/betty-src/`;
 await mkdir(out, { recursive: true });
 await mkdir(cache, { recursive: true });
@@ -2173,10 +2175,11 @@ git commit -m "feat(hud): replace flight HUD with Holo Glass instruments and Bet
 ```ts
 // Visual check for the Holo Glass HUD. Usage: CHROMIUM_PATH=… bun scripts/check-hud-browser.ts
 import { mkdir } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
 import { chromium, type Page } from "playwright";
 
 const url = process.env.HUD_CHECK_URL ?? "http://127.0.0.1:5199/";
-const out = new URL("../output/hud/", import.meta.url).pathname;
+const out = fileURLToPath(new URL("../output/hud/", import.meta.url));
 await mkdir(out, { recursive: true });
 const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
 const errors: string[] = [];

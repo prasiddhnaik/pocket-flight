@@ -11,12 +11,14 @@ sys.dont_write_bytecode = True
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from finch_wing_markings import fit_wing_markings
 from finch_internal_systems import build_internal_systems
+from finch_airframe_details import fit_airframe_details
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / 'assets/finch'
 bpy.ops.wm.open_mainfile(filepath=str(OUT / 'Finch-U2-base.blend'))
 bpy.context.preferences.filepaths.save_version = 0
 fit_wing_markings()
+airframe_details = fit_airframe_details()
 old = bpy.data.objects['Cockpit']
 for o in list(old.children_recursive) + [old]:
     bpy.data.objects.remove(o, do_unlink=True)
@@ -84,7 +86,7 @@ def group(name, p=(0, 0, 0), parent=None):
 
 
 cockpit = group('Cockpit', parent=bpy.data.objects['Fuselage'])
-cockpit['revision'] = 'Finch cockpit 2026-10-12'
+cockpit['revision'] = 'Finch cockpit 2026-10-14 seated panel controls'
 cockpit['handbook_sections'] = '13.1 / 13.3 / 13.4 / 16.1 / 16.2'
 cockpit['inspection_bounds_glTF'] = [[-.67,-.25,-1.64],[.67,1.22,.91]]
 hinge = (0, -.87, .63)
@@ -422,9 +424,9 @@ for x, kind in [(-.295,'PFD'),(.295,'MAP')]:
         label('Map title','PALM BAY',(x,.743,.535),.012,ivory,panel)
         label('Map distance','12.4 NM',(x,.743,.395),.011,ivory,panel)
     for dx in [-.116,.116]:
-        cylinder('Avionics rotary knob',(x+dx,.750,.354),(x+dx,.730,.354),.013,rubber,panel)
+        cylinder('Avionics rotary knob',(x+dx,.756,.354),(x+dx,.736,.354),.011,rubber,panel)
     for i in range(5):
-        box('Display softkey',(x-.077+i*.038,.747,.349),(.022,.013,.006),metal,panel,.002)
+        box('Display softkey',(x-.077+i*.038,.751,.354),(.022,.013,.006),metal,panel,.0015)
     label('Display name',kind,(x,.744,.58),.010,ivory,panel)
 box('Centre avionics stack',(0,.770,.425),(.12,.035,.28),rubber,panel,.007)
 rectangle('Radio face',0,.5,.099,.065,screen,.748)
@@ -438,9 +440,13 @@ for z, title in [(.405,'ATT'),(.305,'RPM')]:
         tube('Standby tick',[(.027*math.sin(a),.730,z+.027*math.cos(a)),(.032*math.sin(a),.730,z+.032*math.cos(a))],.0008,ivory,panel)
     tube('Standby needle',[(0,.729,z),(.021,.729,z+.016)],.0015,ivory,panel)
 for x, title in [(-.38,'MASTER'),(-.28,'AVIONICS'),(-.18,'LIGHTS'),(.18,'PUMP'),(.28,'PITOT'),(.38,'FLAPS')]:
-    cylinder('Switch mounting',(x,.775,.27),(x,.766,.27),.011,metal,panel,16)
-    tube('Toggle switch',[(x,.765,.27),(x,.746,.282)],.004,metal,panel)
-    label('Switch legend',title,(x,.76,.235),.009,ivory,panel)
+    # The washer intersects the fascia at Y=.786; the retaining nut and lever
+    # form a continuous assembly instead of floating in front of the panel.
+    cylinder('Switch mounting',(x,.789,.285),(x,.7845,.285),.0085,metal,panel,24)
+    cylinder('Switch retaining nut',(x,.785,.285),(x,.781,.285),.0065,metal,panel,6)
+    tube('Toggle switch',[(x,.782,.285),(x,.769,.295)],.0018,metal,panel)
+    cylinder('Toggle grip',(x,.773,.292),(x,.768,.296),.0025,rubber,panel,12)
+    label('Switch legend',title,(x,.7854,.316),.009,ivory,panel)
 for s in [-1,1]:
     cylinder('Fresh air vent',(s*.457,.779,.445),(s*.457,.755,.445),.027,rubber,panel,24)
     for dx in [-.012,0,.012]:
@@ -548,6 +554,7 @@ if any(p['glass_furniture_intersections'] for p in canopy_travel):
     raise RuntimeError('Opening glazing intersects fixed cabin: '+str(canopy_travel))
 
 manifest={'revision':cockpit['revision'],'frame':'Blender metres X right +Y forward +Z up',
+          'airframe_details':airframe_details,
           'internal_systems':internal_systems,
           'clearance_m':clearance,'pilot_eyes':eyes,'control_travel':travel,
           'canopy_travel':canopy_travel,

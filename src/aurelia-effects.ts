@@ -1,5 +1,6 @@
 import * as T from "three";
 import { JetMotion, type JetInput } from "./jet-effects";
+import { AURELIA_GEAR_STOW_TIME } from "./aurelia-motion";
 
 /** Uses the exported Blender gear curves; flight input drives the other rig nodes. */
 export class AureliaEffects {
@@ -80,7 +81,7 @@ export class AureliaEffects {
     this.motion.update(dt, { ...input, burner: false });
     const s = this.motion;
     s.fanPhase = (s.fanPhase + s.rpm * 18 * dt) % (Math.PI * 2);
-    this.mixer.setTime(((1 - s.gear) * 123) / 24);
+    this.mixer.setTime((1 - s.gear) * AURELIA_GEAR_STOW_TIME);
     const rotate = (name: string, axis: "x" | "y" | "z", angle: number) => {
       const o = this.root.getObjectByName(name);
       if (o) o.rotation[axis] = angle;

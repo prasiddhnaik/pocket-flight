@@ -42,7 +42,7 @@ export function batchStaticMeshes(
         return `${name}:${a.itemSize}:${a.normalized}:${a.array.constructor.name}`;
       })
       .join("|");
-    const key = `${node.material.uuid}:${wing}:${node.castShadow}:${node.receiveShadow}:${node.renderOrder}:${!!node.geometry.index}:${attributes}`;
+    const key = `${node.material.uuid}:${wing}:${!!node.userData.internal}:${node.castShadow}:${node.receiveShadow}:${node.renderOrder}:${!!node.geometry.index}:${attributes}`;
     const group = groups.get(key) ?? { meshes: [], wing };
     group.meshes.push(node);
     groups.set(key, group);
@@ -74,6 +74,7 @@ export function batchStaticMeshes(
     batch.receiveShadow = source.receiveShadow;
     batch.renderOrder = source.renderOrder;
     batch.userData.mainWing = wing;
+    batch.userData.internal = !!source.userData.internal;
     root.add(batch);
     for (const mesh of meshes) {
       mesh.removeFromParent();

@@ -278,8 +278,10 @@ export function aircraftAerodynamics(
     qS = dynamicPressure * g.wingArea;
   const leftDamage = config.leftWingDamage ?? config.wingDamage;
   const rightDamage = config.rightWingDamage ?? config.wingDamage;
-  const leftLift = qS * cl * 0.5 * (config.leftWingDetached ? 0 : 1 - leftDamage * 0.62);
-  const rightLift = qS * cl * 0.5 * (config.rightWingDetached ? 0 : 1 - rightDamage * 0.62);
+  const leftLift =
+    qS * cl * 0.5 * (config.leftWingDetached ? 0 : 1 - leftDamage * 0.62);
+  const rightLift =
+    qS * cl * 0.5 * (config.rightWingDetached ? 0 : 1 - rightDamage * 0.62);
   const lift = leftLift + rightLift,
     drag = qS * cd;
   const right = new Vector3(1, 0, 0).applyQuaternion(orientation);
@@ -298,15 +300,15 @@ export function aircraftAerodynamics(
   const c = g.meanAerodynamicChord,
     rateScale = 1 / (2 * Math.max(flow.speed, 1));
   const nominalTrimCL =
-    (design.nominal.mass * GRAVITY) /
+    (design.reference.mass * GRAVITY) /
     (0.5 * SEA_LEVEL_DENSITY * design.trimSpeed ** 2 * g.wingArea);
   const trimAlpha = (nominalTrimCL - a.cl0) / a.liftSlope;
-  const nominalMargin = (design.neutralPointZ - design.nominal.cg.z) / c;
+  const nominalMargin = (design.neutralPointZ - design.reference.cg.z) / c;
   // Whole-aircraft moment derivatives include the estimated tail contribution.
   // CG displacement changes lift's lever arm, without retuning the polar.
   const pitchCoefficient =
     -a.liftSlope * nominalMargin * (alpha - trimAlpha) +
-    (cl * (cg.z - design.nominal.cg.z)) / c +
+    (cl * (cg.z - design.reference.cg.z)) / c +
     pitchDamping * rates.x * c * rateScale +
     m.elevator * controls.pitch * controlEffectiveness;
   const yawCoefficient =
@@ -316,11 +318,16 @@ export function aircraftAerodynamics(
   const rollCoefficient =
     m.dihedral * Math.sin(flow.beta) +
     m.rollDamping * rates.z * g.span * rateScale -
-    m.aileron * controls.roll * controlEffectiveness * (1 - (leftDamage + rightDamage) * 0.25);
+    m.aileron *
+      controls.roll *
+      controlEffectiveness *
+      (1 - (leftDamage + rightDamage) * 0.25);
   const moment = new Vector3(
     qS * c * pitchCoefficient,
     qS * g.span * yawCoefficient,
-    qS * g.span * rollCoefficient + (rightLift - leftLift) * g.span * 0.25,
+    qS * g.span * rollCoefficient +
+      (rightLift - leftLift) * g.span * 0.25 -
+      cg.x * lift,
   );
   return {
     ...flow,

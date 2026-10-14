@@ -21,6 +21,7 @@ for (const id of [
   scene.updateMatrixWorld(true);
   const probes: { center: number[]; radius: number; part: ContactPart }[] = [];
   const groups: [string, ContactPart][] = [
+    ["AureliaGearBays", "body"],
     [id === "stormbird" ? "Airframe" : "Fuselage", "body"],
     ["Wing_Left", "leftWing"],
     ["Wing_Right", "rightWing"],

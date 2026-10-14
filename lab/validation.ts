@@ -16,20 +16,20 @@ import { solveTrim } from "../src/flight-trim";
 import { localSoundSpeed } from "../src/engine-map";
 import { references } from "../src/flight-reference-data";
 
-export const VALIDATION_VERSION = "fleet-envelope-1";
+export const VALIDATION_VERSION = "fleet-envelope-balance-3";
 const zero = new Vector3(),
   neutral = { pitch: 0, roll: 0, yaw: 0, throttle: 0, brake: false };
 const radians = Math.PI / 180;
-const loadings: Loading[] = [
-  { fuel: 1, payload: 1 },
-  { fuel: 0.1, payload: 1 },
-  { fuel: 1, payload: 0 },
-  { fuel: 0.1, payload: 0 },
-];
 export function validateAircraft(id: AircraftId) {
   const design = aircraftDesign(id),
     speed = design.trimSpeed,
     altitude = 1000;
+  const loadings: Loading[] = [
+    design.defaultLoading,
+    { fuel: 0.1, payload: 1 },
+    { fuel: design.defaultLoading.fuel, payload: id === "aurelia" ? 0 : 0.9 },
+    { fuel: 0.1, payload: id === "aurelia" ? 0 : 0.9 },
+  ];
   const sample = (
     alpha: number,
     balance = design.nominal,
@@ -110,6 +110,9 @@ export function validateAircraft(id: AircraftId) {
       p.velocity.set(0, 0, -speed);
       p.pitch = c.trim.alpha;
       p.elevatorTrim = c.trim.pitch;
+      p.roll = c.trim.bank;
+      p.rollTrim = c.trim.roll;
+      p.yawTrim = c.trim.yaw;
       p.throttle = p.enginePower = c.trim.throttle;
       p.beginnerAssist = false;
       p.windOverride = new Vector3();

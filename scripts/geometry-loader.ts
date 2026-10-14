@@ -3,7 +3,11 @@ import { createHash } from "node:crypto";
 
 // Pack external buffers into a temporary geometry-only GLB. No network fetch,
 // DOM image decoding or texture changes to the original files are involved.
-export async function loadGeometryOnly(url: URL, keepAnimations = false) {
+export async function loadGeometryOnly(
+  url: URL,
+  keepAnimations = false,
+  bufferBase = url,
+) {
   const source = new Uint8Array(await Bun.file(url).arrayBuffer());
   const isGLB = url.pathname.endsWith(".glb");
   const jsonLength = isGLB
@@ -14,14 +18,15 @@ export async function loadGeometryOnly(url: URL, keepAnimations = false) {
       isGLB ? source.slice(20, 20 + jsonLength) : source,
     ),
   );
-  const buffers: Uint8Array[] = isGLB
-    ? [source.slice(28 + jsonLength)]
-    : await Promise.all(
-        data.buffers.map(
-          async (b: { uri: string }) =>
-            new Uint8Array(await Bun.file(new URL(b.uri, url)).arrayBuffer()),
-        ),
-      );
+  const buffers: Uint8Array[] = await Promise.all(
+    data.buffers.map(async (b: { uri?: string }, index: number) =>
+      isGLB && index === 0 && !b.uri
+        ? source.slice(28 + jsonLength)
+        : new Uint8Array(
+            await Bun.file(new URL(b.uri!, bufferBase)).arrayBuffer(),
+          ),
+    ),
+  );
   const offsets: number[] = [];
   let length = 0;
   for (const b of buffers) {
@@ -56,7 +61,9 @@ export async function loadGeometryOnly(url: URL, keepAnimations = false) {
   for (let i = 0; i < buffers.length; i++)
     output.set(buffers[i], 28 + paddedLength + offsets[i]);
   const hash = createHash("sha256").update(source);
-  if (!isGLB) buffers.forEach((b) => hash.update(b));
+  buffers.forEach((b, index) => {
+    if (!isGLB || index > 0) hash.update(b);
+  });
   const { scene, animations } = await new GLTFLoader().parseAsync(
     output.buffer,
     "",

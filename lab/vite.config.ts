@@ -7,9 +7,15 @@ import { aircraftCatalog } from "./aircraft";
 const root = fileURLToPath(new URL(".", import.meta.url));
 const assets = resolve(root, "../public/assets");
 const sharedFiles = Object.values(aircraftCatalog).flatMap((a) => {
-  if (a.asset.endsWith(".glb")) return [a.asset];
-  const gltf = JSON.parse(readFileSync(resolve(assets, a.asset), "utf8"));
-  return [a.asset, ...gltf.buffers.map((b: { uri: string }) => b.uri)];
+  const bytes = readFileSync(resolve(assets, a.asset));
+  const json = a.asset.endsWith(".glb")
+    ? bytes.subarray(20, 20 + bytes.readUInt32LE(12)).toString("utf8")
+    : bytes.toString("utf8");
+  const gltf = JSON.parse(json);
+  return [
+    a.asset,
+    ...gltf.buffers.flatMap((b: { uri?: string }) => (b.uri ? [b.uri] : [])),
+  ];
 });
 
 export default defineConfig({

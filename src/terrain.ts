@@ -184,14 +184,25 @@ function vertexHeight(ix: number, iz: number) {
 }
 // A triangle cannot rise above its vertices. Use this conservative bound to
 // reject aircraft sweeps that are entirely above the local ground and pavement.
-export function maximumGroundHeight(x0: number, x1: number, z0: number, z1: number) {
+export function maximumGroundHeight(
+  x0: number,
+  x1: number,
+  z0: number,
+  z1: number,
+) {
   const ix0 = Math.floor((x0 + WORLD_SIZE / 2) / terrainCell);
   const ix1 = Math.floor((x1 + WORLD_SIZE / 2) / terrainCell) + 1;
   const iz0 = Math.floor((z0 + WORLD_SIZE / 2) / terrainCell);
   const iz1 = Math.floor((z1 + WORLD_SIZE / 2) / terrainCell) + 1;
-  let height = Math.max(0, ...runways.map((r) => r.y + Math.max(APRON_PAVEMENT_HEIGHT, RUNWAY_PAVEMENT_HEIGHT)));
+  let height = Math.max(
+    0,
+    ...runways.map(
+      (r) => r.y + Math.max(APRON_PAVEMENT_HEIGHT, RUNWAY_PAVEMENT_HEIGHT),
+    ),
+  );
   for (let iz = iz0; iz <= iz1; iz++)
-    for (let ix = ix0; ix <= ix1; ix++) height = Math.max(height, vertexHeight(ix, iz));
+    for (let ix = ix0; ix <= ix1; ix++)
+      height = Math.max(height, vertexHeight(ix, iz));
   return height;
 }
 export function terrainSurfaceHeight(x: number, z: number) {

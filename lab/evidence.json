@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-11T16:23:34.429Z",
+  "generatedAt": "2026-10-13T11:06:06.196Z",
   "chamber": {
     "units": "metres",
     "designVersion": "premium-chamber-2",
@@ -45,7 +45,7 @@
     {
       "id": "finch",
       "asset": "finch-u2.glb",
-      "revision": "b880679bd9cf8551b092db072968db372c5d1b93076de447d26f4170a7a53036",
+      "revision": "040ff689926f6868bb0cb4f4ef3987f44598ac3e8b6b6588811eb6ce90b6bcb3",
       "clearance": [
         {
           "alpha": -8,
@@ -108,9 +108,9 @@
       "experiment": {
         "schemaVersion": 1,
         "solver": "horseshoe-vlm-1.0",
-        "generatedAt": "2026-10-11T16:23:34.192Z",
+        "generatedAt": "2026-10-13T11:06:05.963Z",
         "aircraft": "Finch U–2 main wing",
-        "geometryRevision": "b880679bd9cf8551b092db072968db372c5d1b93076de447d26f4170a7a53036",
+        "geometryRevision": "040ff689926f6868bb0cb4f4ef3987f44598ac3e8b6b6588811eb6ce90b6bcb3",
         "assumptions": [
           "Spanwise integration of the exported main-wing/control-surface outer chord envelope (includes merged root fillets), plus a 1 m fuselage-covered strip at the measured root chord. 800 midpoint slices per half-wing; internal chordwise hinge gaps filled; spanwise control gaps remain.",
           "Nominal authoring section: 1.5% sinusoidal camber. Thin-airfoil approximation; no measured polar.",
@@ -120,7 +120,7 @@
         ],
         "geometry": {
           "name": "Finch U–2 main wing",
-          "revision": "b880679bd9cf8551b092db072968db372c5d1b93076de447d26f4170a7a53036",
+          "revision": "040ff689926f6868bb0cb4f4ef3987f44598ac3e8b6b6588811eb6ce90b6bcb3",
           "stations": [
             {
               "x": 0,
@@ -876,7 +876,7 @@
     {
       "id": "peregrine",
       "asset": "peregrine-hx27.glb",
-      "revision": "489cd7f96f157f9dbd3837fdd14209f292f94b356b639a2120305cabfbfcba7f",
+      "revision": "02f0e763e06cc3cf1fee013e94b2abcc0c61455d3f420012216bb3196069db7e",
       "clearance": [
         {
           "alpha": -8,
@@ -939,9 +939,9 @@
       "experiment": {
         "schemaVersion": 1,
         "solver": "horseshoe-vlm-1.0",
-        "generatedAt": "2026-10-11T16:23:34.269Z",
+        "generatedAt": "2026-10-13T11:06:06.037Z",
         "aircraft": "Peregrine HX–27 main wing",
-        "geometryRevision": "489cd7f96f157f9dbd3837fdd14209f292f94b356b639a2120305cabfbfcba7f",
+        "geometryRevision": "02f0e763e06cc3cf1fee013e94b2abcc0c61455d3f420012216bb3196069db7e",
         "assumptions": [
           "Main-wing and neutral control-surface outer chord envelope extracted from the runtime export. Root fillets included where merged. Decorative hardware and seals excluded.",
           "Runtime scale 0.7, vertical offset -1.6099999999999999 m. Centreline-covered strip reconstructed using measured root chord.",
@@ -953,7 +953,7 @@
         ],
         "geometry": {
           "name": "Peregrine HX–27 main wing",
-          "revision": "489cd7f96f157f9dbd3837fdd14209f292f94b356b639a2120305cabfbfcba7f",
+          "revision": "02f0e763e06cc3cf1fee013e94b2abcc0c61455d3f420012216bb3196069db7e",
           "stations": [
             {
               "x": 0,
@@ -1711,7 +1711,7 @@
     {
       "id": "aurelia",
       "asset": "aurelia-flight.glb",
-      "revision": "a9a430919c0609e8af506cfd2ac9fa5ade31ec3efe89d9f8b6f51d81b4a5eb20",
+      "revision": "6cd1a640e4fb8477683a1e839967d503061eee6d64cf2749f863c734dc7a7207",
       "clearance": [
         {
           "alpha": -8,
@@ -1746,7 +1746,7 @@
           {
             "panelCount": 24,
             "cl": 0.29615289297574754,
-            "cdi": 0.0038673288311573176,
+            "cdi": 0.0038673288311573168,
             "residual": 1.4802973661668753e-16
           },
           {
@@ -1757,26 +1757,26 @@
           },
           {
             "panelCount": 96,
-            "cl": 0.29372609311802284,
-            "cdi": 0.004032815770443437,
-            "residual": 1.6949404842610724e-15
+            "cl": 0.2937260931180228,
+            "cdi": 0.004032815770443443,
+            "residual": 1.6431300764452318e-15
           },
           {
             "panelCount": 144,
             "cl": 0.29310077840827564,
-            "cdi": 0.004022775890076102,
-            "residual": 2.264854970235319e-15
+            "cdi": 0.0040227758900761084,
+            "residual": 2.338869838543663e-15
           }
         ],
-        "liftChangePercent": 0.2133446090259642,
-        "dragChangePercent": 0.2495759306925879
+        "liftChangePercent": 0.21334460902594524,
+        "dragChangePercent": 0.24957593069258752
       },
       "experiment": {
         "schemaVersion": 1,
         "solver": "horseshoe-vlm-1.0",
-        "generatedAt": "2026-10-11T16:23:34.333Z",
+        "generatedAt": "2026-10-13T11:06:06.105Z",
         "aircraft": "Aurelia S32 main wing",
-        "geometryRevision": "a9a430919c0609e8af506cfd2ac9fa5ade31ec3efe89d9f8b6f51d81b4a5eb20",
+        "geometryRevision": "6cd1a640e4fb8477683a1e839967d503061eee6d64cf2749f863c734dc7a7207",
         "assumptions": [
           "Main-wing and neutral control-surface outer chord envelope extracted from the runtime export. Root fillets included where merged. Decorative hardware and seals excluded.",
           "Runtime scale 0.55, vertical offset -1.265 m. Centreline-covered strip reconstructed using measured root chord.",
@@ -1788,7 +1788,7 @@
         ],
         "geometry": {
           "name": "Aurelia S32 main wing",
-          "revision": "a9a430919c0609e8af506cfd2ac9fa5ade31ec3efe89d9f8b6f51d81b4a5eb20",
+          "revision": "6cd1a640e4fb8477683a1e839967d503061eee6d64cf2749f863c734dc7a7207",
           "stations": [
             {
               "x": 0,
@@ -1932,7 +1932,7 @@
             },
             {
               "x": 2.746070303034038,
-              "y": 0.3681897299537568,
+              "y": 0.36818972995375676,
               "leading": -0.6348741785924576,
               "chord": 2.9888742939870503,
               "zeroLiftAlpha": 0
@@ -2191,7 +2191,7 @@
             },
             {
               "x": 6.645812446564437,
-              "y": 0.7725337058904036,
+              "y": 0.7725337058904037,
               "leading": 2.3170418236950026,
               "chord": 0.977634368012843,
               "zeroLiftAlpha": 0
@@ -2212,7 +2212,7 @@
             },
             {
               "x": 6.962007755499334,
-              "y": 0.8163163261075409,
+              "y": 0.8163163261075408,
               "leading": 2.566836105691677,
               "chord": 0.8353464639147723,
               "zeroLiftAlpha": 0
@@ -2247,7 +2247,7 @@
             },
             {
               "x": 7.488999937057496,
-              "y": 1.653159754478291,
+              "y": 1.6531597544782912,
               "leading": 3.2885713760218,
               "chord": 0.3339287079015403,
               "zeroLiftAlpha": 0
@@ -2287,12 +2287,12 @@
             },
             "panelCount": 96,
             "cl": -0.5860211822356182,
-            "cdi": 0.016052768910062024,
+            "cdi": 0.016052768910062017,
             "lift": -11457.328233638325,
-            "inducedDrag": 313.84845469182505,
+            "inducedDrag": 313.84845469182494,
             "dynamicPressure": 551.25,
-            "residual": 2.9013828376870757e-15,
-            "efficiency": 1.076565839687653
+            "residual": 2.827367969378732e-15,
+            "efficiency": 1.0765658396876534
           },
           {
             "conditions": {
@@ -2302,12 +2302,12 @@
             },
             "panelCount": 96,
             "cl": -0.5131596278871151,
-            "cdi": 0.012309156357836755,
+            "cdi": 0.012309156357836748,
             "lift": -10032.808490854975,
-            "inducedDrag": 240.6569061768293,
+            "inducedDrag": 240.65690617682915,
             "dynamicPressure": 551.25,
-            "residual": 3.315866100213801e-15,
-            "efficiency": 1.0765658396876545
+            "residual": 2.7385501274087196e-15,
+            "efficiency": 1.0765658396876552
           },
           {
             "conditions": {
@@ -2317,12 +2317,12 @@
             },
             "panelCount": 96,
             "cl": -0.4401417601448684,
-            "cdi": 0.009055417474964267,
+            "cdi": 0.009055417474964262,
             "lift": -8605.232657415307,
-            "inducedDrag": 177.0429012608207,
+            "inducedDrag": 177.04290126082063,
             "dynamicPressure": 551.25,
-            "residual": 2.3684757858670005e-15,
-            "efficiency": 1.0765658396876545
+            "residual": 2.3092638912203257e-15,
+            "efficiency": 1.076565839687655
           },
           {
             "conditions": {
@@ -2332,12 +2332,12 @@
             },
             "panelCount": 96,
             "cl": -0.3669898209587329,
-            "cdi": 0.006295516441073288,
+            "cdi": 0.006295516441073286,
             "lift": -7175.035586747435,
-            "inducedDrag": 123.08394380980317,
+            "inducedDrag": 123.08394380980313,
             "dynamicPressure": 551.25,
-            "residual": 2.2500519965736505e-15,
-            "efficiency": 1.0765658396876547
+            "residual": 2.264854970235319e-15,
+            "efficiency": 1.0765658396876552
           },
           {
             "conditions": {
@@ -2346,13 +2346,13 @@
               "alpha": -4
             },
             "panelCount": 96,
-            "cl": -0.29372609311802284,
-            "cdi": 0.004032815770443437,
-            "lift": -5742.652930733704,
-            "inducedDrag": 78.84577450169026,
+            "cl": -0.2937260931180228,
+            "cdi": 0.004032815770443443,
+            "lift": -5742.652930733703,
+            "inducedDrag": 78.84577450169037,
             "dynamicPressure": 551.25,
-            "residual": 1.6949404842610724e-15,
-            "efficiency": 1.0765658396876543
+            "residual": 1.6431300764452318e-15,
+            "efficiency": 1.076565839687652
           },
           {
             "conditions": {
@@ -2361,13 +2361,13 @@
               "alpha": -3
             },
             "panelCount": 96,
-            "cl": -0.22037289346396072,
-            "cdi": 0.0022700722152995626,
-            "lift": -4308.521007006948,
-            "inducedDrag": 44.38229073141643,
+            "cl": -0.22037289346396066,
+            "cdi": 0.002270072215299563,
+            "lift": -4308.521007006947,
+            "inducedDrag": 44.38229073141644,
             "dynamicPressure": 551.25,
-            "residual": 1.0658141036401502e-15,
-            "efficiency": 1.0765658396876547
+            "residual": 1.1472304587793285e-15,
+            "efficiency": 1.076565839687654
           },
           {
             "conditions": {
@@ -2381,7 +2381,7 @@
             "lift": -2873.076666043873,
             "inducedDrag": 19.735480945262992,
             "dynamicPressure": 551.25,
-            "residual": 8.511709855459534e-16,
+            "residual": 7.327471962526033e-16,
             "efficiency": 1.0765658396876545
           },
           {
@@ -2392,12 +2392,12 @@
             },
             "panelCount": 96,
             "cl": -0.07348747554434451,
-            "cdi": 0.00025243524014730684,
+            "cdi": 0.0002524352401473068,
             "lift": -1436.7571580962037,
-            "inducedDrag": 4.935373484404436,
+            "inducedDrag": 4.935373484404435,
             "dynamicPressure": 551.25,
-            "residual": 3.904284303265134e-16,
-            "efficiency": 1.0765658396876536
+            "residual": 3.552713678800501e-16,
+            "efficiency": 1.0765658396876538
           },
           {
             "conditions": {
@@ -2422,12 +2422,12 @@
             },
             "panelCount": 96,
             "cl": 0.07348747554434451,
-            "cdi": 0.00025243524014730684,
+            "cdi": 0.0002524352401473068,
             "lift": 1436.7571580962037,
-            "inducedDrag": 4.935373484404436,
+            "inducedDrag": 4.935373484404435,
             "dynamicPressure": 551.25,
-            "residual": 3.904284303265134e-16,
-            "efficiency": 1.0765658396876536
+            "residual": 3.552713678800501e-16,
+            "efficiency": 1.0765658396876538
           },
           {
             "conditions": {
@@ -2441,7 +2441,7 @@
             "lift": 2873.076666043873,
             "inducedDrag": 19.735480945262992,
             "dynamicPressure": 551.25,
-            "residual": 8.511709855459534e-16,
+            "residual": 7.327471962526033e-16,
             "efficiency": 1.0765658396876545
           },
           {
@@ -2451,13 +2451,13 @@
               "alpha": 3
             },
             "panelCount": 96,
-            "cl": 0.22037289346396072,
-            "cdi": 0.0022700722152995626,
-            "lift": 4308.521007006948,
-            "inducedDrag": 44.38229073141643,
+            "cl": 0.22037289346396066,
+            "cdi": 0.002270072215299563,
+            "lift": 4308.521007006947,
+            "inducedDrag": 44.38229073141644,
             "dynamicPressure": 551.25,
-            "residual": 1.0658141036401502e-15,
-            "efficiency": 1.0765658396876547
+            "residual": 1.1472304587793285e-15,
+            "efficiency": 1.076565839687654
           },
           {
             "conditions": {
@@ -2466,13 +2466,13 @@
               "alpha": 4
             },
             "panelCount": 96,
-            "cl": 0.29372609311802284,
-            "cdi": 0.004032815770443437,
-            "lift": 5742.652930733704,
-            "inducedDrag": 78.84577450169026,
+            "cl": 0.2937260931180228,
+            "cdi": 0.004032815770443443,
+            "lift": 5742.652930733703,
+            "inducedDrag": 78.84577450169037,
             "dynamicPressure": 551.25,
-            "residual": 1.6949404842610724e-15,
-            "efficiency": 1.0765658396876543
+            "residual": 1.6431300764452318e-15,
+            "efficiency": 1.076565839687652
           },
           {
             "conditions": {
@@ -2482,12 +2482,12 @@
             },
             "panelCount": 96,
             "cl": 0.3669898209587329,
-            "cdi": 0.006295516441073288,
+            "cdi": 0.006295516441073286,
             "lift": 7175.035586747435,
-            "inducedDrag": 123.08394380980317,
+            "inducedDrag": 123.08394380980313,
             "dynamicPressure": 551.25,
-            "residual": 2.2500519965736505e-15,
-            "efficiency": 1.0765658396876547
+            "residual": 2.264854970235319e-15,
+            "efficiency": 1.0765658396876552
           },
           {
             "conditions": {
@@ -2497,12 +2497,12 @@
             },
             "panelCount": 96,
             "cl": 0.4401417601448684,
-            "cdi": 0.009055417474964267,
+            "cdi": 0.009055417474964262,
             "lift": 8605.232657415307,
-            "inducedDrag": 177.0429012608207,
+            "inducedDrag": 177.04290126082063,
             "dynamicPressure": 551.25,
-            "residual": 2.3684757858670005e-15,
-            "efficiency": 1.0765658396876545
+            "residual": 2.3092638912203257e-15,
+            "efficiency": 1.076565839687655
           },
           {
             "conditions": {
@@ -2512,12 +2512,12 @@
             },
             "panelCount": 96,
             "cl": 0.5131596278871151,
-            "cdi": 0.012309156357836755,
+            "cdi": 0.012309156357836748,
             "lift": 10032.808490854975,
-            "inducedDrag": 240.6569061768293,
+            "inducedDrag": 240.65690617682915,
             "dynamicPressure": 551.25,
-            "residual": 3.315866100213801e-15,
-            "efficiency": 1.0765658396876545
+            "residual": 2.7385501274087196e-15,
+            "efficiency": 1.0765658396876552
           },
           {
             "conditions": {
@@ -2527,26 +2527,26 @@
             },
             "panelCount": 96,
             "cl": 0.5860211822356182,
-            "cdi": 0.016052768910062024,
+            "cdi": 0.016052768910062017,
             "lift": 11457.328233638325,
-            "inducedDrag": 313.84845469182505,
+            "inducedDrag": 313.84845469182494,
             "dynamicPressure": 551.25,
-            "residual": 2.9013828376870757e-15,
-            "efficiency": 1.076565839687653
+            "residual": 2.827367969378732e-15,
+            "efficiency": 1.0765658396876534
           }
         ]
       },
       "referenceResult": {
-        "cl": 0.29372609311802284,
-        "cdi": 0.004032815770443437,
-        "lift": 5742.652930733704,
-        "inducedDrag": 78.84577450169026
+        "cl": 0.2937260931180228,
+        "cdi": 0.004032815770443443,
+        "lift": 5742.652930733703,
+        "inducedDrag": 78.84577450169037
       }
     },
     {
       "id": "stormbird",
       "asset": "stormbird-hx40.gltf",
-      "revision": "7adb7cc95f9066e35baaed95259ce873033e594abfe8cfa4d581c851d67a0c00",
+      "revision": "0bad95db964f90bffe04a8c338bd41a7f36777b189eed94dc79945da6285ff44",
       "clearance": [
         {
           "alpha": -8,
@@ -2609,9 +2609,9 @@
       "experiment": {
         "schemaVersion": 1,
         "solver": "horseshoe-vlm-1.0",
-        "generatedAt": "2026-10-11T16:23:34.423Z",
+        "generatedAt": "2026-10-13T11:06:06.190Z",
         "aircraft": "Stormbird HX–40 main wing",
-        "geometryRevision": "7adb7cc95f9066e35baaed95259ce873033e594abfe8cfa4d581c851d67a0c00",
+        "geometryRevision": "0bad95db964f90bffe04a8c338bd41a7f36777b189eed94dc79945da6285ff44",
         "assumptions": [
           "Main-wing and neutral control-surface outer chord envelope extracted from the runtime export. Root fillets included where merged. Decorative hardware and seals excluded.",
           "Gross main-wing stations come from the CAD design sheet, verified against exported outer sections. Covered wing reconstructed across fuselage cutouts; separate inlet/root fairings excluded.",
@@ -2624,7 +2624,7 @@
         ],
         "geometry": {
           "name": "Stormbird HX–40 main wing",
-          "revision": "7adb7cc95f9066e35baaed95259ce873033e594abfe8cfa4d581c851d67a0c00",
+          "revision": "0bad95db964f90bffe04a8c338bd41a7f36777b189eed94dc79945da6285ff44",
           "stations": [
             {
               "x": 0,

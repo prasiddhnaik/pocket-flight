@@ -14,6 +14,7 @@ import {
 } from "./aerodynamics";
 import { aircraftDesign, massProperties } from "./aircraft-design";
 import type { Loading } from "./aircraft-design";
+import { consumeTankFuel } from "./fuel-loading";
 import { advanceOrientation, integrateAngularVelocity } from "./rigid-body";
 import { solveTrim } from "./flight-trim";
 import { aircraftWheels, airframeProbes, wheelPose } from "./airframe-contact";
@@ -23,6 +24,7 @@ import {
   inverseContactMass,
   pointVelocity,
   solveWheelContacts,
+  resolveWheelPenetration,
 } from "./wheel-contact";
 import type { ContactBody, WheelContact } from "./wheel-contact";
 import { sweepAirframe } from "./collision";
@@ -199,8 +201,13 @@ export class FlightPhysics {
   get design() {
     return aircraftDesign(this.aircraftId);
   }
-  private loading: Loading = { fuel: 1, payload: 1 };
-  massProperties = massProperties(aircraftDesign("finch").massBudget);
+  private loading: Loading = aircraftDesign("finch").defaultLoading;
+  private loadingAircraft: AircraftId = "finch";
+  massProperties = massProperties(
+    aircraftDesign("finch").massBudget,
+    aircraftDesign("finch").defaultLoading,
+  );
+  private tankFuelKg = { ...this.massProperties.fuelByTank };
   private massOverride: number | null = null;
   get loadedMass() {
     return this.massOverride ?? this.massProperties.mass;
@@ -210,7 +217,8 @@ export class FlightPhysics {
       throw new RangeError("Mass must be positive and finite.");
     this.massOverride = value;
   }
-  fuelKg = 80;
+  installedThrust = 0;
+  fuelKg = this.massProperties.fuelKg;
   private fuelUpdateTime = 0;
   configureLoading(loading: Loading) {
     const balance = massProperties(this.design.massBudget, loading);
@@ -218,12 +226,15 @@ export class FlightPhysics {
     if (balance.cg.z < forward || balance.cg.z > aft)
       throw new RangeError("Loading is outside the declared CG envelope.");
     this.massProperties = balance;
-    this.loading = { ...loading };
+    this.fuelUpdateTime = 0;
+    this.loading = {
+      ...loading,
+      tanks: loading.tanks ? { ...loading.tanks } : undefined,
+    };
+    this.loadingAircraft = this.aircraftId;
+    this.tankFuelKg = { ...balance.fuelByTank };
     this.massOverride = null;
-    this.fuelKg =
-      this.design.massBudget
-        .filter((p) => p.category === "fuel")
-        .reduce((sum, p) => sum + p.mass, 0) * loading.fuel;
+    this.fuelKg = balance.fuelKg;
   }
   get stallSpeed() {
     return aircraftStallSpeed(
@@ -237,6 +248,8 @@ export class FlightPhysics {
   surfaces = { pitch: 0, roll: 0, yaw: 0 };
   flapPosition = 0;
   elevatorTrim = 0;
+  rollTrim = 0;
+  yawTrim = 0;
   aerodynamics: ReturnType<typeof aircraftAerodynamics> | null = null;
   private groundTime = 0;
   private announcedAirborne = false;
@@ -270,8 +283,13 @@ export class FlightPhysics {
     });
   }
   reset(airStart = false, short = false) {
-    this.configureLoading(this.loading);
+    this.configureLoading(
+      this.loadingAircraft === this.aircraftId
+        ? this.loading
+        : this.design.defaultLoading,
+    );
     this.fuelUpdateTime = 0;
+    this.installedThrust = 0;
     const r = short ? runways[1] : runways[0];
     this.yaw = r.heading;
     this.pitch = airStart ? -0.015 : 0;
@@ -319,7 +337,7 @@ export class FlightPhysics {
     this.gearSteering = 0;
     this.manualGearTarget = this.gearPosition;
     this.manualFlapTarget = this.flapPosition;
-    this.elevatorTrim = 0;
+    this.elevatorTrim = this.rollTrim = this.yawTrim = 0;
     if (airStart) {
       this.initializeAirStart(
         Math.max(this.design.trimSpeed, this.stallSpeed * 1.4),
@@ -338,8 +356,11 @@ export class FlightPhysics {
       this.flapPosition,
     );
     this.pitch = trim.alpha;
+    this.roll = trim.bank;
+    this.rollTrim = trim.roll;
+    this.yawTrim = trim.yaw;
     this.elevatorTrim = trim.pitch;
-    this.surfaces = { pitch: trim.pitch, roll: 0, yaw: 0 };
+    this.surfaces = { pitch: trim.pitch, roll: trim.roll, yaw: trim.yaw };
     this.angularVelocity.set(0, 0, 0);
     this.throttle = this.enginePower = trim.throttle;
     this.velocity
@@ -443,6 +464,13 @@ export class FlightPhysics {
       this.profile.engineResponse,
       dt,
     );
+    if (this.attitudeDirty) this.updateQuaternion();
+    resolveWheelPenetration(
+      this.position,
+      this.quaternion,
+      this.aircraftId,
+      this.jet ? this.gearPosition : 1,
+    );
     const prev = this.position.clone();
     const gust = this.strongWind ? 7 : 1.5;
     this.wind.set(
@@ -491,24 +519,47 @@ export class FlightPhysics {
         7,
         dt,
       );
-    const fuelCapacity = this.design.massBudget
-      .filter((p) => p.category === "fuel")
-      .reduce((sum, p) => sum + p.mass, 0);
-    this.fuelKg = Math.max(
+    const tanks = this.design.fuel.tanks;
+    const storedFuel = Object.values(this.tankFuelKg).reduce(
+      (sum, kg) => sum + kg,
       0,
-      this.fuelKg -
+    );
+    // Preserve the existing public fuel cutoff control, including test/engine-out scenarios.
+    if (this.fuelKg < storedFuel) {
+      this.tankFuelKg = consumeTankFuel(
+        tanks,
+        this.tankFuelKg,
+        storedFuel - Math.max(0, this.fuelKg),
+      );
+    }
+    if (!this.engineOut && !this.crashed) {
+      const burn =
         this.design.propulsion.fuelRate *
-          this.enginePower *
-          (1 +
-            MathUtils.smoothstep(this.enginePower, 0.88, 1) *
-              (this.profile.afterburner ? 1 : 0)) *
-          dt,
+        this.enginePower *
+        (1 +
+          MathUtils.smoothstep(this.enginePower, 0.88, 1) *
+            (this.profile.afterburner ? 1 : 0)) *
+        dt;
+      this.tankFuelKg = consumeTankFuel(tanks, this.tankFuelKg, burn);
+    }
+    this.fuelKg = Object.values(this.tankFuelKg).reduce(
+      (sum, kg) => sum + kg,
+      0,
     );
     this.fuelUpdateTime += dt;
-    if (this.fuelUpdateTime >= 1) {
+    if (
+      this.fuelUpdateTime >= 0.25 ||
+      (this.fuelKg === 0 && this.massProperties.fuelKg > 0)
+    ) {
+      const fractions = Object.fromEntries(
+        tanks.map((t) => [
+          t.id,
+          this.tankFuelKg[t.id] / (t.usableLitres * t.densityKgPerLitre),
+        ]),
+      );
       this.massProperties = massProperties(this.design.massBudget, {
         ...this.loading,
-        fuel: this.fuelKg / fuelCapacity,
+        tanks: fractions,
       });
       this.fuelUpdateTime = 0;
     }
@@ -551,6 +602,7 @@ export class FlightPhysics {
           protection.thrustScale *
           (1 - this.damage.engine * 0.85) *
           (this.jet ? 1 : 1 - this.damage.propeller * 0.8);
+    this.installedThrust = thrust;
     const thrustMoment = new Vector3()
       .fromArray(design.propulsion.thrustCenter)
       .sub(balance.cg)
@@ -563,15 +615,36 @@ export class FlightPhysics {
           this.loadedMass * GRAVITY - baseAero.force.y - forward.y * thrust,
         )
       : 0;
-    const groundMoment = new Vector3(
-      -normalLoad * Math.max(0, mainGearZ - balance.cg.z),
-      0,
-      0,
+    const mainWheels = wheels.filter(
+      (w) => Math.abs(w.center.z - mainGearZ) < 0.01,
     );
+    const mainPoint = new Vector3(
+      0,
+      mainWheels.reduce((sum, w) => sum + w.center.y - w.major - w.minor, 0) /
+        mainWheels.length,
+      mainGearZ,
+    );
+    const groundMoment = mainPoint
+      .sub(balance.cg)
+      .cross(
+        new Vector3(0, normalLoad, 0).applyQuaternion(
+          this.quaternion.clone().invert(),
+        ),
+      );
+    // Once the nose wheel supports the aircraft, reactions balance across the
+    // gear. A main-gear-only estimate would falsely command nose-up elevator.
+    if (
+      this.grounded &&
+      input.pitch <= 0 &&
+      this.wheelContacts.some(
+        (c) => wheels[c.index].center.z < -1 && c.load > 0,
+      )
+    )
+      groundMoment.set(0, 0, 0);
     let command = {
       pitch: MathUtils.clamp(input.pitch + this.elevatorTrim, -1, 1),
-      roll: MathUtils.clamp(input.roll, -1, 1),
-      yaw: MathUtils.clamp(input.yaw, -1, 1),
+      roll: MathUtils.clamp(input.roll + this.rollTrim, -1, 1),
+      yaw: MathUtils.clamp(input.yaw + this.yawTrim, -1, 1),
     };
     if (this.beginnerAssist && !this.crashed) {
       const flightPath = Math.atan2(air.y, Math.hypot(air.x, air.z));
@@ -913,6 +986,12 @@ export class FlightPhysics {
         this.impact(1.2, "propeller", { part: "body" });
       remaining *= 1 - hit.fraction;
     }
+    resolveWheelPenetration(
+      this.position,
+      this.quaternion,
+      this.aircraftId,
+      this.jet ? this.gearPosition : 1,
+    );
     this.attitude.setFromQuaternion(this.quaternion, "YXZ");
     this.attitudeDirty = false;
     this.verticalSpeed = this.velocity.y;

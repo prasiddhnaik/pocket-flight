@@ -1,14 +1,16 @@
 import { beforeAll, expect, test } from "bun:test";
-import { GLTFLoader, type GLTF } from "three/addons/loaders/GLTFLoader.js";
+import type { GLTF } from "three/addons/loaders/GLTFLoader.js";
+import { loadGeometryOnly } from "../scripts/geometry-loader";
 import { Vector3 } from "three";
 import { AureliaEffects } from "../src/aurelia-effects";
 import { initialJetInput } from "../src/jet-effects";
-let gltf: GLTF;
+let gltf: Pick<GLTF, "scene" | "animations">;
 beforeAll(async () => {
-  gltf = await new GLTFLoader().parseAsync(
-    await Bun.file("public/assets/aurelia-flight.glb").arrayBuffer(),
-    "",
+  const loaded = await loadGeometryOnly(
+    new URL("../public/assets/aurelia-flight.glb", import.meta.url),
+    true,
   );
+  gltf = loaded;
 });
 test("exported Blender gear retracts into the hull and returns to its original pose", () => {
   const e = new AureliaEffects(gltf.scene, gltf.animations),

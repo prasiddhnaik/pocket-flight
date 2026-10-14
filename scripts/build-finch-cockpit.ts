@@ -46,12 +46,17 @@ await Bun.write(
 );
 if (nativeCode || !nativeOut.includes("FINCH_NATIVE_REOPEN_OK"))
   throw new Error("Saved cockpit failed its independent native reopen check");
-for (const script of ["measure-finch.ts", "measure-fleet.ts"]) {
-  const measured = Bun.spawn(["bun", `scripts/${script}`, "--save"], {
+// Keep geometry and fuel evidence tied to the newly exported asset revision.
+for (const args of [
+  ["scripts/measure-finch.ts", "--save"],
+  ["scripts/measure-fleet.ts", "--save"],
+  ["scripts/measure-fuel-and-mass.ts"],
+]) {
+  const measured = Bun.spawn(["bun", ...args], {
     cwd: root,
     stdout: "inherit",
     stderr: "inherit",
   });
-  if (await measured.exited) throw new Error(`Failed ${script}`);
+  if (await measured.exited) throw new Error(`Failed ${args[0]}`);
 }
 console.log("Finch cockpit saved, validated, exported and remeasured.");

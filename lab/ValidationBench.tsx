@@ -184,7 +184,7 @@ export function ValidationBench({ aircraft }: { aircraft: AircraftId }) {
         <>
           <p>
             <strong>{aircraftCatalog[aircraft].name}</strong> · {result.version}{" "}
-            · ISA · zero wind · four fuel/payload cases
+            · ISA · zero wind · four admissible dispatch / low-fuel / payload cases
           </p>
           {view === "stall" && (
             <>

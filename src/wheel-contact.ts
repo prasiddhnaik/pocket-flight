@@ -1,6 +1,10 @@
 import { Matrix3, Quaternion, Vector3 } from "three";
 import type { AircraftId } from "./aircraft";
-import { aircraftWheels, wheelPose } from "./airframe-contact";
+import {
+  aircraftWheels,
+  wheelPose,
+  wheelSupportPoint,
+} from "./airframe-contact";
 import { groundAt } from "./terrain";
 
 export type ContactBody = {
@@ -78,31 +82,30 @@ export function solveWheelContacts(
 ): WheelContact[] {
   const wheels = aircraftWheels[id];
   const contacts = [];
-  const spring =
-    ((body.mass * 9.80665) / (wheels.length * 0.018)) * (1 - damage * 0.65);
-  const damping = 1.7 * Math.sqrt((spring * body.mass) / wheels.length);
-  const softness = 1 / (dt * (damping + dt * spring));
   for (let index = 0; index < wheels.length; index++) {
     const pose = wheelPose(id, index, gear);
-    const axle = pose.axle.applyQuaternion(body.quaternion);
-    const wheel = wheels[index];
-    const radius =
-      wheel.major * Math.sqrt(Math.max(0, 1 - axle.y ** 2)) + wheel.minor;
-    const world = pose.center
+    const center = pose.center
       .clone()
       .applyQuaternion(body.quaternion)
       .add(body.position);
-    world.y -= radius;
+    const normal = terrainNormal(center.x, center.z);
+    const world = wheelSupportPoint(
+      id,
+      index,
+      gear,
+      body.position,
+      body.quaternion,
+      normal,
+    );
     const surface = groundAt(world.x, world.z);
     const gap = world.y - surface.height;
-    // Cheap rejection before slope samples; speculative contacts stop a wheel
-    // crossing the ground during this tick, without requiring a height clamp.
+    // Speculative contact limits downward motion before the next pose crosses
+    // the surface. Position recovery is separate from kinetic impulses.
     if (
       gap >
       Math.max(0.06, pointVelocity(body, pose.center).length() * dt + 0.02)
     )
       continue;
-    const normal = terrainNormal(world.x, world.z);
     const point = world
       .clone()
       .sub(body.position)
@@ -132,7 +135,8 @@ export function solveWheelContacts(
       normalImpulse: 0,
       forwardImpulse: 0,
       lateralImpulse: 0,
-      bias: gap < 0 ? (gap * spring) / (damping + dt * spring) : gap / dt,
+      // Tire exclusion is rigid; overlap recovery never injects kinetic energy.
+      bias: Math.max(0, gap) / dt,
       traction: (surface.runway ? 0.8 : 0.55) * (1 - damage * 0.55),
       rolling: brake && !nose ? 0.65 : surface.runway ? 0.016 : 0.08,
     });
@@ -143,8 +147,7 @@ export function solveWheelContacts(
       const next = Math.max(
         0,
         c.normalImpulse -
-          (speed + c.bias + softness * c.normalImpulse) /
-            (inverseContactMass(body, c.point, c.normal) + softness),
+          (speed + c.bias) / inverseContactMass(body, c.point, c.normal),
       );
       applyContactImpulse(
         body,
@@ -198,4 +201,32 @@ export function solveWheelContacts(
     runway: c.runway,
     water: c.water,
   }));
+}
+
+/** Split position correction: remove overlap without adding bounce velocity. */
+export function resolveWheelPenetration(
+  position: Vector3,
+  rotation: Quaternion,
+  id: AircraftId,
+  gear: number,
+) {
+  if (id !== "finch" && gear < 0.995) return 0;
+  let depth = 0;
+  for (let index = 0; index < aircraftWheels[id].length; index++) {
+    const pose = wheelPose(id, index, gear);
+    const center = pose.center.applyQuaternion(rotation).add(position);
+    const point = wheelSupportPoint(
+      id,
+      index,
+      gear,
+      position,
+      rotation,
+      terrainNormal(center.x, center.z),
+    );
+    depth = Math.max(depth, groundAt(point.x, point.z).height - point.y);
+  }
+  // Tire-ground exclusion is a positional constraint, not spring compression.
+  // Correct the minimum required height while preserving attitude and all rates.
+  if (depth > 0) position.y += depth + 1e-6;
+  return depth;
 }

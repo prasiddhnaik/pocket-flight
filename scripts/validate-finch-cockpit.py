@@ -51,6 +51,28 @@ def object_surface(o):
     return BVHTree.FromPolygons([o.matrix_world@v.co for v in o.data.vertices],
         [t.vertices for t in o.data.loop_triangles], all_triangles=True)
 
+# Check the saved meshes, independently of the builder's intended coordinates.
+fascia = object_surface(bpy.data.objects['Instrument panel fascia'])
+mounts = [o for o in bpy.data.objects if o.name.startswith('Switch mounting')]
+keys = [o for o in bpy.data.objects if o.name.startswith('Display softkey')]
+knobs = [o for o in bpy.data.objects if o.name.startswith('Avionics rotary knob')]
+legends = [o for o in bpy.data.objects if o.name.startswith('Switch legend')]
+if (len(mounts), len(keys), len(knobs), len(legends)) != (6, 10, 4, 6):
+    raise RuntimeError('Incomplete panel controls')
+for o in mounts:
+    if not fascia.overlap(object_surface(o)):
+        raise RuntimeError('Switch mounting floats off fascia: '+o.name)
+for o in keys + knobs:
+    bezel = bpy.data.objects[('PFD' if o.matrix_world.translation.x < 0 else 'MAP')+' display bezel']
+    if not object_surface(bezel).overlap(object_surface(o)):
+        raise RuntimeError('Display control floats off bezel: '+o.name)
+legend_gaps = [fascia.find_nearest(o.matrix_world@v.co)[3] for o in legends for v in o.data.vertices]
+if max(legend_gaps) > .001:
+    raise RuntimeError('Switch legends stand off panel')
+evidence['panel_controls'] = {'seated_switch_bases':len(mounts),
+    'seated_softkeys':len(keys), 'seated_rotary_knobs':len(knobs),
+    'legends_on_fascia':len(legends), 'maximum_legend_skin_gap_m':max(legend_gaps)}
+
 tank=bpy.data.objects['Conformal belly fuel cell']
 bm=bmesh.new();bm.from_mesh(tank.data)
 if any(not e.is_manifold for e in bm.edges):raise RuntimeError('Fuel cell is not closed')

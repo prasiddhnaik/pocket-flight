@@ -45,7 +45,7 @@ export class AirframeEnvelope {
       meshes: { xyz: Float32Array; indices: ArrayLike<number> | null }[] = [];
     this.bounds = new Box3();
     root.traverse((node) => {
-      if (!(node instanceof Mesh)) return;
+      if (!(node instanceof Mesh) || node.userData.internal) return;
       const position = node.geometry.getAttribute("position");
       if (!position) return;
       const transform = new Matrix4().multiplyMatrices(

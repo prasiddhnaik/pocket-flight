@@ -1,6 +1,13 @@
 import { Matrix3, Vector3 } from "three";
 import type { AircraftId } from "./aircraft";
 import { finchDesign } from "./finch-design";
+import {
+  calibratedMassBudget,
+  fuelInstallation,
+  tankFractions,
+  tankState,
+  type FuelTank,
+} from "./fuel-loading";
 
 // SI units; +X right, +Y up, +Z aft. Geometry is measured at runtime scale.
 // Component masses/envelopes and aero/engine data are conceptual estimates.
@@ -10,6 +17,9 @@ export type MassComponent = {
   center: readonly number[];
   size: readonly number[];
   category: "empty" | "fuel" | "payload";
+  fuelTank?: FuelTank;
+  inertiaPerKg?: readonly number[];
+  trappedFuel?: boolean;
 };
 const part = (
   name: string,
@@ -79,7 +89,11 @@ const massBudgets: Record<AircraftId, MassComponent[]> = {
   ],
 };
 
-export type Loading = { fuel: number; payload: number };
+export type Loading = {
+  fuel: number;
+  payload: number;
+  tanks?: Record<string, number>;
+};
 export function massProperties(
   parts: readonly MassComponent[],
   loading: Loading = { fuel: 1, payload: 1 },
@@ -95,19 +109,34 @@ export function massProperties(
     throw new RangeError(
       "Fuel and payload fractions must be between zero and one.",
     );
+  const fractions = tankFractions(parts, loading);
+  const states = parts.map((p) =>
+    p.fuelTank
+      ? tankState(p.fuelTank, fractions[p.fuelTank.id])
+      : { center: p.center, inertiaPerKg: p.inertiaPerKg },
+  );
   const masses = parts.map(
-    (p) => p.mass * (p.category === "empty" ? 1 : loading[p.category]),
+    (p) =>
+      p.mass *
+      (p.fuelTank
+        ? fractions[p.fuelTank.id]
+        : p.category === "empty"
+          ? 1
+          : loading[p.category]),
   );
   const mass = masses.reduce((sum, m) => sum + m, 0);
   const cg = new Vector3();
   parts.forEach((p, i) =>
-    cg.addScaledVector(new Vector3().fromArray(p.center), masses[i] / mass),
+    cg.addScaledVector(
+      new Vector3().fromArray(states[i].center),
+      masses[i] / mass,
+    ),
   );
   const inertia = new Matrix3().set(0, 0, 0, 0, 0, 0, 0, 0, 0);
   parts.forEach((p, i) => {
     const [w, h, l] = p.size,
       m = masses[i];
-    const { x, y, z } = new Vector3().fromArray(p.center).sub(cg);
+    const { x, y, z } = new Vector3().fromArray(states[i].center).sub(cg);
     const contribution = [
       m * ((h * h + l * l) / 12 + y * y + z * z),
       -m * x * y,
@@ -119,9 +148,42 @@ export function massProperties(
       -m * y * z,
       m * ((w * w + h * h) / 12 + x * x + y * y),
     ];
-    contribution.forEach((value, j) => (inertia.elements[j] += value));
+    const intrinsic = states[i].inertiaPerKg;
+    contribution.forEach((value, j) => {
+      // Replace cuboid self-inertia with measured settled-liquid inertia.
+      if (intrinsic)
+        value +=
+          m * intrinsic[j] -
+          (j === 0
+            ? (m * (h * h + l * l)) / 12
+            : j === 4
+              ? (m * (w * w + l * l)) / 12
+              : j === 8
+                ? (m * (w * w + h * h)) / 12
+                : 0);
+      inertia.elements[j] += value;
+    });
   });
-  return { mass, cg, inertia, inverseInertia: inertia.clone().invert() };
+  const fuelByTank = Object.fromEntries(
+    parts
+      .filter((p) => p.fuelTank)
+      .map((p) => [p.fuelTank!.id, p.mass * fractions[p.fuelTank!.id]]),
+  );
+  return {
+    mass,
+    cg,
+    inertia,
+    inverseInertia: inertia.clone().invert(),
+    fuelByTank,
+    fuelKg: parts.reduce(
+      (sum, p, i) => sum + (p.category === "fuel" ? masses[i] : 0),
+      0,
+    ),
+    unusableFuelKg: parts.reduce(
+      (sum, p) => sum + (p.trappedFuel ? p.mass : 0),
+      0,
+    ),
+  };
 }
 
 const geometries = {
@@ -250,11 +312,15 @@ const propulsion = {
 } as const;
 function createAircraftDesign(id: AircraftId) {
   const geometry = geometries[id],
-    massBudget = massBudgets[id];
-  const nominal = massProperties(massBudget);
+    referenceMassBudget = massBudgets[id],
+    massBudget = calibratedMassBudget(id, referenceMassBudget);
+  const fuel = fuelInstallation(id),
+    defaultLoading = fuel.defaultLoading;
+  const nominal = massProperties(massBudget, defaultLoading),
+    reference = massProperties(referenceMassBudget);
   const staticMargin = id === "finch" ? 0.14 : id === "aurelia" ? 0.16 : 0.1;
   const neutralPointZ =
-    nominal.cg.z + staticMargin * geometry.meanAerodynamicChord;
+    reference.cg.z + staticMargin * geometry.meanAerodynamicChord;
   const forwardCG = Math.min(
     ...[0, 1].flatMap((fuel) =>
       [0, 1].map(
@@ -267,6 +333,10 @@ function createAircraftDesign(id: AircraftId) {
     geometry,
     massBudget,
     nominal,
+    reference,
+    fuel,
+    defaultLoading,
+    maxTakeoffMass: fuel.maxTakeoffMass,
     aerodynamics: polars[id],
     propulsion: propulsion[id],
     neutralPointZ,
@@ -306,7 +376,7 @@ function createAircraftDesign(id: AircraftId) {
       neutralPointZ - 0.03 * geometry.meanAerodynamicChord,
     ],
     provenance:
-      "Measured main-wing geometry; estimated component cuboids, whole-aircraft coefficients, neutral point. Finch altitude power and military jet thrust/damping use explicitly transferred published references; civil engine map remains estimated. Subsonic conceptual model; not flight-test calibrated.",
+      "Measured main-wing and tank geometry, settled-liquid moments and internal equipment stations; estimated component masses, residual allowance, dry-component cuboid inertia, whole-aircraft coefficients and neutral point. Finch altitude power and military jet thrust/damping use explicitly transferred published references; civil engine map remains estimated. Subsonic conceptual model; not flight-test calibrated.",
   };
 }
 const designs = Object.fromEntries(

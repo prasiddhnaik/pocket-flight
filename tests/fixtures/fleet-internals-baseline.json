@@ -1,0 +1,515 @@
+{
+  "provenance": "Original airframes at 5e66d0ab0d0d1a8e8c08ddf8c4af5a085995afd4 before internal installation",
+  "aircraft": {
+    "peregrine": {
+      "asset": "peregrine-hx27.glb",
+      "fields": {
+        "nodes": {
+          "count": 177,
+          "sha256": "67990c3e60c83b9afdfc0690fc2bd4816e1a3004b9a2d78f517084520e63b7eb"
+        },
+        "meshes": {
+          "count": 137,
+          "sha256": "352be04efdc0bfc05769706c953f041a0938d152525be3d95a7594b0bda3171e"
+        },
+        "accessors": {
+          "count": 481,
+          "sha256": "91674dd8e6f7be15725e9aa3e493082e22c278d73cac34880e3661d5758d03f8"
+        },
+        "bufferViews": {
+          "count": 481,
+          "sha256": "1bbdfd469d25cf0530b261ea6f6d59640bcd2908033330e52fc88e19d0e1ca61"
+        },
+        "materials": {
+          "count": 20,
+          "sha256": "96d33f4cdd06d291ee1055218ef2c4c7a2dd96a370a31f64d8bcdb9ed6a0c118"
+        },
+        "buffers": {
+          "count": 1,
+          "sha256": "e228e8ceecc6ba8c13047e3063a8ad6b70ee53b0804f8c3bbd078e25f96a8328"
+        }
+      },
+      "buffers": [
+        {
+          "uri": null,
+          "sha256": "2a97edb5ab065588bdabb1cc0c1eae8eacdb8af9b82ff93b1b61ddd8a236a020"
+        }
+      ],
+      "sceneRoots": [
+        176
+      ],
+      "animationsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "anchors": {
+        "Wing_Left": {
+          "matrix": [
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          "min": [
+            -9.920000553131104,
+            3.7027180194854736,
+            -8.600000381469727
+          ],
+          "max": [
+            -0.9700000286102295,
+            4.301393985748291,
+            6.199999809265137
+          ]
+        },
+        "Wing_Right": {
+          "matrix": [
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          "min": [
+            0.9700000286102295,
+            3.7027180194854736,
+            -8.600000381469727
+          ],
+          "max": [
+            9.920000553131104,
+            4.301393985748291,
+            6.199999809265137
+          ]
+        },
+        "Aileron_Left": {
+          "matrix": [
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            -5.900000095367432,
+            4,
+            3.7839999198913574,
+            1
+          ],
+          "min": [
+            -9.850000381469727,
+            3.9656035900115967,
+            3.8072500228881836
+          ],
+          "max": [
+            -5.900000095367432,
+            4.129734516143799,
+            5.980000019073486
+          ]
+        },
+        "Flap_Right": {
+          "matrix": [
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            2.5999999046325684,
+            3.940000057220459,
+            2.700000047683716,
+            1
+          ],
+          "min": [
+            2.5999999046325684,
+            3.884521961212158,
+            2.737499952316284
+          ],
+          "max": [
+            5.900000095367432,
+            4.1470794677734375,
+            4.900000095367432
+          ]
+        }
+      }
+    },
+    "aurelia": {
+      "asset": "aurelia-flight.glb",
+      "fields": {
+        "nodes": {
+          "count": 300,
+          "sha256": "33a9c1292c0bd9c1f838e1792dd05a6e749c36342bedc2d0d2403dde2b4dec8c"
+        },
+        "meshes": {
+          "count": 225,
+          "sha256": "c670fe2dca75459fc66056094f8f93d5733d1bbfd3748818b1bb154ff26b28ab"
+        },
+        "accessors": {
+          "count": 858,
+          "sha256": "4decb7cf9248828548015bb7f2d267aca116f8ca8f532a407907ac7bdc33a294"
+        },
+        "bufferViews": {
+          "count": 858,
+          "sha256": "aa9e6cfc4c32735c24e67685683a3816cade251a0f558a3a1ed7dcef09158b0c"
+        },
+        "materials": {
+          "count": 20,
+          "sha256": "3a7c311a0677318f184e808e766e008ece54c2c533082e16eb5424abd78eb07f"
+        },
+        "buffers": {
+          "count": 2,
+          "sha256": "ea7ae8865fb584fa4d96fe23fed9fda445b99b9c8597bbd4d6ac0aa719a8bf03"
+        }
+      },
+      "buffers": [
+        {
+          "byteLength": 8116124,
+          "sha256": "48ce7eb185d13aa12f40f5b722260c77340e39c19ed61f2f86c0ea7e24061255"
+        },
+        {
+          "uri": "aurelia-gear-bays.bin",
+          "byteLength": 720264,
+          "sha256": "d7a98da3ec765939af97c9129076e8ce0e488d1ba3795cc7c65c232ea42d3cb4"
+        }
+      ],
+      "sceneRoots": [
+        275
+      ],
+      "animationsSha256": "cb43163f4ce67a7c7ca5c87c6f6e3fec730567db654d22b14ee983df1043ae0b",
+      "anchors": {
+        "Wing_Left": {
+          "matrix": [
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          "min": [
+            -13.619999885559082,
+            2.445930242538452,
+            -3
+          ],
+          "max": [
+            -1.350000023841858,
+            5.909233093261719,
+            6.590000152587891
+          ]
+        },
+        "Wing_Right": {
+          "matrix": [
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          "min": [
+            1.350000023841858,
+            2.445930242538452,
+            -3
+          ],
+          "max": [
+            13.619999885559082,
+            5.909233093261719,
+            6.590000152587891
+          ]
+        },
+        "Aileron_Left": {
+          "matrix": [
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            -8,
+            3.240000009536743,
+            3.765749931335449,
+            1
+          ],
+          "min": [
+            -13.300000190734863,
+            3.185612678527832,
+            3.765749931335449
+          ],
+          "max": [
+            -8,
+            4.035285949707031,
+            6.340000152587891
+          ]
+        },
+        "Flap_Right": {
+          "matrix": [
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            2.5999999046325684,
+            2.799999952316284,
+            2.5637500286102295,
+            1
+          ],
+          "min": [
+            2.5999999046325684,
+            2.696587324142456,
+            2.5637500286102295
+          ],
+          "max": [
+            8,
+            3.351844310760498,
+            4.599999904632568
+          ]
+        }
+      },
+      "approvedRepair": "2026-10-13: removed ten exposed decorative wing barrels; retained fuel caps, all original transforms and animations",
+      "gearRepair": "Aft-folding underfloor bays, fixed mounts and sequenced closing doors; 2026-10-13"
+    },
+    "stormbird": {
+      "asset": "stormbird-hx40.gltf",
+      "fields": {
+        "nodes": {
+          "count": 160,
+          "sha256": "cf346ca810ba993950f6ffffe43fbe49b7e673712df5a23add39ef59c20824a5"
+        },
+        "meshes": {
+          "count": 99,
+          "sha256": "8efac4d889cef3b591550411234f483f66ea197bc2a313870c606e7b4f54cb88"
+        },
+        "accessors": {
+          "count": 297,
+          "sha256": "d99685712300f33f1dd3344905b4c8d74ceb2b01c67ef0128baea696613ffb56"
+        },
+        "bufferViews": {
+          "count": 297,
+          "sha256": "a82a814c8c5fac442a96752d4d1e7f17639bf16531b51e0e8bc9659e73f2a3d4"
+        },
+        "materials": {
+          "count": 16,
+          "sha256": "6d490b2f4129f46c10e2b30d4442cfd6ceb9a7cd5219e115554abe8efdf5b53b"
+        },
+        "buffers": {
+          "count": 6,
+          "sha256": "32ccc18338f69652e094d02af168a94e945818f2cb83361ddd7b5802b7472a43"
+        }
+      },
+      "buffers": [
+        {
+          "uri": "stormbird-hx40-part-0.bin",
+          "sha256": "5f659c10e78c47e30862a61a824a8f3512f0ea64dd5ffd255c19c6dca748b16b"
+        },
+        {
+          "uri": "stormbird-hx40-part-1.bin",
+          "sha256": "13a121db136c42fe6dbac4dcae0cb9719227ab17e86c965b206a1baa4fd005e7"
+        },
+        {
+          "uri": "stormbird-hx40-part-2.bin",
+          "sha256": "affae245a210adb1c088d48d1ae92098a8490cd1461dc61cf3197ba868c8a31b"
+        },
+        {
+          "uri": "stormbird-hx40-part-3.bin",
+          "sha256": "71f9a42c284ad396dc54895681eed59530afafec0df197201914956eb6b1483e"
+        },
+        {
+          "uri": "stormbird-hx40-part-4.bin",
+          "sha256": "e7d030185de0caeaa7c278b02f5adb12801d0445046b65f51febab058573c2a4"
+        },
+        {
+          "uri": "stormbird-hx40-part-5.bin",
+          "sha256": "3db859d17e2b570a31fcb56b044d0aeb277813356ecaf10eedf6974ba233b7f2"
+        }
+      ],
+      "sceneRoots": [
+        0
+      ],
+      "animationsSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "anchors": {
+        "Wing_Left": {
+          "matrix": [
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          "min": [
+            -6.699999809265137,
+            1.7502145767211914,
+            -4.550000190734863
+          ],
+          "max": [
+            -0.3799999952316284,
+            2.4059221744537354,
+            4.269999980926514
+          ]
+        },
+        "Wing_Right": {
+          "matrix": [
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          "min": [
+            0.3799999952316284,
+            1.7502145767211914,
+            -4.550000190734863
+          ],
+          "max": [
+            6.699999809265137,
+            2.4059221744537354,
+            4.269999980926514
+          ]
+        },
+        "Aileron_Left": {
+          "matrix": [
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            -5,
+            2.05,
+            3.3,
+            1
+          ],
+          "min": [
+            -6.399999976158142,
+            1.9669924408197401,
+            3.3
+          ],
+          "max": [
+            -3.559999942779541,
+            2.1100355826318262,
+            4.013711321353912
+          ]
+        },
+        "Flap_Right": {
+          "matrix": [
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            2.7,
+            2.05,
+            3.3,
+            1
+          ],
+          "min": [
+            1.9900000214576723,
+            1.9517316550016401,
+            3.3
+          ],
+          "max": [
+            3.3999999880790712,
+            2.129324260354042,
+            4.175567018985748
+          ]
+        }
+      }
+    }
+  }
+}

@@ -1,3 +1,4 @@
+import { LoadingBench } from "./LoadingBench";
 import { ValidationBench } from "./ValidationBench";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -395,27 +396,35 @@ export default function App() {
                   {title}
                 </button>
               ))}
-              {id === "finch" && (
-                <button
-                  className="secondary"
-                  onClick={() => {
-                    setRevealMechanisms(false);
-                    scene.current?.rearCabinView();
-                  }}
-                >
-                  Rear bulkhead
-                </button>
-              )}
-              {id === "finch" && (
+              <button
+                className="secondary"
+                onClick={() => {
+                  setRevealMechanisms(false);
+                  scene.current?.rearCabinView();
+                }}
+              >
+                Rear bulkhead
+              </button>
+              <button
+                className="secondary"
+                onClick={() => {
+                  setRevealMechanisms(true);
+                  setLayers((previous) => ({ ...previous, chamber: false }));
+                  scene.current?.internalSystemsView("body");
+                }}
+              >
+                Internal systems
+              </button>
+              {id !== "finch" && (
                 <button
                   className="secondary"
                   onClick={() => {
                     setRevealMechanisms(true);
                     setLayers((previous) => ({ ...previous, chamber: false }));
-                    scene.current?.internalSystemsView();
+                    scene.current?.internalSystemsView("wing");
                   }}
                 >
-                  Internal systems
+                  Wing interior
                 </button>
               )}
               {id === "finch" && (
@@ -443,7 +452,7 @@ export default function App() {
               hidden; readouts retain the neutral-wing reference.{" "}
               {id === "finch"
                 ? "Finch’s gear is fixed. Rear bulkhead shows the closed cabin partition. Internal systems reveals the underfloor fuel cell and separate aft equipment bay. Wing pushrods stay inside the skin."
-                : "Retractable gear, doors and pressure linkages cycle together."}
+                : "Rear bulkhead shows the closed aft partition. Internal systems reveals fuel, equipment and hydraulic service bays; Wing interior shows spars, ribs, wet fuel cells and enclosed control mechanisms."}
             </p>
           </>
         )}
@@ -732,6 +741,7 @@ export default function App() {
           </div>
         </aside>
       </div>
+      <LoadingBench aircraft={id} />
       <ValidationBench aircraft={id} />
       <div className="analysis-grid">
         <section className="panel plot">

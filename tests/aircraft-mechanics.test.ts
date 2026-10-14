@@ -8,6 +8,44 @@ import {
 import { aircraftCatalog, type LabAircraftId } from "../lab/aircraft";
 import { batchStaticMeshes } from "../lab/render-batching";
 import { loadGeometryOnly } from "../scripts/geometry-loader";
+import { AureliaEffects } from "../src/aurelia-effects";
+import { initialJetInput } from "../src/jet-effects";
+
+test("Aurelia tester stows all six wheels at the same native pose as flight, and scrubs back to gear down", async () => {
+  const asset = new URL("../public/assets/aurelia-flight.glb", import.meta.url);
+  const { scene, animations } = await loadGeometryOnly(asset, true);
+  const flight = await loadGeometryOnly(asset, true);
+  const rig = new AircraftMechanics(scene, "aurelia", animations);
+  const effects = new AureliaEffects(flight.scene, flight.animations);
+  const wheels: T.Object3D[] = [];
+  scene.traverse((node) => {
+    if (!(node instanceof T.Mesh) && /^(Main|Nose)_wheel_/.test(node.name))
+      wheels.push(node);
+  });
+  expect(wheels).toHaveLength(6);
+  rig.apply(mechanismPose(0, "gear"), 0);
+  const down = wheels.map((w) => w.getWorldPosition(new T.Vector3()));
+  rig.apply(mechanismPose(16, "gear"), 16);
+  effects.motion.gear = 0;
+  effects.update(0, initialJetInput());
+  wheels.forEach((wheel, index) => {
+    const up = wheel.getWorldPosition(new T.Vector3());
+    expect(up.y).toBeGreaterThan(down[index].y + 1);
+    expect(
+      up.distanceTo(
+        flight.scene
+          .getObjectByName(wheel.name)!
+          .getWorldPosition(new T.Vector3()),
+      ),
+    ).toBeLessThan(1e-5);
+  });
+  rig.apply(mechanismPose(0, "gear"), 0);
+  wheels.forEach((wheel, index) =>
+    expect(
+      wheel.getWorldPosition(new T.Vector3()).distanceTo(down[index]),
+    ).toBeLessThan(1e-5),
+  );
+});
 
 test("mechanical programmes are periodic, bounded and independently selectable", () => {
   for (const programme of [

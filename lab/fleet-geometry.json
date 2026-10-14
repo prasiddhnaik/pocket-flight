@@ -2,7 +2,7 @@
   {
     "id": "finch",
     "name": "Finch U–2",
-    "revision": "040ff689926f6868bb0cb4f4ef3987f44598ac3e8b6b6588811eb6ce90b6bcb3",
+    "revision": "032333ed4910a229ec6d903029949e326e60ce03aabbd252bbe66dca620e89e3",
     "dimensions": [
       10.979999542236328,
       3.222000107988958,
@@ -494,7 +494,7 @@
   {
     "id": "peregrine",
     "name": "Peregrine HX–27",
-    "revision": "ab7c4156790555808a0bb021e2068219dc7c034fa8c44fd6377145649f47184e",
+    "revision": "9e02cb279b9c40fa00a1a32365cc3452b59f22277b1e69ecbe6380a3091af4be",
     "dimensions": [
       13.888000774383544,
       5.517890173438953,
@@ -988,10 +988,10 @@
   {
     "id": "aurelia",
     "name": "Aurelia S32",
-    "revision": "a84dfdf75a3c86082340197e6ee8f72cb85243b422c44dade7dc007a382f0cf6",
+    "revision": "2b1c0aaebcb5d2d6bea884d57991b25c60b9c705da5b6341a3168a12f44170c9",
     "dimensions": [
       14.981999874114992,
-      5.254111713599611,
+      5.277009330290831,
       17.325000524520874
     ],
     "scale": 0.55,
@@ -1484,7 +1484,7 @@
   {
     "id": "stormbird",
     "name": "Stormbird HX–40",
-    "revision": "7adb7cc95f9066e35baaed95259ce873033e594abfe8cfa4d581c851d67a0c00",
+    "revision": "dc94b60413f57c498023eca560b04afa813d61feb76ac45a3cbb53bd486c91de",
     "dimensions": [
       13.399999618530273,
       4.5057568609714505,

@@ -1,8 +1,10 @@
 import * as T from "three";
+import { fuelInstallation } from "../src/fuel-loading";
 import { StormbirdMechanisms } from "../src/stormbird-mechanisms";
 import type { LabAircraftId } from "./aircraft";
 import { FinchCockpit } from "./finch-cockpit";
 import { internalControlMount } from "./internal-control-link";
+import { AURELIA_GEAR_STOW_TIME } from "../src/aurelia-motion";
 
 export type MechanismProgramme =
   "all" | "gear" | "controls" | "power" | "cockpit";
@@ -126,7 +128,6 @@ export class AircraftMechanics {
   private rest: Rest[] = [];
   private mechanisms?: StormbirdMechanisms;
   private mixer?: T.AnimationMixer;
-  private gearDuration = 0;
   private legs: { node: T.Object3D; side: number; nose: boolean }[] = [];
   private carriers: { node: T.Object3D; rest: T.Vector3; nose: boolean }[] = [];
   private doors: { node: T.Object3D; side: number }[] = [];
@@ -321,6 +322,7 @@ export class AircraftMechanics {
       this.segment(barrel, a, end, radius);
       this.segment(piston, begin, b, radius * 0.48);
     });
+    return [barrel, piston];
   }
   private hose(fixed: Anchor, moving: Anchor, radius: number) {
     const slots = Array.from({ length: 8 }, () => this.slot("hose"));
@@ -429,7 +431,6 @@ export class AircraftMechanics {
       const clip = new T.AnimationClip("Native gear inspection", -1, [
         ...new Map(tracks.map((t) => [t.name, t])).values(),
       ]);
-      this.gearDuration = clip.duration;
       const action = this.mixer.clipAction(clip);
       action.setLoop(T.LoopOnce, 1);
       action.clampWhenFinished = true;
@@ -529,19 +530,77 @@ export class AircraftMechanics {
       if (box.isEmpty()) continue;
       const hinge = this.native(node),
         parent = node.parent!;
-      if (this.id === "finch" && /^(Aileron|Flap)_/.test(node.name)) {
-        const mount = internalControlMount(this.root, node);
-        const fixed = this.anchor(parent, mount.fixed);
-        const moving = this.anchor(node, mount.moving);
-        const rod = this.slot("alloy");
-        this.hardwareUpdates.push(() =>
-          this.segment(rod, this.read(fixed, this.a), this.read(moving, this.b), 0.005),
+      if (/^(Aileron|Flap)_/.test(node.name)) {
+        const mount = internalControlMount(
+          this.root,
+          node,
+          this.id === "finch",
         );
-        const horn = this.fitting(node, mount.moving, 0.007, 0.020);
-        const bearing = this.fitting(parent, mount.fixed, 0.009, 0.025);
-        for (const slot of [rod, horn, bearing]) {
-          slot.pool.userData.internalControlInstances ??= [];
-          slot.pool.userData.internalControlInstances.push({ index: slot.index, control: node.name });
+        const fixed = this.anchor(parent, mount.fixed);
+        let driver = node;
+        if (mount.pivot) {
+          // A compact servo drives an internal bellcrank. The existing authored
+          // surface hinge may lie in an open seam, so it cannot host the barrel.
+          driver = new T.Group();
+          driver.name = `Internal_actuator_${node.name}`;
+          driver.position.copy(mount.pivot);
+          this.root.add(driver);
+          this.mark(driver);
+          const restInverse = node.quaternion.clone().invert();
+          const pivot = driver;
+          this.hardwareUpdates.push(() => {
+            pivot.quaternion.copy(node.quaternion).multiply(restInverse);
+            pivot.updateWorldMatrix(true, false);
+          });
+          this.root.updateWorldMatrix(true, true);
+        }
+        const moving = this.anchor(driver, mount.moving);
+        const before = new Map(
+          [...this.pools.values()].map((pool) => [pool, pool.count]),
+        );
+        if (this.id === "finch") {
+          const rod = this.slot("alloy");
+          this.hardwareUpdates.push(() =>
+            this.segment(
+              rod,
+              this.read(fixed, this.a),
+              this.read(moving, this.b),
+              0.005,
+            ),
+          );
+        } else {
+          this.ram(fixed, moving, mount.radius);
+          this.hose(
+            this.anchor(
+              parent,
+              mount.fixed.clone().add(new T.Vector3(0.025, 0, -0.04)),
+            ),
+            this.anchor(
+              parent,
+              mount.fixed.clone().add(new T.Vector3(0.025, 0, 0.05)),
+            ),
+            0.0025,
+          );
+        }
+        this.fitting(
+          driver,
+          mount.moving,
+          this.id === "finch" ? 0.007 : mount.radius * 0.55,
+          0.02,
+        );
+        this.fitting(
+          parent,
+          mount.fixed,
+          this.id === "finch" ? 0.009 : mount.radius * 0.8,
+          0.025,
+        );
+        for (const pool of this.pools.values()) {
+          pool.userData.internalControlInstances ??= [];
+          for (let index = before.get(pool)!; index < pool.count; index++)
+            pool.userData.internalControlInstances.push({
+              index,
+              control: node.name,
+            });
         }
         continue;
       }
@@ -594,13 +653,25 @@ export class AircraftMechanics {
       if (box.isEmpty()) continue;
       const moving = box.getCenter(new T.Vector3()),
         fixed = this.native(node);
+      if (this.id === "aurelia") {
+        // Attach to the door's inner face; its outside face must stay clear
+        // when the fitted panel closes against the belly opening.
+        const local = node.worldToLocal(this.root.localToWorld(moving.clone()));
+        local.y += 0.1;
+        moving.copy(this.native(node, local));
+      }
       fixed.y += 0.12;
       fixed.z -= 0.22;
-      this.ram(
+      const slots = this.ram(
         this.anchor(node.parent!, fixed),
         this.anchor(node, moving),
         0.026,
       );
+      if (this.id === "aurelia")
+        for (const slot of slots) {
+          const records = (slot.pool.userData.doorHardwareInstances ??= []);
+          records.push({ index: slot.index, hinge: node.name });
+        }
     }
   }
 
@@ -916,9 +987,7 @@ export class AircraftMechanics {
       this.mechanisms.apply(extension, pose.canopy, pose.yaw);
     }
     if (this.mixer)
-      this.mixer.setTime(
-        (1 - extension) * Math.max(0, this.gearDuration - 0.001),
-      );
+      this.mixer.setTime((1 - extension) * AURELIA_GEAR_STOW_TIME);
     for (const leg of this.legs) {
       const fold = smooth(1 - extension, 0.12, 0.88);
       leg.node.rotation[leg.nose ? "x" : "z"] = leg.nose
@@ -975,13 +1044,38 @@ export class AircraftMechanics {
       time: this.time,
       pose: this.pose,
       hardwareParts: this.partCount,
-      internalSystems: this.nodes.has("BellyFuelBay") ? {
-        rearBulkhead: this.nodes.has("RearCabinBulkhead"),
-        dryEquipmentBay: this.nodes.has("AftEquipmentBay"),
-        fuelEnvelopeLitres: this.nodes.get("BellyFuelBay")!.userData.envelope_litres,
-        usableFuelLitres: this.nodes.get("BellyFuelBay")!.userData.usable_fuel_litres,
-        fuelCentroid: this.nodes.get("BellyFuelBay")!.userData.fuel_centroid_glTF,
-      } : null,
+      internalSystems: this.nodes.has("BellyFuelBay")
+        ? {
+            rearBulkhead: this.nodes.has("RearCabinBulkhead"),
+            dryEquipmentBay:
+              this.nodes.has("AftEquipmentBay") ||
+              this.nodes.has("ForwardEquipmentBay"),
+            fuelEnvelopeLitres:
+              this.nodes.get("BellyFuelBay")!.userData.envelope_litres,
+            usableFuelLitres: fuelInstallation(this.id).tanks.reduce(
+              (sum, t) => sum + t.usableLitres,
+              0,
+            ),
+            fuelCentroid: fuelInstallation(this.id).tanks[0].samples.at(-1)!
+              .center,
+          }
+        : this.nodes.has("InternalSystems")
+          ? {
+              rearBulkhead: this.nodes.has("RearCabinBulkhead"),
+              dryEquipmentBay:
+                this.nodes.has("AftEquipmentBay") ||
+                this.nodes.has("ForwardEquipmentBay"),
+              fuelEnvelopeLitres:
+                this.nodes.get("InternalSystems")!.userData.fuelEnvelopeLitres,
+              usableFuelLitres: fuelInstallation(this.id).tanks.reduce(
+                (sum, t) => sum + t.usableLitres,
+                0,
+              ),
+              fuelLayout:
+                this.nodes.get("InternalSystems")!.userData.fuelLayout,
+              partCount: this.nodes.get("InternalSystems")!.userData.partCount,
+            }
+          : null,
       articulatedAssemblies: this.moving.size,
       fixedGear: this.id === "finch",
       actualGearExtension: this.id === "finch" ? 1 : this.pose.gear,

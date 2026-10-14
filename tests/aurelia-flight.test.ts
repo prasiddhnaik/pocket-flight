@@ -52,7 +52,9 @@ test("Aurelia takes off within Palm Bay and climbs without damage", () => {
 test("Aurelia approach lands and brakes to a stop without damage", () => {
   const p = jet();
   p.reset(true);
-  p.position.set(-260, 13, 410);
+  // Start far enough up the 470 m runway for the calibrated CG-dependent
+  // wheel loads and braking distance. The former late approach overran it.
+  p.position.set(-260, 13, 510);
   p.gearPosition = 1;
   p.flapPosition = 0.65;
   const speed = p.stallSpeed * 1.35;
@@ -66,15 +68,19 @@ test("Aurelia approach lands and brakes to a stop without damage", () => {
   p.velocity.set(0, -1.2, -speed);
   p.pitch = alpha - Math.atan2(1.2, speed);
   p.throttle = p.enginePower = 0.08;
-  let landed = false;
+  let landed = false,
+    touched = false;
   for (let n = 0; n < 1200; n++) {
+    // Lower the nose and keep braking after touchdown, including brief wheel
+    // unloading. Re-entering a flare every unloaded frame delays the rollout.
+    touched ||= p.grounded;
     p.step(1 / 60, {
       ...neutral,
-      pitch: p.grounded
+      pitch: touched
         ? 0
         : ((p.position.y < 11 ? alpha + 0.015 : alpha - 0.04) - p.pitch) * 4,
-      throttle: p.grounded ? -1 : 0,
-      brake: p.grounded,
+      throttle: touched ? -1 : 0,
+      brake: touched,
     });
     landed ||= p.events.some((e) => e.type === "landing");
   }
@@ -82,6 +88,9 @@ test("Aurelia approach lands and brakes to a stop without damage", () => {
   expect(p.grounded).toBe(true);
   expect(p.health).toBe(100);
   expect(p.velocity.length()).toBeLessThan(1);
+  expect(p.position.z).toBeGreaterThan(
+    runways[0].z - runways[0].length / 2 + 10,
+  );
 });
 test("jet thrust exceeds Finch thrust while engine-out removes acceleration", () => {
   const a = jet(),

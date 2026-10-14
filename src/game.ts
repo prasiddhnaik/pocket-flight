@@ -291,22 +291,56 @@ export class PocketFlight {
   };
   toggleGear() {
     if (this.mode !== "playing") return;
-    if (!this.physics.jet) { this.onToast("Finch has fixed landing gear."); return; }
-    if (this.physics.automaticConfiguration) { this.onToast("For manual gear, turn off Automatic gear and flaps in Settings → Controls."); return; }
-    if (!this.physics.toggleGear()) this.onToast("Gear stays down while weight is on the wheels.");
-    else this.onToast(this.physics.gearCommand ? "Gear commanded down." : "Gear commanded up.");
+    if (!this.physics.jet) {
+      this.onToast("Finch has fixed landing gear.");
+      return;
+    }
+    if (this.physics.automaticConfiguration) {
+      this.onToast(
+        "For manual gear, turn off Automatic gear and flaps in Settings → Controls.",
+      );
+      return;
+    }
+    if (!this.physics.toggleGear())
+      this.onToast("Gear stays down while weight is on the wheels.");
+    else
+      this.onToast(
+        this.physics.gearCommand
+          ? "Gear commanded down."
+          : "Gear commanded up.",
+      );
   }
   cycleFlaps() {
     if (this.mode !== "playing") return;
-    if (!this.physics.jet) { this.onToast("Finch has no movable flaps."); return; }
-    if (!this.physics.cycleFlaps()) this.onToast("For manual flaps, turn off Automatic gear and flaps in Settings → Controls.");
-    else this.onToast(`Flaps commanded ${Math.round(this.physics.flapCommand * 100)}%.`);
+    if (!this.physics.jet) {
+      this.onToast("Finch has no movable flaps.");
+      return;
+    }
+    if (!this.physics.cycleFlaps())
+      this.onToast(
+        "For manual flaps, turn off Automatic gear and flaps in Settings → Controls.",
+      );
+    else
+      this.onToast(
+        `Flaps commanded ${Math.round(this.physics.flapCommand * 100)}%.`,
+      );
   }
   adjustTrim(change: number) {
     if (this.mode !== "playing") return;
-    if (this.physics.beginnerAssist) { this.onToast("Flight assist handles trim. For manual trim, turn it off in Settings → Controls."); return; }
-    this.physics.elevatorTrim = T.MathUtils.clamp(this.physics.elevatorTrim + change, -1, 1);
-    this.onToast(`Elevator trim ${Math.round(this.physics.elevatorTrim * 100)}%.`);
+    if (this.physics.beginnerAssist) {
+      this.onToast(
+        "Flight assist handles trim. For manual trim, turn it off in Settings → Controls.",
+      );
+      return;
+    }
+    this.physics.elevatorTrim = T.MathUtils.clamp(
+      this.physics.elevatorTrim + change,
+      -1,
+      1,
+    );
+    this.onToast(
+      `Elevator trim ${Math.round(this.physics.elevatorTrim * 100)}%.`,
+    );
   }
   private keyup = (e: KeyboardEvent) => {
     this.keys.delete(e.code);
@@ -438,12 +472,16 @@ export class PocketFlight {
     }
     if (mission.id === "canyon") {
       this.physics.position.set(95, 110, 470);
-      this.physics.initializeAirStart(this.physics.jet ? Math.max(48, this.physics.stallSpeed * 1.4) : 34);
+      this.physics.initializeAirStart(
+        this.physics.jet ? Math.max(48, this.physics.stallSpeed * 1.4) : 34,
+      );
     }
     if (mission.id === "free") {
       this.physics.position.y += 100;
       this.physics.yaw = Math.PI;
-      this.physics.initializeAirStart(Math.max(this.physics.design.trimSpeed, this.physics.stallSpeed * 1.4));
+      this.physics.initializeAirStart(
+        Math.max(this.physics.design.trimSpeed, this.physics.stallSpeed * 1.4),
+      );
     }
     this.aircraft.group.scale.setScalar(1);
     this.aircraft.group.visible = true;
@@ -600,7 +638,11 @@ export class PocketFlight {
       this.ringGroup.add(ring);
     });
   }
-  private makeDebris(severity: number, struckPart?: ContactPart, point?: number[]) {
+  private makeDebris(
+    severity: number,
+    struckPart?: ContactPart,
+    point?: number[],
+  ) {
     const p = this.physics;
     const count = severity > 0.8 ? 14 : 5;
     for (let i = 0; i < count; i++) {
@@ -646,7 +688,10 @@ export class PocketFlight {
         life: 20,
       });
     }
-    if (severity > 0.8 && (struckPart === "leftWing" || struckPart === "rightWing")) {
+    if (
+      severity > 0.8 &&
+      (struckPart === "leftWing" || struckPart === "rightWing")
+    ) {
       const wing = this.aircraft.wings[struckPart === "leftWing" ? 0 : 1];
       if (!wing.visible) return;
       const part = wing.clone(true);
@@ -1380,9 +1425,18 @@ export class PocketFlight {
             : "Arrow keys to fly · Shift / Ctrl throttle",
       stall: p.stall,
       grounded: p.grounded,
-      gearPosition: this.replaySample ? this.aircraft.effects?.motion.gear ?? this.replaySample.gearPosition ?? 1 : p.gearPosition,
-      flapPosition: this.replaySample ? this.aircraft.effects?.motion.flaps ?? this.replaySample.flapPosition ?? 0 : p.flapPosition,
-      automaticConfiguration: this.replaySample?.automaticConfiguration ?? p.automaticConfiguration,
+      gearPosition: this.replaySample
+        ? (this.aircraft.effects?.motion.gear ??
+          this.replaySample.gearPosition ??
+          1)
+        : p.gearPosition,
+      flapPosition: this.replaySample
+        ? (this.aircraft.effects?.motion.flaps ??
+          this.replaySample.flapPosition ??
+          0)
+        : p.flapPosition,
+      automaticConfiguration:
+        this.replaySample?.automaticConfiguration ?? p.automaticConfiguration,
       speedProtection: p.speedProtectionActive,
       elevatorTrim: this.replaySample?.elevatorTrim ?? p.elevatorTrim,
       damage: { ...p.damage },
@@ -1439,7 +1493,14 @@ export class PocketFlight {
       detachedWings: { ...p.detachedWings },
       simulationTick: p.simulationTick,
       speedProtection: p.speedProtectionActive,
-      wheelContacts: p.wheelContacts.map((c) => ({ index: c.index, loadNewtons: c.load, compression: c.compression, closingSpeed: c.closingSpeed, locked: c.locked, runway: c.runway })),
+      wheelContacts: p.wheelContacts.map((c) => ({
+        index: c.index,
+        loadNewtons: c.load,
+        compression: c.compression,
+        closingSpeed: c.closingSpeed,
+        locked: c.locked,
+        runway: c.runway,
+      })),
       aerodynamics: p.aerodynamics
         ? {
             alpha: p.aerodynamics.alpha,

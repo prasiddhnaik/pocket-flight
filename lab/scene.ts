@@ -78,6 +78,7 @@ export class TunnelScene {
   private displayTime = 0;
   private displays: CockpitDisplays | null = null;
   private revealMechanisms = false;
+  private internalFocus: "body" | "wing" = "body";
   private ghostShells = new Map<
     T.Mesh,
     { solid: T.Material; ghost: T.Material }
@@ -117,7 +118,14 @@ export class TunnelScene {
   private solution: Solution | null = null;
   private aircraftSize = 11;
   private currentView:
-    "test" | "top" | "rear" | "chamber" | "side" | "displays" | "internal" | "cabin" = "test";
+    | "test"
+    | "top"
+    | "rear"
+    | "chamber"
+    | "side"
+    | "displays"
+    | "internal"
+    | "cabin" = "test";
   private layers = initialLayers;
   private frame = 0;
   private ticket = 0;
@@ -852,10 +860,31 @@ export class TunnelScene {
   private applyChamberView() {
     for (const section of this.chamberCutaways)
       section.visible = this.currentView === "chamber";
+    this.mechanicalAircraft
+      ?.getObjectByName("InternalSystems")
+      ?.traverse((node) => {
+        const region = node.userData.installationRegion;
+        if (!region) return;
+        node.visible =
+          this.currentView !== "internal" ||
+          (this.internalFocus === "body"
+            ? region === "body"
+            : region === "Wing_Right");
+      });
     this.invalidateShadows();
   }
 
-  view(view: "test" | "top" | "rear" | "chamber" | "side" | "displays" | "internal" | "cabin") {
+  view(
+    view:
+      | "test"
+      | "top"
+      | "rear"
+      | "chamber"
+      | "side"
+      | "displays"
+      | "internal"
+      | "cabin",
+  ) {
     if (view === "displays") {
       this.displayView();
       return;
@@ -1031,6 +1060,7 @@ export class TunnelScene {
   focusMechanism(focus: "gear" | "controls" | "power" | "cockpit") {
     if (!this.mechanics) return;
     this.currentView = "test";
+    this.applyChamberView();
     this.camera.fov = 38;
     this.camera.near = 0.1;
     this.orbit.minDistance = 1.2;
@@ -1117,36 +1147,81 @@ export class TunnelScene {
     this.dirty = true;
   }
 
-  internalSystemsView() {
+  internalSystemsView(focus: "body" | "wing" = this.internalFocus) {
     const bay = this.mechanicalAircraft?.getObjectByName("InternalSystems");
     if (!bay) return;
+    this.internalFocus = focus;
     this.currentView = "internal";
     this.applyChamberView();
     this.camera.fov = 42;
     this.camera.near = 0.025;
     this.camera.updateProjectionMatrix();
     this.orbit.minDistance = 0.1;
-    const box = new T.Box3().setFromObject(bay);
+    const names =
+      focus === "wing"
+        ? ["WingStructure_Right", "WetWingFuel_Right"]
+        : [
+            "AftEquipmentBay",
+            "ForwardEquipmentBay",
+            "HydraulicServiceBay",
+            "CentreFuelBay",
+            "BellyFuelBay",
+          ];
+    const box = new T.Box3();
+    for (const name of names) {
+      const group = bay.getObjectByName(name);
+      if (group) box.union(new T.Box3().setFromObject(group));
+    }
+    if (box.isEmpty()) box.setFromObject(bay);
     const target = box.getCenter(new T.Vector3());
-    const distance = box.getSize(new T.Vector3()).length() /
-      (2 * Math.tan(T.MathUtils.degToRad(this.camera.fov / 2)) * Math.min(1, this.camera.aspect)) * 1.1;
-    this.camera.position.copy(target).addScaledVector(new T.Vector3(1, -0.22, 0.85).normalize(), distance);
+    const distance =
+      (box.getSize(new T.Vector3()).length() /
+        (2 *
+          Math.tan(T.MathUtils.degToRad(this.camera.fov / 2)) *
+          Math.min(1, this.camera.aspect))) *
+      1.1;
+    this.camera.position
+      .copy(target)
+      .addScaledVector(
+        (focus === "wing"
+          ? new T.Vector3(1, 0.9, 0.5)
+          : new T.Vector3(1, 0.55, -0.85)
+        ).normalize(),
+        distance,
+      );
     this.orbit.target.copy(target);
     this.orbit.update();
     this.dirty = true;
   }
 
   rearCabinView() {
+    const partition =
+      this.mechanicalAircraft?.getObjectByName("RearCabinBulkhead");
     const cabin = this.mechanicalAircraft?.getObjectByName("Cockpit");
-    if (!cabin) return;
+    if (!partition) return;
     this.currentView = "cabin";
     this.applyChamberView();
-    this.camera.fov = 82;
+    this.camera.fov = partition.userData.inspectionFov ?? 82;
     this.camera.near = 0.01;
     this.camera.updateProjectionMatrix();
     this.orbit.minDistance = 0.05;
-    this.camera.position.copy(cabin.localToWorld(new T.Vector3(0, 0.23, 0.40)));
-    this.orbit.target.copy(cabin.localToWorld(new T.Vector3(0, 0.12, 0.94)));
+    if (partition.userData.inspectionEye) {
+      this.camera.position.copy(
+        partition.localToWorld(
+          new T.Vector3().fromArray(partition.userData.inspectionEye),
+        ),
+      );
+      this.orbit.target.copy(
+        partition.localToWorld(
+          new T.Vector3().fromArray(partition.userData.inspectionTarget),
+        ),
+      );
+    } else if (cabin) {
+      this.camera.position.copy(
+        cabin.localToWorld(new T.Vector3(0, 0.23, 0.4)),
+      );
+      this.orbit.target.copy(cabin.localToWorld(new T.Vector3(0, 0.12, 0.94)));
+    }
     this.orbit.update();
     this.dirty = true;
   }

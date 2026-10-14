@@ -103,6 +103,21 @@ test("worker envelopes and reusable path samples preserve the clearance calculat
   }
 });
 
+test("internal inspection parts do not alter the external airflow envelope after batching", () => {
+  const root = new T.Group(),
+    material = new T.MeshBasicMaterial();
+  root.add(new T.Mesh(new T.BoxGeometry(2, 2, 4), material));
+  const before = new AirframeEnvelope(root).toData();
+  for (const x of [-4, 4]) {
+    const internal = new T.Mesh(new T.BoxGeometry(), material);
+    internal.position.x = x;
+    internal.userData.internal = true;
+    root.add(internal);
+  }
+  batchStaticMeshes(root);
+  expect(new AirframeEnvelope(root).toData()).toEqual(before);
+});
+
 for (const id of Object.keys(aircraftCatalog) as LabAircraftId[])
   test(`${id}: batching preserves every runtime triangle and aircraft bounds`, async () => {
     const config = aircraftCatalog[id],

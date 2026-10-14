@@ -40,13 +40,20 @@ for (const id of fleet) {
     }
   });
   test(`${id}: wheel reactions prevent a power-only nose rotation on the runway`, () => {
+    // Compare with the settled stance of the measured rigid tires. Finch's
+    // unequal axle heights give a slight nose-down stance even without power.
+    const resting = new FlightPhysics();
+    resting.aircraftId = id;
+    resting.reset();
+    resting.beginnerAssist = false;
+    for (let n = 0; n < 180; n++) resting.step(1 / 60, neutral);
     const p = new FlightPhysics();
     p.aircraftId = id;
     p.reset();
     p.beginnerAssist = false;
     p.throttle = 1;
     for (let n = 0; n < 180; n++) p.step(1 / 60, neutral);
-    expect(Math.abs(p.pitch)).toBeLessThan(0.005);
+    expect(Math.abs(p.pitch - resting.pitch)).toBeLessThan(0.005);
     expect(p.grounded).toBe(true);
   });
   test(`${id}: payload changes actual lift acceleration`, () => {
@@ -68,16 +75,20 @@ for (const id of fleet) {
     expect(light.aerodynamics).not.toBeNull();
     expect(heavy.aerodynamics).not.toBeNull();
   });
-  test(`${id}: declared loading changes CG and inertia, with a stable CG envelope`, () => {
+  test(`${id}: loading changes CG and inertia; inadmissible loadings are rejected`, () => {
     const d = aircraftDesign(id);
     for (const fuel of [0, 0.1, 1])
       for (const payload of [0, 0.5, 1]) {
         const m = massProperties(d.massBudget, { fuel, payload });
         expect(m.mass).toBeGreaterThan(0);
         expect(m.inertia.determinant()).toBeGreaterThan(0);
-        expect(m.cg.z).toBeGreaterThan(d.cgEnvelope[0]);
-        expect(m.cg.z).toBeLessThan(d.cgEnvelope[1]);
-        expect(d.neutralPointZ - m.cg.z).toBeGreaterThan(0);
+        const admissible =
+          m.cg.z >= d.cgEnvelope[0] && m.cg.z <= d.cgEnvelope[1];
+        const p = new FlightPhysics();
+        p.aircraftId = id;
+        if (admissible)
+          expect(() => p.configureLoading({ fuel, payload })).not.toThrow();
+        else expect(() => p.configureLoading({ fuel, payload })).toThrow();
         const product = m.inertia.clone().multiply(m.inverseInertia);
         product.elements.forEach((v, i) =>
           expect(v).toBeCloseTo(i % 4 === 0 ? 1 : 0, 8),
@@ -187,8 +198,12 @@ for (const id of fleet) {
     p.position.y = 600;
     p.beginnerAssist = false;
     p.step(1 / 120, { ...neutral, pitch: 1, roll: 1, yaw: 1 });
-    for (const value of Object.values(p.surfaces))
-      expect(Math.abs(value)).toBeLessThanOrEqual(3 / 120 + 1e-9);
+    const start = { ...p.surfaces };
+    p.step(1 / 120, { ...neutral, pitch: -1, roll: -1, yaw: -1 });
+    for (const axis of ["pitch", "roll", "yaw"] as const)
+      expect(Math.abs(p.surfaces[axis] - start[axis])).toBeLessThanOrEqual(
+        3 / 120 + 1e-9,
+      );
     const mass = p.loadedMass,
       fuel = p.fuelKg;
     for (let n = 0; n < 180; n++) p.step(1 / 60, neutral);

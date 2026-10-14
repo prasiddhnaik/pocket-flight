@@ -35,6 +35,30 @@ describe("betty scheduling", () => {
     expect(r.callout).toBeNull();
     expect(r.stop).toBe(false);
   });
+  test("fresh damage plays between stall repeats", () => {
+    let r = planCallout(idleCallouts(), ["stall"], 0, len);
+    r = planCallout(r.state, ["stall"], 2, len);
+    expect(r.callout).toEqual({ id: "stall", chime: false });
+    r = planCallout(r.state, ["stall", "damage"], 3.3, len);
+    expect(r.callout).toEqual({ id: "damage", chime: true });
+    expect(r.stop).toBe(false);
+  });
+  test("fresh damage waits for a playing stall to finish", () => {
+    let r = planCallout(idleCallouts(), ["stall"], 0, len);
+    r = planCallout(r.state, ["stall", "damage"], 0.5, len);
+    expect(r.callout).toBeNull();
+    expect(r.stop).toBe(false);
+    expect(r.state.announced).toEqual(["stall"]);
+  });
+  test("clearing warnings stops the voice even after its deadline", () => {
+    let r = planCallout(idleCallouts(), ["stall"], 0, len);
+    r = planCallout(r.state, [], 2, len);
+    expect(r.stop).toBe(true);
+    expect(r.state.playing).toBeNull();
+    expect(r.state.announced).toEqual([]);
+    r = planCallout(r.state, [], 3, len);
+    expect(r.stop).toBe(false);
+  });
   test("clearing all warnings stops the voice and forgets announcements", () => {
     let r = planCallout(idleCallouts(), ["stall"], 0, len);
     r = planCallout(r.state, [], 0.5, len);
@@ -55,6 +79,30 @@ const flushPreload = async () => {
 };
 
 describe("Betty playback", () => {
+  test("a one-shot waits silently for its voice buffer even with a loaded chime", async () => {
+    const audio = new FlightAudio();
+    audio.enabled = true;
+    const chime = buffer(0.4);
+    const voice = buffer(1.2);
+    let decode = (_clip: AudioBuffer | null) => {};
+    const pending = new Promise<AudioBuffer | null>((resolve) => { decode = resolve; });
+    audio.loadVoice = async (url) => url.endsWith("damage.mp3") ? pending : url.endsWith("chime.mp3") ? chime : null;
+    const played: AudioBuffer[][] = [];
+    audio.playVoice = (clips) => { played.push(clips); };
+    const betty = new Betty(audio);
+    betty.update([], 0);
+    await flushPreload();
+    betty.update(["damage"], 0.25);
+    betty.update(["damage"], 0.5);
+    expect(played).toEqual([]);
+    decode(voice);
+    await flushPreload();
+    betty.update(["damage"], 1);
+    expect(played).toEqual([[chime, voice]]);
+    betty.update(["damage"], 10);
+    expect(played).toHaveLength(1);
+  });
+
   test("missing clips stay silent and preload retries once audio is ready", async () => {
     const audio = new FlightAudio();
     audio.enabled = true;

@@ -27,16 +27,18 @@ export function planCallout(state: CalloutState, active: WarningId[], now: numbe
     announced: state.announced.filter((id) => active.includes(id)),
   };
   const busy = next.playing !== null && now < next.busyUntil;
-  const top = active[0];
-  if (!top) {
+  if (!active.length) {
+    const stop = next.playing !== null;
     next.playing = null;
-    return { callout: null, stop: busy, state: next };
+    return { callout: null, stop, state: next };
   }
+  const top = active.find((id) => {
+    const repeat = repeatSeconds[id];
+    return !next.announced.includes(id) || (repeat !== null && now - (next.lastStarted[id] ?? -Infinity) >= repeat);
+  });
+  if (!top) return { callout: null, stop: false, state: next };
   if (busy && rank(next.playing!) <= rank(top)) return { callout: null, stop: false, state: next };
-  const repeat = repeatSeconds[top];
   const fresh = !next.announced.includes(top);
-  const due = fresh || (repeat !== null && now - (next.lastStarted[top] ?? -Infinity) >= repeat);
-  if (!due) return { callout: null, stop: false, state: next };
   next.playing = top;
   next.busyUntil = now + durationOf(top) + (fresh ? CHIME_SECONDS : 0);
   next.lastStarted[top] = now;
@@ -61,7 +63,7 @@ export class Betty {
 
   update(active: WarningId[], now: number) {
     this.preload();
-    const audible = this.enabled && this.audio.enabled ? active : [];
+    const audible = this.enabled && this.audio.enabled ? active.filter((id) => this.buffers.has(id)) : [];
     const r = planCallout(this.state, audible, now, (id) => this.buffers.get(id)?.duration ?? 1.4);
     this.state = r.state;
     if (r.stop) this.audio.stopVoice();

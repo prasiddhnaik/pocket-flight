@@ -97,6 +97,37 @@ function withFrames(check: (driver: {
 }
 
 describe("hud spring driver", () => {
+  test("recreating a channel with new config preserves its last applied value", () => {
+    withFrames(({ create, advance, pending }) => {
+      let value = 0;
+      const values: number[] = [];
+      const apply = (next: number) => { value = next; values.push(next); };
+      let channel = create(value, apply);
+      channel.set(100);
+      advance(0);
+      advance(16);
+      expect(value).toBeGreaterThan(0);
+      expect(value).toBeLessThan(100);
+
+      const movingValue = value;
+      channel.dispose();
+      channel = create(value, apply, { stiffness: 200, damping: 24 });
+      expect(values.at(-1)).toBe(movingValue);
+      channel.set(100);
+      for (let i = 0; i < 180 && pending(); i++) advance(32 + i * 1000 / 60);
+      expect(value).toBe(100);
+      expect(pending()).toBe(0);
+
+      for (let i = 0; i < 3; i++) {
+        channel.dispose();
+        channel = create(value, apply, { stiffness: 200, damping: 24 });
+        channel.set(100);
+        advance(4000 + i * 16);
+        expect(value).toBe(100);
+        expect(pending()).toBe(0);
+      }
+    });
+  });
   test("channels share one loop, land exactly on target, and sleep until retargeted", () => {
     withFrames(({ create, advance, pending }) => {
       const values: number[] = [];

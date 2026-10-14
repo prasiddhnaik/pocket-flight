@@ -15,9 +15,10 @@ export function useSpring<T extends Element>(
   const applyRef = useRef(apply);
   applyRef.current = apply;
   const channel = useRef<ReturnType<typeof createChannel> | null>(null);
-  const initial = useRef(target);
+  const value = useRef(target);
   useEffect(() => {
-    const ch = createChannel(initial.current, (v) => {
+    const ch = createChannel(value.current, (v) => {
+      value.current = v;
       if (ref.current) applyRef.current(ref.current, v);
     }, config);
     channel.current = ch;

@@ -9,6 +9,7 @@ import {
   Volume2,
   VolumeX,
   Music2,
+  Siren,
   Compass,
   Mountain,
   PlaneLanding,
@@ -18,7 +19,6 @@ import {
   Pause,
   Play,
   RotateCcw,
-  Camera,
   ChevronRight,
   Check,
   Settings2,
@@ -30,7 +30,6 @@ import {
   CircleHelp,
   MoveUpRight,
   Flag,
-  Navigation,
   ArrowLeft,
   Heart,
   Film,
@@ -47,7 +46,8 @@ import type { AircraftId } from "./aircraft";
 import { paints } from "./aircraft";
 import { terrainHeight, runways } from "./terrain";
 import { flightProfiles } from "./flight-profiles";
-import { aircraftNames, climbReadout, headingReadout } from "./flight-ui";
+import { aircraftNames } from "./flight-ui";
+import { FlightHud } from "./hud/FlightHud";
 import type { SavedReplay } from "./replay-data";
 const ReplayStudio = lazy(() => import("./ReplayStudio"));
 const icons: Record<string, LucideIcon> = {
@@ -250,7 +250,6 @@ export default function App() {
         : "finch";
     }),
     [switchingAircraft, setSwitchingAircraft] = useState(false),
-    [instrumentsExpanded, setInstrumentsExpanded] = useState(false),
     [night, setNight] = useState(false),
     [sound, setSound] = useState(false),
     [musicVolume, setMusicVolume] = useState(() => {
@@ -264,6 +263,7 @@ export default function App() {
     }),
     [beginnerAssist, setBeginnerAssist] = useState(() => read("pocket-flight-assist", true)),
     [automaticConfiguration, setAutomaticConfiguration] = useState(() => read("pocket-flight-auto-configuration", true)),
+    [voiceWarnings, setVoiceWarnings] = useState(() => read("pocket-flight-voice-warnings", true)),
     [toast, setToast] = useState(""),
     [result, setResult] = useState<FlightResult | null>(null),
     [log, setLog] = useState<FlightResult[]>(() =>
@@ -278,10 +278,6 @@ export default function App() {
   const aircraftName = aircraftNames[aircraftId];
   const rotationKnots = flightProfiles[aircraftId].rotationKnots;
   const launchDisabled = !ready || switchingAircraft;
-  const heading = headingReadout(snapshot?.heading ?? 0);
-  const climb = climbReadout(snapshot?.verticalSpeed ?? 0);
-  const flightWarning =
-    snapshot?.stall || snapshot?.hint.startsWith("Engine out");
   const closePanel = () => {
     setPanel(null);
     if (resumeAfterPanel.current) game.current?.resume();
@@ -414,6 +410,12 @@ export default function App() {
     if (game.current) game.current.night = !night;
   };
   const toggleSound = () => setSound(game.current?.audio.toggle() ?? false);
+  const toggleVoiceWarnings = () => {
+    setVoiceWarnings((on) => {
+      save("pocket-flight-voice-warnings", !on);
+      return !on;
+    });
+  };
   const changeMusicVolume = (value: number) => {
     const audio = game.current?.audio;
     if (!audio) return;
@@ -760,333 +762,19 @@ export default function App() {
       )}
       {mode !== "menu" && snapshot && (
         <>
-          <header className="flight-header">
-            <button
-              className="flight-brand"
-              onClick={() => {
-                game.current?.pause();
-                setPanel(null);
-              }}
-              aria-label="Open pause menu"
-            >
-              <span className="brand-icon">
-                <Plane size={22} />
-              </span>
-            </button>
-            <div className="objective">
-              <span className="tiny-label">{current.name}</span>
-              <h3>{snapshot.objective}</h3>
-              <div className="mission-progress">
-                {snapshot.totalRings > 0 &&
-                  Array.from({ length: snapshot.totalRings }, (_, i) => (
-                    <i
-                      key={i}
-                      className={
-                        i < snapshot.ring
-                          ? "done"
-                          : i === snapshot.ring
-                            ? "next"
-                            : ""
-                      }
-                    />
-                  ))}
-                <span>
-                  {snapshot.totalRings > 0
-                    ? `${snapshot.ring}/${snapshot.totalRings}`
-                    : current.id === "free"
-                      ? "Free flight"
-                      : "Landing mission"}
-                </span>
-              </div>
-            </div>
-            <div className="flight-tools">
-              <span className="wind-readout">
-                <Wind size={17} />
-                {snapshot.wind.toFixed(0)} <small>KT</small>
-              </span>
-              <button
-                className="icon-button"
-                title="Cycle camera (C)"
-                aria-label="Cycle camera"
-                onClick={() => game.current?.cycleCamera()}
-              >
-                <Camera size={19} />
-              </button>
-              <button
-                className="icon-button"
-                aria-label="Toggle flight audio"
-                onClick={toggleSound}
-              >
-                {sound ? <Volume2 size={19} /> : <VolumeX size={19} />}
-              </button>
-              <button
-                className="icon-button flight-help"
-                title="Flight controls"
-                aria-label="Flight controls"
-                onClick={() => openPanel("controls")}
-              >
-                <CircleHelp size={19} />
-              </button>
-              <button
-                className="icon-button"
-                aria-label="Pause flight"
-                onClick={() => game.current?.pause()}
-              >
-                <Pause size={19} />
-              </button>
-            </div>
-          </header>
-          <div
-            className="compass"
-            aria-label={`Heading ${heading.degrees} degrees ${heading.cardinal}`}
-          >
-            <strong>{heading.degrees}°</strong>
-            <i />
-            <span className="compass-cardinal">{heading.cardinal}</span>
-          </div>
-          {mode === "playing" && snapshot.target && (
-            <div
-              className={`target-label ${snapshot.target.visible ? "" : "offscreen"}`}
-              style={{
-                left: `${(snapshot.target.x * 0.5 + 0.5) * 100}%`,
-                top: `${(-snapshot.target.y * 0.5 + 0.5) * 100}%`,
-              }}
-            >
-              <span className="target-diamond">
-                {snapshot.target.visible ? "" : <Navigation size={17} />}
-              </span>
-              <span>
-                {snapshot.ring < snapshot.totalRings
-                  ? String(snapshot.ring + 1).padStart(2, "0")
-                  : current.land}{" "}
-                <b>
-                  {snapshot.target.distance > 1000
-                    ? `${(snapshot.target.distance / 1000).toFixed(1)} km`
-                    : `${Math.round(snapshot.target.distance)} m`}
-                </b>
-              </span>
-            </div>
-          )}
-          {mode === "playing" && (
-            <div className="center-reticle">
-              <span />
-              <i />
-              <span />
-            </div>
-          )}
-          <div className="flight-bottom">
-            <div
-              className={`telemetry ${instrumentsExpanded ? "expanded" : "compact"}`}
-            >
-              <div className="deck-status">
-                <span>{aircraftName}</span>
-                <b className={snapshot.stall ? "stall-status" : ""}>
-                  {snapshot.stall
-                    ? "STALL"
-                    : snapshot.grounded
-                      ? "ON RUNWAY"
-                      : "AIRBORNE"}
-                </b>
-                <button
-                  className="instrument-toggle"
-                  aria-label={
-                    instrumentsExpanded
-                      ? "Collapse flight instruments"
-                      : "Expand flight instruments"
-                  }
-                  aria-expanded={instrumentsExpanded}
-                  title={
-                    instrumentsExpanded
-                      ? "Less detail"
-                      : "Climb rate and instrument detail"
-                  }
-                  onClick={() => setInstrumentsExpanded(!instrumentsExpanded)}
-                >
-                  <ChevronDown size={16} />
-                </button>
-              </div>
-              <div className="main-readouts">
-                <div>
-                  <label>AIRSPEED</label>
-                  <strong>
-                    {Math.round(snapshot.speed)}
-                    <small>kn</small>
-                  </strong>
-                  <span className="sub-readout">
-                    {snapshot.grounded
-                      ? `ROTATE ${rotationKnots} KN`
-                      : "AIR RELATIVE"}
-                  </span>
-                </div>
-                <span className="readout-divider" />
-                <div>
-                  <label>ALTITUDE</label>
-                  <strong>
-                    {Math.round(snapshot.altitude)}
-                    <small>ft</small>
-                  </strong>
-                  <span className="sub-readout">
-                    {snapshot.grounded
-                      ? "ON THE GROUND"
-                      : `${Math.max(0, Math.round(snapshot.agl))} FT AGL`}
-                  </span>
-                </div>
-              </div>
-              {instrumentsExpanded && (
-                <div className="climb-readout">
-                  <span>CLIMB RATE</span>
-                  <b>
-                    {climb}
-                    {climb !== "LEVEL" && <small> ft/min</small>}
-                  </b>
-                </div>
-              )}
-              <div className="secondary-readouts">
-                <label>
-                  THROTTLE <b>{Math.round(snapshot.throttle)}%</b>
-                </label>
-                <input
-                  aria-label="Throttle"
-                  onPointerUp={(e) => e.currentTarget.blur()}
-                  type="range"
-                  min="0"
-                  max="100"
-                  value={snapshot.throttle}
-                  onChange={(e) => {
-                    if (game.current)
-                      game.current.physics.throttle =
-                        Number(e.target.value) / 100;
-                  }}
-                />
-                <div
-                  className={`health ${snapshot.health < 70 ? "damaged" : ""}`}
-                  aria-label={`Aircraft condition ${Math.round(snapshot.health)} percent`}
-                  title="Aircraft condition"
-                >
-                  <Heart size={13} />
-                  <span>{Math.round(snapshot.health)}%</span>
-                </div>
-              </div>
-              <div className="configuration-readout" aria-label="Aircraft configuration">
-                <span>{aircraftId === "finch" ? "GEAR FIXED" : snapshot.gearPosition > 0.995 ? "GEAR DOWN" : snapshot.gearPosition < 0.005 ? "GEAR UP" : `GEAR ${Math.round(snapshot.gearPosition * 100)}%`}</span>
-                {aircraftId !== "finch" && <span>FLAPS {Math.round(snapshot.flapPosition * 100)}%</span>}
-                {aircraftId !== "finch" && <span>{snapshot.automaticConfiguration ? "AUTO" : "MANUAL"}</span>}
-                {snapshot.speedProtection && <span className="envelope-warning">SPEED LIMIT</span>}
-                {!beginnerAssist && <span>TRIM {Math.round(snapshot.elevatorTrim * 100)}%</span>}
-              </div>
-              {snapshot.health < 97 && (
-                <div className="damage-parts">
-                  {Object.entries(snapshot.damage)
-                    .filter(([, d]) => d > 0.1)
-                    .map(([part, d]) => (
-                      <span key={part}>
-                        {part} {Math.round((1 - d) * 100)}%
-                      </span>
-                    ))}
-                </div>
-              )}
-            </div>
-            {(flightWarning || (snapshot.grounded && snapshot.time < 18)) && (
-              <div className="flight-center-bottom">
-                <div
-                  className={`flight-hint ${flightWarning ? "warning" : ""}`}
-                >
-                  {snapshot.grounded && !flightWarning
-                    ? `Shift: power up · ↓ / S: raise nose at ${rotationKnots} kn · B: brake`
-                    : snapshot.hint}
-                </div>
-              </div>
-            )}
-            <div className="map-wrap">
-              <div className="flight-clock">
-                <Timer size={14} />
-                <span>
-                  {current.id === "race"
-                    ? time(Math.max(0, current.par * 1.5 - snapshot.time))
-                    : time(snapshot.time)}
-                </span>
-                <small>
-                  {current.id === "race" ? "REMAINING" : "FLIGHT TIME"}
-                </small>
-              </div>
-              <MiniMap snapshot={snapshot} mission={current} />
-            </div>
-          </div>
-          {mode === "playing" && (
-            <div className="touch-controls">
-              <div
-                className="touch-stick"
-                onPointerDown={(e) => {
-                  e.currentTarget.setPointerCapture(e.pointerId);
-                  const rect = e.currentTarget.getBoundingClientRect();
-                  if (game.current)
-                    game.current.touch = {
-                      roll:
-                        (e.clientX - rect.x - rect.width / 2) /
-                        (rect.width / 2),
-                      pitch:
-                        (e.clientY - rect.y - rect.height / 2) /
-                        (rect.height / 2),
-                      yaw: 0,
-                    };
-                }}
-                onPointerMove={(e) => {
-                  if (!e.currentTarget.hasPointerCapture(e.pointerId)) return;
-                  const rect = e.currentTarget.getBoundingClientRect();
-                  if (game.current)
-                    game.current.touch = {
-                      roll: Math.max(
-                        -1,
-                        Math.min(
-                          1,
-                          (e.clientX - rect.x - rect.width / 2) /
-                            (rect.width / 2),
-                        ),
-                      ),
-                      pitch: Math.max(
-                        -1,
-                        Math.min(
-                          1,
-                          (e.clientY - rect.y - rect.height / 2) /
-                            (rect.height / 2),
-                        ),
-                      ),
-                      yaw: 0,
-                    };
-                }}
-                onPointerUp={() => {
-                  if (game.current)
-                    game.current.touch = { pitch: 0, roll: 0, yaw: 0 };
-                }}
-                onPointerCancel={() => {
-                  if (game.current)
-                    game.current.touch = { pitch: 0, roll: 0, yaw: 0 };
-                }}
-              >
-                <span>+</span>
-                <small>FLY</small>
-              </div>
-              <button
-                className="touch-brake"
-                onPointerDown={() => game.current?.keys.add("KeyB")}
-                onPointerUp={() => game.current?.keys.delete("KeyB")}
-                onPointerLeave={() => game.current?.keys.delete("KeyB")}
-                onPointerCancel={() => game.current?.keys.delete("KeyB")}
-              >
-                BRAKE
-              </button>
-              {aircraftId !== "finch" && !automaticConfiguration && (
-                <div className="touch-configuration">
-                  <button onClick={() => game.current?.toggleGear()} aria-label="Toggle landing gear">GEAR</button>
-                  <button onClick={() => game.current?.cycleFlaps()} aria-label="Cycle flaps">FLAPS</button>
-                </div>
-              )}
-              {!beginnerAssist && <div className="touch-configuration">
-                <button onClick={() => game.current?.adjustTrim(-0.02)} aria-label="Decrease elevator trim">TRIM −</button>
-                <button onClick={() => game.current?.adjustTrim(0.02)} aria-label="Increase elevator trim">TRIM +</button>
-              </div>}
-            </div>
-          )}
+          <FlightHud
+            game={game.current}
+            snapshot={snapshot}
+            mission={current}
+            aircraftId={aircraftId}
+            beginnerAssist={beginnerAssist}
+            automaticConfiguration={automaticConfiguration}
+            sound={sound}
+            voiceWarnings={voiceWarnings}
+            map={<MiniMap snapshot={snapshot} mission={current} />}
+            onToggleSound={toggleSound}
+            onOpenControls={() => openPanel("controls")}
+          />
           {mode === "replay" && (
             <div className="replay-bar">
               <div className="replay-progress">
@@ -1531,6 +1219,17 @@ export default function App() {
                     {sound ? <Volume2 size={17} /> : <VolumeX size={17} />}
                   </button>
                 </div>
+                <div className="setting-row">
+                  <span>
+                    <Siren size={21} />
+                    <b>Voice warnings</b>
+                  </span>
+                  <button className="setting-toggle" aria-pressed={voiceWarnings} onClick={toggleVoiceWarnings}>
+                    {voiceWarnings ? "Betty on" : "Betty off"}
+                    {voiceWarnings ? <Volume2 size={17} /> : <VolumeX size={17} />}
+                  </button>
+                </div>
+                <p className="music-status">Voice warnings: real cockpit recordings.</p>
                 <div className="setting-row music-setting">
                   <span>
                     <Music2 size={21} />

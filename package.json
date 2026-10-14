@@ -8,6 +8,7 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview --host 0.0.0.0",
     "test": "bun test ./tests",
+    "betty:fetch": "bun scripts/fetch-betty.ts",
     "physics:measure": "bun scripts/measure-collision-proxies.ts",
     "physics:calibrate": "bun scripts/calibrate-island.ts",
     "music:compose": "bun scripts/compose-soundtrack.ts",

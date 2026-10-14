@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { climbReadout, headingReadout } from "../src/flight-ui";
+import { climbReadout, formatClock, headingReadout } from "../src/flight-ui";
 
 describe("flight deck units", () => {
   test("heading wraps through north, including rounding and negative values", () => {
@@ -11,5 +11,11 @@ describe("flight deck units", () => {
     expect(climbReadout(5)).toBe("+1,000");
     expect(climbReadout(-2)).toBe("−400");
     expect(climbReadout(0.1)).toBe("LEVEL");
+  });
+  test("clock formats minutes and seconds", () => {
+    expect(formatClock(0)).toBe("00:00");
+    expect(formatClock(252.9)).toBe("04:12");
+    expect(formatClock(-1)).toBe("00:00");
+    expect(formatClock(3600)).toBe("60:00");
   });
 });

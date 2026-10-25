@@ -1,7 +1,7 @@
 import { join } from "node:path";
 import { mkdir } from "node:fs/promises";
-import { musicStems } from "../src/music-mix";
-import { musicTracks, trackDuration } from "../src/music-tracks";
+import { musicStems } from "../src/audio/music-mix";
+import { musicTracks, trackDuration } from "../src/audio/music-tracks";
 
 const report: unknown[] = [];
 for (const track of musicTracks) {

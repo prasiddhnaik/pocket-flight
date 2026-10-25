@@ -1,22 +1,22 @@
 import { Euler, MathUtils, Quaternion, Vector3 } from "three";
-import type { AircraftId } from "../src/aircraft";
+import type { AircraftId } from "../src/aircraft/aircraft";
 import {
   aircraftDesign,
   massProperties,
   type Loading,
-} from "../src/aircraft-design";
+} from "../src/aircraft/aircraft-design";
 import {
   aircraftAerodynamics,
   aircraftStallSpeed,
   aircraftThrust,
   airDensity,
-} from "../src/aerodynamics";
-import { FlightPhysics } from "../src/physics";
-import { solveTrim } from "../src/flight-trim";
-import { localSoundSpeed } from "../src/engine-map";
-import { references } from "../src/flight-reference-data";
+} from "../src/flight/aerodynamics";
+import { FlightPhysics } from "../src/flight/physics";
+import { solveTrim } from "../src/flight/flight-trim";
+import { localSoundSpeed } from "../src/flight/engine-map";
+import { references } from "../src/flight/flight-reference-data";
 
-export const VALIDATION_VERSION = "fleet-envelope-balance-3";
+export const VALIDATION_VERSION = "fleet-envelope-balance-4";
 const zero = new Vector3(),
   neutral = { pitch: 0, roll: 0, yaw: 0, throttle: 0, brake: false };
 const radians = Math.PI / 180;
@@ -24,6 +24,7 @@ export function validateAircraft(id: AircraftId) {
   const design = aircraftDesign(id),
     speed = design.trimSpeed,
     altitude = 1000;
+  const gear = id === "finch" || id === "heron" ? 1 : 0;
   const loadings: Loading[] = [
     design.defaultLoading,
     { fuel: 0.1, payload: 1 },
@@ -46,7 +47,7 @@ export function validateAircraft(id: AircraftId) {
       balance.cg,
       rates,
       { pitch, roll: 0, yaw: 0 },
-      { gear: id === "finch" ? 1 : 0, flap, wingDamage: 0, gearDamage: 0 },
+      { gear, flap, wingDamage: 0, gearDamage: 0 },
     );
   const polars = [0, 1].map((flap) => ({
     flap,
@@ -70,7 +71,7 @@ export function validateAircraft(id: AircraftId) {
   }));
   const cgChecks = loadings.map((loading) => {
     const balance = massProperties(design.massBudget, loading),
-      t = solveTrim(design, balance, speed, altitude, id === "finch" ? 1 : 0);
+      t = solveTrim(design, balance, speed, altitude, gear);
     const a = sample(t.alpha, balance),
       step = 1e-4;
     const cmAlpha =
@@ -286,8 +287,12 @@ export function validateAircraft(id: AircraftId) {
           height,
         ),
         referenceStatus:
-          id === "aurelia"
+          id === "f15c"
+            ? "Estimated twin F100-class subsonic installed map"
+            : id === "aurelia"
             ? "Estimated civil map"
+            : id === "heron"
+              ? "Estimated turboprop altitude lapse, efficiency and static thrust"
             : id === "finch"
               ? "Published altitude power; estimated propeller efficiency/static thrust"
               : mach < 0.2
@@ -316,11 +321,17 @@ export function validateAircraft(id: AircraftId) {
     stallSpeeds,
     references,
     limitations: [
-      "Internal consistency and reference transfer checks, not empirical validation of the fictional aircraft.",
+      id === "f15c"
+        ? "Internal consistency checks for an estimated F-15C reconstruction, not empirical aircraft validation."
+        : "Internal consistency and reference transfer checks, not empirical validation of the fictional aircraft.",
       "Attached geometry slope is from main-wing VLM; that solver does not predict stall.",
       "Stall curve transfers approximate NACA 0012 section loss shape. Fleet CLmax/critical alpha and negative-alpha symmetry remain assumptions; no local tip/root progression, dynamic hysteresis, spin or T-tail deep-stall validation.",
-      "Control attenuation is estimated. Neutral point, yaw/roll derivatives and civil pitch damping remain estimated. Thirty-second disturbance decay is not a complete modal or handling-qualities certification.",
-      "Military thrust deck is a published simulator input, scaled to concept ratings. M<0.2 holds a boundary; civil deck, propeller efficiency/static thrust, fuel flow and spool response remain estimated.",
+      id === "f15c"
+        ? "Control attenuation, neutral point and all whole-aircraft stability/control derivatives remain estimates. Thirty-second disturbance decay is not a complete modal or handling-qualities certification."
+        : "Control attenuation is estimated. Neutral point, yaw/roll derivatives and civil pitch damping remain estimated. Thirty-second disturbance decay is not a complete modal or handling-qualities certification.",
+      id === "f15c"
+        ? "Twin F100-class sea-level ratings, density lapse, inlet losses, fuel flow and spool response are estimates. The island cap is Mach 0.7; no transonic/supersonic thrust or intake validation."
+        : "Military thrust deck is a published simulator input, scaled to concept ratings. M<0.2 holds a boundary; civil deck, propeller efficiency/static thrust, fuel flow and spool response remain estimated.",
     ],
   };
 }

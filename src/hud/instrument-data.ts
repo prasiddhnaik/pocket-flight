@@ -1,4 +1,4 @@
-import type { FlightPhysics } from "../physics";
+import type { FlightPhysics } from "../flight/physics";
 
 export type EngineReadout = { kind: "propeller"; rpm: number } | { kind: "jet"; percent: number };
 export type InstrumentData = {

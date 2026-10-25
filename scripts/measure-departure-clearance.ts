@@ -2,14 +2,15 @@ import { createHash } from "node:crypto";
 import { mkdir } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { MathUtils, Vector3 } from "three";
-import { FlightPhysics } from "../src/physics";
-import type { AircraftId } from "../src/aircraft";
-import { aircraftDesign, massProperties } from "../src/aircraft-design";
-import { airframeProbes } from "../src/airframe-contact";
-import { aircraftThrust, airDensity, GRAVITY } from "../src/aerodynamics";
-import { solveTrim } from "../src/flight-trim";
-import { groundHeight, runways } from "../src/terrain";
-import { missions } from "../src/missions";
+import { FlightPhysics } from "../src/flight/physics";
+import type { AircraftId } from "../src/aircraft/aircraft";
+import { aircraftDefinitionSources } from "./aircraft-source";
+import { aircraftDesign, massProperties } from "../src/aircraft/aircraft-design";
+import { airframeProbes } from "../src/flight/airframe-contact";
+import { aircraftThrust, airDensity, GRAVITY } from "../src/flight/aerodynamics";
+import { solveTrim } from "../src/flight/flight-trim";
+import { groundHeight, runways } from "../src/world/terrain";
+import { missions } from "../src/flight/missions";
 
 // Read-only experiments: use the shipped dynamics, contacts, fuel burn and assist.
 // Controllers issue ordinary pilot inputs; they never overwrite motion or mass.
@@ -140,11 +141,11 @@ for (const id of ids) {
 
 const terrain = [];
 for (let z = 459; z >= -700; z -= 5) terrain.push({ z, distance: 459 - z, height: groundHeight(-260, z) });
-const files = ["src/physics.ts", "src/aerodynamics.ts", "src/engine-map.ts", "src/flight-reference-data.ts",
-  "src/aircraft-design.ts", "src/flight-profiles.ts", "src/finch-design.ts", "src/fuel-loading.ts",
-  "src/fuel-mass-calibration.json", "src/terrain.ts", "src/collision.ts", "src/airframe-contact.ts",
-  "src/airframe-collision.json", "src/wheel-contact.ts", "src/landing-gear.ts", "src/aurelia-motion.ts",
-  "src/rigid-body.ts", "src/flight-envelope.ts", "src/flight-trim.ts", "src/missions.ts"];
+const files = [...aircraftDefinitionSources, "src/flight/physics.ts", "src/flight/aerodynamics.ts", "src/flight/engine-map.ts", "src/flight/flight-reference-data.ts",
+  "src/aircraft/aircraft-design.ts", "src/flight/flight-profiles.ts", "src/aircraft/finch/finch-design.ts", "src/flight/fuel-loading.ts",
+  "src/aircraft/fuel-mass-calibration.json", "src/world/terrain.ts", "src/flight/collision.ts", "src/flight/airframe-contact.ts",
+  "src/aircraft/airframe-collision.json", "src/flight/wheel-contact.ts", "src/aircraft/landing-gear.ts", "src/aircraft/aurelia/aurelia-motion.ts",
+  "src/flight/rigid-body.ts", "src/flight/flight-envelope.ts", "src/flight/flight-trim.ts", "src/flight/missions.ts"];
 const hashes = Object.fromEntries(await Promise.all(files.map(async path =>
   [path, createHash("sha256").update(new Uint8Array(await Bun.file(root + path).arrayBuffer())).digest("hex")])));
 const report = {

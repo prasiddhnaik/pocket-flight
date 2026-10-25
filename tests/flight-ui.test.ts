@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { climbReadout, formatClock, headingReadout } from "../src/flight-ui";
+import { climbReadout, formatClock, headingReadout } from "../src/app/flight-ui";
 
 describe("flight deck units", () => {
   test("heading wraps through north, including rounding and negative values", () => {

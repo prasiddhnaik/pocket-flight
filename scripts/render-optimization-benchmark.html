@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pocket Flight rendering experiments</title>
+  <style>
+    body {
+      margin: 0;
+      background: #fff;
+      color: #222;
+      font: 14px/1.5 system-ui;
+    }
+    header {
+      padding: 12px 18px;
+    }
+    h1 {
+      font-size: 19px;
+      margin: 0 0 6px;
+    }
+    button,
+    select {
+      font: inherit;
+      margin: 4px;
+      padding: 5px 10px;
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: auto; aspect-ratio: 16 / 9;
+    }
+    pre {
+      white-space: pre-wrap;
+      max-height: 300px;
+      overflow: auto;
+      padding: 16px;
+    }
+    #status {
+      margin: 8px 0;
+    }
+    small {
+      display: block;
+    }
+  </style>
+  <header>
+    <h1>Pocket Flight: rendering optimization experiments</h1>
+    <label
+      >Variant
+      <select id="variant">
+        <option value="baseline">Current tree LOD baseline</option>
+        <option value="shadow1024">1024 shadow map</option>
+        <option value="render85">85% render resolution</option>
+        <option value="terrainLOD">Terrain detail LOD</option>
+        <option value="noShadows">No shadows (diagnostic)</option>
+        <option value="lightInstances">Instanced runway lights</option>
+      </select></label
+    >
+    <label
+      >View
+      <select id="view">
+        <option value="forest">Low forest</option>
+        <option value="airfield">Airfield</option>
+        <option value="overhead">Overhead</option>
+        <option value="water">Coast and water</option>
+      </select></label
+    >
+    <button id="run" disabled>Measure selected variant</button>
+    <button id="pair" disabled>Compare three balanced rounds</button>
+    <button id="save">Save benchmark evidence</button>
+    <button id="capture">Save current view</button>
+    <p id="status" role="status">Loading island…</p>
+    <small
+      >1280 × 720 baseline; 85% variant uses 1088 × 612. All include current tree LOD. Warmed scenery
+      renderer; excludes aircraft, flight physics and HUD. Frame intervals
+      include browser scheduling. GPU time is reported only if timer queries are
+      available.</small
+    >
+  </header>
+  <div id="viewport"></div>
+  <pre id="results" data-testid="results"></pre>
+  <script type="module" src="/scripts/render-optimization-benchmark.ts"></script>
+</html>

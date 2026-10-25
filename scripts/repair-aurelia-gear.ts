@@ -11,6 +11,7 @@ import {
   AURELIA_BAY_REVISION,
   bayOpeningContains,
   aureliaPanels,
+  aureliaBodyCenter,
   panelHinge,
 } from "./aurelia-gear-bays";
 import {
@@ -18,7 +19,7 @@ import {
   aureliaGearFold,
   aureliaDoorAngle,
   AURELIA_MAIN_GEAR,
-} from "../src/aurelia-motion";
+} from "../src/aircraft/aurelia/aurelia-motion";
 
 const assets = new URL("../public/assets/", import.meta.url);
 const saved = new URL(
@@ -214,6 +215,70 @@ if (doc.extras?.gear_bays_revision !== AURELIA_BAY_REVISION) {
     a.count = keep.length;
     a.min = [Math.min(...keep)];
     a.max = [Math.max(...keep)];
+  }
+  // Keep the painted skin physically outside the pressure shell. The old
+  // coarse paint tessellation crossed the finer white shell and flickered.
+  const shell = current.scene.getObjectByName(
+    "Continuous_pressure_shell",
+  ) as T.Mesh;
+  const shellMaterial = shell.material as T.Material;
+  shellMaterial.side = T.DoubleSide;
+  for (const [name, clearance] of [
+    ["Fuselage | Atlantic blue lacquer", 0.025],
+    ["Fuselage | Champagne trim", 0.03],
+  ] as const) {
+    const node = doc.nodes.find((n: any) => n.name === name);
+    const painted = current.scene.getObjectByName(key(name)) as T.Mesh;
+    const position = painted.geometry.getAttribute("position");
+    const inverse = painted.matrixWorld.clone().invert();
+    let moved = 0;
+    for (let i = 0; i < position.count; i++) {
+      const point = new T.Vector3()
+        .fromBufferAttribute(position, i)
+        .applyMatrix4(painted.matrixWorld);
+      const origin = new T.Vector3(0, aureliaBodyCenter(point.z), point.z);
+      const direction = point.clone().sub(origin),
+        radius = direction.length();
+      if (radius < 0.05) continue;
+      const hit = new T.Raycaster(
+        origin,
+        direction.normalize(),
+        0,
+        4,
+      ).intersectObject(shell, false)[0];
+      if (!hit || Math.abs(radius - hit.distance) > 0.045) continue;
+      if (radius >= hit.distance + clearance) continue;
+      const corrected = origin
+        .addScaledVector(direction, hit.distance + clearance)
+        .applyMatrix4(inverse);
+      position.setXYZ(i, corrected.x, corrected.y, corrected.z);
+      moved++;
+    }
+    painted.geometry.computeVertexNormals();
+    for (const attribute of ["POSITION", "NORMAL"]) {
+      const accessor =
+        doc.accessors[
+          doc.meshes[node.mesh].primitives[0].attributes[attribute]
+        ];
+      const view = doc.bufferViews[accessor.bufferView];
+      if (view.buffer !== 0 || accessor.componentType !== 5126)
+        throw Error("Expected embedded paint geometry");
+      const values = painted.geometry.getAttribute(
+        attribute === "POSITION" ? "position" : "normal",
+      );
+      const offset = (view.byteOffset ?? 0) + (accessor.byteOffset ?? 0),
+        stride = view.byteStride ?? 12;
+      for (let i = 0; i < values.count; i++)
+        [values.getX(i), values.getY(i), values.getZ(i)].forEach((value, j) =>
+          data.setFloat32(offset + i * stride + j * 4, value, true),
+        );
+      if (attribute === "POSITION") {
+        painted.geometry.computeBoundingBox();
+        accessor.min = painted.geometry.boundingBox!.min.toArray();
+        accessor.max = painted.geometry.boundingBox!.max.toArray();
+      }
+    }
+    console.log(`${name}: separated ${moved} vertices from the pressure shell`);
   }
   const built = compile(doc, makeAureliaGearBays(), "aurelia-gear-bays.bin");
   doc = built.doc;

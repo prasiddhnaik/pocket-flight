@@ -1,0 +1,83 @@
+{
+  "id": "heron",
+  "name": "Heron UT–9",
+  "revision": "81bc153162e94b25e74cc750aacc86628b2e6ac6d3f83e1c61c858f0bd3bba70",
+  "dimensions": [
+    15.869999885559082,
+    4.700000102519989,
+    12.670000077486037
+  ],
+  "scale": 1,
+  "offsetY": 0,
+  "maxChordAsymmetry": 0,
+  "meshNames": [
+    "Wing_skin_Left",
+    "Wing_skin_Right"
+  ],
+  "stations": [
+    {
+      "x": 0,
+      "leading": -1.1486637031009284,
+      "chord": 1.9481440320846226,
+      "y": 1.0699771685203308,
+      "incidence": 2.5,
+      "zeroLiftAlpha": -2.040566720061146
+    },
+    {
+      "x": 0.52,
+      "leading": -1.1486637031009284,
+      "chord": 1.9481440320846226,
+      "y": 1.0699771685203308,
+      "incidence": 2.5,
+      "zeroLiftAlpha": -2.040566720061146
+    },
+    {
+      "x": 4.8,
+      "leading": -0.899829626761809,
+      "chord": 1.6997633705025124,
+      "y": 1.193330813231555,
+      "incidence": 0.9559884559884564,
+      "zeroLiftAlpha": -2.040566720061146
+    },
+    {
+      "x": 7.45,
+      "leading": -0.62,
+      "chord": 1.31,
+      "y": 1.31,
+      "incidence": 0,
+      "zeroLiftAlpha": -2.040566720061146
+    },
+    {
+      "x": 7.68,
+      "leading": -0.53,
+      "chord": 1.18,
+      "y": 1.3200000000000003,
+      "incidence": 0,
+      "zeroLiftAlpha": -2.040566720061146
+    },
+    {
+      "x": 7.84,
+      "leading": -0.42,
+      "chord": 0.95,
+      "y": 1.3400000000000003,
+      "incidence": 0,
+      "zeroLiftAlpha": -2.040566720061146
+    },
+    {
+      "x": 7.935,
+      "leading": -0.3,
+      "chord": 0.7,
+      "y": 1.35,
+      "incidence": 0,
+      "zeroLiftAlpha": -2.040566720061146
+    }
+  ],
+  "wingArea": 26.6852364082726,
+  "meanAerodynamicChord": 1.7143083527115224,
+  "quarterChordZ": -0.5090700216579928,
+  "assumptions": [
+    "Gross main-wing stations from the original CAD; center section carried through the fuselage.",
+    "14% NACA-style thickness, 2% sinusoidal camber; quarter-chord heights, 2.5 degree root incidence and 2.5 degree washout follow the CAD. Section zero-lift angle is a thin-airfoil estimate.",
+    "Main wing only; attached flow. No fuselage, tail, propwash, viscous drag or stall-onset solution."
+  ]
+}

@@ -17,8 +17,8 @@ async (page) => {
           finchWheels,
           peregrineWheels,
           aureliaWheels,
-        } = await import("/src/landing-gear.ts");
-        const { stormbirdContact } = await import("/src/stormbird-contact.ts");
+        } = await import("/src/aircraft/landing-gear.ts");
+        const { stormbirdContact } = await import("/src/aircraft/stormbird/stormbird-contact.ts");
         p.reset(true);
         game.replay.clear();
         p.gearPosition = 1;

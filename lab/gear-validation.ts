@@ -1,9 +1,10 @@
 import { Quaternion, TorusGeometry, Vector3 } from "three";
-import type { AircraftId } from "../src/aircraft";
-import { aircraftWheels, wheelPose } from "../src/airframe-contact";
-import { groundAt } from "../src/terrain";
-import { FlightPhysics } from "../src/physics";
-import geometry from "../src/stormbird-geometry.json";
+import type { AircraftId } from "../src/aircraft/aircraft";
+import { aircraftWheels, wheelPose } from "../src/flight/airframe-contact";
+import { groundAt } from "../src/world/terrain";
+import { FlightPhysics } from "../src/flight/physics";
+import { f15cTires } from "../src/aircraft/f15c/landing-gear";
+import geometry from "../src/aircraft/stormbird/stormbird-geometry.json";
 
 // Independent vertex sampling of measured rigid tire geometry, rather than
 // reusing the contact solver's support-point calculation for its verdict.
@@ -11,6 +12,10 @@ const vertices = new Map<AircraftId, Vector3[][]>();
 function tireVertices(id: AircraftId) {
   if (vertices.has(id)) return vertices.get(id)!;
   const result = aircraftWheels[id].map((wheel, index) => {
+    if (id === "f15c") {
+      const tire = f15cTires[index];
+      return [-tire.halfWidth, tire.halfWidth].flatMap((x) => Array.from({ length: 128 }, (_, i) => new Vector3(x, tire.radius * Math.cos(i * Math.PI / 64), tire.radius * Math.sin(i * Math.PI / 64))));
+    }
     if (id === "stormbird") {
       return geometry.wheels[index].profile.flatMap(([a, radius]) =>
         [-a, a].flatMap((x) =>

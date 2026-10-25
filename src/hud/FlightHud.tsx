@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Camera, CircleHelp, Navigation, Pause, Volume2, VolumeX, Wind } from "lucide-react";
-import type { AircraftId } from "../aircraft";
-import type { PocketFlight, Snapshot } from "../game";
-import type { Mission } from "../missions";
-import { Betty } from "../betty";
-import { flightProfiles } from "../flight-profiles";
-import { aircraftNames, climbReadout, formatClock } from "../flight-ui";
+import type { AircraftId } from "../aircraft/aircraft";
+import type { PocketFlight, Snapshot } from "../flight/game";
+import type { Mission } from "../flight/missions";
+import { Betty } from "../audio/betty";
+import { flightProfiles } from "../flight/flight-profiles";
+import { aircraftNames, climbReadout, formatClock } from "../app/flight-ui";
 import { BarGauge } from "./BarGauge";
 import { isNewFlight } from "./boot";
 import { CompassRose } from "./CompassRose";
@@ -74,7 +74,7 @@ export function FlightHud({
   const betty = useRef<Betty | null>(null);
   const [warnings, setWarnings] = useState<WarningId[]>([]);
   const profile = flightProfiles[aircraftId];
-  const jet = aircraftId !== "finch";
+  const jet = aircraftId !== "finch" && aircraftId !== "heron";
 
   useEffect(() => {
     if (game && !betty.current) betty.current = new Betty(game.audio);
@@ -233,7 +233,7 @@ export function FlightHud({
         )}
         <div className="hud-row">
           <div className="hud-slots">
-            {jet && <SlotGauge label="FLAPS" position={s.flapPosition} readout={`${Math.round(s.flapPosition * 100)}%`} />}
+            {aircraftId !== "finch" && <SlotGauge label="FLAPS" position={s.flapPosition} readout={`${Math.round(s.flapPosition * 100)}%`} />}
             {!beginnerAssist && (
               <SlotGauge label="TRIM" position={0.5 - s.elevatorTrim / 2} readout={`${s.elevatorTrim > 0 ? "+" : ""}${Math.round(s.elevatorTrim * 100)}`} />
             )}

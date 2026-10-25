@@ -5,9 +5,15 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
+    "f15c:build": "bun scripts/build-f15c.ts",
+    "scenery:tree-lod": "bun scripts/build-tree-lod.ts",
     "build": "tsc -b && vite build",
     "preview": "vite preview --host 0.0.0.0",
     "test": "bun test ./tests",
+    "engine:benchmark": "bun scripts/run-engine-benchmark.ts",
+    "engine:render-benchmark": "bun scripts/run-engine-benchmark.ts --render",
+    "engine:uncapped": "bun scripts/run-engine-benchmark.ts --uncapped",
+    "engine:render-uncapped": "bun scripts/run-engine-benchmark.ts --uncapped --render",
     "betty:fetch": "bun scripts/fetch-betty.ts",
     "physics:measure": "bun scripts/measure-collision-proxies.ts",
     "physics:calibrate": "bun scripts/calibrate-island.ts",
@@ -45,8 +51,19 @@
     "lab:fuel-check": "bun scripts/run-fuel-browser-check.ts",
     "aurelia:gear-build": "bun scripts/repair-aurelia-gear.ts && bun run fleet:internals && bun scripts/measure-fuel-and-mass.ts",
     "aurelia:gear-check": "bun test ./tests/aurelia-gear-packaging.test.ts ./tests/aircraft-mechanics.test.ts ./tests/fleet-internal-systems.test.ts ./tests/gear-surface.test.ts",
+    "aurelia:exterior-build": "bun scripts/build-aurelia-exterior.ts",
+    "aurelia:lab-measure": "bun scripts/measure-aurelia-lab.ts",
+    "aurelia:lab-check": "bun scripts/run-lab-browser-check.ts aurelia",
+    "aurelia:floor-check": "bun run aurelia:exterior-build && bun scripts/check-aurelia-floor.ts",
+    "aurelia:attachment-check": "bun run aurelia:exterior-build && bun test ./tests/aurelia-attachments.test.ts && bun scripts/check-aurelia-attachments.ts && bun scripts/check-aurelia-floor.ts --out output/aurelia-attachment-check",
+    "aurelia:exterior-check": "bun run aurelia:exterior-build && bun test ./tests/aurelia-exterior.test.ts ./tests/aurelia-interior.test.ts",
+    "aurelia:reference-check": "bun run aurelia:exterior-build && bun test --timeout 30000 ./tests/aurelia-exterior.test.ts ./tests/aurelia-interior.test.ts ./tests/aurelia-attachments.test.ts ./tests/aurelia-resize.test.ts ./tests/aurelia-avionics.test.ts ./tests/aurelia-avionics-input.test.ts ./tests/aurelia-dashboard.test.ts ./tests/aurelia-cockpit.test.ts ./tests/aurelia-render-loop.test.ts ./tests/aurelia-partition.test.ts && bun scripts/check-aurelia-reference.ts && bun scripts/check-aurelia-cockpit.ts && bun scripts/check-aurelia-attachments.ts --out output/aurelia-reference-check && bun scripts/check-aurelia-floor.ts --out output/aurelia-reference-check",
     "departure:measure": "bun scripts/measure-departure-clearance.ts",
-    "departure:research": "bun run departure:measure && bun scripts/report-departure-research.ts"
+    "departure:research": "bun run departure:measure && bun scripts/report-departure-research.ts",
+    "repo:check": "bun scripts/check-repository-layout.ts",
+    "heron:build": "bun scripts/build-heron.ts",
+    "heron:check": "bun test ./tests/heron.test.ts ./tests/heron-realism.test.ts ./tests/envelope-validation.test.ts",
+    "heron:study": "bun scripts/study-heron.ts"
   },
   "dependencies": {
     "@fix-webm-duration/fix": "1.0.1",
@@ -56,12 +73,16 @@
     "three": "^0.180.0"
   },
   "devDependencies": {
+    "@gltf-transform/core": "^4.5.1",
+    "@gltf-transform/extensions": "^4.5.1",
+    "@gltf-transform/functions": "^4.5.1",
     "@playwright/cli": "latest",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",
     "@types/three": "^0.180.0",
     "@vitejs/plugin-react": "^5.0.0",
     "fake-indexeddb": "^6.2.5",
+    "meshoptimizer": "^1.3.0",
     "prettier": "^3.9.6",
     "typescript": "^5.8.3",
     "vite": "^7.1.0"

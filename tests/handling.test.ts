@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
-import { FlightPhysics } from "../src/physics";
-import { flightProfiles } from "../src/flight-profiles";
-import type { AircraftId } from "../src/aircraft";
+import { FlightPhysics } from "../src/flight/physics";
+import { flightProfiles } from "../src/flight/flight-profiles";
+import type { AircraftId } from "../src/aircraft/aircraft";
 
 const neutral = { pitch: 0, roll: 0, yaw: 0, throttle: 0, brake: false };
 const ids = Object.keys(flightProfiles) as AircraftId[];

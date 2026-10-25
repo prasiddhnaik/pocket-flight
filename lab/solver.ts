@@ -7,6 +7,7 @@ export type WingStation = {
   leading: number;
   chord: number;
   zeroLiftAlpha: number;
+  incidence?: number;
 };
 export type WingGeometry = {
   name: string;
@@ -44,7 +45,7 @@ export type Solution = {
   core: number;
   wakeLength: number;
 };
-export const SOLVER_VERSION = "horseshoe-vlm-1.0";
+export const SOLVER_VERSION = "horseshoe-vlm-1.1";
 export const LIMITS = {
   minAlpha: -8,
   maxAlpha: 8,
@@ -85,6 +86,7 @@ function validate(
       !Object.values(s).every(Number.isFinite) ||
       s.chord <= 0 ||
       Math.abs(s.zeroLiftAlpha) > 8 ||
+      Math.abs(s.incidence ?? 0) > 8 ||
       (i > 0 && s.x <= geometry.stations[i - 1].x)
     )
       throw new Error(
@@ -107,6 +109,7 @@ export function wingSection(geometry: WingGeometry, x: number): WingStation {
     leading: a.leading + (b.leading - a.leading) * t,
     chord: a.chord + (b.chord - a.chord) * t,
     zeroLiftAlpha: a.zeroLiftAlpha + (b.zeroLiftAlpha - a.zeroLiftAlpha) * t,
+    incidence: (a.incidence ?? 0) + ((b.incidence ?? 0) - (a.incidence ?? 0)) * t,
   };
 }
 
@@ -195,13 +198,16 @@ export function solveWing(
     const a = wingSection(geometry, x0),
       b = wingSection(geometry, x1),
       mid = wingSection(geometry, (x0 + x1) / 2);
-    const normal = new Vector3(-(b.y - a.y) / (x1 - x0), 1, 0)
+    const pitch = (mid.incidence ?? 0) * radians;
+    const chordSlope = Math.tan(pitch);
+    const sweep = (b.leading + b.chord / 4 - a.leading - a.chord / 4) / (x1 - x0);
+    const normal = new Vector3(-(b.y - a.y) / (x1 - x0) - sweep * chordSlope, 1, chordSlope)
       .normalize()
       .toArray() as Vec3;
     return {
       a: [x0, a.y, a.leading + a.chord / 4],
       b: [x1, b.y, b.leading + b.chord / 4],
-      control: [mid.x, mid.y, mid.leading + mid.chord * 0.75],
+      control: [mid.x, mid.y - mid.chord * 0.5 * chordSlope, mid.leading + mid.chord * 0.75],
       normal,
       gamma: 0,
       x: mid.x,

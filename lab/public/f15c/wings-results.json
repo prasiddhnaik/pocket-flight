@@ -1,0 +1,765 @@
+{
+  "artifact": "STEP/airframe_wings.step",
+  "sha256": "2620ce5e7d2b0cb794a121914d5fcc5eaf8a2118c6c4b8789b0fe7efc2999216",
+  "units": "mm",
+  "dimensionsM": [
+    13.049250000200006,
+    18.920000000200154,
+    1.9770729327219354
+  ],
+  "boundsM": {
+    "min": [
+      -6.524625000100003,
+      -8.92000000010015,
+      1.477614437004361
+    ],
+    "max": [
+      6.524625000100003,
+      10.000000000100002,
+      3.4546873697262965
+    ]
+  },
+  "checks": [
+    {
+      "name": "All saved solids valid, closed and positive",
+      "pass": true,
+      "invalid": [],
+      "solidCount": 29
+    },
+    {
+      "name": "All saved parts have an exact contact path to the fuselage",
+      "pass": true,
+      "floating": [],
+      "contactToleranceMm": 0.5,
+      "solidDistanceChecks": 22
+    },
+    {
+      "name": "Saved solids are closed, valid and positive",
+      "pass": true,
+      "solids": 10
+    },
+    {
+      "name": "Reference span retained",
+      "pass": true,
+      "spanM": 13.049250000200006,
+      "toleranceM": 0.002
+    },
+    {
+      "name": "Exact fuselage root contact Right",
+      "pass": true,
+      "gapMm": 0,
+      "toleranceMm": 0.5
+    },
+    {
+      "name": "Fixed wing is a single solid Right",
+      "pass": true
+    },
+    {
+      "name": "Inboard closure is buried inside saved fuselage Right",
+      "pass": true,
+      "capFaces": 1,
+      "outsideAreaMm2": 0,
+      "maximumMm2": 1
+    },
+    {
+      "name": "Flap is a separate positive solid Right",
+      "pass": true
+    },
+    {
+      "name": "Flap running gap Right",
+      "pass": true,
+      "gapMm": 12.551215978509592,
+      "minimumMm": 0.5
+    },
+    {
+      "name": "Flap hinge contact Right fixed",
+      "pass": true,
+      "gapMm": 0,
+      "toleranceMm": 0.1
+    },
+    {
+      "name": "Flap hinge contact Right control",
+      "pass": true,
+      "gapMm": 4.547473508864641e-13,
+      "toleranceMm": 0.1
+    },
+    {
+      "name": "Flap pin clears neighboring control Right",
+      "pass": true,
+      "gapMm": 62.48875119584595,
+      "minimumMm": 0.5
+    },
+    {
+      "name": "Aileron is a separate positive solid Right",
+      "pass": true
+    },
+    {
+      "name": "Aileron running gap Right",
+      "pass": true,
+      "gapMm": 7.7217415428644065,
+      "minimumMm": 0.5
+    },
+    {
+      "name": "Aileron hinge contact Right fixed",
+      "pass": true,
+      "gapMm": 0,
+      "toleranceMm": 0.1
+    },
+    {
+      "name": "Aileron hinge contact Right control",
+      "pass": true,
+      "gapMm": 0,
+      "toleranceMm": 0.1
+    },
+    {
+      "name": "Aileron pin clears neighboring control Right",
+      "pass": true,
+      "gapMm": 16.085328009328805,
+      "minimumMm": 0.5
+    },
+    {
+      "name": "Exact fuselage root contact Left",
+      "pass": true,
+      "gapMm": 0,
+      "toleranceMm": 0.5
+    },
+    {
+      "name": "Fixed wing is a single solid Left",
+      "pass": true
+    },
+    {
+      "name": "Inboard closure is buried inside saved fuselage Left",
+      "pass": true,
+      "capFaces": 1,
+      "outsideAreaMm2": 0,
+      "maximumMm2": 1
+    },
+    {
+      "name": "Flap is a separate positive solid Left",
+      "pass": true
+    },
+    {
+      "name": "Flap running gap Left",
+      "pass": true,
+      "gapMm": 12.551215978509592,
+      "minimumMm": 0.5
+    },
+    {
+      "name": "Flap hinge contact Left fixed",
+      "pass": true,
+      "gapMm": 0,
+      "toleranceMm": 0.1
+    },
+    {
+      "name": "Flap hinge contact Left control",
+      "pass": true,
+      "gapMm": 4.547473508864641e-13,
+      "toleranceMm": 0.1
+    },
+    {
+      "name": "Flap pin clears neighboring control Left",
+      "pass": true,
+      "gapMm": 62.48875119584595,
+      "minimumMm": 0.5
+    },
+    {
+      "name": "Aileron is a separate positive solid Left",
+      "pass": true
+    },
+    {
+      "name": "Aileron running gap Left",
+      "pass": true,
+      "gapMm": 7.7217415428644065,
+      "minimumMm": 0.5
+    },
+    {
+      "name": "Aileron hinge contact Left fixed",
+      "pass": true,
+      "gapMm": 0,
+      "toleranceMm": 0.1
+    },
+    {
+      "name": "Aileron hinge contact Left control",
+      "pass": true,
+      "gapMm": 0,
+      "toleranceMm": 0.1
+    },
+    {
+      "name": "Aileron pin clears neighboring control Left",
+      "pass": true,
+      "gapMm": 16.085328009328805,
+      "minimumMm": 0.5
+    },
+    {
+      "name": "Saved root/tip section thickness decreases",
+      "pass": true,
+      "rootM": 0.36130470709714335,
+      "tipM": 0.06296420891627304
+    },
+    {
+      "name": "All measured chords remain positive",
+      "pass": true,
+      "chordsM": [
+        6.629667774286254,
+        6.005795910834643,
+        5.114550391618163,
+        4.1341803204802,
+        3.1538102493426927,
+        2.5299383858915565,
+        2.191265088589305,
+        1.9611368307797215,
+        1.6841196015290603
+      ]
+    },
+    {
+      "name": "Saved wing preserves slight anhedral",
+      "pass": true,
+      "effectiveDegrees": -0.7616918097425193,
+      "note": "Bounding section midheights include the outboard camber."
+    },
+    {
+      "name": "Bilateral solid volumes agree within spline integration tolerance",
+      "pass": true,
+      "relativeError": 0.00020998622101400726,
+      "tolerance": 0.0005,
+      "note": "Exact mirrored shapes have slightly different OpenCascade numerical spline volume integration."
+    },
+    {
+      "part": "Flap_Left",
+      "angleDegrees": -15,
+      "fixedGapMm": 9.496899137501611,
+      "overlapMm3": 0,
+      "pass": true,
+      "maximumOverlapMm3": 100,
+      "name": "Flap_Left at -15°"
+    },
+    {
+      "part": "Flap_Left",
+      "angleDegrees": 0,
+      "fixedGapMm": 12.551215978509592,
+      "overlapMm3": 0,
+      "pass": true,
+      "maximumOverlapMm3": 100,
+      "name": "Flap_Left at 0°"
+    },
+    {
+      "part": "Flap_Left",
+      "angleDegrees": 25,
+      "fixedGapMm": 4.214175818811642,
+      "overlapMm3": 0,
+      "pass": true,
+      "maximumOverlapMm3": 100,
+      "name": "Flap_Left at 25°"
+    },
+    {
+      "part": "Aileron_Left",
+      "angleDegrees": -20,
+      "fixedGapMm": 4.051281654200553,
+      "overlapMm3": 0,
+      "pass": true,
+      "maximumOverlapMm3": 100,
+      "name": "Aileron_Left at -20°"
+    },
+    {
+      "part": "Aileron_Left",
+      "angleDegrees": 0,
+      "fixedGapMm": 7.7217415428644065,
+      "overlapMm3": 0,
+      "pass": true,
+      "maximumOverlapMm3": 100,
+      "name": "Aileron_Left at 0°"
+    },
+    {
+      "part": "Aileron_Left",
+      "angleDegrees": 20,
+      "fixedGapMm": 4.108882385011374,
+      "overlapMm3": 0,
+      "pass": true,
+      "maximumOverlapMm3": 100,
+      "name": "Aileron_Left at 20°"
+    },
+    {
+      "part": "Flap_Right",
+      "angleDegrees": -15,
+      "fixedGapMm": 9.496899137501611,
+      "overlapMm3": 0,
+      "pass": true,
+      "maximumOverlapMm3": 100,
+      "name": "Flap_Right at -15°"
+    },
+    {
+      "part": "Flap_Right",
+      "angleDegrees": 0,
+      "fixedGapMm": 12.551215978509592,
+      "overlapMm3": 0,
+      "pass": true,
+      "maximumOverlapMm3": 100,
+      "name": "Flap_Right at 0°"
+    },
+    {
+      "part": "Flap_Right",
+      "angleDegrees": 25,
+      "fixedGapMm": 4.214175818811138,
+      "overlapMm3": 0,
+      "pass": true,
+      "maximumOverlapMm3": 100,
+      "name": "Flap_Right at 25°"
+    },
+    {
+      "part": "Aileron_Right",
+      "angleDegrees": -20,
+      "fixedGapMm": 4.051281654200553,
+      "overlapMm3": 0,
+      "pass": true,
+      "maximumOverlapMm3": 100,
+      "name": "Aileron_Right at -20°"
+    },
+    {
+      "part": "Aileron_Right",
+      "angleDegrees": 0,
+      "fixedGapMm": 7.7217415428644065,
+      "overlapMm3": 0,
+      "pass": true,
+      "maximumOverlapMm3": 100,
+      "name": "Aileron_Right at 0°"
+    },
+    {
+      "part": "Aileron_Right",
+      "angleDegrees": 20,
+      "fixedGapMm": 4.108882385010368,
+      "overlapMm3": 0,
+      "pass": true,
+      "maximumOverlapMm3": 100,
+      "name": "Aileron_Right at 20°"
+    },
+    {
+      "name": "All 17 sweep cases finite and small residual",
+      "pass": true,
+      "maxResidual": 4.9441932029973636e-15
+    },
+    {
+      "name": "Lift increases through the attached-flow sweep",
+      "pass": true
+    },
+    {
+      "name": "Symmetric baseline near zero lift at zero angle",
+      "pass": true
+    },
+    {
+      "name": "Positive lift and induced drag at four degrees",
+      "pass": true
+    },
+    {
+      "name": "96-to-144 panel lift convergence within 2%",
+      "pass": true,
+      "changePercent": 0.25842580075654914
+    },
+    {
+      "name": "96-to-144 panel induced-drag convergence within 5%",
+      "pass": true,
+      "changePercent": 0.10466854131857535
+    },
+    {
+      "name": "Blended saved fuselage is one valid closed positive solid",
+      "pass": true
+    },
+    {
+      "name": "Saved stage3 contains added root fairing volume",
+      "pass": true,
+      "addedVolumeM3": 1.516387304440445
+    },
+    {
+      "name": "All fresh stage3 saved solids are valid closed and positive",
+      "pass": true,
+      "invalid": [],
+      "solidCount": 29
+    },
+    {
+      "name": "Stage3 includes current native intake skin Left",
+      "pass": true,
+      "maximumBoundDifferenceMm": 0,
+      "relativeVolumeDifference": 0
+    },
+    {
+      "name": "Stage3 includes current native intake skin Right",
+      "pass": true,
+      "maximumBoundDifferenceMm": 0,
+      "relativeVolumeDifference": 0
+    },
+    {
+      "name": "Exact blended body to fixed wing contact Left",
+      "pass": true,
+      "gapMm": 0
+    },
+    {
+      "name": "Exact blended body to fixed wing contact Right",
+      "pass": true,
+      "gapMm": 0
+    },
+    {
+      "name": "Aft inboard trailing-edge step samples are buried by the blended skin",
+      "pass": true,
+      "samples": [
+        {
+          "side": "Left",
+          "pointM": [
+            -1.2000000000000002,
+            -5.17966777408653,
+            3.0537926051112922
+          ],
+          "coveredBefore": true,
+          "coveredAfter": true
+        },
+        {
+          "side": "Left",
+          "pointM": [
+            -1.2,
+            -5.1796677740865285,
+            3.0462073948887785
+          ],
+          "coveredBefore": true,
+          "coveredAfter": true
+        },
+        {
+          "side": "Left",
+          "pointM": [
+            -1.35,
+            -5.2006987568231615,
+            3.06298746123234
+          ],
+          "coveredBefore": false,
+          "coveredAfter": true
+        },
+        {
+          "side": "Left",
+          "pointM": [
+            -1.35,
+            -5.2006987568231615,
+            3.0556437774569534
+          ],
+          "coveredBefore": false,
+          "coveredAfter": true
+        },
+        {
+          "side": "Left",
+          "pointM": [
+            -1.5,
+            -5.2161517804131154,
+            3.058077479718109
+          ],
+          "coveredBefore": false,
+          "coveredAfter": true
+        },
+        {
+          "side": "Left",
+          "pointM": [
+            -1.5,
+            -5.2161517804131154,
+            3.0509779436969793
+          ],
+          "coveredBefore": false,
+          "coveredAfter": true
+        },
+        {
+          "side": "Right",
+          "pointM": [
+            1.1999999999999997,
+            -5.1796677740865285,
+            3.053792605111291
+          ],
+          "coveredBefore": true,
+          "coveredAfter": true
+        },
+        {
+          "side": "Right",
+          "pointM": [
+            1.2,
+            -5.179667774086528,
+            3.046207394888778
+          ],
+          "coveredBefore": true,
+          "coveredAfter": true
+        },
+        {
+          "side": "Right",
+          "pointM": [
+            1.3499999999999999,
+            -5.2006987568231615,
+            3.0629874612323396
+          ],
+          "coveredBefore": false,
+          "coveredAfter": true
+        },
+        {
+          "side": "Right",
+          "pointM": [
+            1.35,
+            -5.200698756823162,
+            3.0556437774569534
+          ],
+          "coveredBefore": false,
+          "coveredAfter": true
+        },
+        {
+          "side": "Right",
+          "pointM": [
+            1.5,
+            -5.2161517804131154,
+            3.058077479718109
+          ],
+          "coveredBefore": false,
+          "coveredAfter": true
+        },
+        {
+          "side": "Right",
+          "pointM": [
+            1.5,
+            -5.2161517804131154,
+            3.0509779436969793
+          ],
+          "coveredBefore": false,
+          "coveredAfter": true
+        }
+      ]
+    },
+    {
+      "name": "Blend covers formerly exposed root edge samples",
+      "pass": true
+    },
+    {
+      "name": "Flap_Left at -15 degrees clears blended fuselage",
+      "pass": true,
+      "gapMm": 34.55260183111659,
+      "minimumMm": 0.5
+    },
+    {
+      "name": "Flap_Left at 0 degrees clears blended fuselage",
+      "pass": true,
+      "gapMm": 40,
+      "minimumMm": 0.5
+    },
+    {
+      "name": "Flap_Left at 25 degrees clears blended fuselage",
+      "pass": true,
+      "gapMm": 29.408650596523103,
+      "minimumMm": 0.5
+    },
+    {
+      "name": "Flap_Right at -15 degrees clears blended fuselage",
+      "pass": true,
+      "gapMm": 34.552601831116135,
+      "minimumMm": 0.5
+    },
+    {
+      "name": "Flap_Right at 0 degrees clears blended fuselage",
+      "pass": true,
+      "gapMm": 40,
+      "minimumMm": 0.5
+    },
+    {
+      "name": "Flap_Right at 25 degrees clears blended fuselage",
+      "pass": true,
+      "gapMm": 29.408650596523103,
+      "minimumMm": 0.5
+    },
+    {
+      "name": "Frozen wing section chords remain unchanged",
+      "pass": true,
+      "maximumChordDifferenceM": 1.4654943925052066e-14
+    }
+  ],
+  "contacts": [
+    {
+      "a": "Radome",
+      "b": "Fuselage",
+      "gapMm": 0,
+      "method": "shared exact CAD vertex"
+    },
+    {
+      "a": "Cockpit_well",
+      "b": "Fuselage",
+      "gapMm": 0,
+      "method": "shared exact CAD vertex"
+    },
+    {
+      "a": "Ramp_2_Left",
+      "b": "Ramp_1_Left",
+      "gapMm": 0,
+      "method": "shared exact CAD vertex"
+    },
+    {
+      "a": "Ramp_3_Left",
+      "b": "Ramp_2_Left",
+      "gapMm": 0,
+      "method": "shared exact CAD vertex"
+    },
+    {
+      "a": "Ramp_2_Right",
+      "b": "Ramp_1_Right",
+      "gapMm": 0,
+      "method": "shared exact CAD vertex"
+    },
+    {
+      "a": "Ramp_3_Right",
+      "b": "Ramp_2_Right",
+      "gapMm": 0,
+      "method": "shared exact CAD vertex"
+    },
+    {
+      "a": "Engine_collar_Left",
+      "b": "Fuselage",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Engine_collar_Right",
+      "b": "Fuselage",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Ramp_3_Left",
+      "b": "Fuselage",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Ramp_3_Right",
+      "b": "Fuselage",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Duct_liner_Left",
+      "b": "Ramp_3_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Intake_skin_Left",
+      "b": "Ramp_3_Left",
+      "gapMm": 8.981260180007666e-12,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Duct_liner_Right",
+      "b": "Ramp_3_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Intake_skin_Right",
+      "b": "Ramp_3_Right",
+      "gapMm": 5.209785393794664e-13,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Duct_end_Left",
+      "b": "Duct_liner_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Splitter_Left",
+      "b": "Duct_liner_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Duct_end_Right",
+      "b": "Duct_liner_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Splitter_Right",
+      "b": "Duct_liner_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Wing_fixed_Left",
+      "b": "Duct_end_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Wing_fixed_Right",
+      "b": "Duct_end_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Flap_hinge_Left",
+      "b": "Wing_fixed_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Aileron_hinge_Left",
+      "b": "Wing_fixed_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Flap_hinge_Right",
+      "b": "Wing_fixed_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Aileron_hinge_Right",
+      "b": "Wing_fixed_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Flap_Left",
+      "b": "Flap_hinge_Left",
+      "gapMm": 4.547473508864641e-13,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Aileron_Left",
+      "b": "Aileron_hinge_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Flap_Right",
+      "b": "Flap_hinge_Right",
+      "gapMm": 4.547473508864641e-13,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Aileron_Right",
+      "b": "Aileron_hinge_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    }
+  ],
+  "passed": 68,
+  "failed": 0,
+  "evidence": [
+    {
+      "artifact": "STEP/airframe_wings.step",
+      "sha256": "2620ce5e7d2b0cb794a121914d5fcc5eaf8a2118c6c4b8789b0fe7efc2999216"
+    },
+    {
+      "artifact": "STEP/wings.step",
+      "sha256": "eddfd4400ba5f7b262deba5b20a492a03bfc689a83486b5c182ebc684c7d900e"
+    },
+    {
+      "artifact": "parts/wings/checks/motion-results.json",
+      "sha256": ""
+    },
+    {
+      "artifact": "parts/wings/checks/lab-results.json",
+      "sha256": ""
+    },
+    {
+      "artifact": "/Users/prasiddhnaik/Documents/blender skills/pocket-flight-site/assets/f15c/STEP/airframe_wings.step",
+      "sha256": "2620ce5e7d2b0cb794a121914d5fcc5eaf8a2118c6c4b8789b0fe7efc2999216"
+    }
+  ]
+}

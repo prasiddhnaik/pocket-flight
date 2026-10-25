@@ -1,0 +1,423 @@
+{
+  "artifact": "STEP/airframe_intakes.step",
+  "sha256": "6de56d62c073439d1e6e75341aa745fce7dc692f654ab1fd27e506632044f7ef",
+  "units": "mm",
+  "dimensionsM": [
+    4.08246418086791,
+    18.920000000200154,
+    1.9770729327219354
+  ],
+  "boundsM": {
+    "min": [
+      -2.041229468190516,
+      -8.92000000010015,
+      1.477614437004361
+    ],
+    "max": [
+      2.0412347126773938,
+      10.000000000100002,
+      3.4546873697262965
+    ]
+  },
+  "checks": [
+    {
+      "name": "All saved solids valid, closed and positive",
+      "pass": true,
+      "invalid": [],
+      "solidCount": 19
+    },
+    {
+      "name": "All saved parts have an exact contact path to the fuselage",
+      "pass": true,
+      "floating": [],
+      "contactToleranceMm": 0.5,
+      "solidDistanceChecks": 12
+    },
+    {
+      "name": "Every saved physical solid is valid, closed and positive",
+      "pass": true,
+      "solidCount": 14,
+      "volumeM3": 5.395365901073321
+    },
+    {
+      "name": "Two skins, two liners, two splitters and six separate ramp solids",
+      "pass": true,
+      "labels": [
+        "Intake_skin_Left",
+        "Duct_liner_Left",
+        "Splitter_Left",
+        "Ramp_1_Left",
+        "Ramp_2_Left",
+        "Ramp_3_Left",
+        "Duct_end_Left",
+        "Intake_skin_Right",
+        "Duct_liner_Right",
+        "Splitter_Right",
+        "Ramp_1_Right",
+        "Ramp_2_Right",
+        "Ramp_3_Right",
+        "Duct_end_Right"
+      ]
+    },
+    {
+      "name": "Symmetric saved lateral envelope",
+      "pass": true,
+      "minXM": -1.8557729827281544,
+      "maxXM": 1.8557729827281544,
+      "toleranceMm": 0.1
+    },
+    {
+      "name": "Saved raked mouth plane: Left",
+      "pass": true,
+      "faceCount": 1
+    },
+    {
+      "name": "Neutral mouth height matches the photographic estimate: Left",
+      "pass": true,
+      "lowZM": 1.6599999999,
+      "highZM": 3.0000000001,
+      "heightM": 1.3400000001999999,
+      "widthM": 0.9892424378558492,
+      "rakeM": 1.3516000002000002,
+      "previousLowZM": 1.58,
+      "previousHighZM": 3.1,
+      "previousHeightM": 1.52,
+      "measurementBasis": "Exact CAD output; the real-aircraft height target is an estimate, not published mold data."
+    },
+    {
+      "name": "Upper lip projects forward of lower lip: Left",
+      "pass": true,
+      "rakeM": 1.3516000002000002,
+      "previousRakeM": 1.3516,
+      "widthM": 0.9892424378558492,
+      "previousWidthM": 1.051652061,
+      "targetWidthRatio": 0.94,
+      "ratioTolerance": 0.005
+    },
+    {
+      "name": "Saved raked mouth plane: Right",
+      "pass": true,
+      "faceCount": 1
+    },
+    {
+      "name": "Neutral mouth height matches the photographic estimate: Right",
+      "pass": true,
+      "lowZM": 1.6599999999,
+      "highZM": 3.0000000001,
+      "heightM": 1.3400000001999999,
+      "widthM": 0.989242437855818,
+      "rakeM": 1.3516000002000002,
+      "previousLowZM": 1.58,
+      "previousHighZM": 3.1,
+      "previousHeightM": 1.52,
+      "measurementBasis": "Exact CAD output; the real-aircraft height target is an estimate, not published mold data."
+    },
+    {
+      "name": "Upper lip projects forward of lower lip: Right",
+      "pass": true,
+      "rakeM": 1.3516000002000002,
+      "previousRakeM": 1.3516,
+      "widthM": 0.989242437855818,
+      "previousWidthM": 1.051652061,
+      "targetWidthRatio": 0.94,
+      "ratioTolerance": 0.005
+    },
+    {
+      "name": "Matched left/right volume: Intake_skin",
+      "pass": true,
+      "relativeError": 6.597552856778735e-14,
+      "tolerance": 0.00001
+    },
+    {
+      "name": "Matched left/right volume: Duct_liner",
+      "pass": true,
+      "relativeError": 1.8304136649983662e-10,
+      "tolerance": 0.00001
+    },
+    {
+      "name": "Matched left/right volume: Splitter",
+      "pass": true,
+      "relativeError": 0,
+      "tolerance": 0.00001
+    },
+    {
+      "name": "Matched left/right volume: Ramp_1",
+      "pass": true,
+      "relativeError": 4.246861037614537e-14,
+      "tolerance": 0.00001
+    },
+    {
+      "name": "Matched left/right volume: Ramp_2",
+      "pass": true,
+      "relativeError": 1.7779482466153992e-13,
+      "tolerance": 0.00001
+    },
+    {
+      "name": "Matched left/right volume: Ramp_3",
+      "pass": true,
+      "relativeError": 1.337260395273031e-13,
+      "tolerance": 0.00001
+    },
+    {
+      "name": "Matched left/right volume: Duct_end",
+      "pass": true,
+      "relativeError": 0,
+      "tolerance": 0.00001
+    },
+    {
+      "name": "Every intake solid has a finite contact path to the saved fuselage",
+      "pass": true,
+      "connected": 15,
+      "total": 15,
+      "floating": [],
+      "toleranceMm": 0.5
+    },
+    {
+      "name": "Left ramp 1 remains wholly inside the actual cavity",
+      "pass": true,
+      "outsideVolumeMm3": 0,
+      "toleranceMm3": 0.01
+    },
+    {
+      "name": "Left ramp 2 remains wholly inside the actual cavity",
+      "pass": true,
+      "outsideVolumeMm3": 0,
+      "toleranceMm3": 0.01
+    },
+    {
+      "name": "Left ramp 3 remains wholly inside the actual cavity",
+      "pass": true,
+      "outsideVolumeMm3": 0,
+      "toleranceMm3": 0.01
+    },
+    {
+      "name": "Left duct is open at Y=3.75 Z=2.75",
+      "pass": true,
+      "occupied": [],
+      "pointInsideAuthoredCavity": true
+    },
+    {
+      "name": "Left duct is open at Y=3.1 Z=2.15",
+      "pass": true,
+      "occupied": [],
+      "pointInsideAuthoredCavity": true
+    },
+    {
+      "name": "Left duct is open at Y=2.75 Z=1.75",
+      "pass": true,
+      "occupied": [],
+      "pointInsideAuthoredCavity": true
+    },
+    {
+      "name": "Left duct is open at Y=2.3 Z=2.1",
+      "pass": true,
+      "occupied": [],
+      "pointInsideAuthoredCavity": true
+    },
+    {
+      "name": "Left duct is open at Y=1.2 Z=2.2",
+      "pass": true,
+      "occupied": [],
+      "pointInsideAuthoredCavity": true
+    },
+    {
+      "name": "Left duct is open at Y=0 Z=2.2",
+      "pass": true,
+      "occupied": [],
+      "pointInsideAuthoredCavity": true
+    },
+    {
+      "name": "Left duct is open at Y=-1.4 Z=2.2",
+      "pass": true,
+      "occupied": [],
+      "pointInsideAuthoredCavity": true
+    },
+    {
+      "name": "Right ramp 1 remains wholly inside the actual cavity",
+      "pass": true,
+      "outsideVolumeMm3": 0,
+      "toleranceMm3": 0.01
+    },
+    {
+      "name": "Right ramp 2 remains wholly inside the actual cavity",
+      "pass": true,
+      "outsideVolumeMm3": 0,
+      "toleranceMm3": 0.01
+    },
+    {
+      "name": "Right ramp 3 remains wholly inside the actual cavity",
+      "pass": true,
+      "outsideVolumeMm3": 0,
+      "toleranceMm3": 0.01
+    },
+    {
+      "name": "Right duct is open at Y=3.75 Z=2.75",
+      "pass": true,
+      "occupied": [],
+      "pointInsideAuthoredCavity": true
+    },
+    {
+      "name": "Right duct is open at Y=3.1 Z=2.15",
+      "pass": true,
+      "occupied": [],
+      "pointInsideAuthoredCavity": true
+    },
+    {
+      "name": "Right duct is open at Y=2.75 Z=1.75",
+      "pass": true,
+      "occupied": [],
+      "pointInsideAuthoredCavity": true
+    },
+    {
+      "name": "Right duct is open at Y=2.3 Z=2.1",
+      "pass": true,
+      "occupied": [],
+      "pointInsideAuthoredCavity": true
+    },
+    {
+      "name": "Right duct is open at Y=1.2 Z=2.2",
+      "pass": true,
+      "occupied": [],
+      "pointInsideAuthoredCavity": true
+    },
+    {
+      "name": "Right duct is open at Y=0 Z=2.2",
+      "pass": true,
+      "occupied": [],
+      "pointInsideAuthoredCavity": true
+    },
+    {
+      "name": "Right duct is open at Y=-1.4 Z=2.2",
+      "pass": true,
+      "occupied": [],
+      "pointInsideAuthoredCavity": true
+    },
+    {
+      "name": "Saved body after duct cuts is valid and connected",
+      "pass": true,
+      "solids": 1
+    }
+  ],
+  "contacts": [
+    {
+      "a": "Radome",
+      "b": "Fuselage",
+      "gapMm": 0,
+      "method": "shared exact CAD vertex"
+    },
+    {
+      "a": "Cockpit_well",
+      "b": "Fuselage",
+      "gapMm": 0,
+      "method": "shared exact CAD vertex"
+    },
+    {
+      "a": "Ramp_2_Left",
+      "b": "Ramp_1_Left",
+      "gapMm": 0,
+      "method": "shared exact CAD vertex"
+    },
+    {
+      "a": "Ramp_3_Left",
+      "b": "Ramp_2_Left",
+      "gapMm": 0,
+      "method": "shared exact CAD vertex"
+    },
+    {
+      "a": "Ramp_2_Right",
+      "b": "Ramp_1_Right",
+      "gapMm": 0,
+      "method": "shared exact CAD vertex"
+    },
+    {
+      "a": "Ramp_3_Right",
+      "b": "Ramp_2_Right",
+      "gapMm": 0,
+      "method": "shared exact CAD vertex"
+    },
+    {
+      "a": "Engine_collar_Left",
+      "b": "Fuselage",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Engine_collar_Right",
+      "b": "Fuselage",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Ramp_3_Left",
+      "b": "Fuselage",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Ramp_3_Right",
+      "b": "Fuselage",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Duct_liner_Left",
+      "b": "Ramp_3_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Intake_skin_Left",
+      "b": "Ramp_3_Left",
+      "gapMm": 8.981260180007666e-12,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Duct_liner_Right",
+      "b": "Ramp_3_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Intake_skin_Right",
+      "b": "Ramp_3_Right",
+      "gapMm": 5.209785393794664e-13,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Duct_end_Left",
+      "b": "Duct_liner_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Splitter_Left",
+      "b": "Duct_liner_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Duct_end_Right",
+      "b": "Duct_liner_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Splitter_Right",
+      "b": "Duct_liner_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    }
+  ],
+  "passed": 40,
+  "failed": 0,
+  "evidence": [
+    {
+      "artifact": "STEP/airframe_intakes.step",
+      "sha256": "6de56d62c073439d1e6e75341aa745fce7dc692f654ab1fd27e506632044f7ef"
+    },
+    {
+      "artifact": "STEP/intakes.step",
+      "sha256": "e06a68159aa26010b75e35187a4b9fa8a70fccf1ed3f8e1d097a23c777c30db6"
+    }
+  ]
+}

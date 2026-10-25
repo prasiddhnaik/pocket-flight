@@ -12,7 +12,7 @@ async (page, labOnly = false) => {
     checks.push(message);
   };
   const state = () => page.evaluate(() => window.windTunnel.getState());
-  const counts = { finch: 2, peregrine: 6, aurelia: 4, stormbird: 4 };
+  const counts = { finch: 2, peregrine: 6, aurelia: 5, stormbird: 4 };
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.waitForFunction(
     () =>
@@ -52,9 +52,10 @@ async (page, labOnly = false) => {
       `${id}: all authored display faces installed`,
     );
     assert(
-      after.performance.cockpitDisplays.replacedStaticBatches ===
-        (id === "peregrine" ? 2 : id === "aurelia" ? 1 : 0),
-      `${id}: obsolete raised screen symbols are removed`,
+      id === "aurelia"
+        ? after.performance.cockpitDisplays.mounted && after.performance.aircraftAsset === "aurelia-phenom300e.glb"
+        : after.performance.cockpitDisplays.replacedStaticBatches === (id === "peregrine" ? 2 : 0),
+      `${id}: live instruments use the current aircraft's authored fittings`,
     );
     assert(
       after.performance.cockpitDisplays.updates > before.updates &&
@@ -70,8 +71,8 @@ async (page, labOnly = false) => {
       `${id}: instrument close-up persists`,
     );
     assert(
-      after.performance.textures <= 6,
-      `${id}: shared atlas keeps texture count bounded`,
+      after.performance.textures <= (id === "aurelia" ? 11 : 6),
+      `${id}: display textures stay within the aircraft's bound`,
     );
     await canvas.screenshot({ path: `output/${id}-animated-displays.png` });
     await page
@@ -171,7 +172,7 @@ async (page, labOnly = false) => {
       id,
     );
     await page.evaluate(async () => {
-      const { missions } = await import("/src/missions.ts");
+      const { missions } = await import("/src/flight/missions.ts");
       const g = window.pocketFlight;
       g.start(missions[1]);
       g.cameraMode = "cockpit";

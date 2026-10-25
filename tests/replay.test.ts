@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test";
-import { ReplayTimeline } from "../src/replay";
-import { replayFilename, replayMimeType } from "../src/replay-export";
+import { ReplayTimeline } from "../src/replay/replay";
+import { replayFilename, replayMimeType } from "../src/replay/replay-export";
 
 describe("flight replay history", () => {
   it("keeps a complete eight-minute mission including its first and final poses", () => {

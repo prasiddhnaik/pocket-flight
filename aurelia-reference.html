@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Aurelia · Phenom-based enlarged airframe</title>
+  </head>
+  <body>
+    <main id="review">
+      <header>
+        <a href="/">Pocket Flight</a>
+        <h1>
+          Aurelia
+          <span id="airframe-label">Phenom-based enlarged airframe</span>
+        </h1>
+        <p id="status" role="status">Loading aircraft…</p>
+      </header>
+      <section id="viewport" aria-label="Interactive aircraft model"></section>
+      <aside aria-label="Aircraft inspection controls">
+        <div class="views" role="group" aria-label="Camera views">
+          <button data-view="beauty" aria-pressed="true">Overview</button
+          ><button data-view="side">Side</button
+          ><button data-view="front">Front</button
+          ><button data-view="nose">Nose close-up</button
+          ><button data-view="top">Top</button
+          ><button data-view="rear">Rear</button
+          ><button data-view="belly">Gear bays</button
+          ><button data-view="entry">Entry door</button
+          ><button data-view="cabin">Interior</button
+          ><button data-view="cockpit">Cockpit</button>
+          <button data-view="pilot">Pilot eye</button>
+          <button data-view="copilot">Copilot eye</button>
+          <button data-view="partition">Cockpit door</button>
+        </div>
+        <div class="avionics-controls">
+          <button id="avionics" aria-pressed="true">Pause displays</button>
+          <p id="avionics-state" class="note">
+            Avionics demo · sample flight data
+          </p>
+        </div>
+        <label
+          >Landing gear <output for="gear">100%</output
+          ><input id="gear" type="range" min="0" max="100" value="100"
+        /></label>
+        <label
+          >Flaps <output for="flaps">0%</output
+          ><input id="flaps" type="range" min="0" max="100" value="0"
+        /></label>
+        <label
+          >Ailerons <output for="roll">0%</output
+          ><input id="roll" type="range" min="-100" max="100" value="0"
+        /></label>
+        <label
+          >Elevators <output for="pitch">0%</output
+          ><input id="pitch" type="range" min="-100" max="100" value="0"
+        /></label>
+        <label
+          >Rudder <output for="yaw">0%</output
+          ><input id="yaw" type="range" min="-100" max="100" value="0"
+        /></label>
+        <label
+          >Nose steering <output for="steering">0%</output
+          ><input id="steering" type="range" min="-100" max="100" value="0"
+        /></label>
+        <label
+          >Entry / airstair <output for="entry">0%</output
+          ><input id="entry" type="range" min="0" max="100" value="0"
+        /></label>
+        <label
+          >Cockpit door <output for="cockpitDoor">0%</output
+          ><input id="cockpitDoor" type="range" min="0" max="100" value="0"
+        /></label>
+        <div class="actions">
+          <button id="cycle" aria-pressed="false">Run gear cycle</button
+          ><button id="fans" aria-pressed="false">Run fans</button
+          ><button id="cutaway" aria-pressed="false">Cutaway</button
+          ><button id="reset">Reset</button
+          ><button id="save-view">Save view</button>
+        </div>
+        <p class="dimensions" id="airframe-dimensions">Loading dimensions…</p>
+        <p class="note">
+          <span id="airframe-scale-note"></span> Seats and cabin fittings retain
+          their original size. Based on Embraer references. Detailed surfaces
+          and mechanism paths are estimates. Flight performance remains a
+          separate calibration milestone.
+        </p>
+        <a href="/assets/aurelia-phenom300e.glb" download
+          >Download editable GLB</a
+        >
+        ·
+        <a
+          href="https://www.embraer.com/media/rboe5b55/brochure-phenom-300e-18-fb-eletronic.pdf#page=10"
+          target="_blank"
+          rel="noreferrer"
+          >Manufacturer reference</a
+        >
+      </aside>
+    </main>
+    <script type="module" src="/src/viewers/aurelia-reference.ts"></script>
+  </body>
+</html>

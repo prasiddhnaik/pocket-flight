@@ -24,13 +24,13 @@ async (page) => {
           knots: p.airspeed * 1.943844,
           position: p.position.toArray(),
         };
-      if (!e.gate && p.position.z < 130)
+      if (!e.gate && p.position.z > 390)
         e.gate = {
           time: p.flightTime,
           height: p.position.y,
           knots: p.airspeed * 1.943844,
         };
-      if (p.flightTime >= 20) window.pocketFlight.setSuspended(true);
+      if (p.flightTime >= 60) window.pocketFlight.setSuspended(true);
     };
   });
   await page.getByRole("button", { name: "Start flight", exact: true }).click();
@@ -42,7 +42,7 @@ async (page) => {
   );
   await page.keyboard.down("s");
   await page.waitForFunction(() => window.pocketFlight.suspended, {
-    timeout: 45000,
+    timeout: 90000,
   });
   await page.keyboard.up("s");
   await page.keyboard.up("Shift");

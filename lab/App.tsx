@@ -329,6 +329,7 @@ export default function App() {
         <div className="model-status">
           <i className={assetError ? "error-dot" : ""} />
           <span role="status">{status}</span>
+          <a href="./f15c.html">F-15C construction</a>
         </div>
       </header>
       <section

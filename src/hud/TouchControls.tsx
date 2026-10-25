@@ -1,6 +1,6 @@
 import type { PointerEvent } from "react";
-import type { AircraftId } from "../aircraft";
-import type { PocketFlight } from "../game";
+import type { AircraftId } from "../aircraft/aircraft";
+import type { PocketFlight } from "../flight/game";
 
 const clampAxis = (v: number) => Math.max(-1, Math.min(1, v));
 
@@ -50,9 +50,18 @@ export function TouchControls({ game, aircraftId, automaticConfiguration, beginn
       >
         BRAKE
       </button>
+      {aircraftId === "f15c" && (
+        <button className="touch-brake touch-fire" aria-label="Fire cannon"
+          onPointerDown={(e) => { e.currentTarget.setPointerCapture(e.pointerId); game?.keys.add("KeyJ"); }}
+          onPointerUp={() => game?.keys.delete("KeyJ")}
+          onPointerCancel={() => game?.keys.delete("KeyJ")}
+          onLostPointerCapture={() => game?.keys.delete("KeyJ")}
+          onContextMenu={(e) => e.preventDefault()}
+        >FIRE</button>
+      )}
       {aircraftId !== "finch" && !automaticConfiguration && (
         <div className="touch-configuration">
-          <button onClick={() => game?.toggleGear()} aria-label="Toggle landing gear">GEAR</button>
+          {aircraftId !== "heron" && <button onClick={() => game?.toggleGear()} aria-label="Toggle landing gear">GEAR</button>}
           <button onClick={() => game?.cycleFlaps()} aria-label="Cycle flaps">FLAPS</button>
         </div>
       )}

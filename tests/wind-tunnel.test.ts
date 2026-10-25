@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { solveWing, velocityAt, type WingGeometry } from "../lab/solver";
+import { solveWing, velocityAt, SOLVER_VERSION, type WingGeometry } from "../lab/solver";
 import { finchWing } from "../lab/finch-wing";
 import {
   runSweep,
@@ -147,7 +147,7 @@ test("sweeps and exports retain conditions, units, model assumptions and geometr
   expect(csv).toContain(
     "alpha_deg,speed_m_s,density_kg_m3,CL,CDi,lift_N,induced_drag_N",
   );
-  expect(csv).toContain("horseshoe-vlm-1.0");
+  expect(csv).toContain(SOLVER_VERSION);
   expect(csv).toContain("geometry_revision,test");
   expect(csv).toContain("Flat symmetric section");
   expect(() =>
@@ -168,12 +168,14 @@ test("sweeps and exports retain conditions, units, model assumptions and geometr
   ).toThrow();
 });
 
-test("all four aircraft have independent runtime geometry and valid numerical results", () => {
+test("all six aircraft have independent lab geometry and valid numerical results", () => {
   expect(fleetMeasurements.map((m) => m.id)).toEqual([
     "finch",
     "peregrine",
     "aurelia",
     "stormbird",
+    "heron",
+    "f15c",
   ]);
   const revisions = new Set<string>();
   for (const id of Object.keys(
@@ -184,7 +186,8 @@ test("all four aircraft have independent runtime geometry and valid numerical re
     const measured = fleetMeasurements.find((m) => m.id === id)!;
     expect(wing.revision).toMatch(/^[a-f0-9]{64}$/);
     revisions.add(wing.revision);
-    expect(Math.abs(result.span - measured.dimensions[0])).toBeLessThan(0.04);
+    const span = "mainWingSpan" in measured ? measured.mainWingSpan : measured.dimensions[0];
+    expect(Math.abs(result.span - span)).toBeLessThan(0.04);
     expect(result.cl).toBeGreaterThan(0.15);
     expect(result.cdi).toBeGreaterThan(0);
     expect(result.residual).toBeLessThan(1e-10);
@@ -192,7 +195,7 @@ test("all four aircraft have independent runtime geometry and valid numerical re
     expect(measured.scale).toBe(aircraftCatalog[id].scale);
     expect(measured.offsetY).toBe(aircraftCatalog[id].offsetY);
   }
-  expect(revisions.size).toBe(4);
+  expect(revisions.size).toBe(6);
   expect(solveWing(wingForAircraft("stormbird"), conditions).area).toBeCloseTo(
     55.3605,
     3,

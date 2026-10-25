@@ -1,0 +1,12 @@
+<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="data:,"><title>Pocket Flight full-game FPS benchmark</title></head><body>
+<div id="root"></div>
+<section id="bench-panel" style="position:relative;padding:12px 20px;background:#fff;color:#222;font:14px/1.5 system-ui;z-index:1000">
+<h1 style="font-size:20px">Pocket Flight: full-game FPS test</h1>
+<p>Real App, Finch aircraft, active physics, React HUD, VFX and audio update pipeline (muted). Default game device pixel ratio. Three rounds; 2 s warmup + 6 s measurement per trial.</p>
+<button id="compare" disabled>Compare full-game variants</button>
+<button id="save">Save full-game evidence</button>
+<label>Preview variant <select id="variant"><option value="baseline">Baseline</option><option value="shadow1024">1024 shadows</option><option value="render85">85% resolution</option><option value="terrainLOD">Terrain detail LOD</option><option value="lightInstances">Instanced runway lights</option><option value="noShadows">No shadows diagnostic</option></select></label>
+<label>Scenario <select id="scenario"><option value="airfield">1280 × 720 airfield</option><option value="forest">1920 × 1080 forest flight</option></select></label>
+<button id="preview" disabled>Start preview flight</button>
+<p id="status" role="status">Loading actual game…</p><pre id="results" style="max-height:240px;overflow:auto;white-space:pre-wrap"></pre>
+</section><script type="module" src="/scripts/full-game-benchmark.tsx"></script></body></html>

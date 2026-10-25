@@ -1,8 +1,8 @@
 import { describe, expect, it } from "bun:test";
-import { musicMix, musicStems } from "../src/music-mix";
-import { getMusicTrack, musicTracks, trackDuration } from "../src/music-tracks";
+import { musicMix, musicStems } from "../src/audio/music-mix";
+import { getMusicTrack, musicTracks, trackDuration } from "../src/audio/music-tracks";
 import { createHash } from "node:crypto";
-import type { MusicState } from "../src/music-mix";
+import type { MusicState } from "../src/audio/music-mix";
 
 const menu: MusicState = {
   mode: "menu",

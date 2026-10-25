@@ -1,4 +1,4 @@
-import type { Snapshot } from "../game";
+import type { Snapshot } from "../flight/game";
 
 export function isNewFlight(previousMode: Snapshot["mode"], previousTime: number, mode: Snapshot["mode"], time: number) {
   return mode === "playing" && (

@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { Vector3, Quaternion, Euler } from "three";
-import { resolveWheelPenetration } from "../src/wheel-contact";
-import { FlightPhysics } from "../src/physics";
+import { resolveWheelPenetration } from "../src/flight/wheel-contact";
+import { FlightPhysics } from "../src/flight/physics";
 import { sampledTireClearance, validateGear } from "../lab/gear-validation";
 for (const id of ["finch", "peregrine", "aurelia", "stormbird"] as const) {
   test(`${id}: actual tire profile samples clear both runways across frame rates and attitude`, () => {

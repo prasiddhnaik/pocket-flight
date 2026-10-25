@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import * as T from "three";
-import { aircraftCatalog } from "../lab/aircraft";
+import { runtimeAircraftCatalog as aircraftCatalog } from "../lab/aircraft";
 import { AircraftMechanics } from "../lab/mechanics";
 import { bodySkin, type JetId } from "../scripts/fleet-internal-geometry";
 import { loadGeometryOnly } from "../scripts/geometry-loader";
@@ -11,7 +11,8 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import baseline from "./fixtures/fleet-internals-baseline.json";
 import { originalFleetDocument } from "../scripts/fleet-internal-baseline";
-import { aircraftSystems } from "../src/aircraft-systems";
+import { fleetBeforeMounts } from "../scripts/fleet-before-mounts";
+import { aircraftSystems } from "../src/aircraft/aircraft-systems";
 const hash = (data: string | Uint8Array) =>
   createHash("sha256").update(data).digest("hex");
 
@@ -35,7 +36,12 @@ for (const id of ["peregrine", "aurelia", "stormbird"] as JetId[]) {
       new URL(`../public/assets/${filename}`, import.meta.url),
     );
     const original = baseline.aircraft[id];
-    const recovered = originalFleetDocument(current.doc, id);
+    if (current.doc.extras?.attachmentRepairRevision)
+      expect(() => originalFleetDocument(current.doc, id)).toThrow(
+        /subsequent edits/,
+      );
+    const beforeMounts = fleetBeforeMounts(current.doc, id);
+    const recovered = originalFleetDocument(beforeMounts, id);
     expect(recovered.scenes[recovered.scene ?? 0].nodes).toEqual(
       original.sceneRoots,
     );
@@ -45,9 +51,9 @@ for (const id of ["peregrine", "aurelia", "stormbird"] as JetId[]) {
       expect(hash(JSON.stringify(recovered[key]))).toBe(field.sha256);
     }
     for (const [key, field] of Object.entries(original.fields)) {
-      expect(hash(JSON.stringify(current.doc[key].slice(0, field.count)))).toBe(
-        field.sha256,
-      );
+      expect(
+        hash(JSON.stringify(beforeMounts[key].slice(0, field.count))),
+      ).toBe(field.sha256);
     }
     for (const buffer of original.buffers) {
       const bytes = buffer.uri
@@ -325,25 +331,32 @@ test("external GLB system buffers are loaded and included in geometry revision h
     const doc = JSON.parse(
       new TextDecoder().decode(bytes.slice(20, 20 + length)),
     );
-    const filename = doc.buffers[1].uri;
-    const buffer = new Uint8Array(
-      await Bun.file(new URL(filename, asset)).arrayBuffer(),
-    );
+    const buffers: { filename: string; bytes: Uint8Array }[] =
+      await Promise.all(
+        doc.buffers.slice(1).map(async (buffer: { uri: string }) => ({
+          filename: buffer.uri,
+          bytes: new Uint8Array(
+            await Bun.file(new URL(buffer.uri, asset)).arrayBuffer(),
+          ),
+        })),
+      );
     const copy = new URL(`file://${directory}/plane.glb`);
     await Bun.write(copy, bytes);
-    await Bun.write(join(directory, filename), buffer);
+    for (const buffer of buffers)
+      await Bun.write(join(directory, buffer.filename), buffer.bytes);
+    const revision = () => {
+      const result = createHash("sha256").update(bytes);
+      for (const buffer of buffers) result.update(buffer.bytes);
+      return result.digest("hex");
+    };
     const before = await loadGeometryOnly(copy);
     expect(before.scene.getObjectByName("InternalSystems")).toBeTruthy();
-    expect(before.sha256).toBe(
-      createHash("sha256").update(bytes).update(buffer).digest("hex"),
-    );
-    buffer[0] ^= 1; // A tiny finite coordinate change only in the copied buffer.
-    await Bun.write(join(directory, filename), buffer);
+    expect(before.sha256).toBe(revision());
+    buffers[0].bytes[0] ^= 1; // A tiny finite coordinate change only in the copied buffer.
+    await Bun.write(join(directory, buffers[0].filename), buffers[0].bytes);
     const after = await loadGeometryOnly(copy);
     expect(after.sha256).not.toBe(before.sha256);
-    expect(after.sha256).toBe(
-      createHash("sha256").update(bytes).update(buffer).digest("hex"),
-    );
+    expect(after.sha256).toBe(revision());
   } finally {
     await rm(directory, { recursive: true, force: true });
   }

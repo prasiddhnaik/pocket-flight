@@ -4,7 +4,7 @@ import {
   mergeVertices,
 } from "three/addons/utils/BufferGeometryUtils.js";
 import { mkdir } from "node:fs/promises";
-import { aircraftCatalog } from "../lab/aircraft";
+import { runtimeAircraftCatalog as aircraftCatalog } from "../lab/aircraft";
 import { loadGeometryOnly } from "./geometry-loader";
 import { makeFleetInternals, type JetId } from "./fleet-internal-geometry";
 import { compile, glb, type Doc } from "./gltf-installation";

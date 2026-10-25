@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { headingReadout } from "../flight-ui";
+import { headingReadout } from "../app/flight-ui";
 import { polar, unwrapHeading } from "./geometry";
 import { RollingDigits } from "./RollingDigits";
 import { useSpring } from "./useSpring";

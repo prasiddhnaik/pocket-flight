@@ -1,0 +1,222 @@
+{
+  "stage": 1,
+  "assembly": "fuselage",
+  "source": "USAF overall envelope; local sections are photographic estimates",
+  "units": "mm",
+  "artifact": "STEP/fuselage.step",
+  "sha256": "4f92f2d6fdc3d64b29ee7b81314328717e4a87a2cc5f288fa2ccd5984a05c88c",
+  "dimensionsM": [
+    4.08246418086791,
+    18.920000000200154,
+    1.9747108582261
+  ],
+  "checks": [
+    {
+      "name": "Every saved solid is valid, closed and positive",
+      "pass": true,
+      "solids": 5,
+      "volumeM3": 63.389008861723894
+    },
+    {
+      "name": "Fuselage remains one connected solid",
+      "pass": true
+    },
+    {
+      "name": "Body contact: Radome",
+      "pass": true,
+      "gapMm": 0,
+      "toleranceMm": 0.5
+    },
+    {
+      "name": "Body contact: Cockpit_well",
+      "pass": true,
+      "gapMm": 0,
+      "toleranceMm": 0.5
+    },
+    {
+      "name": "Body contact: Engine_collar_Left",
+      "pass": true,
+      "gapMm": 0,
+      "toleranceMm": 0.5
+    },
+    {
+      "name": "Body contact: Engine_collar_Right",
+      "pass": true,
+      "gapMm": 0,
+      "toleranceMm": 0.5
+    },
+    {
+      "name": "Stage-1 longitudinal envelope",
+      "pass": true,
+      "noseYM": 10.000000000100002,
+      "aftYM": -8.92000000010015,
+      "lengthM": 18.920000000200154
+    },
+    {
+      "name": "Bilateral envelope",
+      "pass": true,
+      "minXM": -2.041229468190516,
+      "maxXM": 2.0412347126773938,
+      "toleranceMm": 0.1
+    },
+    {
+      "name": "Left/right saved body volumes agree",
+      "pass": true,
+      "relativeError": 0.000032090544160620155,
+      "tolerance": 0.0001,
+      "note": "Volume bisection tolerance includes spline/Boolean integration error; envelope tolerance is 0.1 mm."
+    },
+    {
+      "name": "Raised dorsal spine stands above the neutral intake lips",
+      "pass": true,
+      "sections": [
+        {
+          "yM": 1.3,
+          "roofZM": 3.449999999999938,
+          "widthAtZ323M": 1.979187522780546
+        },
+        {
+          "yM": 0.32,
+          "roofZM": 3.430000000000025,
+          "widthAtZ323M": 2.116137439525405
+        },
+        {
+          "yM": -1,
+          "roofZM": 3.414639573239404,
+          "widthAtZ323M": 2.1573754151684934
+        }
+      ],
+      "intakeLipZM": 3
+    },
+    {
+      "name": "Raised dorsal spine is broader than each individual inlet",
+      "pass": true,
+      "sections": [
+        {
+          "yM": 1.3,
+          "roofZM": 3.449999999999938,
+          "widthAtZ323M": 1.979187522780546
+        },
+        {
+          "yM": 0.32,
+          "roofZM": 3.430000000000025,
+          "widthAtZ323M": 2.116137439525405
+        },
+        {
+          "yM": -1,
+          "roofZM": 3.414639573239404,
+          "widthAtZ323M": 2.1573754151684934
+        }
+      ],
+      "singleInletWidthM": 0.989242,
+      "minimumWidthM": 1.25
+    },
+    {
+      "name": "Rear cockpit roof joins the raised spine without the previous saddle",
+      "pass": true,
+      "sections": [
+        {
+          "yM": 3.15,
+          "roofZM": 3.43
+        },
+        {
+          "yM": 2.85,
+          "roofZM": 3.443729313465912
+        },
+        {
+          "yM": 2.25,
+          "roofZM": 3.445691920657783
+        }
+      ],
+      "minimumRoofZM": 3.4,
+      "maximumHeightRangeM": 0.05
+    },
+    {
+      "name": "Cockpit opening is open",
+      "pass": true
+    },
+    {
+      "name": "Nose gear bay is open",
+      "pass": true
+    },
+    {
+      "name": "Left main bay is open",
+      "pass": true
+    },
+    {
+      "name": "Right main bay is open",
+      "pass": true
+    },
+    {
+      "name": "Cockpit well has depth",
+      "pass": true,
+      "floorHeightM": 2.4400000001000053
+    },
+    {
+      "name": "Attachment datum: wingRootLeft",
+      "pass": true,
+      "gapMm": 0,
+      "toleranceMm": 20
+    },
+    {
+      "name": "Attachment datum: wingRootRight",
+      "pass": true,
+      "gapMm": 0,
+      "toleranceMm": 20
+    },
+    {
+      "name": "Attachment datum: finLeft",
+      "pass": true,
+      "gapMm": 0,
+      "toleranceMm": 20
+    },
+    {
+      "name": "Attachment datum: finRight",
+      "pass": true,
+      "gapMm": 0,
+      "toleranceMm": 20
+    },
+    {
+      "name": "Attachment datum: mainGearLeft",
+      "pass": true,
+      "gapMm": 0,
+      "toleranceMm": 20
+    },
+    {
+      "name": "Attachment datum: mainGearRight",
+      "pass": true,
+      "gapMm": 0,
+      "toleranceMm": 20
+    }
+  ],
+  "contacts": [
+    {
+      "part": "Radome",
+      "bodyGapMm": 0
+    },
+    {
+      "part": "Cockpit_well",
+      "bodyGapMm": 0
+    },
+    {
+      "part": "Engine_collar_Left",
+      "bodyGapMm": 0
+    },
+    {
+      "part": "Engine_collar_Right",
+      "bodyGapMm": 0
+    }
+  ],
+  "passed": 23,
+  "failed": 0,
+  "aerodynamics": {
+    "status": "not run",
+    "reason": "No wings yet. Existing lab solver cannot test fuselage flow."
+  },
+  "evidence": [
+    {
+      "artifact": "STEP/fuselage.step",
+      "sha256": "4f92f2d6fdc3d64b29ee7b81314328717e4a87a2cc5f288fa2ccd5984a05c88c"
+    }
+  ]
+}

@@ -106,10 +106,10 @@ h1,h2,h3{line-height:1.25}h2{margin-top:34px}table{border-collapse:collapse;widt
 <table>
 <thead><tr><th>Existing source</th><th>Proposed change</th></tr></thead>
 <tbody>
-<tr><td><code>src/game.ts</code></td><td>Extract the shared fixed update from requestAnimationFrame, choose human/agent/controller inputs, add stepped clock execution and collect per-step events.</td></tr>
-<tr><td><code>src/physics.ts</code></td><td>Add explicit validated actuator-target commands while retaining existing keyboard helpers and physical limits.</td></tr>
-<tr><td><code>src/flight-trim.ts</code>, <code>src/aircraft-design.ts</code>, <code>src/terrain.ts</code>, <code>src/world.ts</code></td><td>Reuse existing trim, aircraft envelope, runway and collision data for maneuver control and observations.</td></tr>
-<tr><td><code>src/App.tsx</code>, <code>src/replay-data.ts</code></td><td>Local agent ownership/status, human takeover, explicit provenance and protection of player log/preferences.</td></tr>
+<tr><td><code>src/flight/game.ts</code></td><td>Extract the shared fixed update from requestAnimationFrame, choose human/agent/controller inputs, add stepped clock execution and collect per-step events.</td></tr>
+<tr><td><code>src/flight/physics.ts</code></td><td>Add explicit validated actuator-target commands while retaining existing keyboard helpers and physical limits.</td></tr>
+<tr><td><code>src/flight/flight-trim.ts</code>, <code>src/aircraft/aircraft-design.ts</code>, <code>src/world/terrain.ts</code>, <code>src/world/world.ts</code></td><td>Reuse existing trim, aircraft envelope, runway and collision data for maneuver control and observations.</td></tr>
+<tr><td><code>src/app/App.tsx</code>, <code>src/replay/replay-data.ts</code></td><td>Local agent ownership/status, human takeover, explicit provenance and protection of player log/preferences.</td></tr>
 <tr><td>New agent API, pilot controller and development adapters</td><td>Keep validation/session management, flight-control policy, WebMCP registration and transport separate modules.</td></tr>
 <tr><td><code>vite.config.ts</code>, <code>scripts/</code>, <code>package.json</code></td><td>Development-only bridge and a repeatable Bun command workflow. No new hosted backend is required.</td></tr>
 </tbody>

@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { FlightPhysics } from "../src/physics";
+import { FlightPhysics } from "../src/flight/physics";
 import { fuelCapacityKg, instrumentData } from "../src/hud/instrument-data";
-import type { AircraftId } from "../src/aircraft";
+import type { AircraftId } from "../src/aircraft/aircraft";
 
 const neutral = { pitch: 0, roll: 0, yaw: 0, throttle: 0.6, brake: false };
 function plane(id: AircraftId, airStart = false) {

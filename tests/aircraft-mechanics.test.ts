@@ -8,8 +8,8 @@ import {
 import { aircraftCatalog, type LabAircraftId } from "../lab/aircraft";
 import { batchStaticMeshes } from "../lab/render-batching";
 import { loadGeometryOnly } from "../scripts/geometry-loader";
-import { AureliaEffects } from "../src/aurelia-effects";
-import { initialJetInput } from "../src/jet-effects";
+import { AureliaEffects } from "../src/aircraft/aurelia/aurelia-effects";
+import { initialJetInput } from "../src/aircraft/jet-effects";
 
 test("Aurelia tester stows all four wheels at the same native pose as flight, and scrubs back to gear down", async () => {
   const asset = new URL("../public/assets/aurelia-flight.glb", import.meta.url);
@@ -111,7 +111,22 @@ for (const id of Object.keys(aircraftCatalog) as LabAircraftId[]) {
       .getObjectByName("Aileron_Right")!
       .getWorldPosition(new T.Vector3());
     const rig = new AircraftMechanics(scene, id, animations);
-    expect(rig.diagnostics().hardwareParts).toBeGreaterThan(100);
+    if (id === "aurelia") {
+      expect(rig.diagnostics().hardwareParts).toBe(0);
+      expect(rig.diagnostics().model).toBe("aurelia-phenom300e.glb");
+      for (const name of ["Flap_carriage_Right_0", "Passenger_entry_hinge", "Cockpit_door_hinge"])
+        expect(rig.getMovingRoots()).toContain(scene.getObjectByName(name)!);
+    } else if (id === "heron") {
+      expect(rig.diagnostics().hardwareParts).toBe(0); // Uses authored CAD hardware.
+      const columns: T.Object3D[] = [];
+      scene.traverse((node) => { if (node.name.startsWith("Yoke_column_")) columns.push(node); });
+      expect(columns).toHaveLength(2);
+    } else if (id === "f15c") {
+      expect(rig.diagnostics().hardwareParts).toBe(0); // Uses the authored CAD hardware.
+      expect(rig.diagnostics().model).toBe("f15c-eagle.glb");
+      for (const name of ["Gear_Left", "Gear_Right", "Gear_Nose", "Stabilator_shaft_Left", "Stabilator_shaft_Right", "Door_Left_Inner", "Door_Right_Inner"])
+        expect(rig.getMovingRoots()).toContain(scene.getObjectByName(name)!);
+    } else expect(rig.diagnostics().hardwareParts).toBeGreaterThan(100);
     const part = scene.getObjectByName("Aileron_Right")!;
     for (const root of rig.getMovingRoots()) batchStaticMeshes(root);
     batchStaticMeshes(scene);
@@ -163,7 +178,7 @@ for (const id of Object.keys(aircraftCatalog) as LabAircraftId[]) {
         original.getObjectByName("Aileron_Right")!.quaternion,
       ),
     ).toBeLessThan(1e-5);
-    expect(rig.diagnostics().fixedGear).toBe(id === "finch");
+    expect(rig.diagnostics().fixedGear).toBe(id === "finch" || id === "heron");
   });
 }
 

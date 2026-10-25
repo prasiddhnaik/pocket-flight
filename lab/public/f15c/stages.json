@@ -1,0 +1,60 @@
+{
+  "stages": [
+    {
+      "id": "fuselage",
+      "label": "Fuselage and nose",
+      "asset": "fuselage.glb",
+      "checks": "fuselage-results.json",
+      "mechanisms": false
+    },
+    {
+      "id": "intakes",
+      "label": "Twin intakes and ducts",
+      "asset": "intakes.glb",
+      "checks": "intakes-results.json",
+      "mechanisms": false
+    },
+    {
+      "id": "wings",
+      "label": "Main wings and controls",
+      "asset": "wings.glb",
+      "checks": "wings-results.json",
+      "mechanisms": false
+    },
+    {
+      "id": "tails",
+      "label": "Fins and stabilators",
+      "asset": "tails.glb",
+      "checks": "tails-results.json",
+      "mechanisms": false
+    },
+    {
+      "id": "exhausts",
+      "label": "Twin exhausts",
+      "asset": "exhausts.glb",
+      "checks": "exhausts-results.json",
+      "mechanisms": false
+    },
+    {
+      "id": "cockpit",
+      "label": "Cockpit and canopy",
+      "asset": "cockpit.glb",
+      "checks": "cockpit-results.json",
+      "mechanisms": false
+    },
+    {
+      "id": "gear",
+      "label": "Landing gear and doors",
+      "asset": "gear.glb",
+      "checks": "gear-results.json",
+      "mechanisms": false
+    },
+    {
+      "id": "complete",
+      "label": "Detailed aircraft",
+      "asset": "complete.glb",
+      "checks": "complete-results.json",
+      "mechanisms": true
+    }
+  ]
+}

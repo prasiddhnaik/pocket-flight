@@ -1,0 +1,337 @@
+{
+  "title": "F-15C Claude reference audit",
+  "date": "2026-10-23",
+  "scope": "Research-only audit; no geometry, runtime, mass, coefficient or weapon behavior edits.",
+  "input": "output/f15c-claude-reference.txt",
+  "sources": [
+    {
+      "id": "TM72861",
+      "title": "NASA TM-72861, Precision Controllability of the F-15 Airplane (1979)",
+      "url": "https://ntrs.nasa.gov/api/citations/19790015808/downloads/19790015808.pdf",
+      "locators": "Printed pp. 3–4, 12–13, 15–16; wing table p. 15 = PDF p. 17",
+      "scope": "F-15 number 8, initially a preproduction test vehicle, progressively modified toward production standards. Table 1 explicitly labels wing area as reference."
+    },
+    {
+      "id": "CAP",
+      "title": "Dale M. Pitt, CAP-TSD Analysis of the F-15 Aircraft (1989)",
+      "url": "https://ntrs.nasa.gov/api/citations/19890009868/downloads/19890009868.pdf",
+      "locators": "Printed pp. 99–102; figures 1–4 = PDF pp. 3–6",
+      "scope": "McDonnell/NASA baseline geometry and comparison with an early 4.7% rigid model tested in January 1971. Not production-C manufacturing station data."
+    },
+    {
+      "id": "TM4604",
+      "title": "NASA TM-4604, Dynamic Ground Effects Flight Test of an F-15 Aircraft (1994)",
+      "url": "https://ntrs.nasa.gov/api/citations/19950005778/downloads/19950005778.pdf",
+      "locators": "Printed pp. 5–6, 8 = PDF pp. 9–10, 12",
+      "scope": "Modified single-seat preproduction F-15A, research PW1128 engines, weapons removed. 150/170-kn landing approaches, gear down and inlets locked full up."
+    },
+    {
+      "id": "TP3414",
+      "title": "NASA TP-3414, In-Flight Lift-Drag Characteristics for a Forward-Swept-Wing Aircraft (and Comparisons With Contemporary Aircraft) (1994)",
+      "url": "https://ntrs.nasa.gov/api/citations/19950012150/downloads/19950012150.pdf",
+      "locators": "Printed p. 11 (F-15C data provenance), p. 14 Table 5 = PDF pp. 15, 18",
+      "scope": "New X-29A results compared with F-15C/F-16C unpublished flight-test data. Does not publish a complete F-15C aerodynamic database."
+    },
+    {
+      "id": "TP3627",
+      "title": "NASA TP-3627, Development and Flight Evaluation of an Emergency Digital Flight Control System Using Only Engine Thrust on an F-15 Airplane (1996)",
+      "url": "https://ntrs.nasa.gov/api/citations/19970001362/downloads/19970001362.pdf",
+      "locators": "Printed pp. 10, 12–13, 18–19; Figure 14 on p. 19 = PDF p. 29",
+      "scope": "NASA preproduction aircraft number 8 with heavier F100 EMD engines, nose ballast, special instrumentation and nonproduction gear placement."
+    },
+    {
+      "id": "TM212027",
+      "title": "NASA/TM-2003-212027 (2003), modified F-15B parameter-identification study",
+      "url": "https://ntrs.nasa.gov/api/citations/20030079970/downloads/20030079970.pdf",
+      "locators": "Printed pp. 4–5 = PDF pp. 8–9",
+      "scope": "Highly modified two-seat preproduction F-15B with canards, F100-PW-229 engines and thrust-vectoring nozzles. Dimensions and derivatives require this configuration label."
+    },
+    {
+      "id": "NMUSAF220",
+      "title": "National Museum of the USAF, Pratt & Whitney F100-PW-220",
+      "url": "https://www.nationalmuseum.af.mil/Visit/Museum-Exhibits/Fact-Sheets/Display/Article/196437/pratt-whitney-f100-pw-220/",
+      "locators": "Technical notes; previously retrieved through connected search",
+      "scope": "Maximum afterburner thrust 23,770 lbf per engine. No full installed net-thrust or fuel-consumption map supplied."
+    },
+    {
+      "id": "PW",
+      "title": "Pratt & Whitney, F100 engine product page",
+      "url": "https://www.rtx.com/en/prattwhitney/products/military-engines/f100",
+      "locators": "F100-PW-229 milestones / specifications",
+      "scope": "Current family page emphasizes PW-229. Its 29,160-lbf figure must not be transferred to a PW-220 model."
+    },
+    {
+      "id": "PHOTO",
+      "title": "NMUSAF, F-15C 86-0156 official photograph collection",
+      "url": "https://www.nationalmuseum.af.mil/Visit/Museum-Exhibits/Fact-Sheets/Display/Article/3454925/mcdonnell-douglas-f-15c-historic-double-mig-killer/",
+      "locators": "Forward side and near-front photographs; also indexed in the reference dossier",
+      "scope": "Production-C exterior comparison: gun aperture on starboard outboard wing-root shoulder beside the inlet. Photographic location is qualitative, not an exact station."
+    }
+  ],
+  "claims": [
+    {
+      "id": "A01",
+      "claim": "S ≈ 56.5 m², b ≈ 13.05 m, taper 0.25, leading-edge sweep 45°, MAC ≈ 4.86 m",
+      "verdict": "Supported as reference geometry, with small source differences",
+      "evidence": "TM-72861 Table 1 gives reference S = 56.61 m², b = 13.05 m, taper = 0.25, LE = 45° and MAC = 4.86 m. TM-4604 Table 1 gives 608 ft² = 56.485 m² and 42.83 ft. CAP gives AR = 3.01, taper = 0.25 and LE = 45°. The article correctly reports these small source differences.",
+      "sources": [
+        "TM72861",
+        "TM4604",
+        "CAP"
+      ],
+      "action": "Use a declared nominal reference basis and retain the article’s source labels. Rounded reference values are not a complete production drawing.",
+      "category": "Verified article data",
+      "article_position": "Section 3.1 lists the nominal values and explicitly records TM-72861’s 56.61-m² alternative."
+    },
+    {
+      "id": "A02",
+      "claim": "The opening says the wing parameters permit an exact planform reconstruction",
+      "verdict": "Opening overstates what the later recipe establishes",
+      "evidence": "The calculation correctly determines a straight-edged reference trapezoid. The article itself later distinguishes that idealization from the cropped production tip. CAP figures 1–3 also distinguish local root/body outline; p. 102 models wing, wing-glove, body and inlets as separate contributors. The parameters alone do not determine those details.",
+      "sources": [
+        "CAP",
+        "TM72861"
+      ],
+      "action": "Read the article’s trapezoid as a reference construction, then trace the exposed production outline and body intersection. Qualify the opening’s word “exactly.”",
+      "category": "Article wording overstatement",
+      "article_position": "The opening says the parameters let the reader rebuild the planform exactly. Sections 1 and 3.2 subsequently call it an idealized reference wing and direct the reader to trace the clipped/raked production tip."
+    },
+    {
+      "id": "A03",
+      "claim": "Current modeled S = 61.560225 m² and MAC = 5.250250 m versus the nominal published reference",
+      "verdict": "Unresolved geometric discrepancy in the current model",
+      "evidence": "Current station integration is 8.96% above 56.5 m²; its MAC is 8.03% above 4.86 m. Source code adds 0.65 m chord near the exposed root, tapering toward 0.15 m at the tip, then crops the outer tip. No primary station data reviewed here validates those additions. A different area convention can explain some disagreement, but has not been quantified against the production outline.",
+      "sources": [
+        "CAP",
+        "TM72861"
+      ],
+      "action": "Retain current values as measured model values. Establish reference area, exposed planform area, root/glove treatment and exact continuation before deciding which geometry to revise.",
+      "category": "Current-model comparison",
+      "article_position": "The article does not describe or endorse the current project’s larger modeled area; this is an independent comparison."
+    },
+    {
+      "id": "A04",
+      "claim": "Named root/tip airfoils: NACA 64A006.6 and NACA 64A203",
+      "verdict": "Secondary attribution is explicit; exact production-C ordinates remain provisional",
+      "evidence": "CAP p. 100 describes a 6%-thick symmetric root, a 3%-thick highly cambered tip and conical camber outboard of 20% semispan. It does not name those NACA sections. This supports the article’s qualitative comparison but independently confirms neither the exact root 6.6% thickness nor a production-C ordinate set. The current analytic polynomial is also not verified 64A-series geometry.",
+      "sources": [
+        "CAP"
+      ],
+      "action": "Preserve the secondary attribution. Use the named sections as provisional reconstruction inputs, while labeling the current analytic sections as approximations.",
+      "category": "Evidence limit / application caveat",
+      "article_position": "The article explicitly attributes NACA 64A006.6 and 64A203 to Lednicer’s secondary compilation and separately quotes NASA’s qualitative section descriptions."
+    },
+    {
+      "id": "A05",
+      "claim": "Wing −1° anhedral, 0° incidence and 0° geometric twist",
+      "verdict": "Supported baseline; conflicting research-aircraft description exists",
+      "evidence": "TM-72861 p. 15 gives −1° dihedral, 0° incidence and 0° geometric twist; CAP p. 99 independently gives −1° dihedral. TP-3627 p. 12 instead describes 0° dihedral on its research aircraft. The article correctly preserves this discrepancy.",
+      "sources": [
+        "TM72861",
+        "CAP",
+        "TP3627"
+      ],
+      "action": "The article’s selected −1° baseline has direct support. Keep the conflict and production-C photo comparison visible.",
+      "category": "Verified article data with recorded conflict",
+      "article_position": "The article explicitly flags −1° versus 0° and recommends −1° from TM-72861 and CAP-TSD."
+    },
+    {
+      "id": "A06",
+      "claim": "Ailerons ±20°, stabilators +15°/−26°, rudders ±30°; differential stabilator ratio 0.3 per aileron degree",
+      "verdict": "Supported for the cited test configuration",
+      "evidence": "TM-72861 Table 1 pp. 15–16 lists the deflection limits. Its appendix p. 12 gives the 0.3° differential-stabilator/aileron-degree gearing, except where actuator-limited. These are surface limits and scheduled system behavior, not a constant stick-to-angle rule across the envelope.",
+      "sources": [
+        "TM72861"
+      ],
+      "action": "Use sign conventions explicitly. Do not equate mechanical rudder travel, pedal authority, CAS authority or ARI authority.",
+      "category": "Verified article data / use conditions",
+      "article_position": "The article gives mechanical limits and the differential stabilator gearing; some additional pedal-authority details are explicitly sourced to secondary simulation references."
+    },
+    {
+      "id": "A07",
+      "claim": "The article records the 30°/40° flap conflict and recommends 30°",
+      "verdict": "Conflict is correctly reported; selected production-C travel is still provisional",
+      "evidence": "TM-4604 p. 5 states a maximum downward 30° and its flight procedure uses 30°. TP-3627 pp. 12–13 states electric flaps with 0°/40° positions on the NASA Dryden aircraft. Both describe modified preproduction research aircraft. These sources confirm the conflict already acknowledged by the article, rather than proving interchangeability.",
+      "sources": [
+        "TM4604",
+        "TP3627"
+      ],
+      "action": "Retain 30° as an explicitly selected modeling assumption until the intended production configuration is checked. Do not characterize the article as saying 30° and 40° are interchangeable.",
+      "category": "Verified article conflict / application caveat",
+      "article_position": "The article explicitly flags 30° versus 40° on the NASA airplane and chooses 30° for its proposed build."
+    },
+    {
+      "id": "A08",
+      "claim": "Tail dimensions, inferred total/per-fin area and the flagged rudder-area conflict",
+      "verdict": "The article appropriately flags ambiguity; do not resolve it by assumption",
+      "evidence": "TM-72861 p. 15 supports stabilator total area 11.15 m², span 8.61 m, exposed root chord 3.48 m, tip 1.18 m and LE sweep 50°. Its fin/rudder table has an unstated total/per-fin convention and a 6.07-m² total rudder area that is questionable beside the listed outline. The article already identifies those issues.",
+      "sources": [
+        "TM72861",
+        "CAP"
+      ],
+      "action": "Keep the article’s inference and conflict labels. Use the outline and explicitly defined exposed chords; do not promote the suspect table entry to a precise CAD target.",
+      "category": "Verified table values with unresolved conventions",
+      "article_position": "The article lists the NASA tail values, marks the per-fin interpretation as inferred and explicitly flags NASA/JSBSim area disagreements and the implausibly large rudder area."
+    },
+    {
+      "id": "A09",
+      "claim": "CD0 = 0.0218 is a NASA F-15C flight-data value",
+      "verdict": "Supported, conditional",
+      "evidence": "TP-3414 Table 5 is on printed p. 14, PDF p. 18, and gives F-15C CD0 = 0.0218. The surrounding definition is subsonic, trimmed, nonlifting aerodynamic efficiency. Printed p. 11 says the F-15C/F-16C comparison data are from unpublished flight tests. The table does not expose a full F-15C Mach/altitude/store-state record.",
+      "sources": [
+        "TP3414"
+      ],
+      "action": "Use as a conditional comparison datum. Do not treat it as a universal constant, apply the X-29A test range to the F-15C, or claim it validates the current aircraft polar.",
+      "category": "Verified article datum / added condition detail",
+      "article_position": "The article labels CD0 = 0.0218 as subsonic NASA flight data and separately calls its transonic multipliers estimates."
+    },
+    {
+      "id": "A10",
+      "claim": "CLα = 0.065/deg = 3.72/rad at α = 8°, from the NASA simulator database",
+      "verdict": "Article’s value and local attribution are supported",
+      "evidence": "TM-4604 p. 8 confirms this derivative and adds nominal stabilator = −5°. The derivatives correct landing-approach data for unwanted attitude/control changes; the method assumes they are locally constant and unchanged by ground effect. Aircraft and approach configuration are given on pp. 5–6. This extends the article’s condition label; it does not refute it.",
+      "sources": [
+        "TM4604"
+      ],
+      "action": "Preserve the article’s α = 8° and simulator labels, plus the stabilator/approach conditions. Application caveat: do not use the number as a direct isolated-wing VLM validation target.",
+      "category": "Verified article datum / transfer caveat",
+      "article_position": "The article explicitly labels CLα = 0.065/deg as an α = 8° value from the NASA Dryden simulator database."
+    },
+    {
+      "id": "A11",
+      "claim": "Companion CLδ, Cmα and Cmδ values from TM-4604",
+      "verdict": "Quoted numbers supported; preserve their local use conditions",
+      "evidence": "The quoted 0.005/deg, −0.0021/deg and −0.00072/deg occur in the same local approach-correction method as CLα on TM-4604 p. 8. The paper defines its own stabilator sign convention. The article does not explicitly claim these values hold throughout the flight envelope.",
+      "sources": [
+        "TM4604"
+      ],
+      "action": "When applying them, retain units, signs and approach conditions. A high-angle or transonic extension would require additional evidence; this is an application limit, not a claim the article makes.",
+      "category": "Verified article data / transfer caveat",
+      "article_position": "The article lists the companion stabilator-lift and pitching-moment derivatives from TM-4604 alongside its explicitly local CLα datum."
+    },
+    {
+      "id": "A12",
+      "claim": "F100-PW-220 maximum afterburner thrust 23,770 lbf ≈ 105.7 kN per engine",
+      "verdict": "Supported rating, not an installed flight map",
+      "evidence": "NMUSAF publishes 23,770 lbf maximum afterburner thrust. The 14,590-lbf dry rating was not independently primary-verified in this pass. Current manufacturer F100 specifications emphasize the stronger PW-229; that is a different variant.",
+      "sources": [
+        "NMUSAF220",
+        "PW"
+      ],
+      "action": "The current twin 210-kN afterburner estimate is close to twice the museum rating. Keep installation, altitude, speed and throttle mapping estimated rather than automatically increasing it.",
+      "category": "Verified article rating / remaining verification gap",
+      "article_position": "The article lists PW-220 dry/afterburner ratings, distinguishes engine variants and labels its altitude map an engineering approximation."
+    },
+    {
+      "id": "A13",
+      "claim": "“Static thrust is conservative because ram effect adds thrust at speed” in the sustained-turn example",
+      "verdict": "The stated justification is incomplete",
+      "evidence": "Net propulsive force depends on gross exhaust thrust minus inlet momentum/ram drag and installation effects. TP-3627 p. 10 explicitly discusses gross thrust minus ram drag in its low-speed research context. Added ram pressure alone does not establish that a static rating is conservative at the example’s speed.",
+      "sources": [
+        "TP3627"
+      ],
+      "action": "Keep the static-thrust example labeled as an approximation. Remove the guaranteed-conservatism rationale or support it with a PW-220 installed net-thrust map for that condition.",
+      "category": "Article physical inference requiring correction",
+      "article_position": "Worked example B states that static thrust is conservative because ram effect adds thrust at speed."
+    },
+    {
+      "id": "A14",
+      "claim": "JSBSim inertia values are estimates; a measured production-C inertia set was not found",
+      "verdict": "Estimate label is appropriate; research-aircraft curves add context without proving a measured C set",
+      "evidence": "TP-3627 pp. 18–19 publishes fuel-dependent moments and product of inertia in Figure 14 for NASA aircraft number 8. It states that each research engine is about 400 lb heavier than standard, with compensating nose ballast, increasing pitch/yaw inertia. This is additional primary mass-property information, but the cited passage does not establish a measured production-C inertia set or refute the article’s qualified search result.",
+      "sources": [
+        "TP3627"
+      ],
+      "action": "Retain the article’s estimate label. Use the NASA curves only with their different-airframe/configuration qualification; neither those curves nor the JSBSim estimates are production-C ground truth.",
+      "category": "Additional source / estimate-transfer caveat",
+      "article_position": "The article explicitly labels the JSBSim inertias as estimates. Its final caveat says a measured inertia set was not found in primary public sources."
+    },
+    {
+      "id": "A15",
+      "claim": "Modified-F-15B derivative transfer and the wing quarter-chord “balance point” explanation",
+      "verdict": "Configuration warnings are appropriate; the balance-point explanation is too broad",
+      "evidence": "TM-2003-212027 pp. 4–5 confirms the modified F-15B with canards, PW-229 engines and special nozzles. TP-3627 pp. 18–20 gives its own research fuel/CG schedule. These support the article’s existing cautions. The quarter-chord of an ideal wing does not by itself establish the full-aircraft neutral point, moment-reference datum or CG target.",
+      "sources": [
+        "TM212027",
+        "TP3627"
+      ],
+      "action": "Preserve the article’s test-configuration labels. Treat the wing quarter-chord as a wing reference marker, not a demonstrated complete-aircraft balance point.",
+      "category": "Transfer caveat and article simplification",
+      "article_position": "The article warns that lateral derivatives are from a canard-equipped F-15B and approximate for a C; it labels CG data as NASA test-aircraft data. Separately, its first-principles visual tip calls the wing MAC quarter-chord the aircraft’s aerodynamic balance point."
+    },
+    {
+      "id": "A16",
+      "claim": "Worked corner-speed and sustained-turn examples under declared assumptions",
+      "verdict": "Fairly labeled model outputs; independent performance validation remains open",
+      "evidence": "The article’s approximately 441-kt corner speed and 18.9°/s sustained turn depend on the disclosed mass, CLmax, efficiency, drag polar, static thrust and atmosphere. The cited NASA reports do not independently validate that complete combination, and the article does not claim the outputs are manual values.",
+      "sources": [
+        "TP3414",
+        "TM4604"
+      ],
+      "action": "Retain the article’s model-output label. Address the thrust rationale in A13 and seek condition-matched performance evidence before treating the examples as calibration targets.",
+      "category": "Article worked example / application caveat",
+      "article_position": "The article explicitly calls the turn results model outputs, not F-15 manual values, and discloses static thrust, assumed CLmax = 1.0 and assumed efficiency."
+    },
+    {
+      "id": "A17",
+      "claim": "The gun is in the right wing root; photographs refine its visible shoulder location",
+      "verdict": "Supported qualitative location",
+      "evidence": "The user’s closed-port photo and official NMUSAF production-C photographs show the recessed oval aperture in the outer right wing-root shoulder, outboard of the inlet’s upper outer region. It is not centered on the movable intake roof.",
+      "sources": [
+        "PHOTO"
+      ],
+      "action": "Retain the corrected one-sided exterior location and shallow oval port. Do not infer exact manufacturing stations from a perspective photograph.",
+      "category": "Verified article location / photographic refinement",
+      "article_position": "The article places the M61A1 in the right wing root and treats this section as exterior modeling."
+    },
+    {
+      "id": "A18",
+      "claim": "Generic Blender −Y nose to glTF +Z recipe versus this project’s existing axes",
+      "verdict": "Adaptation required for this project; not an error in the generic recipe",
+      "evidence": "The article describes a generic Blender/glTF convention. This project’s current CAD authoring nose is +Y, and runtime axes are +X right, +Y up and +Z aft. The runtime geometry file declares its conversion and ground-datum subtraction. A valid generic recipe should not replace the current exporter’s established transform.",
+      "sources": [],
+      "action": "Keep the distinction explicit when adapting the article. Verify exported muzzle, controls and camera axes through the actual project pipeline.",
+      "category": "Project-specific application caveat",
+      "article_position": "The article gives a generic Blender nose −Y to glTF +Z workflow; it does not claim this is the current project’s CAD convention."
+    }
+  ],
+  "calculations": {
+    "idealized_trapezoid": {
+      "span_m": 13.05,
+      "area_m2": 56.5,
+      "taper": 0.25,
+      "root_chord_m": 6.9272030651340994,
+      "tip_chord_m": 1.7318007662835249,
+      "mac_m": 4.849042145593869,
+      "aspect_ratio": 3.014203539823009
+    },
+    "tm72861_table": {
+      "area_m2": 56.61,
+      "span_m": 13.05,
+      "mac_m": 4.86
+    },
+    "current_model": {
+      "revision": "eddfd4400ba5f7b262deba5b20a492a03bfc689a83486b5c182ebc684c7d900e",
+      "area_m2": 61.56022521316562,
+      "mac_m": 5.250250398235864,
+      "exposed_area_x_ge_1_2_m2": 45.28084979764338,
+      "area_difference_percent": 8.956150819762154,
+      "mac_difference_percent": 8.029843585100082
+    },
+    "illustrative_same_cut_comparison": {
+      "cut_x_m": 1.2,
+      "ideal_exposed_area_m2": 41.02128418549346,
+      "model_exposed_area_m2": 45.28084979764338,
+      "caveat": "Comparison to an ideal trapezoid only, not a traced production outline. Root/glove conventions remain unresolved."
+    },
+    "force_normalization": {
+      "formula": "C_new = C_old * S_old / S_new; Cm_new = Cm_old * S_old * c_old / (S_new * c_new)",
+      "current_drag_area_m2": 1.6005658555423061,
+      "article_nominal_drag_area_m2": 1.2317,
+      "current_lift_slope_area_m2_per_rad": 180.18050086946636,
+      "article_nominal_lift_slope_area_m2_per_rad": 210.41875026179486
+    }
+  },
+  "recommendation": "The article is a useful starting point and source index. Qualify its exact-planform opening, ram-thrust conservatism rationale and full-aircraft quarter-chord balance-point simplification. Preserve its existing uncertainty labels, resolve the current wing discrepancy by tracing, and transfer conditional aerodynamics with their configuration/reference basis.",
+  "audit_method": "Separates actual article wording/data from application caveats and independent current-model comparisons. Explicit article estimate/conflict labels are retained."
+}

@@ -34,7 +34,7 @@ body{max-width:900px;margin:36px auto;padding:0 22px 60px;font:16px/1.6 system-u
 </ul>
 <h3>Dependencies and delivery order</h3>
 <p>The configuration-mode setting and manual commands belong to the first flight-physics release. They require the common actuator command path and actual-state feedback. The wider settings redesign is a queued work item: refine its layout after the final set of first-release controls is known.</p>
-<p>Source starting points: <code>pocket-flight-site/src/App.tsx</code> currently has separate Controls and Settings panels; <code>src/game.ts</code> maps keyboard/touch commands; <code>src/physics.ts</code> automatically commands gear and approach flaps. Verify the current working tree before implementation because it contains active changes.</p>
+<p>Source starting points: <code>pocket-flight-site/src/app/App.tsx</code> currently has separate Controls and Settings panels; <code>src/flight/game.ts</code> maps keyboard/touch commands; <code>src/flight/physics.ts</code> automatically commands gear and approach flaps. Verify the current working tree before implementation because it contains active changes.</p>
 <h3>Acceptance criteria</h3>
 <ul>
 <li>A player can find the automatic gear/flap toggle under Settings → Controls and identify the selected mode.</li>

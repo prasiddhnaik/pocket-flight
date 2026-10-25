@@ -4,7 +4,7 @@ import * as T from "three";
 // Single main wheels retract inboard; Aurelia's dimensions and twin nose gear
 // remain aircraft-specific. https://africair.com/wp-content/uploads/2016/03/SD-CJ4-Unit-0200-to-TBD-2015-Oct.pdf
 
-export const AURELIA_BAY_REVISION = 22;
+export const AURELIA_BAY_REVISION = 23;
 // Native GLB coordinates. The occupied passenger floor starts at Y=2.38.
 export const aureliaBays = [
   {
@@ -92,6 +92,7 @@ function hull(z: number) {
         (-a[j] + 3 * b[j] - 3 * c[j] + d[j]) * t * t * t),
   );
 }
+export const aureliaBodyCenter = (z: number) => hull(z)[2];
 export function bellyDoorHeight(b: Bay, x: number) {
   return b.side
     ? 1.79 + 0.07 * (Math.abs(x) / 3.42) ** 2
@@ -420,6 +421,10 @@ export function makeAureliaGearBays() {
       strut.add(part);
     };
     tube("upper_oleo", [0, 0.98, -0.15], [0, -0.14, -0.15], 0.105);
+    tube("trunnion_bearing", [0, 0.98, -0.34], [0, 0.98, 0.04], 0.135);
+    tube("upper_collar", [0, 0.72, -0.15], [0, 0.81, -0.15], 0.124);
+    tube("gland_collar", [0, -0.16, -0.15], [0, -0.06, -0.15], 0.125);
+    tube("piston_wiper", [0, -0.175, -0.15], [0, -0.155, -0.15], 0.095);
     tube(
       "polished_piston",
       [0, -0.12, -0.15],
@@ -431,6 +436,46 @@ export function makeAureliaGearBays() {
     tube("short_axle", [-0.14, -0.59, 0], [0.14, -0.59, 0], 0.085);
     tube("torque_link_upper", [0, 0.02, -0.25], [0, -0.19, -0.36], 0.025);
     tube("torque_link_lower", [0, -0.19, -0.36], [0, -0.4, -0.25], 0.025);
+    for (const [index, y, z] of [
+      [0, 0.02, -0.25],
+      [1, -0.19, -0.36],
+      [2, -0.4, -0.25],
+    ])
+      tube(
+        `torque_pivot_${index}`,
+        [-0.055, y, z],
+        [0.055, y, z],
+        0.036,
+        chrome,
+      );
+    tube("axle_hub", [-0.2, -0.59, 0], [0.2, -0.59, 0], 0.12);
+    // The rotor and caliper sit beside the tire; they do not enlarge the tire.
+    const side = label === "Left" ? -1 : 1;
+    tube(
+      "brake_rotor",
+      [side * 0.145, -0.59, 0],
+      [side * 0.18, -0.59, 0],
+      0.285,
+      chrome,
+    );
+    tube(
+      "brake_caliper",
+      [side * 0.2, -0.48, 0.16],
+      [side * 0.2, -0.48, 0.32],
+      0.06,
+    );
+    const hose = new T.CatmullRomCurve3([
+      new T.Vector3(-side * 0.08, 0.5, -0.25),
+      new T.Vector3(-side * 0.12, -0.1, -0.28),
+      new T.Vector3(-side * 0.14, -0.42, -0.18),
+      new T.Vector3(side * 0.2, -0.48, 0.22),
+    ]);
+    const hoseMesh = new T.Mesh(
+      new T.TubeGeometry(hose, 18, 0.012, 6, false),
+      new T.MeshStandardMaterial({ color: "#263034", roughness: 0.8 }),
+    );
+    hoseMesh.name = `${label}_brake_hose`;
+    strut.add(hoseMesh);
     root.add(strut);
   }
   for (const b of aureliaBays) {

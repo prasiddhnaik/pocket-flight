@@ -1,6 +1,6 @@
 import { test, expect } from "bun:test";
 import * as T from "three";
-import { refineAircraftMaterials } from "../src/aircraft-materials";
+import { refineAircraftMaterials } from "../src/aircraft/aircraft-materials";
 
 test("finish refinement preserves authored color, textures, sharing and matte rubber", () => {
   const root = new T.Group(),

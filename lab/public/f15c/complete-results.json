@@ -1,0 +1,3041 @@
+{
+  "artifact": "/Users/prasiddhnaik/Documents/blender skills/pocket-flight-site/assets/f15c/STEP/f15c.step",
+  "sha256": "146e29a75206a21a9448ad70acb12edeb3bd36d0e24d85751310e62c35886d2b",
+  "units": "mm",
+  "dimensionsM": [
+    13.049250000200006,
+    19.4310000002,
+    5.6261
+  ],
+  "boundsM": {
+    "min": [
+      -6.524625000100003,
+      -9.431000000100001,
+      0
+    ],
+    "max": [
+      6.524625000100003,
+      10.000000000100002,
+      5.6261
+    ]
+  },
+  "checks": [
+    {
+      "name": "All saved solids valid, closed and positive",
+      "pass": true,
+      "invalid": [],
+      "solidCount": 440
+    },
+    {
+      "name": "All saved parts have an exact contact path to the fuselage",
+      "pass": true,
+      "floating": [],
+      "contactToleranceMm": 0.5,
+      "solidDistanceChecks": 735
+    },
+    {
+      "name": "Span matches the F-15C reference envelope",
+      "pass": true,
+      "actualM": 13.049250000200006,
+      "expectedM": 13.04925,
+      "toleranceMm": 0.2
+    },
+    {
+      "name": "Length matches the F-15C reference envelope",
+      "pass": true,
+      "actualM": 19.4310000002,
+      "expectedM": 19.431,
+      "toleranceMm": 0.2
+    },
+    {
+      "name": "Height matches the F-15C reference envelope",
+      "pass": true,
+      "actualM": 5.6261,
+      "expectedM": 5.6261,
+      "toleranceMm": 0.2
+    },
+    {
+      "name": "Saved complete aircraft contains the revised neutral intake lips",
+      "pass": true,
+      "upperLipZM": [
+        3,
+        3
+      ],
+      "expectedUpperLipZM": 3,
+      "gunCentreZM": 3.04
+    },
+    {
+      "name": "Saved complete aircraft contains the fuller revised wing chord",
+      "pass": true,
+      "actualM": 6.005795910834643,
+      "expectedM": 6.005795910834643
+    },
+    {
+      "name": "Six recessed Vulcan barrels sit outboard of the right intake",
+      "pass": true,
+      "barrelCentreXM": [
+        2.0337749907480003,
+        2,
+        1.9662250092520002,
+        1.9662250092520002,
+        2,
+        2.0337749907480003
+      ],
+      "minimumXM": 1.9
+    },
+    {
+      "name": "Saved complete aircraft contains the raised dorsal spine",
+      "pass": true,
+      "sections": [
+        {
+          "yM": 1.3,
+          "roofZM": 3.449999999999938,
+          "expectedRoofZM": 3.449999999999938
+        },
+        {
+          "yM": 0.32,
+          "roofZM": 3.430000000000025,
+          "expectedRoofZM": 3.430000000000025
+        },
+        {
+          "yM": -1,
+          "roofZM": 3.414639573239404,
+          "expectedRoofZM": 3.414639573239404
+        }
+      ],
+      "toleranceMm": 0.2
+    },
+    {
+      "name": "Saved airbrake hinge is seated at the raised spine datum",
+      "pass": true,
+      "hingeM": [
+        0,
+        0.32,
+        3.45
+      ],
+      "expectedM": [
+        0,
+        0.32,
+        3.45
+      ],
+      "maximumCoordinateErrorM": 0
+    },
+    {
+      "name": "Every saved solid is valid closed and positive",
+      "pass": true,
+      "invalid": [],
+      "solidCount": 83
+    },
+    {
+      "name": "Intended contact tree covers every saved solid",
+      "pass": true,
+      "unmapped": [],
+      "missingParents": [],
+      "cycles": []
+    },
+    {
+      "name": "Every saved solid has an exact contact path to the fuselage",
+      "pass": true,
+      "floating": [],
+      "toleranceMm": 0.5,
+      "contacts": 82
+    },
+    {
+      "name": "Game cannon datum is in front of the recessed port",
+      "pass": true,
+      "datumM": [
+        2,
+        2.05,
+        3.04
+      ],
+      "portFrontYM": 2.0000000001000027
+    },
+    {
+      "name": "Game airbrake pivot matches the raised dorsal-skin datum",
+      "pass": true,
+      "pivotM": [
+        0,
+        0.32,
+        3.45
+      ]
+    },
+    {
+      "name": "Airbrake panel clears body at 0 degrees",
+      "pass": true,
+      "overlapMm3": 0,
+      "gapMm": 6.933780819445249,
+      "minimumGapMm": 0.5
+    },
+    {
+      "name": "Airbrake panel clears body at -5 degrees",
+      "pass": true,
+      "overlapMm3": 0,
+      "gapMm": 9.05037453420846,
+      "minimumGapMm": 0.5
+    },
+    {
+      "name": "Airbrake panel clears body at -10 degrees",
+      "pass": true,
+      "overlapMm3": 0,
+      "gapMm": 9.18444864796362,
+      "minimumGapMm": 0.5
+    },
+    {
+      "name": "Airbrake panel clears body at -15 degrees",
+      "pass": true,
+      "overlapMm3": 0,
+      "gapMm": 9.400813515863703,
+      "minimumGapMm": 0.5
+    },
+    {
+      "name": "Airbrake panel clears body at -20 degrees",
+      "pass": true,
+      "overlapMm3": 0,
+      "gapMm": 9.69782346218155,
+      "minimumGapMm": 0.5
+    },
+    {
+      "name": "Airbrake panel clears body at -25 degrees",
+      "pass": true,
+      "overlapMm3": 0,
+      "gapMm": 10.073219363785324,
+      "minimumGapMm": 0.5
+    },
+    {
+      "name": "Airbrake panel clears body at -30 degrees",
+      "pass": true,
+      "overlapMm3": 0,
+      "gapMm": 10.524145802592423,
+      "minimumGapMm": 0.5
+    },
+    {
+      "name": "Airbrake panel clears body at -35 degrees",
+      "pass": true,
+      "overlapMm3": 0,
+      "gapMm": 11.047172748519122,
+      "minimumGapMm": 0.5
+    },
+    {
+      "name": "Airbrake panel clears body at -40 degrees",
+      "pass": true,
+      "overlapMm3": 0,
+      "gapMm": 11.638321609420554,
+      "minimumGapMm": 0.5
+    },
+    {
+      "name": "Airbrake panel clears body at -45 degrees",
+      "pass": true,
+      "overlapMm3": 0,
+      "gapMm": 12.293095451441587,
+      "minimumGapMm": 0.5
+    },
+    {
+      "name": "Airbrake panel clears body at -50 degrees",
+      "pass": true,
+      "overlapMm3": 0,
+      "gapMm": 13.006513161561143,
+      "minimumGapMm": 0.5
+    },
+    {
+      "name": "Airbrake panel clears body at -55 degrees",
+      "pass": true,
+      "overlapMm3": 0,
+      "gapMm": 13.773147294138118,
+      "minimumGapMm": 0.5
+    },
+    {
+      "name": "Closed airbrake avoids Dorsal_vent_frame_Left",
+      "pass": true,
+      "overlapMm3": 0
+    },
+    {
+      "name": "Closed airbrake avoids Dorsal_vent_frame_Right",
+      "pass": true,
+      "overlapMm3": 0
+    },
+    {
+      "name": "Closed airbrake avoids Upper_beacon_base",
+      "pass": true,
+      "overlapMm3": 0
+    },
+    {
+      "name": "Closed airbrake avoids Dorsal_antenna_base",
+      "pass": true,
+      "overlapMm3": 0
+    },
+    {
+      "name": "Closed airbrake avoids Gun_port_fairing",
+      "pass": true,
+      "overlapMm3": 0
+    },
+    {
+      "name": "Gun port and forward emission path are open",
+      "pass": true,
+      "samples": 35,
+      "blocked": [],
+      "emissionTestRadiusMm": 15,
+      "axialRangeM": [
+        2.05,
+        4.5
+      ]
+    },
+    {
+      "name": "Every gun solid is valid closed and positive",
+      "pass": true,
+      "solids": 26,
+      "namedParts": 25
+    },
+    {
+      "name": "Every gun part has a physical contact path to the fuselage",
+      "pass": true,
+      "contacts": 26,
+      "toleranceMm": 0.5,
+      "failures": []
+    },
+    {
+      "name": "Cannon has six separate visible barrel leaves",
+      "pass": true
+    },
+    {
+      "name": "Barrel faces are recessed behind the port",
+      "pass": true,
+      "portYM": 2,
+      "barrelFaceYM": 1.915,
+      "recessM": 0.08499999999999996
+    },
+    {
+      "name": "Compact shoulder fairing does not become a projecting external gun",
+      "pass": true,
+      "lengthM": 1.352727888390762,
+      "widthM": 0.4544058356735898,
+      "maximumZM": 3.1350117383859244
+    },
+    {
+      "name": "Recessed port is on the outboard right wing-root shoulder beside the intake",
+      "pass": true,
+      "inletUpperOutboardXM": 1.81632,
+      "barrelCentreRangeXM": [
+        1.9662250092520002,
+        2.0337749907480003
+      ],
+      "source": "User supplied closed exterior museum photograph; placement is a visual estimate."
+    },
+    {
+      "name": "All six visual bores are clear through their front apertures",
+      "pass": true,
+      "boreDiameterM": 0.02,
+      "checkedSweepRadiusM": 0.009,
+      "results": [
+        {
+          "barrel": 1,
+          "gunOverlapM3": 0,
+          "skinOverlapM3": 0,
+          "pass": true
+        },
+        {
+          "barrel": 2,
+          "gunOverlapM3": 0,
+          "skinOverlapM3": 0,
+          "pass": true
+        },
+        {
+          "barrel": 3,
+          "gunOverlapM3": 0,
+          "skinOverlapM3": 0,
+          "pass": true
+        },
+        {
+          "barrel": 4,
+          "gunOverlapM3": 0,
+          "skinOverlapM3": 0,
+          "pass": true
+        },
+        {
+          "barrel": 5,
+          "gunOverlapM3": 0,
+          "skinOverlapM3": 0,
+          "pass": true
+        },
+        {
+          "barrel": 6,
+          "gunOverlapM3": 0,
+          "skinOverlapM3": 0,
+          "pass": true
+        }
+      ]
+    },
+    {
+      "name": "Game emission begins forward of the aperture and clears body/intake/wing",
+      "pass": true,
+      "originM": [
+        2,
+        2.05,
+        3.04
+      ],
+      "direction": [
+        0,
+        1,
+        0
+      ],
+      "sweepRadiusM": 0.01,
+      "sweepLengthM": 3,
+      "overlaps": []
+    }
+  ],
+  "contacts": [
+    {
+      "a": "Radome",
+      "b": "Fuselage",
+      "gapMm": 0,
+      "method": "shared exact CAD vertex"
+    },
+    {
+      "a": "Cockpit_well",
+      "b": "Fuselage",
+      "gapMm": 0,
+      "method": "shared exact CAD vertex"
+    },
+    {
+      "a": "Intake_skin_Left",
+      "b": "Fuselage",
+      "gapMm": 0,
+      "method": "shared exact CAD vertex"
+    },
+    {
+      "a": "Ramp_2_Left",
+      "b": "Ramp_1_Left",
+      "gapMm": 0,
+      "method": "shared exact CAD vertex"
+    },
+    {
+      "a": "Ramp_3_Left",
+      "b": "Ramp_2_Left",
+      "gapMm": 0,
+      "method": "shared exact CAD vertex"
+    },
+    {
+      "a": "Intake_skin_Right",
+      "b": "Fuselage",
+      "gapMm": 0,
+      "method": "shared exact CAD vertex"
+    },
+    {
+      "a": "Ramp_2_Right",
+      "b": "Ramp_1_Right",
+      "gapMm": 0,
+      "method": "shared exact CAD vertex"
+    },
+    {
+      "a": "Ramp_3_Right",
+      "b": "Ramp_2_Right",
+      "gapMm": 0,
+      "method": "shared exact CAD vertex"
+    },
+    {
+      "a": "Engine_collar_Left",
+      "b": "Fuselage",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Engine_collar_Right",
+      "b": "Fuselage",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_mount_Left",
+      "b": "Engine_collar_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_reinforcement_Left",
+      "b": "Nozzle_mount_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Afterburner_liner_Left",
+      "b": "Fuselage",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Afterburner_depth_Left",
+      "b": "Afterburner_liner_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_throat_Left",
+      "b": "Convergent_petal_Left_1",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_exit_Left",
+      "b": "Divergent_petal_Left_1",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Convergent_petal_Left_1",
+      "b": "Nozzle_reinforcement_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Divergent_petal_Left_1",
+      "b": "Nozzle_throat_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_actuator_Left_1",
+      "b": "Nozzle_reinforcement_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_link_Left_1",
+      "b": "Divergent_petal_Left_1",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_hinge_Left_1",
+      "b": "Nozzle_actuator_Left_1",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Convergent_petal_Left_2",
+      "b": "Nozzle_reinforcement_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Divergent_petal_Left_2",
+      "b": "Nozzle_throat_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_actuator_Left_2",
+      "b": "Nozzle_reinforcement_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_link_Left_2",
+      "b": "Divergent_petal_Left_2",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_hinge_Left_2",
+      "b": "Nozzle_actuator_Left_2",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Convergent_petal_Left_3",
+      "b": "Nozzle_reinforcement_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Divergent_petal_Left_3",
+      "b": "Nozzle_throat_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_actuator_Left_3",
+      "b": "Nozzle_reinforcement_Left",
+      "gapMm": 1.1368683772161603e-13,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_link_Left_3",
+      "b": "Divergent_petal_Left_3",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_hinge_Left_3",
+      "b": "Nozzle_actuator_Left_3",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Convergent_petal_Left_4",
+      "b": "Nozzle_reinforcement_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Divergent_petal_Left_4",
+      "b": "Nozzle_throat_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_actuator_Left_4",
+      "b": "Nozzle_reinforcement_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_link_Left_4",
+      "b": "Divergent_petal_Left_4",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_hinge_Left_4",
+      "b": "Nozzle_actuator_Left_4",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Convergent_petal_Left_5",
+      "b": "Nozzle_reinforcement_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Divergent_petal_Left_5",
+      "b": "Nozzle_throat_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_actuator_Left_5",
+      "b": "Nozzle_reinforcement_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_link_Left_5",
+      "b": "Divergent_petal_Left_5",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_hinge_Left_5",
+      "b": "Nozzle_actuator_Left_5",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Convergent_petal_Left_6",
+      "b": "Nozzle_reinforcement_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Divergent_petal_Left_6",
+      "b": "Nozzle_throat_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_actuator_Left_6",
+      "b": "Nozzle_reinforcement_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_link_Left_6",
+      "b": "Divergent_petal_Left_6",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_hinge_Left_6",
+      "b": "Nozzle_actuator_Left_6",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Convergent_petal_Left_7",
+      "b": "Nozzle_reinforcement_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Divergent_petal_Left_7",
+      "b": "Nozzle_throat_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_actuator_Left_7",
+      "b": "Nozzle_reinforcement_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_link_Left_7",
+      "b": "Divergent_petal_Left_7",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_hinge_Left_7",
+      "b": "Nozzle_actuator_Left_7",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Convergent_petal_Left_8",
+      "b": "Nozzle_reinforcement_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Divergent_petal_Left_8",
+      "b": "Nozzle_throat_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_actuator_Left_8",
+      "b": "Nozzle_reinforcement_Left",
+      "gapMm": 2.2737367544323206e-13,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_link_Left_8",
+      "b": "Divergent_petal_Left_8",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_hinge_Left_8",
+      "b": "Nozzle_actuator_Left_8",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Convergent_petal_Left_9",
+      "b": "Nozzle_reinforcement_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Divergent_petal_Left_9",
+      "b": "Nozzle_throat_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_actuator_Left_9",
+      "b": "Nozzle_reinforcement_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_link_Left_9",
+      "b": "Divergent_petal_Left_9",
+      "gapMm": 2.2737367544323206e-13,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_hinge_Left_9",
+      "b": "Nozzle_actuator_Left_9",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Convergent_petal_Left_10",
+      "b": "Nozzle_reinforcement_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Divergent_petal_Left_10",
+      "b": "Nozzle_throat_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_actuator_Left_10",
+      "b": "Nozzle_reinforcement_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_link_Left_10",
+      "b": "Divergent_petal_Left_10",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_hinge_Left_10",
+      "b": "Nozzle_actuator_Left_10",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Convergent_petal_Left_11",
+      "b": "Nozzle_reinforcement_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Divergent_petal_Left_11",
+      "b": "Nozzle_throat_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_actuator_Left_11",
+      "b": "Nozzle_reinforcement_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_link_Left_11",
+      "b": "Divergent_petal_Left_11",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_hinge_Left_11",
+      "b": "Nozzle_actuator_Left_11",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Convergent_petal_Left_12",
+      "b": "Nozzle_reinforcement_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Divergent_petal_Left_12",
+      "b": "Nozzle_throat_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_actuator_Left_12",
+      "b": "Nozzle_reinforcement_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_link_Left_12",
+      "b": "Divergent_petal_Left_12",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_hinge_Left_12",
+      "b": "Nozzle_actuator_Left_12",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Convergent_petal_Left_13",
+      "b": "Nozzle_reinforcement_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Divergent_petal_Left_13",
+      "b": "Nozzle_throat_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_actuator_Left_13",
+      "b": "Nozzle_reinforcement_Left",
+      "gapMm": 1.1368683772161603e-13,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_link_Left_13",
+      "b": "Divergent_petal_Left_13",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_hinge_Left_13",
+      "b": "Nozzle_actuator_Left_13",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Convergent_petal_Left_14",
+      "b": "Nozzle_reinforcement_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Divergent_petal_Left_14",
+      "b": "Nozzle_throat_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_actuator_Left_14",
+      "b": "Nozzle_reinforcement_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_link_Left_14",
+      "b": "Divergent_petal_Left_14",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_hinge_Left_14",
+      "b": "Nozzle_actuator_Left_14",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Convergent_petal_Left_15",
+      "b": "Nozzle_reinforcement_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Divergent_petal_Left_15",
+      "b": "Nozzle_throat_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_actuator_Left_15",
+      "b": "Nozzle_reinforcement_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_link_Left_15",
+      "b": "Divergent_petal_Left_15",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_hinge_Left_15",
+      "b": "Nozzle_actuator_Left_15",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_mount_Right",
+      "b": "Engine_collar_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_reinforcement_Right",
+      "b": "Nozzle_mount_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Afterburner_liner_Right",
+      "b": "Fuselage",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Afterburner_depth_Right",
+      "b": "Afterburner_liner_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_throat_Right",
+      "b": "Convergent_petal_Right_1",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_exit_Right",
+      "b": "Divergent_petal_Right_1",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Convergent_petal_Right_1",
+      "b": "Nozzle_reinforcement_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Divergent_petal_Right_1",
+      "b": "Nozzle_throat_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_actuator_Right_1",
+      "b": "Nozzle_reinforcement_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_link_Right_1",
+      "b": "Divergent_petal_Right_1",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_hinge_Right_1",
+      "b": "Nozzle_actuator_Right_1",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Convergent_petal_Right_2",
+      "b": "Nozzle_reinforcement_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Divergent_petal_Right_2",
+      "b": "Nozzle_throat_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_actuator_Right_2",
+      "b": "Nozzle_reinforcement_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_link_Right_2",
+      "b": "Divergent_petal_Right_2",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_hinge_Right_2",
+      "b": "Nozzle_actuator_Right_2",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Convergent_petal_Right_3",
+      "b": "Nozzle_reinforcement_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Divergent_petal_Right_3",
+      "b": "Nozzle_throat_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_actuator_Right_3",
+      "b": "Nozzle_reinforcement_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_link_Right_3",
+      "b": "Divergent_petal_Right_3",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_hinge_Right_3",
+      "b": "Nozzle_actuator_Right_3",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Convergent_petal_Right_4",
+      "b": "Nozzle_reinforcement_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Divergent_petal_Right_4",
+      "b": "Nozzle_throat_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_actuator_Right_4",
+      "b": "Nozzle_reinforcement_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_link_Right_4",
+      "b": "Divergent_petal_Right_4",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_hinge_Right_4",
+      "b": "Nozzle_actuator_Right_4",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Convergent_petal_Right_5",
+      "b": "Nozzle_reinforcement_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Divergent_petal_Right_5",
+      "b": "Nozzle_throat_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_actuator_Right_5",
+      "b": "Nozzle_reinforcement_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_link_Right_5",
+      "b": "Divergent_petal_Right_5",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_hinge_Right_5",
+      "b": "Nozzle_actuator_Right_5",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Convergent_petal_Right_6",
+      "b": "Nozzle_reinforcement_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Divergent_petal_Right_6",
+      "b": "Nozzle_throat_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_actuator_Right_6",
+      "b": "Nozzle_reinforcement_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_link_Right_6",
+      "b": "Divergent_petal_Right_6",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_hinge_Right_6",
+      "b": "Nozzle_actuator_Right_6",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Convergent_petal_Right_7",
+      "b": "Nozzle_reinforcement_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Divergent_petal_Right_7",
+      "b": "Nozzle_throat_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_actuator_Right_7",
+      "b": "Nozzle_reinforcement_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_link_Right_7",
+      "b": "Divergent_petal_Right_7",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_hinge_Right_7",
+      "b": "Nozzle_actuator_Right_7",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Convergent_petal_Right_8",
+      "b": "Nozzle_reinforcement_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Divergent_petal_Right_8",
+      "b": "Nozzle_throat_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_actuator_Right_8",
+      "b": "Nozzle_reinforcement_Right",
+      "gapMm": 5.684341886080802e-14,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_link_Right_8",
+      "b": "Divergent_petal_Right_8",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_hinge_Right_8",
+      "b": "Nozzle_actuator_Right_8",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Convergent_petal_Right_9",
+      "b": "Nozzle_reinforcement_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Divergent_petal_Right_9",
+      "b": "Nozzle_throat_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_actuator_Right_9",
+      "b": "Nozzle_reinforcement_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_link_Right_9",
+      "b": "Divergent_petal_Right_9",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_hinge_Right_9",
+      "b": "Nozzle_actuator_Right_9",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Convergent_petal_Right_10",
+      "b": "Nozzle_reinforcement_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Divergent_petal_Right_10",
+      "b": "Nozzle_throat_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_actuator_Right_10",
+      "b": "Nozzle_reinforcement_Right",
+      "gapMm": 2.2737367544323206e-13,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_link_Right_10",
+      "b": "Divergent_petal_Right_10",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_hinge_Right_10",
+      "b": "Nozzle_actuator_Right_10",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Convergent_petal_Right_11",
+      "b": "Nozzle_reinforcement_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Divergent_petal_Right_11",
+      "b": "Nozzle_throat_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_actuator_Right_11",
+      "b": "Nozzle_reinforcement_Right",
+      "gapMm": 2.2737367544323206e-13,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_link_Right_11",
+      "b": "Divergent_petal_Right_11",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_hinge_Right_11",
+      "b": "Nozzle_actuator_Right_11",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Convergent_petal_Right_12",
+      "b": "Nozzle_reinforcement_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Divergent_petal_Right_12",
+      "b": "Nozzle_throat_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_actuator_Right_12",
+      "b": "Nozzle_reinforcement_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_link_Right_12",
+      "b": "Divergent_petal_Right_12",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_hinge_Right_12",
+      "b": "Nozzle_actuator_Right_12",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Convergent_petal_Right_13",
+      "b": "Nozzle_reinforcement_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Divergent_petal_Right_13",
+      "b": "Nozzle_throat_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_actuator_Right_13",
+      "b": "Nozzle_reinforcement_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_link_Right_13",
+      "b": "Divergent_petal_Right_13",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_hinge_Right_13",
+      "b": "Nozzle_actuator_Right_13",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Convergent_petal_Right_14",
+      "b": "Nozzle_reinforcement_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Divergent_petal_Right_14",
+      "b": "Nozzle_throat_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_actuator_Right_14",
+      "b": "Nozzle_reinforcement_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_link_Right_14",
+      "b": "Divergent_petal_Right_14",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_hinge_Right_14",
+      "b": "Nozzle_actuator_Right_14",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Convergent_petal_Right_15",
+      "b": "Nozzle_reinforcement_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Divergent_petal_Right_15",
+      "b": "Nozzle_throat_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_actuator_Right_15",
+      "b": "Nozzle_reinforcement_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_link_Right_15",
+      "b": "Divergent_petal_Right_15",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nozzle_hinge_Right_15",
+      "b": "Nozzle_actuator_Right_15",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Canopy_glass",
+      "b": "Canopy_front_bow",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Canopy_front_bow",
+      "b": "Canopy_rail_Left_4",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Windshield_glass",
+      "b": "Cockpit_sill_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Seat_pan",
+      "b": "Seat_back",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Seat_back",
+      "b": "Ejection_seat_rail_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Seat_headrest",
+      "b": "Seat_back",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Instrument_panel",
+      "b": "Panel_mount_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Instrument_coaming",
+      "b": "Instrument_panel",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Control_stick",
+      "b": "Cockpit_well",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Control_grip",
+      "b": "Control_stick",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Throttle_lever",
+      "b": "Cockpit_side_console_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Throttle_grip",
+      "b": "Throttle_lever",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "HUD_base",
+      "b": "Instrument_coaming",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "HUD_glass",
+      "b": "HUD_support_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Cockpit_sill_Left",
+      "b": "Fuselage",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Canopy_rail_Left_0",
+      "b": "Cockpit_sill_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Windshield_side_frame_Left",
+      "b": "Cockpit_sill_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Cockpit_side_console_Left",
+      "b": "Console_mount_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Console_mount_Left",
+      "b": "Fuselage",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Panel_mount_Left",
+      "b": "Fuselage",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Canopy_hinge_Left",
+      "b": "Fuselage",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Ejection_seat_rail_Left",
+      "b": "Cockpit_well",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "HUD_support_Left",
+      "b": "HUD_base",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Canopy_rail_Left_1",
+      "b": "Canopy_rail_Left_0",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Canopy_rail_Left_2",
+      "b": "Canopy_rail_Left_1",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Canopy_rail_Left_3",
+      "b": "Canopy_rail_Left_2",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Canopy_rail_Left_4",
+      "b": "Canopy_rail_Left_3",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Cockpit_sill_Right",
+      "b": "Fuselage",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Canopy_rail_Right_0",
+      "b": "Cockpit_sill_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Windshield_side_frame_Right",
+      "b": "Cockpit_sill_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Cockpit_side_console_Right",
+      "b": "Console_mount_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Console_mount_Right",
+      "b": "Fuselage",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Panel_mount_Right",
+      "b": "Fuselage",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Canopy_hinge_Right",
+      "b": "Fuselage",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Ejection_seat_rail_Right",
+      "b": "Cockpit_well",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "HUD_support_Right",
+      "b": "HUD_base",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Canopy_rail_Right_1",
+      "b": "Canopy_rail_Right_0",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Canopy_rail_Right_2",
+      "b": "Canopy_rail_Right_1",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Canopy_rail_Right_3",
+      "b": "Canopy_rail_Right_2",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Canopy_rail_Right_4",
+      "b": "Canopy_rail_Right_3",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Display_bezel_0",
+      "b": "Instrument_panel",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Display_screen_0",
+      "b": "Display_bezel_0",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Display_bezel_1",
+      "b": "Instrument_panel",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Display_screen_1",
+      "b": "Display_bezel_1",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Display_bezel_2",
+      "b": "Instrument_panel",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Display_screen_2",
+      "b": "Display_bezel_2",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Round_instrument_0",
+      "b": "Instrument_panel",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Instrument_face_0",
+      "b": "Round_instrument_0",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Round_instrument_1",
+      "b": "Instrument_panel",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Instrument_face_1",
+      "b": "Round_instrument_1",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Round_instrument_2",
+      "b": "Instrument_panel",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Instrument_face_2",
+      "b": "Round_instrument_2",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Round_instrument_3",
+      "b": "Instrument_panel",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Instrument_face_3",
+      "b": "Round_instrument_3",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Round_instrument_4",
+      "b": "Instrument_panel",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Instrument_face_4",
+      "b": "Round_instrument_4",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Ramp_3_Left",
+      "b": "Fuselage",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Ramp_3_Right",
+      "b": "Fuselage",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Duct_liner_Left",
+      "b": "Ramp_3_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Duct_liner_Right",
+      "b": "Ramp_3_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Duct_end_Left",
+      "b": "Duct_liner_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Splitter_Left",
+      "b": "Duct_liner_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Duct_end_Right",
+      "b": "Duct_liner_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Splitter_Right",
+      "b": "Duct_liner_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Wing_fixed_Left",
+      "b": "Duct_end_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Wing_fixed_Right",
+      "b": "Duct_end_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Flap_hinge_Left",
+      "b": "Wing_fixed_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Aileron_hinge_Left",
+      "b": "Wing_fixed_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Flap_hinge_Right",
+      "b": "Wing_fixed_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Aileron_hinge_Right",
+      "b": "Wing_fixed_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Flap_Left",
+      "b": "Flap_hinge_Left",
+      "gapMm": 4.547473508864641e-13,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Aileron_Left",
+      "b": "Aileron_hinge_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Flap_Right",
+      "b": "Flap_hinge_Right",
+      "gapMm": 4.547473508864641e-13,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Aileron_Right",
+      "b": "Aileron_hinge_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Airbrake_panel",
+      "b": "Airbrake_hinge",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Airbrake_hinge",
+      "b": "Fuselage",
+      "gapMm": 4.0990372275064023e-13,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Dorsal_antenna_base",
+      "b": "Fuselage",
+      "gapMm": 3.188577607412546e-11,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Dorsal_blade_antenna",
+      "b": "Dorsal_antenna_base",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Upper_beacon_base",
+      "b": "Fuselage",
+      "gapMm": 2.6564605381483114e-10,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Upper_beacon",
+      "b": "Upper_beacon_base",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Gun_support_Left",
+      "b": "Gun_recess_liner",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Gun_support_Right",
+      "b": "Gun_recess_liner",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "M61_front_retainer",
+      "b": "Gun_support_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "M61_rear_retainer",
+      "b": "Gun_recess_liner",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "M61_center_hub",
+      "b": "M61_front_retainer",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Gun_barrel_1",
+      "b": "M61_front_retainer",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Gun_muzzle_face_1",
+      "b": "Gun_barrel_1",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Gun_barrel_2",
+      "b": "M61_front_retainer",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Gun_muzzle_face_2",
+      "b": "Gun_barrel_2",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Gun_barrel_3",
+      "b": "M61_front_retainer",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Gun_muzzle_face_3",
+      "b": "Gun_barrel_3",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Gun_barrel_4",
+      "b": "M61_front_retainer",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Gun_muzzle_face_4",
+      "b": "Gun_barrel_4",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Gun_barrel_5",
+      "b": "M61_front_retainer",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Gun_muzzle_face_5",
+      "b": "Gun_barrel_5",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Gun_barrel_6",
+      "b": "M61_front_retainer",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Gun_muzzle_face_6",
+      "b": "Gun_barrel_6",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Gun_vent_louvre_01",
+      "b": "Gun_vent_frame",
+      "gapMm": 6.821210263296962e-12,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Gun_vent_louvre_02",
+      "b": "Gun_vent_frame",
+      "gapMm": 2.2737367544323206e-13,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Gun_vent_louvre_03",
+      "b": "Gun_vent_frame",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Gun_vent_louvre_04",
+      "b": "Gun_vent_frame",
+      "gapMm": 6.821210263296962e-12,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Gun_vent_louvre_05",
+      "b": "Gun_vent_frame",
+      "gapMm": 1.639614891002561e-12,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Dorsal_vent_frame_Left",
+      "b": "Fuselage",
+      "gapMm": 4.473327870880262e-11,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Formation_light_Left",
+      "b": "Wing_fixed_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Dorsal_vent_Left_0",
+      "b": "Dorsal_vent_frame_Left",
+      "gapMm": 9.345099552171342e-11,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Dorsal_vent_Left_1",
+      "b": "Dorsal_vent_frame_Left",
+      "gapMm": 1.8260810070624996e-12,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Dorsal_vent_Left_2",
+      "b": "Dorsal_vent_frame_Left",
+      "gapMm": 4.150737427955547e-12,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Dorsal_vent_Left_3",
+      "b": "Dorsal_vent_frame_Left",
+      "gapMm": 1.8314522608854774e-11,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Dorsal_vent_Left_4",
+      "b": "Dorsal_vent_frame_Left",
+      "gapMm": 9.860601507536368e-11,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Dorsal_vent_Left_5",
+      "b": "Dorsal_vent_frame_Left",
+      "gapMm": 5.428281622269632e-11,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Dorsal_vent_Left_6",
+      "b": "Dorsal_vent_frame_Left",
+      "gapMm": 1.1039296352349368e-10,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Dorsal_vent_Left_7",
+      "b": "Dorsal_vent_frame_Left",
+      "gapMm": 1.224444715065716e-12,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Dorsal_vent_Left_8",
+      "b": "Dorsal_vent_frame_Left",
+      "gapMm": 2.0520395478103624e-11,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Dorsal_vent_frame_Right",
+      "b": "Fuselage",
+      "gapMm": 4.059256957748181e-11,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Formation_light_Right",
+      "b": "Wing_fixed_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Dorsal_vent_Right_0",
+      "b": "Dorsal_vent_frame_Right",
+      "gapMm": 8.827034399693584e-11,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Dorsal_vent_Right_1",
+      "b": "Dorsal_vent_frame_Right",
+      "gapMm": 6.761261238898103e-12,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Dorsal_vent_Right_2",
+      "b": "Dorsal_vent_frame_Right",
+      "gapMm": 8.411289542479569e-12,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Dorsal_vent_Right_3",
+      "b": "Dorsal_vent_frame_Right",
+      "gapMm": 1.4069636112621976e-11,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Dorsal_vent_Right_4",
+      "b": "Dorsal_vent_frame_Right",
+      "gapMm": 9.379157221919415e-11,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Dorsal_vent_Right_5",
+      "b": "Dorsal_vent_frame_Right",
+      "gapMm": 4.967802615089522e-11,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Dorsal_vent_Right_6",
+      "b": "Dorsal_vent_frame_Right",
+      "gapMm": 1.0527947494081208e-10,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Dorsal_vent_Right_7",
+      "b": "Dorsal_vent_frame_Right",
+      "gapMm": 5.615715524631227e-12,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Dorsal_vent_Right_8",
+      "b": "Dorsal_vent_frame_Right",
+      "gapMm": 2.484206987657919e-11,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nose_Upper_strut",
+      "b": "Nose_Trunnion",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nose_Oleo_piston",
+      "b": "Nose_Upper_strut",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nose_Fork_crown",
+      "b": "Nose_Oleo_piston",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nose_Fork_-1",
+      "b": "Nose_Fork_crown",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nose_Fork_1",
+      "b": "Nose_Fork_crown",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nose_Tire",
+      "b": "Nose_Fork_crown",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nose_Wheel_hub",
+      "b": "Nose_Fork_-1",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nose_Axle",
+      "b": "Nose_Fork_-1",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nose_Hub_cap_-1",
+      "b": "Nose_Fork_-1",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nose_Hub_bolt_-1_0",
+      "b": "Nose_Wheel_hub",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nose_Hub_bolt_-1_1",
+      "b": "Nose_Wheel_hub",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nose_Hub_bolt_-1_2",
+      "b": "Nose_Wheel_hub",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nose_Hub_bolt_-1_3",
+      "b": "Nose_Wheel_hub",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nose_Hub_bolt_-1_4",
+      "b": "Nose_Wheel_hub",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nose_Hub_bolt_-1_5",
+      "b": "Nose_Wheel_hub",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nose_Hub_cap_1",
+      "b": "Nose_Fork_1",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nose_Hub_bolt_1_0",
+      "b": "Nose_Wheel_hub",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nose_Hub_bolt_1_1",
+      "b": "Nose_Wheel_hub",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nose_Hub_bolt_1_2",
+      "b": "Nose_Wheel_hub",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nose_Hub_bolt_1_3",
+      "b": "Nose_Wheel_hub",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nose_Hub_bolt_1_4",
+      "b": "Nose_Wheel_hub",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nose_Hub_bolt_1_5",
+      "b": "Nose_Wheel_hub",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nose_Torque_pin_top",
+      "b": "Nose_Upper_strut",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nose_Torque_upper",
+      "b": "Nose_Upper_strut",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nose_Torque_lower",
+      "b": "Nose_Torque_upper",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nose_Torque_pin_bottom",
+      "b": "Nose_Oleo_piston",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nose_Drag_brace_upper",
+      "b": "Nose_Trunnion",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nose_Drag_brace_lower",
+      "b": "Nose_Upper_strut",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nose_Retraction_barrel",
+      "b": "Nose_Upper_strut",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nose_Retraction_rod",
+      "b": "Nose_Upper_strut",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Nose_Actuator_pin",
+      "b": "Nose_Upper_strut",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Left_Trunnion_arm",
+      "b": "Left_Trunnion",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Left_Upper_strut",
+      "b": "Left_Trunnion_arm",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Left_Oleo_piston",
+      "b": "Left_Upper_strut",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Left_Lower_clevis",
+      "b": "Left_Oleo_piston",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Left_Axle_carrier",
+      "b": "Left_Oleo_piston",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Left_Tire",
+      "b": "Left_Oleo_piston",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Left_Wheel_hub",
+      "b": "Left_Oleo_piston",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Left_Axle",
+      "b": "Left_Lower_clevis",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Left_Hub_cap_-1",
+      "b": "Left_Axle_carrier",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Left_Hub_bolt_-1_0",
+      "b": "Left_Wheel_hub",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Left_Hub_bolt_-1_1",
+      "b": "Left_Wheel_hub",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Left_Hub_bolt_-1_2",
+      "b": "Left_Wheel_hub",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Left_Hub_bolt_-1_3",
+      "b": "Left_Wheel_hub",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Left_Hub_bolt_-1_4",
+      "b": "Left_Wheel_hub",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Left_Hub_bolt_-1_5",
+      "b": "Left_Wheel_hub",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Left_Hub_cap_1",
+      "b": "Left_Oleo_piston",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Left_Hub_bolt_1_0",
+      "b": "Left_Wheel_hub",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Left_Hub_bolt_1_1",
+      "b": "Left_Wheel_hub",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Left_Hub_bolt_1_2",
+      "b": "Left_Wheel_hub",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Left_Hub_bolt_1_3",
+      "b": "Left_Wheel_hub",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Left_Hub_bolt_1_4",
+      "b": "Left_Wheel_hub",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Left_Hub_bolt_1_5",
+      "b": "Left_Wheel_hub",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Left_Torque_pin_top",
+      "b": "Left_Upper_strut",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Left_Torque_upper",
+      "b": "Left_Upper_strut",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Left_Torque_lower",
+      "b": "Left_Torque_upper",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Left_Torque_pin_bottom",
+      "b": "Left_Oleo_piston",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Left_Drag_brace_upper",
+      "b": "Left_Trunnion_arm",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Left_Drag_brace_lower",
+      "b": "Left_Upper_strut",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Left_Retraction_barrel",
+      "b": "Left_Trunnion_arm",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Left_Retraction_rod",
+      "b": "Left_Upper_strut",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Left_Actuator_pin",
+      "b": "Left_Upper_strut",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Left_Brake_pack",
+      "b": "Left_Oleo_piston",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Right_Trunnion_arm",
+      "b": "Right_Trunnion",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Right_Upper_strut",
+      "b": "Right_Trunnion_arm",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Right_Oleo_piston",
+      "b": "Right_Upper_strut",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Right_Lower_clevis",
+      "b": "Right_Oleo_piston",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Right_Axle_carrier",
+      "b": "Right_Oleo_piston",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Right_Tire",
+      "b": "Right_Oleo_piston",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Right_Wheel_hub",
+      "b": "Right_Oleo_piston",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Right_Axle",
+      "b": "Right_Lower_clevis",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Right_Hub_cap_-1",
+      "b": "Right_Oleo_piston",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Right_Hub_bolt_-1_0",
+      "b": "Right_Wheel_hub",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Right_Hub_bolt_-1_1",
+      "b": "Right_Wheel_hub",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Right_Hub_bolt_-1_2",
+      "b": "Right_Wheel_hub",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Right_Hub_bolt_-1_3",
+      "b": "Right_Wheel_hub",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Right_Hub_bolt_-1_4",
+      "b": "Right_Wheel_hub",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Right_Hub_bolt_-1_5",
+      "b": "Right_Wheel_hub",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Right_Hub_cap_1",
+      "b": "Right_Axle_carrier",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Right_Hub_bolt_1_0",
+      "b": "Right_Wheel_hub",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Right_Hub_bolt_1_1",
+      "b": "Right_Wheel_hub",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Right_Hub_bolt_1_2",
+      "b": "Right_Wheel_hub",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Right_Hub_bolt_1_3",
+      "b": "Right_Wheel_hub",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Right_Hub_bolt_1_4",
+      "b": "Right_Wheel_hub",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Right_Hub_bolt_1_5",
+      "b": "Right_Wheel_hub",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Right_Torque_pin_top",
+      "b": "Right_Upper_strut",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Right_Torque_upper",
+      "b": "Right_Upper_strut",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Right_Torque_lower",
+      "b": "Right_Torque_upper",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Right_Torque_pin_bottom",
+      "b": "Right_Oleo_piston",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Right_Drag_brace_upper",
+      "b": "Right_Trunnion_arm",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Right_Drag_brace_lower",
+      "b": "Right_Upper_strut",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Right_Retraction_barrel",
+      "b": "Right_Trunnion_arm",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Right_Retraction_rod",
+      "b": "Right_Upper_strut",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Right_Actuator_pin",
+      "b": "Right_Upper_strut",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Right_Brake_pack",
+      "b": "Right_Oleo_piston",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Stabilator_shaft_Left",
+      "b": "Stabilator_bearing_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Stabilator_shaft_Right",
+      "b": "Stabilator_bearing_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Rudder_hinge_Right_1",
+      "b": "Rudder_actuator_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Rudder_hinge_Left_1",
+      "b": "Rudder_actuator_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Rudder_hinge_Left_1",
+      "b": "Rudder_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Rudder_hinge_Right_1",
+      "b": "Rudder_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Rudder_hinge_Left_2",
+      "b": "Rudder_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Rudder_hinge_Right_2",
+      "b": "Rudder_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Rudder_hinge_Right_3",
+      "b": "Rudder_Right",
+      "gapMm": 2.2737367544323206e-13,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Rudder_hinge_Left_3",
+      "b": "Rudder_Left",
+      "gapMm": 2.2737367544323206e-13,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Rudder_actuator_Left",
+      "b": "Fin_fairing_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Rudder_actuator_Right",
+      "b": "Fin_fairing_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Rudder_hinge_Left_1",
+      "b": "Fin_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Rudder_hinge_Right_1",
+      "b": "Fin_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Stabilator_shaft_Left",
+      "b": "Stabilator_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Stabilator_shaft_Right",
+      "b": "Stabilator_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Fin_tip_fairing_Right",
+      "b": "Fin_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Fin_tip_fairing_Left",
+      "b": "Fin_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Stabilator_shaft_Left",
+      "b": "Fuselage",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Stabilator_shaft_Right",
+      "b": "Fuselage",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Fin_fairing_Left",
+      "b": "Fuselage",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Fin_fairing_Right",
+      "b": "Fuselage",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Mount_Nose",
+      "b": "Nose_Trunnion",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Mount_Right",
+      "b": "Right_Trunnion",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Mount_Left",
+      "b": "Left_Trunnion",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Door_Left_Aft",
+      "b": "Left_Retraction_barrel",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Door_Right_Aft",
+      "b": "Right_Retraction_barrel",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Door_Nose_Aft",
+      "b": "Nose_Retraction_barrel",
+      "gapMm": 9.122660370453579e-13,
+      "method": "solid distance"
+    },
+    {
+      "a": "Mount_Door_Left_Aft",
+      "b": "Door_Left_Aft",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Mount_Door_Right_Aft",
+      "b": "Door_Right_Aft",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Mount_Door_Nose_Forward",
+      "b": "Door_Nose_Forward",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Mount_Door_Left_Aft",
+      "b": "Mount_Door_Left_Forward",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Mount_Door_Right_Aft",
+      "b": "Mount_Door_Right_Forward",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Mount_Door_Left_Aft",
+      "b": "Door_Left_Forward",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Mount_Door_Right_Aft",
+      "b": "Door_Right_Forward",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Mount_Door_Nose_Aft",
+      "b": "Mount_Door_Nose_Forward",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Mount_Door_Nose_Forward",
+      "b": "Door_Nose_Aft",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Mount_Door_Left_Inner",
+      "b": "Door_Left_Inner",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Mount_Door_Right_Inner",
+      "b": "Door_Right_Inner",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Gun_support_Right",
+      "b": "Gun_port_fairing:1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Gun_vent_louvre_04",
+      "b": "Gun_port_fairing:1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Mount_Door_Left_Forward",
+      "b": "Intake_skin_Left",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Mount_Door_Right_Forward",
+      "b": "Intake_skin_Right",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Gun_port_fairing:2",
+      "b": "Duct_liner_Right",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Gun_port_fairing:1",
+      "b": "Intake_skin_Right",
+      "gapMm": 1.1368683772161603e-13,
+      "method": "solid distance"
+    },
+    {
+      "a": "Mount_Nose",
+      "b": "Fuselage",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Mount_Door_Left_Inner",
+      "b": "Fuselage",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Mount_Door_Right_Inner",
+      "b": "Fuselage",
+      "gapMm": 0,
+      "method": "solid distance"
+    }
+  ],
+  "passed": 41,
+  "failed": 0,
+  "evidence": [
+    {
+      "artifact": "/Users/prasiddhnaik/Documents/blender skills/pocket-flight-site/assets/f15c/STEP/f15c.step",
+      "sha256": "146e29a75206a21a9448ad70acb12edeb3bd36d0e24d85751310e62c35886d2b"
+    },
+    {
+      "artifact": "/Users/prasiddhnaik/Documents/blender skills/pocket-flight-site/assets/f15c/STEP/details_preview.step",
+      "sha256": "d25e611e82c5746a401dc234e90927e2fd7e0cd02a6c2d6f72bc7af18f917e5e"
+    },
+    {
+      "artifact": "/Users/prasiddhnaik/Documents/blender skills/pocket-flight-site/assets/f15c/STEP/details_preview.step",
+      "sha256": "d25e611e82c5746a401dc234e90927e2fd7e0cd02a6c2d6f72bc7af18f917e5e"
+    },
+    {
+      "artifact": "STEP/gun_preview.step",
+      "sha256": "efd03024d0dd6e0068607c74bbc728997b4654afee8656d18cdfc86e2bf942e1"
+    }
+  ]
+}

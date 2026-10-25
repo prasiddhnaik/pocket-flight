@@ -1,14 +1,14 @@
 import { Vector3 } from "three";
-import type { AircraftId } from "../src/aircraft";
+import type { AircraftId } from "../src/aircraft/aircraft";
 import {
   aircraftDesign,
   massProperties,
   type Loading,
-} from "../src/aircraft-design";
-import { aircraftStallSpeed } from "../src/aerodynamics";
-import { consumeTankFuel } from "../src/fuel-loading";
-import { FlightPhysics } from "../src/physics";
-import { solveTrim } from "../src/flight-trim";
+} from "../src/aircraft/aircraft-design";
+import { aircraftStallSpeed } from "../src/flight/aerodynamics";
+import { consumeTankFuel } from "../src/flight/fuel-loading";
+import { FlightPhysics } from "../src/flight/physics";
+import { solveTrim } from "../src/flight/flight-trim";
 import { validateGear } from "./gear-validation";
 
 export function loadingSnapshot(id: AircraftId, loading: Loading) {
@@ -25,7 +25,7 @@ export function loadingSnapshot(id: AircraftId, loading: Loading) {
       balance,
       design.trimSpeed,
       1000,
-      id === "finch" ? 1 : 0,
+      id === "finch" || id === "heron" ? 1 : 0,
     );
   } catch (error) {
     trimError = String(error);

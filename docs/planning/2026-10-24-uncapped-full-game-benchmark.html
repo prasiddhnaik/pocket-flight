@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="icon" href="data:,">
+  <title>Plan: uncapped full-game benchmarks</title>
+  <style>
+    body{max-width:980px;margin:36px auto;padding:0 20px;color:#222;font:16px/1.55 system-ui}
+    h1,h2{line-height:1.2}h2{margin-top:30px}table{width:100%;border-collapse:collapse;font-size:14px}
+    th,td{border:1px solid #ccc;padding:10px;text-align:left;vertical-align:top}th{background:#f3f3f3}
+    code{background:#f3f3f3;padding:2px 4px}.scroll{overflow:auto}li{margin:10px 0}small{color:#555}
+    @media print{body{margin:0;max-width:none}}
+  </style>
+</head>
+<body>
+<header><h1>Plan: uncapped full-game benchmarks</h1><p>24 October 2026 · Pocket Flight · Prepared before implementation</p></header>
+<main>
+<section><h2>Goal and current evidence</h2>
+<p>Remove the test browser's observed 30 FPS ceiling, then determine which existing engine and rendering experiments improve full-game throughput with Finch, physics, HUD and VFX running.</p>
+<p>The previous empty <code>about:blank</code> control measured exactly 30 FPS. The runner records that control but currently continues without a cap-removal gate. It also reuses fixed output directories. Existing capped evidence must stay available for reference.</p>
+</section>
+<section><h2>Recommended approach</h2>
+<p>Create a dedicated benchmark browser configuration that retains Chromium and the Metal GPU backend and adds <code>--disable-frame-rate-limit</code>. Chromium's own source says this switch removes scheduler frame limiting and also implies <code>--disable-gpu-vsync</code>. Verify behavior empirically before any long run. <a href="https://chromium.googlesource.com/chromium/src/+/HEAD/components/viz/common/switches.cc">Chromium switch definition</a>.</p>
+<p>Use a separate browser session and a new timestamped output directory. Preserve the existing shared browser configuration and capped datasets. The game source and graphics defaults stay at the current baseline while the experiments run.</p>
+</section>
+<section><h2>Execution sequence and gates</h2><ol>
+<li><strong>Snapshot the experiment.</strong> Save browser configuration/version, launch flags, source fingerprints, dimensions, device/game pixel ratios, GPU identity and the variant list. Preserve previous results.</li>
+<li><strong>Prove the cap is removed.</strong> Measure three short empty-page controls, an animated DOM element and a simple animated WebGL scene. Require blank-page median above 45 FPS and both active controls above 90 FPS, with visible documents and a hardware renderer. Check controls again after the comparisons. If the first flag does not work, try explicit GPU-vsync disabling and a separate hardware-accelerated headless configuration; record each attempt. Stop the long benchmark if active controls remain capped.</li>
+<li><strong>Run a baseline flight smoke test.</strong> Verify the aircraft and HUD visually, confirm advancing fixed-step physics and HUD snapshots, and check console/WebGL errors. Confirm that browser controls have enough headroom above measured game FPS; results close to the control ceiling remain inconclusive.</li>
+<li><strong>Rerun both full-game comparisons.</strong> Run the 12 collision trials and the 36 rendering trials, keeping the current 2-second warmup, 6-second measurement and 0.5-second GPU drain. Preserve alternating/rotating order and identical flight paths. Run comparisons sequentially without builds, tests or other agent-owned rendering sessions competing for resources.</li>
+<li><strong>Validate and rank.</strong> Require complete unique round/scenario/variant coverage, zero hidden/invalid frames, advancing physics and HUD, visible aircraft/HUD, correct collision path, stable source hashes and zero browser errors/warnings. Save full JSON by direct download, plus screenshots and logs.</li>
+<li><strong>Confirm a promising result.</strong> Compare median FPS, frame-time distributions, 1% low FPS, physics CPU time, render submission time, GPU query time and draw calls. A candidate with at least a 5% median FPS gain should improve all three initial paired rounds and avoid a material 1% low regression. Confirm the strongest candidate with a focused alternating baseline comparison using longer measurement windows. Otherwise report no consistent winner.</li>
+<li><strong>Write the HTML findings.</strong> Distinguish confirmed improvements, inconclusive changes and diagnostics. Report visual costs alongside FPS. Label uncapped results as throughput in this local development build, rather than screen refresh rate or mobile performance.</li>
+</ol></section>
+<section><h2>Comparison matrix</h2><div class="scroll"><table>
+<tr><th>Comparison</th><th>Variants</th><th>Views</th><th>Trials</th></tr>
+<tr><td>Collision</td><td>Exhaustive scenery scan; spatial collision grid</td><td>1280 × 720 airfield; 1920 × 1080 forest</td><td>2 × 2 × 3 = 12</td></tr>
+<tr><td>Rendering</td><td>Baseline; 1024 shadow map; 85% resolution; terrain detail LOD; instanced runway lights; no-shadows diagnostic</td><td>Same two views; spatial collision grid enabled throughout</td><td>6 × 2 × 3 = 36</td></tr>
+</table></div><p>Keep device pixel ratio 2 and game pixel ratio 1.75 for the original-resolution variants. The 85% variant deliberately changes render resolution. No shadows is a diagnostic. Any quality-changing winner needs its visual tradeoff shown clearly.</p></section>
+<section><h2>Files and deliverables</h2>
+<ul>
+<li><code>scripts/run-engine-benchmark.ts</code>: isolated launch configuration, cap/headroom gate, timestamped outputs, saved controls and launch metadata.</li>
+<li><code>scripts/full-game-benchmark.tsx</code>: only add narrow timing/confirmation options if required; preserve the real game loop and existing scenario paths.</li>
+<li>A dedicated uncapped HTML report and raw evidence under <code>output/full-game-uncapped/&lt;run-id&gt;/</code>.</li>
+<li>Update the benchmark workflow documentation after the new path works.</li>
+</ul></section>
+<section><h2>Completion criteria</h2>
+<p>A verified control above the old cap, 48 valid saved full-game trials, a repeatability-based ranking with visual tradeoffs, and an HTML report that states any remaining ceiling or noise. If the browser cannot be uncapped, preserve the failed control evidence and identify that limitation instead of repeating capped long runs.</p>
+<p><small>Estimated long-run measurement time after the control succeeds: about seven minutes, plus browser startup, validation and any focused confirmation. No production deployment is part of this experiment.</small></p>
+<p><small>Initial probe refinement: with the frame-limit flag, the unchanged blank page reached roughly 57 FPS while animated WebGL reached roughly 499 FPS on Metal. Idle-page pacing therefore cannot be the only uncapped gate; active DOM/WebGL controls and the real-game smoke test establish useful rendering headroom.</small></p>
+</section>
+</main></body></html>

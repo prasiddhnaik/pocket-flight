@@ -1,37 +1,11 @@
-import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { loadGeometryOnly } from "./geometry-loader";
 import { Box3, Mesh, Vector3 } from "three";
-import { createHash } from "node:crypto";
 
 // Geometry-only loading keeps this repeatable in Bun without a browser image decoder.
 export async function measureFinch() {
-  const bytes = await Bun.file(
+  const { scene, sha256 } = await loadGeometryOnly(
     new URL("../public/assets/finch-u2.glb", import.meta.url),
-  ).arrayBuffer();
-  const view = new DataView(bytes);
-  const jsonLength = view.getUint32(12, true);
-  const data = JSON.parse(
-    new TextDecoder().decode(bytes.slice(20, 20 + jsonLength)),
   );
-  delete data.images;
-  delete data.textures;
-  delete data.samplers;
-  delete data.materials;
-  for (const mesh of data.meshes)
-    for (const primitive of mesh.primitives) delete primitive.material;
-  const json = new TextEncoder().encode(JSON.stringify(data));
-  const paddedLength = Math.ceil(json.length / 4) * 4;
-  const binaryChunk = new Uint8Array(bytes, 20 + jsonLength);
-  const geometryOnly = new Uint8Array(20 + paddedLength + binaryChunk.length);
-  const header = new DataView(geometryOnly.buffer);
-  header.setUint32(0, 0x46546c67, true);
-  header.setUint32(4, 2, true);
-  header.setUint32(8, geometryOnly.length, true);
-  header.setUint32(12, paddedLength, true);
-  header.setUint32(16, 0x4e4f534a, true);
-  geometryOnly.fill(32, 20, 20 + paddedLength);
-  geometryOnly.set(json, 20);
-  geometryOnly.set(binaryChunk, 20 + paddedLength);
-  const { scene } = await new GLTFLoader().parseAsync(geometryOnly.buffer, "");
   scene.updateMatrixWorld(true);
   const bounds = new Box3().setFromObject(scene);
   const dimensions = bounds.getSize(new Vector3());
@@ -109,7 +83,7 @@ export async function measureFinch() {
   );
   return {
     asset: "public/assets/finch-u2.glb",
-    sha256: createHash("sha256").update(new Uint8Array(bytes)).digest("hex"),
+    sha256,
     frame: "metres: X right, Y up, -Z forward",
     scale: 1,
     dimensions: {

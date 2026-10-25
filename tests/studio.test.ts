@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { Vector3, Quaternion } from "three";
 import { IDBFactory } from "fake-indexeddb";
-import { ReplayLibrary } from "../src/replay-library";
+import { ReplayLibrary } from "../src/replay/replay-library";
 import {
   clipDuration,
   locateClip,
@@ -9,13 +9,13 @@ import {
   addReplayClip,
   trimClip,
   validateProject,
-} from "../src/studio-model";
+} from "../src/studio/studio-model";
 import {
   saveFrames,
   sampleFrames,
   validateReplay,
   type SavedReplay,
-} from "../src/replay-data";
+} from "../src/replay/replay-data";
 const replay: SavedReplay = {
   schemaVersion: 1,
   id: "flight",

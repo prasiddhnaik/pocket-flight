@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { existsSync, statSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { bettyFiles } from "../src/betty";
+import { bettyFiles } from "../src/audio/betty";
 
 const dir = fileURLToPath(new URL("../public/audio/betty/", import.meta.url));
 const files = Object.values(bettyFiles).map((f) => `${dir}${f}.mp3`);

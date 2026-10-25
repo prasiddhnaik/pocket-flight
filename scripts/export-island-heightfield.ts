@@ -1,5 +1,5 @@
 // Shared collision/render data sampled for Blender's editable island mesh.
-import { terrainHeight, WORLD_SIZE, TERRAIN_SEGMENTS } from "../src/terrain";
+import { terrainHeight, WORLD_SIZE, TERRAIN_SEGMENTS } from "../src/world/terrain";
 const heights: number[] = [];
 for (let z = 0; z <= TERRAIN_SEGMENTS; z++)
   for (let x = 0; x <= TERRAIN_SEGMENTS; x++)

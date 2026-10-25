@@ -166,45 +166,45 @@
       "asset": "aurelia-flight.glb",
       "fields": {
         "nodes": {
-          "count": 296,
-          "sha256": "40af3449b2a8498c1ec42c5df80e9c26bc8b28f09b217dcef3556578e84d1df2"
+          "count": 318,
+          "sha256": "6c0fa6fc5dbadbd308d0f3d858282f2e752e8ce5791652df851dfd860fd59315"
         },
         "meshes": {
-          "count": 241,
-          "sha256": "c22753e407f7087b5f0dfa46c2a43e92c04859102d38726a0fce30da96a18cd2"
+          "count": 263,
+          "sha256": "d399734bc0699fccc2b1f451deac34557485d6698de66f4bfea88e5bbe9f530c"
         },
         "accessors": {
-          "count": 910,
-          "sha256": "a81260f68c4558ecba1d010f15d526e8a5022653a24c39b7633973d8a2e7e1a2"
+          "count": 976,
+          "sha256": "82773da30ab064ef4aa3f93febf02432a34ed094c10f56cc255fb7352fd74bbe"
         },
         "bufferViews": {
-          "count": 910,
-          "sha256": "a0eb850b5c4e44a6642cdaf6adadf6cf0c190c18aa3636baf3c29b639f73b9f2"
+          "count": 976,
+          "sha256": "d6df814870035def2b9889b8cf3d7773d7ff350541b5fd935e8aae9d6daecc76"
         },
         "materials": {
-          "count": 22,
-          "sha256": "89f2a2e6a68cf7a7bd9bbc36695a447106b25d69055a6e58ed1ace530321e54e"
+          "count": 24,
+          "sha256": "cbe6ad2a70446efd3962bc679827ee847be707c80c45dd15d9594fd44fc1c091"
         },
         "buffers": {
           "count": 2,
-          "sha256": "7f34709de5a1d0b0077da47b0bca24e16a3589384b62f1b949976696444ae7d4"
+          "sha256": "1345aef4d973e44ca61fa97db495e675f20d6362765f75fedc4229c16571a9fe"
         }
       },
       "buffers": [
         {
           "byteLength": 8116124,
-          "sha256": "d1fe5d14400a4c1a61caff3c2815e1dd5d2ca704447556eb9f7f80380bae22f7"
+          "sha256": "b8dec492819e2761f37a5740e29f24dcd7bbf11a309d85de1e4b6f06ed4449aa"
         },
         {
           "uri": "aurelia-gear-bays.bin",
-          "byteLength": 1275816,
-          "sha256": "8dd020741a45096d10e4b0b036b66687eb2328a9f22da29faab7eed959bfc714"
+          "byteLength": 1350744,
+          "sha256": "bd1206436b8bc860e337e37fc1e13f09fc6a559671e7286fac6cf7c22a191c7b"
         }
       ],
       "sceneRoots": [
         249
       ],
-      "animationsSha256": "0ee6cf6436157f1c7a7bf524f95bb4eb1a82d58b136ace25f2f47d5ebfae1077",
+      "animationsSha256": "7ede58fb0497e5585fb448fd1562f8ade565f340a7af29866d7ff0e8d3bf35cb",
       "anchors": {
         "Wing_Left": {
           "matrix": [

@@ -3,8 +3,8 @@ import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.j
 import { Octree } from "three/addons/math/Octree.js";
 import { fixedWingSkins } from "../lab/internal-control-link";
 import { wingSampler } from "./skin-sampler";
-import { aircraftCatalog, type LabAircraftId } from "../lab/aircraft";
-import { aircraftSystems } from "../src/aircraft-systems";
+import { runtimeAircraftCatalog as aircraftCatalog, type LabAircraftId } from "../lab/aircraft";
+import { aircraftSystems } from "../src/aircraft/aircraft-systems";
 
 export type JetId = Exclude<LabAircraftId, "finch">;
 export const layouts = {

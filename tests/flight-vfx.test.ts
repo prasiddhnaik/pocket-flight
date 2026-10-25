@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { Points, Quaternion, Vector3 } from "three";
-import { FlightVfx, tireContactPoints, type VfxInput } from "../src/flight-vfx";
-import { groundAt } from "../src/terrain";
+import { FlightVfx, tireContactPoints, type VfxInput } from "../src/flight/flight-vfx";
+import { groundAt } from "../src/world/terrain";
 
 function input(id: VfxInput["id"] = "finch"): VfxInput {
   return {

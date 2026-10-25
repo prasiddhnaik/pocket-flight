@@ -1,6 +1,6 @@
 import { validateAircraft } from "./validation";
 self.onmessage = () => {
-  for (const id of ["finch", "peregrine", "aurelia", "stormbird"] as const) {
+  for (const id of ["finch", "peregrine", "aurelia", "stormbird", "heron", "f15c"] as const) {
     try {
       self.postMessage({ result: validateAircraft(id) });
     } catch (error) {

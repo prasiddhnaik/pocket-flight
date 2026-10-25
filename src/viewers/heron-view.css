@@ -1,0 +1,189 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Manrope:wght@400;500;600;700&display=swap");
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  color: #203b3c;
+  background: #e7e6df;
+  font-family: "DM Sans", sans-serif;
+}
+main {
+  min-height: 100vh;
+  position: relative;
+}
+header {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  padding: 28px 42px;
+  font-size: 12px;
+  letter-spacing: 0.13em;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+.heron-title {
+  position: relative;
+  z-index: 2;
+  margin: 28px 42px;
+  pointer-events: none;
+}
+.heron-title p:first-child {
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  color: #5b7270;
+}
+h1 {
+  font:
+    600 clamp(48px, 6vw, 88px)/1.1 "Manrope",
+    sans-serif;
+  letter-spacing: -0.065em;
+  margin: 12px 0;
+}
+h1 span {
+  font-weight: 400;
+  color: #7d9691;
+}
+.heron-title p:last-child {
+  font-size: 14px;
+  color: #637773;
+}
+#viewport {
+  position: absolute;
+  inset: 95px 340px 46px 0;
+  min-height: 520px;
+}
+canvas {
+  display: block;
+  outline: 0;
+}
+aside {
+  position: absolute;
+  z-index: 2;
+  right: 42px;
+  top: 175px;
+  width: 270px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.heron-status {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #326f67;
+  border-top: 1px solid #bfcac1;
+  padding-top: 16px;
+}
+dl {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px 12px;
+  margin: 28px 0;
+}
+dt {
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  color: #637773;
+}
+dd {
+  margin: 5px 0;
+  font-family: "Manrope", sans-serif;
+  font-size: 21px;
+  font-weight: 600;
+}
+dd small {
+  font-size: 11px;
+  font-weight: 400;
+}
+aside > p {
+  color: #5e706c;
+}
+label {
+  display: block;
+  margin: 20px 0 15px;
+  font-size: 11px;
+}
+input {
+  display: block;
+  width: 100%;
+  accent-color: #17646b;
+  margin-top: 10px;
+}
+.heron-views {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+}
+button {
+  font: inherit;
+  font-size: 11px;
+  padding: 9px;
+  background: transparent;
+  border: 1px solid #afbeb6;
+  color: #365853;
+  border-radius: 3px;
+  cursor: pointer;
+}
+.heron-fly {
+  display: block;
+  background: #17646b;
+  color: #fff;
+  padding: 12px 16px;
+  margin: 22px 0 12px;
+  border-radius: 3px;
+  font-size: 12px;
+}
+aside > small {
+  font-size: 10px;
+  color: #75837d;
+  display: block;
+}
+footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 18px 42px;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  color: #6b8178;
+}
+@media (max-width: 850px) {
+  header {
+    padding: 22px;
+  }
+  .heron-title {
+    margin: 20px 22px;
+  }
+  #viewport {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    height: 440px;
+    min-height: 0;
+  }
+  aside {
+    position: relative;
+    inset: auto;
+    width: auto;
+    margin: 0 22px 30px;
+    max-width: 500px;
+  }
+  .heron-title {
+    margin-bottom: 0;
+  }
+  dl {
+    gap: 10px;
+  }
+  footer {
+    position: relative;
+    padding: 20px 22px;
+    gap: 20px;
+    font-size: 8px;
+  }
+}

@@ -1,0 +1,2812 @@
+{
+  "name": "Heron UT-9",
+  "assetSha256": "81bc153162e94b25e74cc750aacc86628b2e6ac6d3f83e1c61c858f0bd3bba70",
+  "source": "assets/heron/src/heron.py",
+  "cadVersion": "0.5.1",
+  "meshDeflectionMm": 1.6,
+  "normalSource": "CAD surface derivatives",
+  "solidCount": 197,
+  "leafCount": 197,
+  "floorEnclosed": true,
+  "connectedSolids": 197,
+  "floating": [],
+  "contactToleranceMm": 0.5,
+  "contactGraph": "validated spanning tree",
+  "solidDistanceChecks": 253,
+  "dimensionsM": [
+    15.870000000200003,
+    12.670000000200016,
+    4.7000000002
+  ],
+  "contacts": [
+    {
+      "a": "Cabin_cheatline_Left#1",
+      "b": "Fuselage#1",
+      "gapMm": 0,
+      "method": "shared CAD vertex"
+    },
+    {
+      "a": "Cabin_cheatline_Right#1",
+      "b": "Fuselage#1",
+      "gapMm": 0,
+      "method": "shared CAD vertex"
+    },
+    {
+      "a": "Curved_belly_livery#1",
+      "b": "Fuselage#1",
+      "gapMm": 0,
+      "method": "shared CAD vertex"
+    },
+    {
+      "a": "Wingtip_cap_Left#1",
+      "b": "Navigation_light_Left#1",
+      "gapMm": 0,
+      "method": "shared CAD vertex"
+    },
+    {
+      "a": "Wing_skin_Left#1",
+      "b": "Wingtip_cap_Left#1",
+      "gapMm": 0,
+      "method": "shared CAD vertex"
+    },
+    {
+      "a": "Wingtip_cap_Right#1",
+      "b": "Navigation_light_Right#1",
+      "gapMm": 0,
+      "method": "shared CAD vertex"
+    },
+    {
+      "a": "Wing_skin_Right#1",
+      "b": "Wing_skin_Left#1",
+      "gapMm": 0,
+      "method": "shared CAD vertex"
+    },
+    {
+      "a": "Wing_skin_Right#1",
+      "b": "Wingtip_cap_Right#1",
+      "gapMm": 0,
+      "method": "shared CAD vertex"
+    },
+    {
+      "a": "Fin_cap#1",
+      "b": "Fin_skin#1",
+      "gapMm": 0,
+      "method": "shared CAD vertex"
+    },
+    {
+      "a": "Rudder#1",
+      "b": "Fin_skin#1",
+      "gapMm": 0,
+      "method": "shared CAD vertex"
+    },
+    {
+      "a": "Elevator_skin_Left#1",
+      "b": "Tailplane_Left#1",
+      "gapMm": 0,
+      "method": "shared CAD vertex"
+    },
+    {
+      "a": "Elevator_skin_Right#1",
+      "b": "Tailplane_Right#1",
+      "gapMm": 0,
+      "method": "shared CAD vertex"
+    },
+    {
+      "a": "Chin_cowling#1",
+      "b": "Fuselage#1",
+      "gapMm": 0,
+      "method": "shared CAD vertex"
+    },
+    {
+      "a": "Beacon_lens#1",
+      "b": "Beacon_base#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Taxi_lamp_lens#1",
+      "b": "Taxi_lamp_housing#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Throttle_handle#1",
+      "b": "Throttle_lever#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Yoke_grip_-0.4_-1#1",
+      "b": "Yoke_crossbar_-0.4#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Yoke_grip_-0.4_1#1",
+      "b": "Yoke_crossbar_-0.4#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Yoke_grip_0.4_-1#1",
+      "b": "Yoke_crossbar_0.4#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Yoke_grip_0.4_1#1",
+      "b": "Yoke_crossbar_0.4#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Brake_mount_Left#1",
+      "b": "Brake_caliper_Left#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Brake_mount_Right#1",
+      "b": "Brake_caliper_Right#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Pitot_probe#1",
+      "b": "Pitot_mast#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Yoke_crossbar_-0.4#1",
+      "b": "Yoke_column_-0.4#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Yoke_crossbar_0.4#1",
+      "b": "Yoke_column_0.4#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Main_hubcap_Left#1",
+      "b": "Main_gear_axle_Left#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Main_hubcap_Right#1",
+      "b": "Main_gear_axle_Right#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Brake_mount_Left#1",
+      "b": "Main_gear_axle_Left#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Brake_mount_Right#1",
+      "b": "Main_gear_axle_Right#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Nose_fork_bridge#1",
+      "b": "Nose_fork_-1#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Nose_fork_bridge#1",
+      "b": "Nose_fork_1#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Nose_fork_bridge#1",
+      "b": "Nose_torque_link_lower#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Nose_torque_link_lower#1",
+      "b": "Nose_torque_link_upper#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Brake_hose_Right#1",
+      "b": "Brake_caliper_Right#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Brake_hose_Left#1",
+      "b": "Brake_caliper_Left#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Nose_axle#1",
+      "b": "Nose_fork_-1#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Nose_hub#1",
+      "b": "Nose_fork_-1#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Brake_caliper_Left#1",
+      "b": "Main_hub_Left#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Brake_caliper_Right#1",
+      "b": "Main_hub_Right#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Nose_fork_bridge#1",
+      "b": "Nose_oleo_piston#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Brake_caliper_Left#1",
+      "b": "Brake_disc_Left#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Brake_caliper_Right#1",
+      "b": "Brake_disc_Right#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Throttle_lever#1",
+      "b": "Throttle_pedestal#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Taxi_lamp_housing#1",
+      "b": "Nose_oleo#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Seat_cushion_0_-1#1",
+      "b": "Seat_pedestal_0_-1#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Seat_cushion_0_1#1",
+      "b": "Seat_pedestal_0_1#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Seat_cushion_1_-1#1",
+      "b": "Seat_pedestal_1_-1#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Seat_cushion_1_1#1",
+      "b": "Seat_pedestal_1_1#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Seat_cushion_2_-1#1",
+      "b": "Seat_pedestal_2_-1#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Seat_cushion_2_1#1",
+      "b": "Seat_pedestal_2_1#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Seat_cushion_3_-1#1",
+      "b": "Seat_pedestal_3_-1#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Seat_cushion_3_1#1",
+      "b": "Seat_pedestal_3_1#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Nose_torque_link_upper#1",
+      "b": "Nose_oleo#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Spinner#1",
+      "b": "Propeller_shaft#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Panel_support_-0.61#1",
+      "b": "Seat_pedestal_0_-1#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Panel_support_0.61#1",
+      "b": "Seat_pedestal_0_1#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Nose_tire#1",
+      "b": "Nose_fork_-1#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Brake_caliper_Left#1",
+      "b": "Main_tire_Left#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Brake_caliper_Right#1",
+      "b": "Main_tire_Right#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Entry_step_Right#1",
+      "b": "Step_bracket_Right#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Entry_step_Left#1",
+      "b": "Step_bracket_Left#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Seat_back_0_-1#1",
+      "b": "Seat_cushion_0_-1#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Seat_back_0_1#1",
+      "b": "Seat_cushion_0_1#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Seat_back_1_-1#1",
+      "b": "Seat_cushion_1_-1#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Seat_back_1_1#1",
+      "b": "Seat_cushion_1_1#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Seat_back_2_-1#1",
+      "b": "Seat_cushion_2_-1#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Seat_back_2_1#1",
+      "b": "Seat_cushion_2_1#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Seat_back_3_-1#1",
+      "b": "Seat_cushion_3_-1#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Seat_back_3_1#1",
+      "b": "Seat_cushion_3_1#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Yoke_column_-0.4#1",
+      "b": "Instrument_panel#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Yoke_column_0.4#1",
+      "b": "Instrument_panel#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Brake_mount_Left#1",
+      "b": "Main_gear_leg_Left#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Brake_mount_Right#1",
+      "b": "Main_gear_leg_Right#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Engine_inlet#1",
+      "b": "Chin_cowling#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Display_bezel_-0.42#1",
+      "b": "Instrument_panel#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Display_bezel_0#1",
+      "b": "Instrument_panel#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Display_bezel_0.42#1",
+      "b": "Instrument_panel#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Chin_cowling#1",
+      "b": "Propeller_shaft#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Propeller_Blade_1#1",
+      "b": "Spinner#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Propeller_Blade_2#1",
+      "b": "Spinner#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Propeller_Blade_3#1",
+      "b": "Spinner#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Propeller_Blade_4#1",
+      "b": "Spinner#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Exhaust_Left#1",
+      "b": "Chin_cowling#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Exhaust_Right#1",
+      "b": "Chin_cowling#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Panel_support_-0.61#1",
+      "b": "Instrument_panel#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Panel_support_0.61#1",
+      "b": "Instrument_panel#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Rudder_hinge#1",
+      "b": "Fin_cap#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Strut_attach_Left_0.68#1",
+      "b": "Wing_strut_Left#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Strut_attach_Left_4.5#1",
+      "b": "Wing_strut_Left#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Strut_attach_Right_0.68#1",
+      "b": "Wing_strut_Right#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Strut_attach_Right_4.5#1",
+      "b": "Wing_strut_Right#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Elevator_skin_Left#1",
+      "b": "Elevator_hinge_Left#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Elevator_skin_Right#1",
+      "b": "Elevator_hinge_Right#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Aileron_hinge_Right#1",
+      "b": "Aileron_Right#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Aileron_hinge_Left#1",
+      "b": "Aileron_Left#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Seat_pedestal_0_-1#1",
+      "b": "Cabin_floor#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Seat_pedestal_1_-1#1",
+      "b": "Cabin_floor#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Seat_pedestal_1_1#1",
+      "b": "Cabin_floor#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Seat_pedestal_2_-1#1",
+      "b": "Cabin_floor#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Seat_pedestal_2_1#1",
+      "b": "Cabin_floor#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Seat_pedestal_3_-1#1",
+      "b": "Cabin_floor#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Seat_pedestal_3_1#1",
+      "b": "Cabin_floor#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Wing_strut_Left#1",
+      "b": "Floor_crossmember_0#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Wing_strut_Right#1",
+      "b": "Floor_crossmember_0#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Door_handle_Left-2.88#1",
+      "b": "Cabin_cheatline_Left#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Door_handle_Right-2.88#1",
+      "b": "Cabin_cheatline_Right#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Elevator_skin_Left#1",
+      "b": "Fin_skin#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Elevator_skin_Right#1",
+      "b": "Fin_skin#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Throttle_pedestal#1",
+      "b": "Cabin_floor#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Step_bracket_Left#1",
+      "b": "Cabin_floor#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Step_bracket_Right#1",
+      "b": "Cabin_floor#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Cargo_latch_Left_1#1",
+      "b": "Cargo_pod#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Cargo_latch_Left_2#1",
+      "b": "Cargo_pod#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Cargo_latch_Left_3#1",
+      "b": "Cargo_pod#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Cargo_latch_Right_1#1",
+      "b": "Cargo_pod#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Cargo_latch_Right_2#1",
+      "b": "Cargo_pod#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Cargo_latch_Right_3#1",
+      "b": "Cargo_pod#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Cargo_hinge_Left_1_1#1",
+      "b": "Cargo_pod#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Cargo_hinge_Left_1_2#1",
+      "b": "Cargo_pod#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Cargo_hinge_Left_2_1#1",
+      "b": "Cargo_pod#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Cargo_hinge_Left_2_2#1",
+      "b": "Cargo_pod#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Cargo_hinge_Left_3_1#1",
+      "b": "Cargo_pod#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Cargo_hinge_Left_3_2#1",
+      "b": "Cargo_pod#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Cargo_hinge_Right_1_1#1",
+      "b": "Cargo_pod#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Cargo_hinge_Right_1_2#1",
+      "b": "Cargo_pod#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Cargo_hinge_Right_2_1#1",
+      "b": "Cargo_pod#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Cargo_hinge_Right_2_2#1",
+      "b": "Cargo_pod#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Cargo_hinge_Right_3_1#1",
+      "b": "Cargo_pod#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Cargo_hinge_Right_3_2#1",
+      "b": "Cargo_pod#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Floor_crossmember_1.3#1",
+      "b": "Cabin_floor#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Floor_crossmember_-2.6#1",
+      "b": "Cabin_floor#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Floor_crossmember_-1.3#1",
+      "b": "Cabin_floor#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Floor_crossmember_0#1",
+      "b": "Cabin_floor#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Seat_pedestal_0_-1#1",
+      "b": "Cargo_pod#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Main_gear_leg_Left#1",
+      "b": "Cabin_floor#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Main_gear_leg_Right#1",
+      "b": "Cabin_floor#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Cabin_cheatline_Left#1",
+      "b": "Pilot_door_seal_Left#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Cabin_cheatline_Right#1",
+      "b": "Pilot_door_seal_Right#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Flap_hinge_Left#1",
+      "b": "Flap_Left#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Flap_hinge_Right#1",
+      "b": "Flap_Right#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Cabin_cheatline_Left#1",
+      "b": "Cabin_door_seal_Left#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Cabin_cheatline_Right#1",
+      "b": "Cabin_door_seal_Right#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Wing_skin_Left#1",
+      "b": "Fuel_cap_Left#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Wing_skin_Right#1",
+      "b": "Fuel_cap_Right#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Wing_skin_Left#1",
+      "b": "Pitot_mast#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Strut_attach_Left_4.5#1",
+      "b": "Wing_skin_Left#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Strut_attach_Left_0.68#1",
+      "b": "Curved_belly_livery#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Wing_skin_Left#1",
+      "b": "Wing_carry_through_spar#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Wing_skin_Left#1",
+      "b": "Aileron_hinge_Left#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Wing_skin_Right#1",
+      "b": "Aileron_hinge_Right#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Wing_skin_Left#1",
+      "b": "Flap_hinge_Left#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Wing_skin_Right#1",
+      "b": "Flap_hinge_Right#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Cowling_fastener_Left_1#1",
+      "b": "Fuselage#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Cowling_fastener_Left_2#1",
+      "b": "Fuselage#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Cowling_fastener_Left_3#1",
+      "b": "Fuselage#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Cowling_fastener_Left_4#1",
+      "b": "Fuselage#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Cowling_fastener_Right_1#1",
+      "b": "Fuselage#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Cowling_fastener_Right_2#1",
+      "b": "Fuselage#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Cowling_fastener_Right_3#1",
+      "b": "Fuselage#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Cowling_fastener_Right_4#1",
+      "b": "Fuselage#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Pilot_door_hinge_Left_1#1",
+      "b": "Fuselage#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Pilot_door_hinge_Left_2#1",
+      "b": "Fuselage#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Cabin_door_hinge_Left_1#1",
+      "b": "Fuselage#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Cabin_door_hinge_Left_2#1",
+      "b": "Fuselage#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Pilot_door_hinge_Right_1#1",
+      "b": "Fuselage#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Pilot_door_hinge_Right_2#1",
+      "b": "Fuselage#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Cabin_door_hinge_Right_1#1",
+      "b": "Fuselage#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Cabin_door_hinge_Right_2#1",
+      "b": "Fuselage#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Beacon_base#1",
+      "b": "Fuselage#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Cooling_slot_Left_1#1",
+      "b": "Fuselage#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Cooling_slot_Right_1#1",
+      "b": "Fuselage#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Cooling_slot_Left_2#1",
+      "b": "Fuselage#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Cooling_slot_Right_2#1",
+      "b": "Fuselage#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Cooling_slot_Left_3#1",
+      "b": "Fuselage#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Cooling_slot_Right_3#1",
+      "b": "Fuselage#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Door_handle_Left1.55#1",
+      "b": "Fuselage#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Door_handle_Right1.55#1",
+      "b": "Fuselage#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Dorsal_antenna#1",
+      "b": "Fuselage#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Cabin_window_Left_5#1",
+      "b": "Fuselage#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Cabin_window_Right_5#1",
+      "b": "Fuselage#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Cabin_window_Left_4#1",
+      "b": "Fuselage#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Cabin_window_Right_4#1",
+      "b": "Fuselage#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Cabin_window_Left_3#1",
+      "b": "Fuselage#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Cabin_window_Right_3#1",
+      "b": "Fuselage#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Cabin_window_Left_2#1",
+      "b": "Fuselage#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Cabin_window_Right_2#1",
+      "b": "Fuselage#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Cabin_window_Right_6#1",
+      "b": "Fuselage#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Cabin_window_Left_6#1",
+      "b": "Fuselage#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Nose_oleo#1",
+      "b": "Fuselage#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Cabin_window_Left_1#1",
+      "b": "Fuselage#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Cabin_window_Right_1#1",
+      "b": "Fuselage#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Windshield_Left#1",
+      "b": "Fuselage#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Windshield_Right#1",
+      "b": "Fuselage#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Cowling_panel_seal_Right#1",
+      "b": "Fuselage#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Cowling_panel_seal_Left#1",
+      "b": "Fuselage#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Rudder_hinge#1",
+      "b": "Fuselage#1",
+      "gapMm": 0,
+      "method": "solid distance"
+    }
+  ],
+  "pathsToBody": {
+    "Fuselage#1": [
+      "Fuselage#1"
+    ],
+    "Cabin_cheatline_Left#1": [
+      "Fuselage#1",
+      "Cabin_cheatline_Left#1"
+    ],
+    "Cabin_cheatline_Right#1": [
+      "Fuselage#1",
+      "Cabin_cheatline_Right#1"
+    ],
+    "Curved_belly_livery#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1"
+    ],
+    "Chin_cowling#1": [
+      "Fuselage#1",
+      "Chin_cowling#1"
+    ],
+    "Cowling_fastener_Left_1#1": [
+      "Fuselage#1",
+      "Cowling_fastener_Left_1#1"
+    ],
+    "Cowling_fastener_Left_2#1": [
+      "Fuselage#1",
+      "Cowling_fastener_Left_2#1"
+    ],
+    "Cowling_fastener_Left_3#1": [
+      "Fuselage#1",
+      "Cowling_fastener_Left_3#1"
+    ],
+    "Cowling_fastener_Left_4#1": [
+      "Fuselage#1",
+      "Cowling_fastener_Left_4#1"
+    ],
+    "Cowling_fastener_Right_1#1": [
+      "Fuselage#1",
+      "Cowling_fastener_Right_1#1"
+    ],
+    "Cowling_fastener_Right_2#1": [
+      "Fuselage#1",
+      "Cowling_fastener_Right_2#1"
+    ],
+    "Cowling_fastener_Right_3#1": [
+      "Fuselage#1",
+      "Cowling_fastener_Right_3#1"
+    ],
+    "Cowling_fastener_Right_4#1": [
+      "Fuselage#1",
+      "Cowling_fastener_Right_4#1"
+    ],
+    "Pilot_door_hinge_Left_1#1": [
+      "Fuselage#1",
+      "Pilot_door_hinge_Left_1#1"
+    ],
+    "Pilot_door_hinge_Left_2#1": [
+      "Fuselage#1",
+      "Pilot_door_hinge_Left_2#1"
+    ],
+    "Cabin_door_hinge_Left_1#1": [
+      "Fuselage#1",
+      "Cabin_door_hinge_Left_1#1"
+    ],
+    "Cabin_door_hinge_Left_2#1": [
+      "Fuselage#1",
+      "Cabin_door_hinge_Left_2#1"
+    ],
+    "Pilot_door_hinge_Right_1#1": [
+      "Fuselage#1",
+      "Pilot_door_hinge_Right_1#1"
+    ],
+    "Pilot_door_hinge_Right_2#1": [
+      "Fuselage#1",
+      "Pilot_door_hinge_Right_2#1"
+    ],
+    "Cabin_door_hinge_Right_1#1": [
+      "Fuselage#1",
+      "Cabin_door_hinge_Right_1#1"
+    ],
+    "Cabin_door_hinge_Right_2#1": [
+      "Fuselage#1",
+      "Cabin_door_hinge_Right_2#1"
+    ],
+    "Beacon_base#1": [
+      "Fuselage#1",
+      "Beacon_base#1"
+    ],
+    "Cooling_slot_Left_1#1": [
+      "Fuselage#1",
+      "Cooling_slot_Left_1#1"
+    ],
+    "Cooling_slot_Right_1#1": [
+      "Fuselage#1",
+      "Cooling_slot_Right_1#1"
+    ],
+    "Cooling_slot_Left_2#1": [
+      "Fuselage#1",
+      "Cooling_slot_Left_2#1"
+    ],
+    "Cooling_slot_Right_2#1": [
+      "Fuselage#1",
+      "Cooling_slot_Right_2#1"
+    ],
+    "Cooling_slot_Left_3#1": [
+      "Fuselage#1",
+      "Cooling_slot_Left_3#1"
+    ],
+    "Cooling_slot_Right_3#1": [
+      "Fuselage#1",
+      "Cooling_slot_Right_3#1"
+    ],
+    "Door_handle_Left1.55#1": [
+      "Fuselage#1",
+      "Door_handle_Left1.55#1"
+    ],
+    "Door_handle_Right1.55#1": [
+      "Fuselage#1",
+      "Door_handle_Right1.55#1"
+    ],
+    "Dorsal_antenna#1": [
+      "Fuselage#1",
+      "Dorsal_antenna#1"
+    ],
+    "Cabin_window_Left_5#1": [
+      "Fuselage#1",
+      "Cabin_window_Left_5#1"
+    ],
+    "Cabin_window_Right_5#1": [
+      "Fuselage#1",
+      "Cabin_window_Right_5#1"
+    ],
+    "Cabin_window_Left_4#1": [
+      "Fuselage#1",
+      "Cabin_window_Left_4#1"
+    ],
+    "Cabin_window_Right_4#1": [
+      "Fuselage#1",
+      "Cabin_window_Right_4#1"
+    ],
+    "Cabin_window_Left_3#1": [
+      "Fuselage#1",
+      "Cabin_window_Left_3#1"
+    ],
+    "Cabin_window_Right_3#1": [
+      "Fuselage#1",
+      "Cabin_window_Right_3#1"
+    ],
+    "Cabin_window_Left_2#1": [
+      "Fuselage#1",
+      "Cabin_window_Left_2#1"
+    ],
+    "Cabin_window_Right_2#1": [
+      "Fuselage#1",
+      "Cabin_window_Right_2#1"
+    ],
+    "Cabin_window_Right_6#1": [
+      "Fuselage#1",
+      "Cabin_window_Right_6#1"
+    ],
+    "Cabin_window_Left_6#1": [
+      "Fuselage#1",
+      "Cabin_window_Left_6#1"
+    ],
+    "Nose_oleo#1": [
+      "Fuselage#1",
+      "Nose_oleo#1"
+    ],
+    "Cabin_window_Left_1#1": [
+      "Fuselage#1",
+      "Cabin_window_Left_1#1"
+    ],
+    "Cabin_window_Right_1#1": [
+      "Fuselage#1",
+      "Cabin_window_Right_1#1"
+    ],
+    "Windshield_Left#1": [
+      "Fuselage#1",
+      "Windshield_Left#1"
+    ],
+    "Windshield_Right#1": [
+      "Fuselage#1",
+      "Windshield_Right#1"
+    ],
+    "Cowling_panel_seal_Right#1": [
+      "Fuselage#1",
+      "Cowling_panel_seal_Right#1"
+    ],
+    "Cowling_panel_seal_Left#1": [
+      "Fuselage#1",
+      "Cowling_panel_seal_Left#1"
+    ],
+    "Rudder_hinge#1": [
+      "Fuselage#1",
+      "Rudder_hinge#1"
+    ],
+    "Door_handle_Left-2.88#1": [
+      "Fuselage#1",
+      "Cabin_cheatline_Left#1",
+      "Door_handle_Left-2.88#1"
+    ],
+    "Pilot_door_seal_Left#1": [
+      "Fuselage#1",
+      "Cabin_cheatline_Left#1",
+      "Pilot_door_seal_Left#1"
+    ],
+    "Cabin_door_seal_Left#1": [
+      "Fuselage#1",
+      "Cabin_cheatline_Left#1",
+      "Cabin_door_seal_Left#1"
+    ],
+    "Door_handle_Right-2.88#1": [
+      "Fuselage#1",
+      "Cabin_cheatline_Right#1",
+      "Door_handle_Right-2.88#1"
+    ],
+    "Pilot_door_seal_Right#1": [
+      "Fuselage#1",
+      "Cabin_cheatline_Right#1",
+      "Pilot_door_seal_Right#1"
+    ],
+    "Cabin_door_seal_Right#1": [
+      "Fuselage#1",
+      "Cabin_cheatline_Right#1",
+      "Cabin_door_seal_Right#1"
+    ],
+    "Strut_attach_Left_0.68#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1"
+    ],
+    "Engine_inlet#1": [
+      "Fuselage#1",
+      "Chin_cowling#1",
+      "Engine_inlet#1"
+    ],
+    "Propeller_shaft#1": [
+      "Fuselage#1",
+      "Chin_cowling#1",
+      "Propeller_shaft#1"
+    ],
+    "Exhaust_Left#1": [
+      "Fuselage#1",
+      "Chin_cowling#1",
+      "Exhaust_Left#1"
+    ],
+    "Exhaust_Right#1": [
+      "Fuselage#1",
+      "Chin_cowling#1",
+      "Exhaust_Right#1"
+    ],
+    "Beacon_lens#1": [
+      "Fuselage#1",
+      "Beacon_base#1",
+      "Beacon_lens#1"
+    ],
+    "Taxi_lamp_housing#1": [
+      "Fuselage#1",
+      "Nose_oleo#1",
+      "Taxi_lamp_housing#1"
+    ],
+    "Nose_torque_link_upper#1": [
+      "Fuselage#1",
+      "Nose_oleo#1",
+      "Nose_torque_link_upper#1"
+    ],
+    "Fin_cap#1": [
+      "Fuselage#1",
+      "Rudder_hinge#1",
+      "Fin_cap#1"
+    ],
+    "Wing_strut_Left#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1"
+    ],
+    "Spinner#1": [
+      "Fuselage#1",
+      "Chin_cowling#1",
+      "Propeller_shaft#1",
+      "Spinner#1"
+    ],
+    "Taxi_lamp_lens#1": [
+      "Fuselage#1",
+      "Nose_oleo#1",
+      "Taxi_lamp_housing#1",
+      "Taxi_lamp_lens#1"
+    ],
+    "Nose_torque_link_lower#1": [
+      "Fuselage#1",
+      "Nose_oleo#1",
+      "Nose_torque_link_upper#1",
+      "Nose_torque_link_lower#1"
+    ],
+    "Fin_skin#1": [
+      "Fuselage#1",
+      "Rudder_hinge#1",
+      "Fin_cap#1",
+      "Fin_skin#1"
+    ],
+    "Strut_attach_Left_4.5#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Strut_attach_Left_4.5#1"
+    ],
+    "Floor_crossmember_0#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1"
+    ],
+    "Propeller_Blade_1#1": [
+      "Fuselage#1",
+      "Chin_cowling#1",
+      "Propeller_shaft#1",
+      "Spinner#1",
+      "Propeller_Blade_1#1"
+    ],
+    "Propeller_Blade_2#1": [
+      "Fuselage#1",
+      "Chin_cowling#1",
+      "Propeller_shaft#1",
+      "Spinner#1",
+      "Propeller_Blade_2#1"
+    ],
+    "Propeller_Blade_3#1": [
+      "Fuselage#1",
+      "Chin_cowling#1",
+      "Propeller_shaft#1",
+      "Spinner#1",
+      "Propeller_Blade_3#1"
+    ],
+    "Propeller_Blade_4#1": [
+      "Fuselage#1",
+      "Chin_cowling#1",
+      "Propeller_shaft#1",
+      "Spinner#1",
+      "Propeller_Blade_4#1"
+    ],
+    "Nose_fork_bridge#1": [
+      "Fuselage#1",
+      "Nose_oleo#1",
+      "Nose_torque_link_upper#1",
+      "Nose_torque_link_lower#1",
+      "Nose_fork_bridge#1"
+    ],
+    "Rudder#1": [
+      "Fuselage#1",
+      "Rudder_hinge#1",
+      "Fin_cap#1",
+      "Fin_skin#1",
+      "Rudder#1"
+    ],
+    "Elevator_skin_Left#1": [
+      "Fuselage#1",
+      "Rudder_hinge#1",
+      "Fin_cap#1",
+      "Fin_skin#1",
+      "Elevator_skin_Left#1"
+    ],
+    "Elevator_skin_Right#1": [
+      "Fuselage#1",
+      "Rudder_hinge#1",
+      "Fin_cap#1",
+      "Fin_skin#1",
+      "Elevator_skin_Right#1"
+    ],
+    "Wing_skin_Left#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Strut_attach_Left_4.5#1",
+      "Wing_skin_Left#1"
+    ],
+    "Wing_strut_Right#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Wing_strut_Right#1"
+    ],
+    "Cabin_floor#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1"
+    ],
+    "Nose_fork_-1#1": [
+      "Fuselage#1",
+      "Nose_oleo#1",
+      "Nose_torque_link_upper#1",
+      "Nose_torque_link_lower#1",
+      "Nose_fork_bridge#1",
+      "Nose_fork_-1#1"
+    ],
+    "Nose_fork_1#1": [
+      "Fuselage#1",
+      "Nose_oleo#1",
+      "Nose_torque_link_upper#1",
+      "Nose_torque_link_lower#1",
+      "Nose_fork_bridge#1",
+      "Nose_fork_1#1"
+    ],
+    "Nose_oleo_piston#1": [
+      "Fuselage#1",
+      "Nose_oleo#1",
+      "Nose_torque_link_upper#1",
+      "Nose_torque_link_lower#1",
+      "Nose_fork_bridge#1",
+      "Nose_oleo_piston#1"
+    ],
+    "Tailplane_Left#1": [
+      "Fuselage#1",
+      "Rudder_hinge#1",
+      "Fin_cap#1",
+      "Fin_skin#1",
+      "Elevator_skin_Left#1",
+      "Tailplane_Left#1"
+    ],
+    "Elevator_hinge_Left#1": [
+      "Fuselage#1",
+      "Rudder_hinge#1",
+      "Fin_cap#1",
+      "Fin_skin#1",
+      "Elevator_skin_Left#1",
+      "Elevator_hinge_Left#1"
+    ],
+    "Tailplane_Right#1": [
+      "Fuselage#1",
+      "Rudder_hinge#1",
+      "Fin_cap#1",
+      "Fin_skin#1",
+      "Elevator_skin_Right#1",
+      "Tailplane_Right#1"
+    ],
+    "Elevator_hinge_Right#1": [
+      "Fuselage#1",
+      "Rudder_hinge#1",
+      "Fin_cap#1",
+      "Fin_skin#1",
+      "Elevator_skin_Right#1",
+      "Elevator_hinge_Right#1"
+    ],
+    "Wingtip_cap_Left#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Strut_attach_Left_4.5#1",
+      "Wing_skin_Left#1",
+      "Wingtip_cap_Left#1"
+    ],
+    "Wing_skin_Right#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Strut_attach_Left_4.5#1",
+      "Wing_skin_Left#1",
+      "Wing_skin_Right#1"
+    ],
+    "Fuel_cap_Left#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Strut_attach_Left_4.5#1",
+      "Wing_skin_Left#1",
+      "Fuel_cap_Left#1"
+    ],
+    "Pitot_mast#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Strut_attach_Left_4.5#1",
+      "Wing_skin_Left#1",
+      "Pitot_mast#1"
+    ],
+    "Wing_carry_through_spar#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Strut_attach_Left_4.5#1",
+      "Wing_skin_Left#1",
+      "Wing_carry_through_spar#1"
+    ],
+    "Aileron_hinge_Left#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Strut_attach_Left_4.5#1",
+      "Wing_skin_Left#1",
+      "Aileron_hinge_Left#1"
+    ],
+    "Flap_hinge_Left#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Strut_attach_Left_4.5#1",
+      "Wing_skin_Left#1",
+      "Flap_hinge_Left#1"
+    ],
+    "Strut_attach_Right_0.68#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Wing_strut_Right#1",
+      "Strut_attach_Right_0.68#1"
+    ],
+    "Strut_attach_Right_4.5#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Wing_strut_Right#1",
+      "Strut_attach_Right_4.5#1"
+    ],
+    "Seat_pedestal_0_-1#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_0_-1#1"
+    ],
+    "Seat_pedestal_1_-1#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_1_-1#1"
+    ],
+    "Seat_pedestal_1_1#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_1_1#1"
+    ],
+    "Seat_pedestal_2_-1#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_2_-1#1"
+    ],
+    "Seat_pedestal_2_1#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_2_1#1"
+    ],
+    "Seat_pedestal_3_-1#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_3_-1#1"
+    ],
+    "Seat_pedestal_3_1#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_3_1#1"
+    ],
+    "Throttle_pedestal#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Throttle_pedestal#1"
+    ],
+    "Step_bracket_Left#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Step_bracket_Left#1"
+    ],
+    "Step_bracket_Right#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Step_bracket_Right#1"
+    ],
+    "Floor_crossmember_1.3#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Floor_crossmember_1.3#1"
+    ],
+    "Floor_crossmember_-2.6#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Floor_crossmember_-2.6#1"
+    ],
+    "Floor_crossmember_-1.3#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Floor_crossmember_-1.3#1"
+    ],
+    "Main_gear_leg_Left#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Main_gear_leg_Left#1"
+    ],
+    "Main_gear_leg_Right#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Main_gear_leg_Right#1"
+    ],
+    "Nose_axle#1": [
+      "Fuselage#1",
+      "Nose_oleo#1",
+      "Nose_torque_link_upper#1",
+      "Nose_torque_link_lower#1",
+      "Nose_fork_bridge#1",
+      "Nose_fork_-1#1",
+      "Nose_axle#1"
+    ],
+    "Nose_hub#1": [
+      "Fuselage#1",
+      "Nose_oleo#1",
+      "Nose_torque_link_upper#1",
+      "Nose_torque_link_lower#1",
+      "Nose_fork_bridge#1",
+      "Nose_fork_-1#1",
+      "Nose_hub#1"
+    ],
+    "Nose_tire#1": [
+      "Fuselage#1",
+      "Nose_oleo#1",
+      "Nose_torque_link_upper#1",
+      "Nose_torque_link_lower#1",
+      "Nose_fork_bridge#1",
+      "Nose_fork_-1#1",
+      "Nose_tire#1"
+    ],
+    "Navigation_light_Left#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Strut_attach_Left_4.5#1",
+      "Wing_skin_Left#1",
+      "Wingtip_cap_Left#1",
+      "Navigation_light_Left#1"
+    ],
+    "Wingtip_cap_Right#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Strut_attach_Left_4.5#1",
+      "Wing_skin_Left#1",
+      "Wing_skin_Right#1",
+      "Wingtip_cap_Right#1"
+    ],
+    "Fuel_cap_Right#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Strut_attach_Left_4.5#1",
+      "Wing_skin_Left#1",
+      "Wing_skin_Right#1",
+      "Fuel_cap_Right#1"
+    ],
+    "Aileron_hinge_Right#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Strut_attach_Left_4.5#1",
+      "Wing_skin_Left#1",
+      "Wing_skin_Right#1",
+      "Aileron_hinge_Right#1"
+    ],
+    "Flap_hinge_Right#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Strut_attach_Left_4.5#1",
+      "Wing_skin_Left#1",
+      "Wing_skin_Right#1",
+      "Flap_hinge_Right#1"
+    ],
+    "Pitot_probe#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Strut_attach_Left_4.5#1",
+      "Wing_skin_Left#1",
+      "Pitot_mast#1",
+      "Pitot_probe#1"
+    ],
+    "Aileron_Left#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Strut_attach_Left_4.5#1",
+      "Wing_skin_Left#1",
+      "Aileron_hinge_Left#1",
+      "Aileron_Left#1"
+    ],
+    "Flap_Left#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Strut_attach_Left_4.5#1",
+      "Wing_skin_Left#1",
+      "Flap_hinge_Left#1",
+      "Flap_Left#1"
+    ],
+    "Seat_cushion_0_-1#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_0_-1#1",
+      "Seat_cushion_0_-1#1"
+    ],
+    "Panel_support_-0.61#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_0_-1#1",
+      "Panel_support_-0.61#1"
+    ],
+    "Cargo_pod#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_0_-1#1",
+      "Cargo_pod#1"
+    ],
+    "Seat_cushion_1_-1#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_1_-1#1",
+      "Seat_cushion_1_-1#1"
+    ],
+    "Seat_cushion_1_1#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_1_1#1",
+      "Seat_cushion_1_1#1"
+    ],
+    "Seat_cushion_2_-1#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_2_-1#1",
+      "Seat_cushion_2_-1#1"
+    ],
+    "Seat_cushion_2_1#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_2_1#1",
+      "Seat_cushion_2_1#1"
+    ],
+    "Seat_cushion_3_-1#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_3_-1#1",
+      "Seat_cushion_3_-1#1"
+    ],
+    "Seat_cushion_3_1#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_3_1#1",
+      "Seat_cushion_3_1#1"
+    ],
+    "Throttle_lever#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Throttle_pedestal#1",
+      "Throttle_lever#1"
+    ],
+    "Entry_step_Left#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Step_bracket_Left#1",
+      "Entry_step_Left#1"
+    ],
+    "Entry_step_Right#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Step_bracket_Right#1",
+      "Entry_step_Right#1"
+    ],
+    "Brake_mount_Left#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Main_gear_leg_Left#1",
+      "Brake_mount_Left#1"
+    ],
+    "Brake_mount_Right#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Main_gear_leg_Right#1",
+      "Brake_mount_Right#1"
+    ],
+    "Navigation_light_Right#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Strut_attach_Left_4.5#1",
+      "Wing_skin_Left#1",
+      "Wing_skin_Right#1",
+      "Wingtip_cap_Right#1",
+      "Navigation_light_Right#1"
+    ],
+    "Aileron_Right#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Strut_attach_Left_4.5#1",
+      "Wing_skin_Left#1",
+      "Wing_skin_Right#1",
+      "Aileron_hinge_Right#1",
+      "Aileron_Right#1"
+    ],
+    "Flap_Right#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Strut_attach_Left_4.5#1",
+      "Wing_skin_Left#1",
+      "Wing_skin_Right#1",
+      "Flap_hinge_Right#1",
+      "Flap_Right#1"
+    ],
+    "Seat_back_0_-1#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_0_-1#1",
+      "Seat_cushion_0_-1#1",
+      "Seat_back_0_-1#1"
+    ],
+    "Instrument_panel#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_0_-1#1",
+      "Panel_support_-0.61#1",
+      "Instrument_panel#1"
+    ],
+    "Cargo_latch_Left_1#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_0_-1#1",
+      "Cargo_pod#1",
+      "Cargo_latch_Left_1#1"
+    ],
+    "Cargo_latch_Left_2#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_0_-1#1",
+      "Cargo_pod#1",
+      "Cargo_latch_Left_2#1"
+    ],
+    "Cargo_latch_Left_3#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_0_-1#1",
+      "Cargo_pod#1",
+      "Cargo_latch_Left_3#1"
+    ],
+    "Cargo_latch_Right_1#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_0_-1#1",
+      "Cargo_pod#1",
+      "Cargo_latch_Right_1#1"
+    ],
+    "Cargo_latch_Right_2#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_0_-1#1",
+      "Cargo_pod#1",
+      "Cargo_latch_Right_2#1"
+    ],
+    "Cargo_latch_Right_3#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_0_-1#1",
+      "Cargo_pod#1",
+      "Cargo_latch_Right_3#1"
+    ],
+    "Cargo_hinge_Left_1_1#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_0_-1#1",
+      "Cargo_pod#1",
+      "Cargo_hinge_Left_1_1#1"
+    ],
+    "Cargo_hinge_Left_1_2#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_0_-1#1",
+      "Cargo_pod#1",
+      "Cargo_hinge_Left_1_2#1"
+    ],
+    "Cargo_hinge_Left_2_1#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_0_-1#1",
+      "Cargo_pod#1",
+      "Cargo_hinge_Left_2_1#1"
+    ],
+    "Cargo_hinge_Left_2_2#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_0_-1#1",
+      "Cargo_pod#1",
+      "Cargo_hinge_Left_2_2#1"
+    ],
+    "Cargo_hinge_Left_3_1#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_0_-1#1",
+      "Cargo_pod#1",
+      "Cargo_hinge_Left_3_1#1"
+    ],
+    "Cargo_hinge_Left_3_2#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_0_-1#1",
+      "Cargo_pod#1",
+      "Cargo_hinge_Left_3_2#1"
+    ],
+    "Cargo_hinge_Right_1_1#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_0_-1#1",
+      "Cargo_pod#1",
+      "Cargo_hinge_Right_1_1#1"
+    ],
+    "Cargo_hinge_Right_1_2#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_0_-1#1",
+      "Cargo_pod#1",
+      "Cargo_hinge_Right_1_2#1"
+    ],
+    "Cargo_hinge_Right_2_1#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_0_-1#1",
+      "Cargo_pod#1",
+      "Cargo_hinge_Right_2_1#1"
+    ],
+    "Cargo_hinge_Right_2_2#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_0_-1#1",
+      "Cargo_pod#1",
+      "Cargo_hinge_Right_2_2#1"
+    ],
+    "Cargo_hinge_Right_3_1#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_0_-1#1",
+      "Cargo_pod#1",
+      "Cargo_hinge_Right_3_1#1"
+    ],
+    "Cargo_hinge_Right_3_2#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_0_-1#1",
+      "Cargo_pod#1",
+      "Cargo_hinge_Right_3_2#1"
+    ],
+    "Seat_back_1_-1#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_1_-1#1",
+      "Seat_cushion_1_-1#1",
+      "Seat_back_1_-1#1"
+    ],
+    "Seat_back_1_1#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_1_1#1",
+      "Seat_cushion_1_1#1",
+      "Seat_back_1_1#1"
+    ],
+    "Seat_back_2_-1#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_2_-1#1",
+      "Seat_cushion_2_-1#1",
+      "Seat_back_2_-1#1"
+    ],
+    "Seat_back_2_1#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_2_1#1",
+      "Seat_cushion_2_1#1",
+      "Seat_back_2_1#1"
+    ],
+    "Seat_back_3_-1#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_3_-1#1",
+      "Seat_cushion_3_-1#1",
+      "Seat_back_3_-1#1"
+    ],
+    "Seat_back_3_1#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_3_1#1",
+      "Seat_cushion_3_1#1",
+      "Seat_back_3_1#1"
+    ],
+    "Throttle_handle#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Throttle_pedestal#1",
+      "Throttle_lever#1",
+      "Throttle_handle#1"
+    ],
+    "Brake_caliper_Left#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Main_gear_leg_Left#1",
+      "Brake_mount_Left#1",
+      "Brake_caliper_Left#1"
+    ],
+    "Main_gear_axle_Left#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Main_gear_leg_Left#1",
+      "Brake_mount_Left#1",
+      "Main_gear_axle_Left#1"
+    ],
+    "Brake_caliper_Right#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Main_gear_leg_Right#1",
+      "Brake_mount_Right#1",
+      "Brake_caliper_Right#1"
+    ],
+    "Main_gear_axle_Right#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Main_gear_leg_Right#1",
+      "Brake_mount_Right#1",
+      "Main_gear_axle_Right#1"
+    ],
+    "Yoke_column_-0.4#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_0_-1#1",
+      "Panel_support_-0.61#1",
+      "Instrument_panel#1",
+      "Yoke_column_-0.4#1"
+    ],
+    "Yoke_column_0.4#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_0_-1#1",
+      "Panel_support_-0.61#1",
+      "Instrument_panel#1",
+      "Yoke_column_0.4#1"
+    ],
+    "Display_bezel_-0.42#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_0_-1#1",
+      "Panel_support_-0.61#1",
+      "Instrument_panel#1",
+      "Display_bezel_-0.42#1"
+    ],
+    "Display_bezel_0#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_0_-1#1",
+      "Panel_support_-0.61#1",
+      "Instrument_panel#1",
+      "Display_bezel_0#1"
+    ],
+    "Display_bezel_0.42#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_0_-1#1",
+      "Panel_support_-0.61#1",
+      "Instrument_panel#1",
+      "Display_bezel_0.42#1"
+    ],
+    "Panel_support_0.61#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_0_-1#1",
+      "Panel_support_-0.61#1",
+      "Instrument_panel#1",
+      "Panel_support_0.61#1"
+    ],
+    "Brake_hose_Left#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Main_gear_leg_Left#1",
+      "Brake_mount_Left#1",
+      "Brake_caliper_Left#1",
+      "Brake_hose_Left#1"
+    ],
+    "Main_hub_Left#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Main_gear_leg_Left#1",
+      "Brake_mount_Left#1",
+      "Brake_caliper_Left#1",
+      "Main_hub_Left#1"
+    ],
+    "Brake_disc_Left#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Main_gear_leg_Left#1",
+      "Brake_mount_Left#1",
+      "Brake_caliper_Left#1",
+      "Brake_disc_Left#1"
+    ],
+    "Main_tire_Left#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Main_gear_leg_Left#1",
+      "Brake_mount_Left#1",
+      "Brake_caliper_Left#1",
+      "Main_tire_Left#1"
+    ],
+    "Main_hubcap_Left#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Main_gear_leg_Left#1",
+      "Brake_mount_Left#1",
+      "Main_gear_axle_Left#1",
+      "Main_hubcap_Left#1"
+    ],
+    "Brake_hose_Right#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Main_gear_leg_Right#1",
+      "Brake_mount_Right#1",
+      "Brake_caliper_Right#1",
+      "Brake_hose_Right#1"
+    ],
+    "Main_hub_Right#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Main_gear_leg_Right#1",
+      "Brake_mount_Right#1",
+      "Brake_caliper_Right#1",
+      "Main_hub_Right#1"
+    ],
+    "Brake_disc_Right#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Main_gear_leg_Right#1",
+      "Brake_mount_Right#1",
+      "Brake_caliper_Right#1",
+      "Brake_disc_Right#1"
+    ],
+    "Main_tire_Right#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Main_gear_leg_Right#1",
+      "Brake_mount_Right#1",
+      "Brake_caliper_Right#1",
+      "Main_tire_Right#1"
+    ],
+    "Main_hubcap_Right#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Main_gear_leg_Right#1",
+      "Brake_mount_Right#1",
+      "Main_gear_axle_Right#1",
+      "Main_hubcap_Right#1"
+    ],
+    "Yoke_crossbar_-0.4#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_0_-1#1",
+      "Panel_support_-0.61#1",
+      "Instrument_panel#1",
+      "Yoke_column_-0.4#1",
+      "Yoke_crossbar_-0.4#1"
+    ],
+    "Yoke_crossbar_0.4#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_0_-1#1",
+      "Panel_support_-0.61#1",
+      "Instrument_panel#1",
+      "Yoke_column_0.4#1",
+      "Yoke_crossbar_0.4#1"
+    ],
+    "Seat_pedestal_0_1#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_0_-1#1",
+      "Panel_support_-0.61#1",
+      "Instrument_panel#1",
+      "Panel_support_0.61#1",
+      "Seat_pedestal_0_1#1"
+    ],
+    "Yoke_grip_-0.4_-1#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_0_-1#1",
+      "Panel_support_-0.61#1",
+      "Instrument_panel#1",
+      "Yoke_column_-0.4#1",
+      "Yoke_crossbar_-0.4#1",
+      "Yoke_grip_-0.4_-1#1"
+    ],
+    "Yoke_grip_-0.4_1#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_0_-1#1",
+      "Panel_support_-0.61#1",
+      "Instrument_panel#1",
+      "Yoke_column_-0.4#1",
+      "Yoke_crossbar_-0.4#1",
+      "Yoke_grip_-0.4_1#1"
+    ],
+    "Yoke_grip_0.4_-1#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_0_-1#1",
+      "Panel_support_-0.61#1",
+      "Instrument_panel#1",
+      "Yoke_column_0.4#1",
+      "Yoke_crossbar_0.4#1",
+      "Yoke_grip_0.4_-1#1"
+    ],
+    "Yoke_grip_0.4_1#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_0_-1#1",
+      "Panel_support_-0.61#1",
+      "Instrument_panel#1",
+      "Yoke_column_0.4#1",
+      "Yoke_crossbar_0.4#1",
+      "Yoke_grip_0.4_1#1"
+    ],
+    "Seat_cushion_0_1#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_0_-1#1",
+      "Panel_support_-0.61#1",
+      "Instrument_panel#1",
+      "Panel_support_0.61#1",
+      "Seat_pedestal_0_1#1",
+      "Seat_cushion_0_1#1"
+    ],
+    "Seat_back_0_1#1": [
+      "Fuselage#1",
+      "Curved_belly_livery#1",
+      "Strut_attach_Left_0.68#1",
+      "Wing_strut_Left#1",
+      "Floor_crossmember_0#1",
+      "Cabin_floor#1",
+      "Seat_pedestal_0_-1#1",
+      "Panel_support_-0.61#1",
+      "Instrument_panel#1",
+      "Panel_support_0.61#1",
+      "Seat_pedestal_0_1#1",
+      "Seat_cushion_0_1#1",
+      "Seat_back_0_1#1"
+    ]
+  },
+  "runtimeDimensions": [
+    15.869999885559082,
+    4.700000102519989,
+    12.670000077486037
+  ],
+  "wingArea": 26.6852364082726,
+  "collisionProbes": 540,
+  "sourceSha256": "093a02ee5544da5abdd05f2b0bbc1c4832da7bd24fbef8e5597f4aab9b75ac0d"
+}

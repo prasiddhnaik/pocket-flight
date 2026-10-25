@@ -1,0 +1,405 @@
+{
+  "date": "2026-10-23",
+  "subject": "Single-seat production F-15C digital model, existing lab validation, usable in-game cannon",
+  "requestedServices": [
+    "Exa",
+    "Parallel Search"
+  ],
+  "counts": {
+    "searchCalls": 10,
+    "exaResultSlots": 20,
+    "discoveredResults": 61,
+    "uniqueUrls": 51
+  },
+  "countMeaning": "Discovery screening counts; not all candidates were fully read or validated.",
+  "selectedSources": [
+    {
+      "id": "usaf-c",
+      "url": "https://www.eglin.af.mil/Portals/56/documents/history/AFD-141104-028.pdf",
+      "quality": "F-15C-specific USAF fact sheet; original agency source.",
+      "use": "Overall envelope; imperial values converted for authoring. Read through Parallel Search; local PDF retrieval did not complete."
+    },
+    {
+      "id": "usaf-eagle",
+      "url": "https://www.af.mil/About-Us/Fact-Sheets/Display/Article/104501/f-15-eagle/",
+      "quality": "USAF primary general fact sheet; combines several variants.",
+      "use": "Single-seat C, rounded envelope, one right-wing-root internal cannon and 940-round published capacity."
+    },
+    {
+      "id": "mcair-nasa-geometry",
+      "url": "https://ntrs.nasa.gov/api/citations/19890009868/downloads/19890009868.pdf",
+      "quality": "McDonnell Aircraft author, NASA-hosted original technical paper; includes comparison with early model tests.",
+      "use": "Wing/stabilator geometry, spanwise section changes, scope of wing-only studies. Original PDF saved; figures 1\u20133 visually inspected."
+    },
+    {
+      "id": "nasa-low-speed",
+      "url": "https://ntrs.nasa.gov/citations/19780002076",
+      "quality": "NASA TM-X-62360; July 1974 model test, not production C manufacturing geometry.",
+      "use": "All-moving stabilator, experimental conditions; detailed scanned table dimensions require original-page visual verification."
+    },
+    {
+      "id": "nasa-inlets",
+      "url": "https://ntrs.nasa.gov/api/citations/19850014083/downloads/19850014083.pdf",
+      "quality": "NASA TP-2411; original flight-test research on an F-15.",
+      "use": "Three-ramp variable capture inlets, lower-cowl hinge, bypass control. Text read; drawing pending visual review if local retrieval fails."
+    },
+    {
+      "id": "nasa-nozzle",
+      "url": "https://ntrs.nasa.gov/api/citations/19810006485/downloads/19810006485.pdf",
+      "quality": "NASA TP-1782; original F100 engine research.",
+      "use": "Variable-area convergent-divergent nozzle architecture; no claim of verified production C hardware dimensions."
+    },
+    {
+      "id": "nmusaf-photos",
+      "url": "https://www.nationalmuseum.af.mil/Visit/Museum-Exhibits/Fact-Sheets/Display/Article/3454925/mcdonnell-douglas-f-15c-historic-double-mig-killer/",
+      "quality": "Museum primary aircraft record and credited original USAF photographs; aircraft 86-0156.",
+      "use": "Visually inspected side, low-front, front, forward-side and rear-quarter views. Chosen photographic baseline; optional external tanks excluded from proposed initial model."
+    },
+    {
+      "id": "smithsonian",
+      "url": "https://airandspace.si.edu/collection-objects/mcdonnell-douglas-f-15c-eagle/nasm_A20260082000",
+      "quality": "Museum primary object record; measurement method/configuration unspecified.",
+      "use": "Preserve differing object dimensions without averaging them into the USAF specification envelope."
+    },
+    {
+      "id": "nasa-aircraft",
+      "url": "https://www.nasa.gov/reference/f-15-flight-research-facility/",
+      "quality": "NASA primary description; explicitly modified F-15A.",
+      "use": "Variant guard: research modifications are not production C detail."
+    },
+    {
+      "id": "usaf-e",
+      "url": "https://www.af.mil/about-us/fact-sheets/display/article/104499/f-15e-strike-eagle/",
+      "quality": "USAF primary F-15E fact sheet.",
+      "use": "Cross-variant guard: two crew members; CFT provision also exists on C."
+    }
+  ],
+  "excludedAsDimensionalAuthorities": [
+    "unrelated keyword hits",
+    "retailer and scale-model sales pages",
+    "flight simulator descriptions",
+    "secondary reposts without original technical evidence",
+    "ACTIVE/STOL demonstrator geometry"
+  ],
+  "outstanding": [
+    "Production C fuselage section coordinates",
+    "Exact canopy and speedbrake pivots/travel",
+    "Landing gear retraction axes and door sequencing",
+    "Minor actuator, panel and fin-top equipment dimensions",
+    "Validated F-15C mass/propulsion/aerodynamic coefficients for runtime",
+    "Measured wing area and section coordinates of the authored CAD",
+    "Game firing, collision and replay validation"
+  ],
+  "discoveries": [
+    {
+      "search": "exa-envelope",
+      "title": "F-15 marks 40 years of flight > Edwards Air Force Base > Article View",
+      "url": "https://www.edwards.af.mil/News/Display/Article/394364/f-15-marks-40-years-of-flight/"
+    },
+    {
+      "search": "exa-envelope",
+      "title": "F-15 Eagle > Air Force > Fact Sheet Display",
+      "url": "https://www.af.mil/About-Us/Fact-Sheets/Display/Article/104501/f-15-eagle/"
+    },
+    {
+      "search": "exa-envelope",
+      "title": "F-15E Strike Eagle > Air Force > Fact Sheet Display",
+      "url": "https://www.af.mil/about-us/fact-sheets/display/article/104499/f-15e-strike-eagle/"
+    },
+    {
+      "search": "exa-envelope",
+      "title": "McDonnell Douglas F-15C Historic Double MiG Killer > National Museum of the United States Air Force  > Display",
+      "url": "https://www.nationalmuseum.af.mil/Visit/Museum-Exhibits/Fact-Sheets/Display/Article/3454925/mcdonnell-douglas-f-15c-historic-double-mig-killer/"
+    },
+    {
+      "search": "exa-envelope",
+      "title": "F-15 Eagle > Air Force > Fact Sheet Display",
+      "url": "https://www.af.mil/about-us/fact-sheets/display/article/104501/f-15-eagle/"
+    },
+    {
+      "search": "exa-geometry",
+      "title": ".N89-19239",
+      "url": "https://ntrs.nasa.gov/api/citations/19890009868/downloads/19890009868.pdf"
+    },
+    {
+      "search": "exa-geometry",
+      "title": "E\"c cifS2 s/\u00ab",
+      "url": "https://ntrs.nasa.gov/api/citations/19860014116/downloads/19860014116.pdf"
+    },
+    {
+      "search": "exa-geometry",
+      "title": "Low speed aerodynamic characteristics of an 0.075-scale F-15 airplane model at high angles of attack and sideslip",
+      "url": "http://hdl.handle.net/2060/19780002076"
+    },
+    {
+      "search": "exa-geometry",
+      "title": "Precision controllability of the F-15 airplane - NASA Technical Reports Server (NTRS)",
+      "url": "http://ntrs.nasa.gov/archive/nasa/casi.ntrs.nasa.gov/19790015808.pdf"
+    },
+    {
+      "search": "exa-geometry",
+      "title": "Precision controllability of the F-15 airplane",
+      "url": "http://hdl.handle.net/2060/19790015808"
+    },
+    {
+      "search": "exa-mechanisms",
+      "title": "McDonnell Douglas F-15C Eagle | National Air and Space Museum",
+      "url": "https://airandspace.si.edu/multimedia-gallery/image/nasm2025-05349tif"
+    },
+    {
+      "search": "exa-mechanisms",
+      "title": "Photos - Page 46 - Category Events - Tag fighter - Sort By Title",
+      "url": "https://www.nationalmuseum.af.mil/Upcoming/Photos/?igcategory=Events&igpage=46&igsort=Title&igtag=fighter"
+    },
+    {
+      "search": "exa-mechanisms",
+      "title": "MCDONNELL DOUGLAS F-15A EAGLE",
+      "url": "https://www.nationalmuseum.af.mil/Upcoming/Photos/igpage/88/igtag/space/igsort/Title/?igcategory=Museum+Aircraft"
+    },
+    {
+      "search": "exa-mechanisms",
+      "title": "F-15 Details & Walk Around by Ken Middleton",
+      "url": "http://www.kenmiddleton.net/real_aviation/F-15/walk/F-15-Details.htm"
+    },
+    {
+      "search": "exa-mechanisms",
+      "title": "McDonnell Douglas F-15 Eagle - Wikimedia Commons",
+      "url": "https://commons.wikimedia.org/wiki/F-15_Eagle"
+    },
+    {
+      "search": "exa-production-features",
+      "title": "Photos - Page 46 - Category Events - Tag fighter - Sort By Title",
+      "url": "https://www.nationalmuseum.af.mil/Upcoming/Photos/?igcategory=Events&igpage=46&igsort=Title&igtag=fighter"
+    },
+    {
+      "search": "exa-production-features",
+      "title": "(page 1) - FlightAware",
+      "url": "https://www.flightaware.com/photos/aircrafttype/F15C"
+    },
+    {
+      "search": "exa-production-features",
+      "title": "McDonnell Douglas F-15 Eagle - Wikimedia Commons",
+      "url": "https://commons.wikimedia.org/wiki/F-15_Eagle"
+    },
+    {
+      "search": "exa-production-features",
+      "title": "McDonnell Douglas F-15C Eagle - Aviation Photo Gallery on Airplane Pictures",
+      "url": "https://airplane-pictures.net/type?apqid=157"
+    },
+    {
+      "search": "exa-production-features",
+      "title": "F-15C Eagle (80-0035) Walk Around Page 1",
+      "url": "http://www.primeportal.net/hangar/bill_spidle3/f-15c_80-0035/"
+    },
+    {
+      "search": "parallel-variant",
+      "url": "https://www.af.mil/About-Us/Fact-Sheets/Display/Article/104501/f-15-eagle/",
+      "title": "\n\tF-15 Eagle > Air Force > Fact Sheet Display\n"
+    },
+    {
+      "search": "parallel-variant",
+      "url": "https://www.afnwc.af.mil/About-Us/Fact-Sheets/Article/2074655/f-15-eagle",
+      "title": "\n\tF-15 Eagle > Air Force Nuclear Weapons Center > Fact Sheets\n"
+    },
+    {
+      "search": "parallel-variant",
+      "url": "https://www.af.mil/about-us/fact-sheets/display/article/104499/f-15e-strike-eagle/",
+      "title": "\n\tF-15E Strike Eagle > Air Force > Fact Sheet Display\n"
+    },
+    {
+      "search": "parallel-variant",
+      "url": "https://digitalnomads.world/tips/eagle-creek-orv-wheeled-trunk-review",
+      "title": "In terms of dimensions, it's 30'' H x 16.5'' x 15'' (76 x 42 x 38cm) , with an empty weight of 9lbs 14oz (about 4.5kg). Digital Nomad World 1y \u00a0\u00b7\u00a0Eagle Creek ORV Wheeled Trunk Review"
+    },
+    {
+      "search": "parallel-variant",
+      "url": "https://aerospaceweb.org/aircraft/fighter/f15",
+      "title": "Aerospaceweb.org | Aircraft Museum - F-15 Eagle"
+    },
+    {
+      "search": "parallel-geometry",
+      "url": "https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/wing-geometry/",
+      "title": "Wing Geometry | Glenn Research Center | NASA"
+    },
+    {
+      "search": "parallel-geometry",
+      "url": "https://www.grc.nasa.gov/www/k-12/VirtualAero/BottleRocket/airplane/geom.html",
+      "title": "Geometry  Definitions"
+    },
+    {
+      "search": "parallel-geometry",
+      "url": "https://en.wikipedia.org/wiki/Northrop_F-15_Reporter",
+      "title": "Northrop F-15 Reporter - Wikipedia"
+    },
+    {
+      "search": "parallel-geometry",
+      "url": "https://www.sanfoundry.com/aircraft-wing-geometry",
+      "title": "Aircraft Wing Geometry - Sanfoundry"
+    },
+    {
+      "search": "parallel-mechanisms",
+      "url": "https://airandspace.si.edu/collection-media/NASM-NASM2025-07835",
+      "title": "McDonnell Douglas F-15C Eagle | National Air and Space Museum"
+    },
+    {
+      "search": "parallel-mechanisms",
+      "url": "https://airandspace.si.edu/collection-media/NASM-NASM2025-07836",
+      "title": "McDonnell Douglas F-15C Eagle | National Air and Space Museum"
+    },
+    {
+      "search": "parallel-mechanisms",
+      "url": "https://airandspace.si.edu/collection-objects/mcdonnell-douglas-f-15c-eagle/nasm_A20260082000",
+      "title": "McDonnell Douglas F-15C Eagle | National Air and Space Museum"
+    },
+    {
+      "search": "parallel-mechanisms",
+      "url": "https://theaviationist.com/2023/11/05/f-15-variable-geometry-air-intakes",
+      "title": "This Incredible Video Shows How F-15's Variable-Geometry Air Intakes Work - The Aviationist"
+    },
+    {
+      "search": "parallel-mechanisms",
+      "url": "https://ftp.fbodaily.com/archive/2022/01-January/26-Jan-2022/FBO-06222588.htm",
+      "title": "F-15 L/H Diffusers, R/H Diffusers and 3rd Ramps | 26-Jan-22"
+    },
+    {
+      "search": "parallel-mechanisms",
+      "url": "http://avonds.com/F-15C%20ARF.htm",
+      "title": "New F-15C ARF"
+    },
+    {
+      "search": "parallel-mechanisms",
+      "url": "https://en.wikipedia.org/wiki/Intake_ramp",
+      "title": "Intake ramp"
+    },
+    {
+      "search": "parallel-mechanisms",
+      "url": "https://www.digitalcombatsimulator.com/en/products/planes/f-15c_flaming_cliffs/?PAGEN_1=2&%3A~%3Atext=The_aircraft%27s_AN%2FAPG-63+in_the_starboard_wing_root",
+      "title": "F-15C Flaming Cliffs"
+    },
+    {
+      "search": "parallel-mechanisms",
+      "url": "https://www.grc.nasa.gov/WWW/k-12/airplane/inlet.html",
+      "title": "Inlets - NASA"
+    },
+    {
+      "search": "parallel-mechanisms",
+      "url": "https://www.twz.com/f-15-eagles-tilting-air-intakes-showcased-in-awesome-video",
+      "title": "F-15's Tilting Air Intakes Showcased In Awesome Video"
+    },
+    {
+      "search": "parallel-inlet-nasa",
+      "url": "https://www.nas.nasa.gov/assets/nas/pdf/ams/2024/AMS_20240215_Heinlein.pdf",
+      "title": "Performance Characteristics and Aerodynamic Behavior of a Boundary Layer Ingesting Inlet \u2013 Distortion Tolerant Fan Gregory S. Heinlein"
+    },
+    {
+      "search": "parallel-inlet-nasa",
+      "url": "https://ntrs.nasa.gov/api/citations/20060004990/downloads/20060004990.pdf",
+      "title": "Boundary-Layer-Ingesting Inlet Flow Control"
+    },
+    {
+      "search": "parallel-inlet-nasa",
+      "url": "https://ntrs.nasa.gov/api/citations/19850014083/downloads/19850014083.pdf",
+      "title": "Effects of Inlet Distortion on a Static Pressure Probe ..."
+    },
+    {
+      "search": "parallel-inlet-nasa",
+      "url": "https://www.grc.nasa.gov/www/BGH/inleth.html",
+      "title": "Inlet Performance"
+    },
+    {
+      "search": "parallel-inlet-nasa",
+      "url": "https://ntrs.nasa.gov/api/citations/19810006485/downloads/19810006485.pdf",
+      "title": "[PDF] ' Engine. in an Flight Evaluation Gross, .Thrust 'Calculation Techn"
+    },
+    {
+      "search": "parallel-inlet-nasa",
+      "url": "https://rotorcraft.arc.nasa.gov/ndarc/media/Files/reportsAndPapers/Johnson%20TP-202510470.pdf",
+      "title": "NDARC - NASA Design and Analysis of Rotorcraft"
+    },
+    {
+      "search": "parallel-inlet-nasa",
+      "url": "https://theaviationist.com/2023/11/05/f-15-variable-geometry-air-intakes",
+      "title": "This Incredible Video Shows How F-15's Variable- ..."
+    },
+    {
+      "search": "parallel-inlet-nasa",
+      "url": "https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/20210239045",
+      "title": "US20210239045A1 - CAM MECHANISM FOR VARIABLE-GEOMETRY CARET INLET"
+    },
+    {
+      "search": "parallel-inlet-nasa",
+      "url": "https://ntrs.nasa.gov/api/citations/20000044616/downloads/20000044616.pdf",
+      "title": "First NASA/Industry High-Speed Research Configuration Aerodynamics Workshop"
+    },
+    {
+      "search": "parallel-inlet-nasa",
+      "url": "https://www.youtube.com/watch?v=38wwO6ooDgo",
+      "title": "This Incredible Video Shows How F-15's Variable-Geometry Air ..."
+    },
+    {
+      "search": "parallel-photo-views",
+      "url": "https://www.af.mil/News/Photos/igtag/F-15C",
+      "title": "\n\tPhotos - Tag F-15C\n"
+    },
+    {
+      "search": "parallel-photo-views",
+      "url": "https://www.eglin.af.mil/Portals/56/documents/history/AFD-141104-028.pdf",
+      "title": "MCDONNELL DOUGLAS F-15C The first production McDonnell Douglas F-15C (S/N 78-468) in flight. (U.S. Air Force photo) Number Type built/"
+    },
+    {
+      "search": "parallel-photo-views",
+      "url": "https://www.nationalmuseum.af.mil/Visit/Museum-Exhibits/Fact-Sheets/Display/Article/3454925/mcdonnell-douglas-f-15c-historic-double-mig-killer",
+      "title": "\n\tMcDonnell Douglas F-15C Historic Double MiG Killer > National Museum of the United States Air Force  > Display\n"
+    },
+    {
+      "search": "parallel-photo-views",
+      "url": "http://craigcentral.com/models/f-15c/default.asp",
+      "title": "McDonnell-Douglas F-15C Eagle"
+    },
+    {
+      "search": "parallel-photo-views",
+      "url": "https://www.jetphotos.com/aircraft/McDonnell%20Douglas%20F-15C%20Eagle",
+      "title": "McDonnell Douglas F-15C Eagle aviation photos on JetPhotos"
+    },
+    {
+      "search": "parallel-rear-view",
+      "url": "https://www.af.mil/News/Photos.aspx?igtag=F-15C%20Eagle",
+      "title": "Photos - Tag F-15C Eagle - U.S. Air Force"
+    },
+    {
+      "search": "parallel-rear-view",
+      "url": "https://www.af.mil/News/Photos/igtag/F-15C",
+      "title": "\n\tPhotos - Tag F-15C\n"
+    },
+    {
+      "search": "parallel-rear-view",
+      "url": "https://www.nationalmuseum.af.mil/Visit/Museum-Exhibits/Fact-Sheets/Display/Article/3454925/mcdonnell-douglas-f-15c-historic-double-mig-killer",
+      "title": "\n\tMcDonnell Douglas F-15C Historic Double MiG Killer > National Museum of the United States Air Force  > Display\n"
+    },
+    {
+      "search": "parallel-rear-view",
+      "url": "https://www.user-manual.renault.com/en/content/renault-trafic/getting-know-your-vehicle/rear-view-mirrors",
+      "title": "Rear view mirrors - Renault Trafic - user manual"
+    },
+    {
+      "search": "parallel-rear-view",
+      "url": "https://www.etsy.com/listing/1637021681/f-15c-eagle-85-0122-desert-storm-58tfs",
+      "title": "F-15C Eagle 85-0122 Desert Storm 58TFS | Side View"
+    },
+    {
+      "search": "parallel-rear-view",
+      "url": "https://www.amazon.com/stores/RearViewSafety/page/F749301E-AE28-4793-BC51-62C204CE15A4",
+      "title": "Rear View Safety"
+    },
+    {
+      "search": "parallel-rear-view",
+      "url": "https://airandspace.si.edu/collection-objects/mcdonnell-douglas-f-15c-eagle/nasm_A20260082000",
+      "title": "McDonnell Douglas F-15C Eagle | National Air and Space Museum"
+    }
+  ],
+  "localSourceStatus": {
+    "nasa-19890009868.pdf": "Complete; 20-page PDF validated with pdfinfo; figures 1\u20133 rendered and visually inspected.",
+    "nasa-19780002076.pdf.partial": "Incomplete transfer; not a usable PDF; range resume unsupported. Online source text read, original table page still pending visual verification.",
+    "nasa-tp2411-19850014083.pdf.partial": "Incomplete transfer; not a usable PDF; range resume unsupported. Online source text read, inlet diagram still pending visual verification."
+  }
+}

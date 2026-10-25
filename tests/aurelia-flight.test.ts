@@ -1,7 +1,7 @@
 import { test, expect } from "bun:test";
-import { FlightPhysics } from "../src/physics";
-import { gearContactHeight, aureliaWheels } from "../src/landing-gear";
-import { runways, groundAt } from "../src/terrain";
+import { FlightPhysics } from "../src/flight/physics";
+import { gearContactHeight, aureliaWheels } from "../src/aircraft/landing-gear";
+import { runways, groundAt } from "../src/world/terrain";
 const neutral = { pitch: 0, roll: 0, yaw: 0, throttle: 0, brake: false };
 function jet() {
   const p = new FlightPhysics();

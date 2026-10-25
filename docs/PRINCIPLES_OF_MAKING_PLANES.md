@@ -179,7 +179,7 @@ For display, `1 knot = 0.514444… m/s`, `1 foot = 0.3048 m`, and `1 degree = pi
 
 ### 4.2 Pocket Flight asset conventions
 
-The existing aircraft-workflow document specifies Blender **X across the wings, +Y forward, +Z up**, with exported aircraft using **+Y up and −Z forward**. The runtime forward vector in `src/physics.ts` is `(0, 0, -1)`. Confirm each actual import and pivot rather than assuming every source uses one convention.
+The existing aircraft-workflow document specifies Blender **X across the wings, +Y forward, +Z up**, with exported aircraft using **+Y up and −Z forward**. The runtime forward vector in `src/flight/physics.ts` is `(0, 0, -1)`. Confirm each actual import and pivot rather than assuming every source uses one convention.
 
 **Do:** document body, world, CAD, Blender, and export frames. Define the signs of pitch, roll, yaw, and control deflection.
 
@@ -771,15 +771,15 @@ Keep the editable source and a compact aircraft manifest. Triangle count, export
 
 | File | Observed responsibility or behavior | Design implication |
 |---|---|---|
-| [`src/flight-profiles.ts`](../src/flight-profiles.ts) | Profile constants for thrust, lift, drag, rates, and speed thresholds; Peregrine and Aurelia share the `jet` object. | Current profiles are tuning data, not measured aircraft engineering datasets. |
-| [`src/physics.ts`](../src/physics.ts) | Subtracts wind from velocity; computes speed-dependent lift/drag; controls directly influence attitude/rates and includes assistance. | Air-relative motion is present, but the model is not a full component-based six-degree-of-freedom aerodynamic simulation. |
-| [`src/physics.ts`](../src/physics.ts) | AOA approximation uses pitch minus air-relative path angle; stall combines a speed threshold with an absolute-AOA threshold. | This is an approximation, especially in banked/sideslipping flight; it does not encode aircraft-specific local stall progression. |
-| [`src/physics.ts`](../src/physics.ts) | Lift/thrust/drag variables feed acceleration directly; no explicit mass/inertia/CG model is defined in this class. | Do not label profile thrust as newtons or lift as `q × S × CL` without changing the data model. |
-| [`src/physics.ts`](../src/physics.ts) | Pitch and roll damping, coordinated-turn yaw, sideslip damping, and stall attitude corrections help guide the aircraft. | Document these as assistance/approximation. They are not evidence of natural aerodynamic stability. |
-| [`src/flight-profiles.ts`](../src/flight-profiles.ts) | Shared jet data includes a nonzero afterburner multiplier; Aurelia uses that shared profile. | A future civilian propulsion model should be distinguished from military afterburning propulsion even if its visuals differ today. |
-| [`src/aircraft.ts`](../src/aircraft.ts) | Runtime loader scales Aurelia by 0.55 and Peregrine by `JET_SCALE = 0.7`; Stormbird has a different center offset and no scale reduction in its branch. | Use actual loaded geometry for reference dimensions and datums; source-model dimensions alone are insufficient. |
-| [`src/landing-gear.ts`](../src/landing-gear.ts) | Physics imports aircraft-specific wheel data and contact-height logic. | Geometry changes must preserve or intentionally update the physical contact datums. |
-| [`src/game.ts`](../src/game.ts) | Advances physics at 60 Hz and interpolates visible poses. | Validate new behavior across rendering rates while retaining a consistent physics timestep. |
+| [`src/flight/flight-profiles.ts`](../src/flight/flight-profiles.ts) | Profile constants for thrust, lift, drag, rates, and speed thresholds; Peregrine and Aurelia share the `jet` object. | Current profiles are tuning data, not measured aircraft engineering datasets. |
+| [`src/flight/physics.ts`](../src/flight/physics.ts) | Subtracts wind from velocity; computes speed-dependent lift/drag; controls directly influence attitude/rates and includes assistance. | Air-relative motion is present, but the model is not a full component-based six-degree-of-freedom aerodynamic simulation. |
+| [`src/flight/physics.ts`](../src/flight/physics.ts) | AOA approximation uses pitch minus air-relative path angle; stall combines a speed threshold with an absolute-AOA threshold. | This is an approximation, especially in banked/sideslipping flight; it does not encode aircraft-specific local stall progression. |
+| [`src/flight/physics.ts`](../src/flight/physics.ts) | Lift/thrust/drag variables feed acceleration directly; no explicit mass/inertia/CG model is defined in this class. | Do not label profile thrust as newtons or lift as `q × S × CL` without changing the data model. |
+| [`src/flight/physics.ts`](../src/flight/physics.ts) | Pitch and roll damping, coordinated-turn yaw, sideslip damping, and stall attitude corrections help guide the aircraft. | Document these as assistance/approximation. They are not evidence of natural aerodynamic stability. |
+| [`src/flight/flight-profiles.ts`](../src/flight/flight-profiles.ts) | Shared jet data includes a nonzero afterburner multiplier; Aurelia uses that shared profile. | A future civilian propulsion model should be distinguished from military afterburning propulsion even if its visuals differ today. |
+| [`src/aircraft/aircraft.ts`](../src/aircraft/aircraft.ts) | Runtime loader scales Aurelia by 0.55 and Peregrine by `JET_SCALE = 0.7`; Stormbird has a different center offset and no scale reduction in its branch. | Use actual loaded geometry for reference dimensions and datums; source-model dimensions alone are insufficient. |
+| [`src/aircraft/landing-gear.ts`](../src/aircraft/landing-gear.ts) | Physics imports aircraft-specific wheel data and contact-height logic. | Geometry changes must preserve or intentionally update the physical contact datums. |
+| [`src/flight/game.ts`](../src/flight/game.ts) | Advances physics at 60 Hz and interpolates visible poses. | Validate new behavior across rendering rates while retaining a consistent physics timestep. |
 
 ### 17.1 Recommended fidelity order
 

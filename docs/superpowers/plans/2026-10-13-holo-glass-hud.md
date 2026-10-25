@@ -15,7 +15,7 @@
 - Work in a git worktree on branch `feat/holo-glass-hud` created from `HEAD` of `pocket-flight-site` (the main checkout has unrelated uncommitted Codex work — never touch it).
 - Package manager: bun. Never npm or yarn. No new runtime dependencies.
 - TypeScript strict; no `any`.
-- Do not modify `src/physics.ts`, `src/aerodynamics.ts`, `src/aircraft-design.ts` or `src/flight-envelope.ts` (they are being changed in the main checkout).
+- Do not modify `src/flight/physics.ts`, `src/flight/aerodynamics.ts`, `src/aircraft/aircraft-design.ts` or `src/flight/flight-envelope.ts` (they are being changed in the main checkout).
 - Font: Oxanium (Google Fonts) for HUD dials/readouts, tabular numerals; everything else stays DM Sans.
 - Colours: cyan `#5ff0ff`, soft cyan `#8feaff`, text `#e8fbff`, green `#4dffa6`, amber `#ffd34d`, red `#ff4d63`, glass `rgba(6,18,28,.55)`, rim `rgba(120,230,255,.42)`.
 - Warning strobe period 0.35 s (≈2.9 flashes/s) — never faster than 3 flashes per second.
@@ -394,7 +394,7 @@ git commit -m "feat(hud): add spring driver for needle animation"
 
 **Files:**
 - Create: `src/hud/instrument-data.ts`
-- Modify: `src/game.ts` (Snapshot type near line 26; `emit()` near line 1356)
+- Modify: `src/flight/game.ts` (Snapshot type near line 26; `emit()` near line 1356)
 - Test: `tests/hud-instrument-data.test.ts`
 
 **Interfaces:**
@@ -489,7 +489,7 @@ export function instrumentData(p: FlightPhysics, propellerRpm: number): Instrume
 }
 ```
 
-Modify `src/game.ts`:
+Modify `src/flight/game.ts`:
 
 ```ts
 // with the other imports
@@ -507,7 +507,7 @@ import { instrumentData, type InstrumentData } from "./hud/instrument-data";
 - [ ] **Step 5: Commit**
 
 ```bash
-git add src/hud/instrument-data.ts src/game.ts tests/hud-instrument-data.test.ts
+git add src/hud/instrument-data.ts src/flight/game.ts tests/hud-instrument-data.test.ts
 git commit -m "feat(hud): expose engine, fuel and AOA instrument data in snapshots"
 ```
 
@@ -689,8 +689,8 @@ git commit -m "feat(hud): evaluate flight warnings with priority and hysteresis"
 ### Task 5: Betty callout scheduler and voice playback
 
 **Files:**
-- Create: `src/betty.ts`
-- Modify: `src/audio.ts` (add voice methods to `FlightAudio`)
+- Create: `src/audio/betty.ts`
+- Modify: `src/audio/audio.ts` (add voice methods to `FlightAudio`)
 - Test: `tests/betty.test.ts`
 
 **Interfaces:**
@@ -749,7 +749,7 @@ describe("betty scheduling", () => {
 
 - [ ] **Step 2: Run to verify failure** — Run: `bun test tests/betty.test.ts`. Expected: FAIL, module not found.
 
-- [ ] **Step 3: Implement** — `src/betty.ts`
+- [ ] **Step 3: Implement** — `src/audio/betty.ts`
 
 ```ts
 import type { FlightAudio } from "./audio";
@@ -832,7 +832,7 @@ export class Betty {
 }
 ```
 
-Modify `src/audio.ts` — add these members to `FlightAudio` (after `jet = false;`) and methods (after `toggle()`):
+Modify `src/audio/audio.ts` — add these members to `FlightAudio` (after `jet = false;`) and methods (after `toggle()`):
 
 ```ts
   private voiceGain: GainNode | null = null;
@@ -899,7 +899,7 @@ Note: `Betty.preload()` only succeeds once the AudioContext exists. If `loadVoic
 - [ ] **Step 5: Commit**
 
 ```bash
-git add src/betty.ts src/audio.ts tests/betty.test.ts
+git add src/audio/betty.ts src/audio/audio.ts tests/betty.test.ts
 git commit -m "feat(audio): add Betty voice warning scheduler and voice playback"
 ```
 
@@ -1018,7 +1018,7 @@ git commit -m "feat(audio): add Betty voice clips cut from real cockpit recordin
 - Test: `bunx tsc -b` (components are verified visually in Task 9)
 
 **Interfaces:**
-- Consumes: Task 1 geometry, Task 2 `useSpring`, `headingReadout` from `src/flight-ui.ts`.
+- Consumes: Task 1 geometry, Task 2 `useSpring`, `headingReadout` from `src/app/flight-ui.ts`.
 - Produces:
   - `RollingDigits({ value: string })`
   - `Dial({ label, min, max, value, start?, sweep?, majorStep, minorStep, tickLabel?, bands?, redline?, readout, unit?, size: "large" | "small", className? })`
@@ -1518,7 +1518,7 @@ git commit -m "feat(hud): add Holo Glass dial, compass, bar and slot components"
 
 **Files:**
 - Create: `src/hud/FlightHud.tsx`, `src/hud/WarningBanner.tsx`, `src/hud/TouchControls.tsx`
-- Modify: `src/hud/hud.css` (append layout, warning, boot, compact, touch, restyle rules), `src/flight-ui.ts` (add `formatClock`), `src/App.tsx` (replace the in-flight HUD block, add the voice-warnings setting)
+- Modify: `src/hud/hud.css` (append layout, warning, boot, compact, touch, restyle rules), `src/app/flight-ui.ts` (add `formatClock`), `src/app/App.tsx` (replace the in-flight HUD block, add the voice-warnings setting)
 - Test: `tests/flight-ui.test.ts` (add `formatClock` case)
 
 **Interfaces:**
@@ -1536,7 +1536,7 @@ git commit -m "feat(hud): add Holo Glass dial, compass, bar and slot components"
 
 Run: `bun test tests/flight-ui.test.ts`. Expected: FAIL (`formatClock` not exported).
 
-- [ ] **Step 2: Add `formatClock`** — append to `src/flight-ui.ts`:
+- [ ] **Step 2: Add `formatClock`** — append to `src/app/flight-ui.ts`:
 
 ```ts
 export function formatClock(seconds: number) {
@@ -1565,7 +1565,7 @@ export function WarningBanner({ warning }: { warning: WarningId | null }) {
 }
 ```
 
-- [ ] **Step 4: TouchControls** — `src/hud/TouchControls.tsx`. Move the existing `{mode === "playing" && (<div className="touch-controls"> … </div>)}` block out of `src/App.tsx` (currently App.tsx lines ~1015–1089) verbatim, replacing `game.current?.` with `game?.` and `if (game.current)` with `if (game)`:
+- [ ] **Step 4: TouchControls** — `src/hud/TouchControls.tsx`. Move the existing `{mode === "playing" && (<div className="touch-controls"> … </div>)}` block out of `src/app/App.tsx` (currently App.tsx lines ~1015–1089) verbatim, replacing `game.current?.` with `game?.` and `if (game.current)` with `if (game)`:
 
 ```tsx
 import type { PointerEvent } from "react";
@@ -2093,7 +2093,7 @@ Check before writing: `Mission` has `name`, `id`, `par`, `land` (used in App tod
 }
 ```
 
-- [ ] **Step 7: Integrate in App** — edit `src/App.tsx`:
+- [ ] **Step 7: Integrate in App** — edit `src/app/App.tsx`:
 
 1. Imports: add `import { FlightHud } from "./hud/FlightHud";` and add `Siren` to the lucide import list.
 2. State: add after `automaticConfiguration`:
@@ -2131,7 +2131,7 @@ and next to `toggleSound`:
           />
 ```
 
-4. Remove what the HUD no longer uses: `instrumentsExpanded` state, `heading`, `climb`, `flightWarning` constants, and the `climbReadout`/`headingReadout` imports if nothing else uses them (check with `grep -n "heading\b\|climb\b\|flightWarning\|instrumentsExpanded" src/App.tsx`). Remove now-unused lucide icons only if `grep` shows no other use.
+4. Remove what the HUD no longer uses: `instrumentsExpanded` state, `heading`, `climb`, `flightWarning` constants, and the `climbReadout`/`headingReadout` imports if nothing else uses them (check with `grep -n "heading\b\|climb\b\|flightWarning\|instrumentsExpanded" src/app/App.tsx`). Remove now-unused lucide icons only if `grep` shows no other use.
 5. Settings panel: insert after the "All audio" `setting-row`:
 
 ```tsx
@@ -2153,7 +2153,7 @@ and next to `toggleSound`:
 - [ ] **Step 9: Commit**
 
 ```bash
-git add src/hud src/App.tsx src/flight-ui.ts tests/flight-ui.test.ts
+git add src/hud src/app/App.tsx src/app/flight-ui.ts tests/flight-ui.test.ts
 git commit -m "feat(hud): replace flight HUD with Holo Glass instruments and Betty warnings"
 ```
 

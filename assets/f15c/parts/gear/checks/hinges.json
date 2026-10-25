@@ -1,0 +1,258 @@
+{
+  "units": "m",
+  "axes": "+X right, +Y forward, +Z up",
+  "zeroGeometry": "Gear deployed, all doors closed",
+  "gear": {
+    "Nose": {
+      "group": "Gear_Nose",
+      "origin": [
+        0,
+        5.0,
+        1.91
+      ],
+      "axis": [
+        1,
+        0,
+        0
+      ],
+      "retractedDegrees": 100
+    },
+    "Left": {
+      "group": "Gear_Left",
+      "origin": [
+        -0.6,
+        -1.94,
+        2.07
+      ],
+      "axis": [
+        0.9271838545667874,
+        -0.374606593415912,
+        0
+      ],
+      "retractedDegrees": 90
+    },
+    "Right": {
+      "group": "Gear_Right",
+      "origin": [
+        0.6,
+        -1.94,
+        2.07
+      ],
+      "axis": [
+        0.9271838545667874,
+        0.374606593415912,
+        0
+      ],
+      "retractedDegrees": 90
+    }
+  },
+  "doors": {
+    "Nose_Forward": {
+      "origin": [
+        -0.23,
+        6.35,
+        1.75
+      ],
+      "axis": [
+        0,
+        1,
+        0
+      ],
+      "angle": 100,
+      "aft": false
+    },
+    "Nose_Aft": {
+      "origin": [
+        -0.23,
+        5.18,
+        1.736
+      ],
+      "axis": [
+        0,
+        1,
+        0
+      ],
+      "angle": 100,
+      "aft": true
+    },
+    "Left_Forward": {
+      "origin": [
+        -1.18,
+        -1.02,
+        1.54
+      ],
+      "axis": [
+        0,
+        1,
+        0
+      ],
+      "angle": 100,
+      "aft": false
+    },
+    "Left_Inner": {
+      "origin": [
+        -0.1,
+        -0.69,
+        1.63
+      ],
+      "axis": [
+        0,
+        1,
+        0
+      ],
+      "angle": -80,
+      "aft": false
+    },
+    "Left_Aft": {
+      "origin": [
+        -1.18,
+        -2.12,
+        1.54
+      ],
+      "axis": [
+        0,
+        1,
+        0
+      ],
+      "angle": 100,
+      "aft": true
+    },
+    "Right_Forward": {
+      "origin": [
+        1.18,
+        -1.02,
+        1.54
+      ],
+      "axis": [
+        0,
+        1,
+        0
+      ],
+      "angle": -100,
+      "aft": false
+    },
+    "Right_Inner": {
+      "origin": [
+        0.1,
+        -0.69,
+        1.63
+      ],
+      "axis": [
+        0,
+        1,
+        0
+      ],
+      "angle": 80,
+      "aft": false
+    },
+    "Right_Aft": {
+      "origin": [
+        1.18,
+        -2.12,
+        1.54
+      ],
+      "axis": [
+        0,
+        1,
+        0
+      ],
+      "angle": -100,
+      "aft": true
+    }
+  },
+  "proposedBays": [
+    {
+      "name": "Nose",
+      "center": [
+        0,
+        5.85,
+        1.715
+      ],
+      "size": [
+        0.45,
+        2.36,
+        1.43
+      ]
+    },
+    {
+      "name": "Left_Aft",
+      "center": [
+        -0.94,
+        -1.7,
+        1.5
+      ],
+      "size": [
+        0.49,
+        1.7,
+        1.6
+      ]
+    },
+    {
+      "name": "Right_Aft",
+      "center": [
+        0.94,
+        -1.7,
+        1.5
+      ],
+      "size": [
+        0.49,
+        1.7,
+        1.6
+      ]
+    },
+    {
+      "name": "Left_UpperTrunnion",
+      "center": [
+        -0.74,
+        -1.7,
+        2.0
+      ],
+      "size": [
+        0.88,
+        1.7,
+        0.7
+      ]
+    },
+    {
+      "name": "Right_UpperTrunnion",
+      "center": [
+        0.74,
+        -1.7,
+        2.0
+      ],
+      "size": [
+        0.88,
+        1.7,
+        0.7
+      ]
+    },
+    {
+      "name": "Left_Inboard",
+      "center": [
+        -0.64,
+        -0.675,
+        1.7
+      ],
+      "size": [
+        1.08,
+        1.75,
+        2.0
+      ]
+    },
+    {
+      "name": "Right_Inboard",
+      "center": [
+        0.64,
+        -0.675,
+        1.7
+      ],
+      "size": [
+        1.08,
+        1.75,
+        2.0
+      ]
+    }
+  ],
+  "configuration": "smoothstep((retract-.16)/.66) drives legs; doors open over 0..0.14, close over0.84..1; aft doors stay open down",
+  "source": "src/landing_gear.py configuration() is authoritative"
+}

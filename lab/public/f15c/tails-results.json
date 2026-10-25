@@ -1,0 +1,515 @@
+{
+  "artifact": "STEP/airframe_tails.step",
+  "sha256": "039215f71fe95560b2ef20915a282c189ede8c7d8e32216426b2eaf61b08b4ad",
+  "units": "mm",
+  "dimensionsM": [
+    13.049250000200006,
+    19.241046109222005,
+    4.148485562995639
+  ],
+  "boundsM": {
+    "min": [
+      -6.524625000100003,
+      -9.241046109122001,
+      1.477614437004361
+    ],
+    "max": [
+      6.524625000100003,
+      10.000000000100002,
+      5.6261
+    ]
+  },
+  "checks": [
+    {
+      "name": "All saved solids valid, closed and positive",
+      "pass": true,
+      "invalid": [],
+      "solidCount": 51
+    },
+    {
+      "name": "All saved parts have an exact contact path to the fuselage",
+      "pass": true,
+      "floating": [],
+      "contactToleranceMm": 0.5,
+      "solidDistanceChecks": 44
+    },
+    {
+      "name": "Saved tail solids are valid, closed and positive",
+      "pass": true,
+      "solids": 22,
+      "leaves": 22
+    },
+    {
+      "name": "Tail maximum height matches F-15C reference",
+      "pass": true,
+      "maximumZM": 5.6261,
+      "targetM": 5.6261,
+      "toleranceMm": 1
+    },
+    {
+      "name": "Stabilator span is bilateral",
+      "pass": true,
+      "minXM": -4.3000000001,
+      "maxXM": 4.3000000001,
+      "toleranceMm": 0.1
+    },
+    {
+      "name": "Stabilator trailing edge stays forward of nozzle exit",
+      "pass": true,
+      "minimumYM": -9.241046109122001,
+      "nozzleExitYM": -9.431
+    },
+    {
+      "name": "Bilateral volume: Fin",
+      "pass": true,
+      "relativeError": 4.864766858580445e-7,
+      "tolerance": 0.0001,
+      "note": "Spline volume integration changes slightly after reflection/STEP transfer."
+    },
+    {
+      "name": "Bilateral volume: Rudder",
+      "pass": true,
+      "relativeError": 2.6213209777032945e-8,
+      "tolerance": 0.0001,
+      "note": "Spline volume integration changes slightly after reflection/STEP transfer."
+    },
+    {
+      "name": "Bilateral volume: Fin_fairing",
+      "pass": true,
+      "relativeError": 0.00000870211218551709,
+      "tolerance": 0.0001,
+      "note": "Spline volume integration changes slightly after reflection/STEP transfer."
+    },
+    {
+      "name": "Bilateral volume: Stabilator",
+      "pass": true,
+      "relativeError": 0.00002507106254187259,
+      "tolerance": 0.0001,
+      "note": "Spline volume integration changes slightly after reflection/STEP transfer."
+    },
+    {
+      "name": "Bilateral volume: Stabilator_bearing",
+      "pass": true,
+      "relativeError": 3.202259602768002e-16,
+      "tolerance": 0.0001,
+      "note": "Spline volume integration changes slightly after reflection/STEP transfer."
+    },
+    {
+      "name": "Bilateral volume: Stabilator_shaft",
+      "pass": true,
+      "relativeError": 9.124320797976228e-16,
+      "tolerance": 0.0001,
+      "note": "Spline volume integration changes slightly after reflection/STEP transfer."
+    },
+    {
+      "name": "Rudder has a visible hinge gap: Left",
+      "pass": true,
+      "gapMm": 35
+    },
+    {
+      "name": "Hinge barrels contact fixed and moving fin: Left",
+      "pass": true,
+      "hinges": [
+        {
+          "hinge": 1,
+          "finGapMm": 0,
+          "rudderGapMm": 0
+        },
+        {
+          "hinge": 2,
+          "finGapMm": 0,
+          "rudderGapMm": 0
+        },
+        {
+          "hinge": 3,
+          "finGapMm": 0,
+          "rudderGapMm": 2.2737367544323206e-13
+        }
+      ]
+    },
+    {
+      "name": "Stabilator is one complete moving solid: Left",
+      "pass": true
+    },
+    {
+      "name": "Root leading-edge notch is open: Left",
+      "pass": true
+    },
+    {
+      "name": "Rudder has a visible hinge gap: Right",
+      "pass": true,
+      "gapMm": 35
+    },
+    {
+      "name": "Hinge barrels contact fixed and moving fin: Right",
+      "pass": true,
+      "hinges": [
+        {
+          "hinge": 1,
+          "finGapMm": 0,
+          "rudderGapMm": 0
+        },
+        {
+          "hinge": 2,
+          "finGapMm": 0,
+          "rudderGapMm": 0
+        },
+        {
+          "hinge": 3,
+          "finGapMm": 0,
+          "rudderGapMm": 2.2737367544323206e-13
+        }
+      ]
+    },
+    {
+      "name": "Stabilator is one complete moving solid: Right",
+      "pass": true
+    },
+    {
+      "name": "Root leading-edge notch is open: Right",
+      "pass": true
+    },
+    {
+      "name": "Every saved tail part has a contact path to fuselage",
+      "pass": true,
+      "floating": [],
+      "contactToleranceMm": 0.5
+    },
+    {
+      "name": "Sampled moving surfaces clear stationary skin",
+      "pass": true,
+      "poses": 40,
+      "collisionVolumeToleranceM3": 1e-9,
+      "collisions": [],
+      "note": "5 degree samples, not a continuous swept-volume proof; bearing/shaft/hinge overlap is intentional."
+    },
+    {
+      "name": "All 54 sampled wing/stabilator configurations clear",
+      "pass": true,
+      "configurations": 54,
+      "minimumClearanceLowerBoundMm": 463.768046926034
+    },
+    {
+      "name": "Wing and tail artifacts stayed unchanged during verification",
+      "pass": true
+    }
+  ],
+  "contacts": [
+    {
+      "a": "Radome",
+      "b": "Fuselage",
+      "gapMm": 0,
+      "method": "shared exact CAD vertex"
+    },
+    {
+      "a": "Cockpit_well",
+      "b": "Fuselage",
+      "gapMm": 0,
+      "method": "shared exact CAD vertex"
+    },
+    {
+      "a": "Ramp_2_Left",
+      "b": "Ramp_1_Left",
+      "gapMm": 0,
+      "method": "shared exact CAD vertex"
+    },
+    {
+      "a": "Ramp_3_Left",
+      "b": "Ramp_2_Left",
+      "gapMm": 0,
+      "method": "shared exact CAD vertex"
+    },
+    {
+      "a": "Ramp_2_Right",
+      "b": "Ramp_1_Right",
+      "gapMm": 0,
+      "method": "shared exact CAD vertex"
+    },
+    {
+      "a": "Ramp_3_Right",
+      "b": "Ramp_2_Right",
+      "gapMm": 0,
+      "method": "shared exact CAD vertex"
+    },
+    {
+      "a": "Engine_collar_Left",
+      "b": "Fuselage",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Engine_collar_Right",
+      "b": "Fuselage",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Ramp_3_Left",
+      "b": "Fuselage",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Ramp_3_Right",
+      "b": "Fuselage",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Duct_liner_Left",
+      "b": "Ramp_3_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Intake_skin_Left",
+      "b": "Ramp_3_Left",
+      "gapMm": 8.981260180007666e-12,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Duct_liner_Right",
+      "b": "Ramp_3_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Intake_skin_Right",
+      "b": "Ramp_3_Right",
+      "gapMm": 5.209785393794664e-13,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Duct_end_Left",
+      "b": "Duct_liner_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Splitter_Left",
+      "b": "Duct_liner_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Duct_end_Right",
+      "b": "Duct_liner_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Splitter_Right",
+      "b": "Duct_liner_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Wing_fixed_Left",
+      "b": "Duct_end_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Wing_fixed_Right",
+      "b": "Duct_end_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Flap_hinge_Left",
+      "b": "Wing_fixed_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Aileron_hinge_Left",
+      "b": "Wing_fixed_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Flap_hinge_Right",
+      "b": "Wing_fixed_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Aileron_hinge_Right",
+      "b": "Wing_fixed_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Flap_Left",
+      "b": "Flap_hinge_Left",
+      "gapMm": 4.547473508864641e-13,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Aileron_Left",
+      "b": "Aileron_hinge_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Flap_Right",
+      "b": "Flap_hinge_Right",
+      "gapMm": 4.547473508864641e-13,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Aileron_Right",
+      "b": "Aileron_hinge_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Stabilator_shaft_Left",
+      "b": "Stabilator_bearing_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Stabilator_shaft_Right",
+      "b": "Stabilator_bearing_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Rudder_hinge_Right_1",
+      "b": "Rudder_actuator_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Rudder_hinge_Left_1",
+      "b": "Rudder_actuator_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Rudder_hinge_Left_1",
+      "b": "Rudder_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Rudder_hinge_Right_1",
+      "b": "Rudder_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Rudder_hinge_Left_2",
+      "b": "Rudder_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Rudder_hinge_Right_2",
+      "b": "Rudder_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Rudder_hinge_Right_3",
+      "b": "Rudder_Right",
+      "gapMm": 2.2737367544323206e-13,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Rudder_hinge_Left_3",
+      "b": "Rudder_Left",
+      "gapMm": 2.2737367544323206e-13,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Rudder_actuator_Left",
+      "b": "Fin_fairing_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Rudder_actuator_Right",
+      "b": "Fin_fairing_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Rudder_hinge_Left_1",
+      "b": "Fin_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Rudder_hinge_Right_1",
+      "b": "Fin_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Stabilator_shaft_Left",
+      "b": "Stabilator_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Stabilator_shaft_Right",
+      "b": "Stabilator_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Fin_tip_fairing_Right",
+      "b": "Fin_Right",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Fin_tip_fairing_Left",
+      "b": "Fin_Left",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Stabilator_shaft_Left",
+      "b": "Fuselage",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Stabilator_shaft_Right",
+      "b": "Fuselage",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Fin_fairing_Left",
+      "b": "Fuselage",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Fin_fairing_Right",
+      "b": "Fuselage",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    }
+  ],
+  "passed": 24,
+  "failed": 0,
+  "evidence": [
+    {
+      "artifact": "STEP/airframe_tails.step",
+      "sha256": "039215f71fe95560b2ef20915a282c189ede8c7d8e32216426b2eaf61b08b4ad"
+    },
+    {
+      "artifact": "STEP/tails.step",
+      "sha256": "3d3c94d974a275475523743c266141198edf2eb96a71995f50e911ae5d8e7e5b"
+    },
+    {
+      "artifact": "STEP/airframe_wings.step",
+      "sha256": "2620ce5e7d2b0cb794a121914d5fcc5eaf8a2118c6c4b8789b0fe7efc2999216"
+    }
+  ]
+}

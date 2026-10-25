@@ -58,7 +58,7 @@
 </tbody></table></div>
 <h2>Repeatable workflow</h2>
 <ol>
-<li>Run <code>bun run finch:measure</code> after any asset change. Reconcile dimensions, reference area, chord, and wheel datums with <code>src/finch-design.ts</code>.</li>
+<li>Run <code>bun run finch:measure</code> after any asset change. Reconcile dimensions, reference area, chord, and wheel datums with <code>src/aircraft/finch/finch-design.ts</code>.</li>
 <li>Revise the conceptual loading budget and propulsion assumptions, keeping units and provenance explicit.</li>
 <li>Run <code>bun run finch:verify</code> for force relationships, bank/wind invariance, stall, power limits, asset consistency, takeoff, landing, glide and damage.</li>
 <li>Run <code>bun test --timeout 30000</code> and <code>bun run build</code>; distinguish pre-existing scenery failures from flight regressions.</li>

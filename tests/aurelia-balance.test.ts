@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { aircraftDesign, massProperties } from "../src/aircraft-design";
+import { aircraftDesign, massProperties } from "../src/aircraft/aircraft-design";
 import { loadingSnapshot, validateLoading } from "../lab/loading-validation";
 
 // Empty-cabin operation must not rely on passengers as forward ballast.

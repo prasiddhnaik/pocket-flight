@@ -1,0 +1,59 @@
+{
+  "name": "Heron before aerodynamic revision",
+  "revision": "0af40b92d81e5b6ab1ea5349bbde20bad699e197573216d4511d30c8ed525669",
+  "stations": [
+    {
+      "x": 0,
+      "leading": -1.4,
+      "chord": 2.25,
+      "y": 1.0300000000000002,
+      "zeroLiftAlpha": -2.040566720061146
+    },
+    {
+      "x": 0.52,
+      "leading": -1.4,
+      "chord": 2.25,
+      "y": 1.0300000000000002,
+      "zeroLiftAlpha": -2.040566720061146
+    },
+    {
+      "x": 4.8,
+      "leading": -1.15,
+      "chord": 2.02,
+      "y": 1.0500000000000003,
+      "zeroLiftAlpha": -2.040566720061146
+    },
+    {
+      "x": 7.45,
+      "leading": -0.82,
+      "chord": 1.65,
+      "y": 1.0900000000000003,
+      "zeroLiftAlpha": -2.040566720061146
+    },
+    {
+      "x": 7.68,
+      "leading": -0.75,
+      "chord": 1.48,
+      "y": 1.1,
+      "zeroLiftAlpha": -2.040566720061146
+    },
+    {
+      "x": 7.84,
+      "leading": -0.63,
+      "chord": 1.18,
+      "y": 1.1300000000000003,
+      "zeroLiftAlpha": -2.040566720061146
+    },
+    {
+      "x": 7.935,
+      "leading": -0.45,
+      "chord": 0.86,
+      "y": 1.1600000000000001,
+      "zeroLiftAlpha": -2.040566720061146
+    }
+  ],
+  "assumptions": [
+    "Gross main-wing stations from the original CAD; center section carried through the fuselage.",
+    "14% NACA-style thickness, 2% sinusoidal camber; wing only. Aerodynamic coefficients remain estimates."
+  ]
+}

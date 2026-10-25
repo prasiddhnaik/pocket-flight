@@ -4,7 +4,7 @@
 import { mkdir } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
-import { bettyFiles } from "../src/betty";
+import { bettyFiles } from "../src/audio/betty";
 import type { WarningId } from "../src/hud/warnings";
 
 type Cut = { video: string; from: number; to: number; says: string };

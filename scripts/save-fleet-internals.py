@@ -9,7 +9,7 @@ root = Path(__file__).resolve().parents[1]
 required = ["InternalSystems", "RearCabinBulkhead", "AftEquipmentBay", "HydraulicServiceBay",
             "FuelSystem", "WingStructure_Left", "WingStructure_Right", "WetWingFuel_Left",
             "WetWingFuel_Right", "Aileron_Left", "Flap_Right"]
-calibration = json.loads((root / "src/fuel-mass-calibration.json").read_text())
+calibration = json.loads((root / "src/aircraft/fuel-mass-calibration.json").read_text())
 evidence = []
 selected = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
 for aircraft, filename in [
@@ -27,7 +27,7 @@ for aircraft, filename in [
     data = calibration["aircraft"][aircraft]
     systems = bpy.data.objects["InternalSystems"]
     systems["physics_mass_updated"] = True
-    systems["physics_mass_source"] = "src/fuel-mass-calibration.json"
+    systems["physics_mass_source"] = "src/aircraft/fuel-mass-calibration.json"
     systems["empty_mass_including_unusable_kg"] = data["emptyMassIncludingResidual"]
     systems["usable_fuel_kg"] = data["usableFuelKg"]
     systems["unusable_fuel_kg"] = data["unusableFuelKg"]

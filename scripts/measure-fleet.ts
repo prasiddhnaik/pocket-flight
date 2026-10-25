@@ -1,6 +1,6 @@
 import { Box3, Mesh, Vector3 } from "three";
 import {
-  aircraftCatalog,
+  runtimeAircraftCatalog as aircraftCatalog,
   zeroLiftEstimate,
   type LabAircraftId,
 } from "../lab/aircraft";

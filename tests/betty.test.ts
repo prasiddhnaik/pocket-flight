@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { Betty, bettyFiles, CHIME_SECONDS, idleCallouts, planCallout } from "../src/betty";
-import { FlightAudio } from "../src/audio";
+import { Betty, bettyFiles, CHIME_SECONDS, idleCallouts, planCallout } from "../src/audio/betty";
+import { FlightAudio } from "../src/audio/audio";
 
 const len = () => 1.2;
 

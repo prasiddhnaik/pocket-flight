@@ -1,9 +1,9 @@
 import * as T from "three";
-import { aircraftCatalog } from "../lab/aircraft";
+import { runtimeAircraftCatalog as aircraftCatalog } from "../lab/aircraft";
 import { loadGeometryOnly } from "./geometry-loader";
 import { connectedSurfaces } from "./geometry-components";
 import { fuelTable, volumeProperties, type Triangles } from "./fuel-volume";
-import { aircraftSystems } from "../src/aircraft-systems";
+import { aircraftSystems } from "../src/aircraft/aircraft-systems";
 
 const specifications = {
   finch: {
@@ -281,7 +281,7 @@ const evidence = {
   ],
 };
 await Bun.write(
-  new URL("../src/fuel-mass-calibration.json", import.meta.url),
+  new URL("../src/aircraft/fuel-mass-calibration.json", import.meta.url),
   JSON.stringify(evidence, null, 2),
 );
 console.log("FLEET_FUEL_MASS_MEASURED");

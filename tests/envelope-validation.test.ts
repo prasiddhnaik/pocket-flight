@@ -5,9 +5,9 @@ import {
   pistonPowerFactor,
   referenceJetThrust,
   localSoundSpeed,
-} from "../src/engine-map";
-import { aircraftDesign } from "../src/aircraft-design";
-import { airDensity, aircraftThrust } from "../src/aerodynamics";
+} from "../src/flight/engine-map";
+import { aircraftDesign } from "../src/aircraft/aircraft-design";
+import { airDensity, aircraftThrust } from "../src/flight/aerodynamics";
 
 test("primary reference anchors preserve units, grid orientation and interpolation", () => {
   // Independent spot checks against PDF Table VI(a) and Lycoming p.8-4.
@@ -25,7 +25,7 @@ test("primary reference anchors preserve units, grid orientation and interpolati
   expect(interpolate([0, 1, 2], [0, 10, 30], 1.5)).toBe(20);
   expect(referenceJetThrust(0, 0)).toBe(56401); // Explicit low-Mach hold.
 });
-for (const id of ["finch", "peregrine", "aurelia", "stormbird"] as const) {
+for (const id of ["finch", "peregrine", "aurelia", "stormbird", "heron"] as const) {
   test(`${id}: bench checks stall, loaded static stability and unassisted disturbance decay`, () => {
     const r = validateAircraft(id);
     expect(r.polars).toHaveLength(2);

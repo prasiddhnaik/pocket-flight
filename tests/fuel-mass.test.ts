@@ -7,15 +7,15 @@ import {
   volumeProperties,
   type Triangles,
 } from "../scripts/fuel-volume";
-import { aircraftDesign, massProperties } from "../src/aircraft-design";
-import { consumeTankFuel, tankState } from "../src/fuel-loading";
+import { aircraftDesign, massProperties } from "../src/aircraft/aircraft-design";
+import { consumeTankFuel, tankState } from "../src/flight/fuel-loading";
 import { loadGeometryOnly } from "../scripts/geometry-loader";
 import { connectedSurfaces } from "../scripts/geometry-components";
-import { aircraftCatalog } from "../lab/aircraft";
+import { runtimeAircraftCatalog as aircraftCatalog } from "../lab/aircraft";
 import { loadingSnapshot, validateLoading } from "../lab/loading-validation";
-import { aircraftAerodynamics } from "../src/aerodynamics";
-import { solveTrim } from "../src/flight-trim";
-import { FlightPhysics } from "../src/physics";
+import { aircraftAerodynamics } from "../src/flight/aerodynamics";
+import { solveTrim } from "../src/flight/flight-trim";
+import { FlightPhysics } from "../src/flight/physics";
 
 function box(w: number, h: number, l: number, center = new T.Vector3()) {
   const g = new T.BoxGeometry(w, h, l).toNonIndexed(),

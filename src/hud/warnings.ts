@@ -1,4 +1,4 @@
-import type { Snapshot } from "../game";
+import type { Snapshot } from "../flight/game";
 
 export const warningOrder = [
   "pullUp", "stall", "overspeed", "landingGear", "bankAngle", "bingoFuel", "damage", "fuelLow",

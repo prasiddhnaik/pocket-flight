@@ -1,14 +1,14 @@
 import { expect, test } from "bun:test";
 import { TorusGeometry, Vector3 } from "three";
-import { FlightPhysics } from "../src/physics";
-import { groundAt, runways, runwayLocal } from "../src/terrain";
+import { FlightPhysics } from "../src/flight/physics";
+import { groundAt, runways, runwayLocal } from "../src/world/terrain";
 import {
   finchWheels,
   peregrineWheels,
   aureliaWheels,
   gearContactHeight,
-} from "../src/landing-gear";
-import { stormbirdContact } from "../src/stormbird-contact";
+} from "../src/aircraft/landing-gear";
+import { stormbirdContact } from "../src/aircraft/stormbird/stormbird-contact";
 
 const neutral = { pitch: 0, roll: 0, yaw: 0, throttle: 0, brake: true };
 

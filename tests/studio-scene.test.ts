@@ -8,17 +8,17 @@ import {
   setTransformKey,
   sampleCamera,
   validateScene,
-} from "../src/studio-scene";
-import { newProject } from "../src/studio-model";
+} from "../src/studio/studio-scene";
+import { newProject } from "../src/studio/studio-model";
 import { Box3, Vector3, Mesh, MeshStandardMaterial } from "three";
-import { loadAssetModel } from "../src/studio-scene-renderer";
-import { ReplayLibrary } from "../src/replay-library";
+import { loadAssetModel } from "../src/studio/studio-scene-renderer";
+import { ReplayLibrary } from "../src/replay/replay-library";
 import {
   packProject,
   readAssets,
   unpackProject,
   type StudioAsset,
-} from "../src/studio-assets";
+} from "../src/studio/studio-assets";
 const asset: StudioAsset = {
   schemaVersion: 1,
   id: "asset",

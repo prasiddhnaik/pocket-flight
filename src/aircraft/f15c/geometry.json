@@ -1,0 +1,112 @@
+{
+  "id": "f15c",
+  "name": "F-15C Eagle",
+  "revision": "eddfd4400ba5f7b262deba5b20a492a03bfc689a83486b5c182ebc684c7d900e",
+  "dimensions": [
+    13.04925,
+    5.6261,
+    19.431
+  ],
+  "scale": 1,
+  "offsetY": 0,
+  "maxChordAsymmetry": 0,
+  "meshNames": [
+    "Wing_fixed_Left",
+    "Wing_fixed_Right"
+  ],
+  "stations": [
+    {
+      "x": 0,
+      "y": 0.690946077913861,
+      "leading": -2.65,
+      "chord": 6.936478405315616,
+      "zeroLiftAlpha": 0,
+      "incidence": 0
+    },
+    {
+      "x": 1.2,
+      "y": 0.6699999809096022,
+      "leading": -1.450000000099726,
+      "chord": 6.629667774286254,
+      "zeroLiftAlpha": 0,
+      "incidence": 0
+    },
+    {
+      "x": 1.9,
+      "y": 0.6681205129517602,
+      "leading": -0.7500000001000529,
+      "chord": 6.005795910834643,
+      "zeroLiftAlpha": 0,
+      "incidence": 0
+    },
+    {
+      "x": 2.9,
+      "y": 0.6637526370243907,
+      "leading": 0.2499999999002064,
+      "chord": 5.114550391618163,
+      "zeroLiftAlpha": 0,
+      "incidence": 0
+    },
+    {
+      "x": 4,
+      "y": 0.6524728839613227,
+      "leading": 1.3499999999001508,
+      "chord": 4.1341803204802,
+      "zeroLiftAlpha": 0,
+      "incidence": 0
+    },
+    {
+      "x": 5.1,
+      "y": 0.6343585548879687,
+      "leading": 2.4499999998996276,
+      "chord": 3.1538102493426927,
+      "zeroLiftAlpha": 0,
+      "incidence": 0
+    },
+    {
+      "x": 5.8,
+      "y": 0.6195259852938673,
+      "leading": 3.1499999998996624,
+      "chord": 2.5299383858915565,
+      "zeroLiftAlpha": 0,
+      "incidence": 0
+    },
+    {
+      "x": 6.18,
+      "y": 0.6105249876353618,
+      "leading": 3.5299999998996596,
+      "chord": 2.191265088589305,
+      "zeroLiftAlpha": 0,
+      "incidence": 0
+    },
+    {
+      "x": 6.37,
+      "y": 0.6050131168134696,
+      "leading": 3.765593706768655,
+      "chord": 1.9611368307797215,
+      "zeroLiftAlpha": 0,
+      "incidence": 0
+    },
+    {
+      "x": 6.524625,
+      "y": 0.5992100862937368,
+      "leading": 4.024624999899941,
+      "chord": 1.6841196015290603,
+      "zeroLiftAlpha": 0,
+      "incidence": 0
+    }
+  ],
+  "wingArea": 61.56022521316562,
+  "meanAerodynamicChord": 5.250250398235864,
+  "quarterChordZ": 1.2957202936056007,
+  "assumptions": [
+    "Exposed stations measured from exact saved wings.step cross-sections in millimetres; converted to metres.",
+    "A theoretical centreline continuation supplies the VLM area basis; the fuselage hides this portion. The turned-down inboard attachment skirt is omitted from aerodynamic stations.",
+    "Declared aircraft aerodynamic reference area56.49m² and reference AR3.01/taper0.25 are distinct from this fuller physical outline and the area integrated from these measured stations.",
+    "Physical outline retains13.04925m span, LE45deg and dihedral−1deg; exposed root/tip chords and aft position were corrected against the NASA-hosted top view. Reference drawing is not production manufacturing data.",
+    "Analytic 6→3% sections and camber beginning outboard of the 20% semispan station are visual approximations, not measured production F-15C airfoil coordinates.",
+    "Zero lift angle and incidence are set to 0° for this baseline sensitivity run; the true cambered-section zero-lift data is unverified.",
+    "Linear attached-flow wing-only VLM at low speed: no fuselage, inlet flow, transonic shocks, separation, stall or full-aircraft validation.",
+    "Runtime axes +X right/+Y up/+Z aft; CAD ground datum Z=2.38 m is subtracted from station heights."
+  ]
+}

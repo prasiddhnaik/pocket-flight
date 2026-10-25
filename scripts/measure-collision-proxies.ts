@@ -1,8 +1,8 @@
 import { Box3, Mesh, Vector3 } from "three";
 import { loadGeometryOnly } from "./geometry-loader";
-import { aircraftCatalog } from "../lab/aircraft";
-import type { AircraftId } from "../src/aircraft";
-import type { ContactPart } from "../src/airframe-contact";
+import { runtimeAircraftCatalog as aircraftCatalog } from "../lab/aircraft";
+import type { AircraftId } from "../src/aircraft/aircraft";
+import type { ContactPart } from "../src/flight/airframe-contact";
 // Offline metrology; no render mesh queries in the physics loop. The release
 // uses compound spheres and sampled skin points, not triangle-exact collisions.
 const models: Record<string, unknown> = {};
@@ -128,6 +128,6 @@ for (const id of [
   console.log(id, probes.length, "proxies");
 }
 await Bun.write(
-  new URL("../src/airframe-collision.json", import.meta.url),
+  new URL("../src/aircraft/airframe-collision.json", import.meta.url),
   JSON.stringify({ model: "island-collision-1", models }),
 );

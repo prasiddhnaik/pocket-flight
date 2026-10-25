@@ -1,10 +1,11 @@
 import { createHash } from "node:crypto";
 import { Vector3 } from "three";
-import { FlightPhysics, type Controls } from "../src/physics";
-import type { AircraftId } from "../src/aircraft";
-import { solveTrim } from "../src/flight-trim";
-import { ISLAND_FLIGHT_MODEL, islandEnvelope } from "../src/flight-envelope";
-import collisionGeometry from "../src/airframe-collision.json";
+import { FlightPhysics, type Controls } from "../src/flight/physics";
+import type { AircraftId } from "../src/aircraft/aircraft";
+import { aircraftDefinitionSources } from "./aircraft-source";
+import { solveTrim } from "../src/flight/flight-trim";
+import { ISLAND_FLIGHT_MODEL, islandEnvelope } from "../src/flight/flight-envelope";
+import collisionGeometry from "../src/aircraft/airframe-collision.json";
 // Repeatable tuning traces, not a test runner or a flight certification.
 // All approaches/obstacle strikes below use seeded physical states.
 const neutral: Controls = {
@@ -225,25 +226,26 @@ for (const id of [
     `peak M${peakMach.toFixed(3)}`,
   );
 }
-const modules = [
-  "physics.ts",
-  "aerodynamics.ts",
-  "aircraft-design.ts",
-  "engine-map.ts",
-  "flight-trim.ts",
-  "rigid-body.ts",
-  "wheel-contact.ts",
-  "collision.ts",
-  "airframe-contact.ts",
-  "airframe-collision.json",
-  "flight-envelope.ts",
-  "terrain.ts",
-];
+const modules = {
+  ...Object.fromEntries(aircraftDefinitionSources.map((path) => [path, `../${path}`])),
+  "physics.ts": "../src/flight/physics.ts",
+  "aerodynamics.ts": "../src/flight/aerodynamics.ts",
+  "aircraft-design.ts": "../src/aircraft/aircraft-design.ts",
+  "engine-map.ts": "../src/flight/engine-map.ts",
+  "flight-trim.ts": "../src/flight/flight-trim.ts",
+  "rigid-body.ts": "../src/flight/rigid-body.ts",
+  "wheel-contact.ts": "../src/flight/wheel-contact.ts",
+  "collision.ts": "../src/flight/collision.ts",
+  "airframe-contact.ts": "../src/flight/airframe-contact.ts",
+  "airframe-collision.json": "../src/aircraft/airframe-collision.json",
+  "flight-envelope.ts": "../src/flight/flight-envelope.ts",
+  "terrain.ts": "../src/world/terrain.ts",
+};
 const hashes: Record<string, string> = {};
-for (const name of modules)
+for (const [name, path] of Object.entries(modules))
   hashes[name] = createHash("sha256")
     .update(
-      new Uint8Array(await Bun.file(new URL("../src/" + name, import.meta.url)).arrayBuffer()),
+      new Uint8Array(await Bun.file(new URL(path, import.meta.url)).arrayBuffer()),
     )
     .digest("hex");
 await Bun.write(

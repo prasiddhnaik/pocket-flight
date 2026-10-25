@@ -168,37 +168,37 @@ bun run dev --port 5173</pre>
         <th>Responsibility</th>
       </tr>
       <tr>
-        <td><code>src/physics.ts</code></td>
+        <td><code>src/flight/physics.ts</code></td>
         <td>Flight forces, ground contact, stalls, damage</td>
       </tr>
       <tr>
-        <td><code>src/terrain.ts</code></td>
+        <td><code>src/world/terrain.ts</code></td>
         <td>
           Shared terrain and runway geometry used by rendering and collision
         </td>
       </tr>
       <tr>
-        <td><code>src/world.ts</code></td>
+        <td><code>src/world/world.ts</code></td>
         <td>
           Island scenery, ocean shader, instancing, lighting, moving scenery
         </td>
       </tr>
       <tr>
-        <td><code>src/aircraft.ts</code></td>
+        <td><code>src/aircraft/aircraft.ts</code></td>
         <td>
           Modular airframe meshes, paint materials, moving propeller and gear
         </td>
       </tr>
       <tr>
-        <td><code>src/game.ts</code></td>
+        <td><code>src/flight/game.ts</code></td>
         <td>Fixed-step loop, input, cameras, missions, replay, and effects</td>
       </tr>
       <tr>
-        <td><code>src/missions.ts</code></td>
+        <td><code>src/flight/missions.ts</code></td>
         <td>Mission routes, objectives, and medal scoring</td>
       </tr>
       <tr>
-        <td><code>src/App.tsx</code></td>
+        <td><code>src/app/App.tsx</code></td>
         <td>
           Menu, mission picker, cockpit HUD, log, settings, touch controls
         </td>

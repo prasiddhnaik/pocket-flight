@@ -1,5 +1,5 @@
 import { test, expect } from "bun:test";
-import { JetMotion, initialJetInput, sequenceInput } from "../src/jet-effects";
+import { JetMotion, initialJetInput, sequenceInput } from "../src/aircraft/jet-effects";
 test("afterburner cannot light at idle and spools smoothly before ignition", () => {
   const s = new JetMotion(),
     i = initialJetInput();

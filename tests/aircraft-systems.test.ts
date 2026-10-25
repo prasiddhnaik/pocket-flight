@@ -1,10 +1,10 @@
 import { expect, test } from "bun:test";
-import { aircraftSystems, hydraulicPumpWatts } from "../src/aircraft-systems";
-import { aircraftDesign } from "../src/aircraft-design";
+import { aircraftSystems, hydraulicPumpWatts } from "../src/aircraft/aircraft-systems";
+import { aircraftDesign } from "../src/aircraft/aircraft-design";
 
 test("Every aircraft has its own installed hardware and sufficient conceptual electrical capacity", () => {
   expect(new Set(Object.values(aircraftSystems).map((s) => s.model)).size).toBe(
-    4,
+    6,
   );
   for (const s of Object.values(aircraftSystems)) {
     expect(s.generatorCount * s.generatorWatts).toBeGreaterThan(s.peakWatts);

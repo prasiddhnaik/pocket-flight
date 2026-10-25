@@ -20,10 +20,10 @@ async (page) => {
   );
   const bench = page.getByRole("region", { name: "Weight and balance bench" });
   await bench
-    .getByRole("button", { name: "Check fuel on all four planes", exact: true })
+    .getByRole("button", { name: "Check fleet fuel", exact: true })
     .click();
   await bench
-    .getByRole("button", { name: "Check fuel on all four planes", exact: true })
+    .getByRole("button", { name: "Check fleet fuel", exact: true })
     .waitFor({ state: "visible" });
   for (const id of ["finch", "peregrine", "aurelia", "stormbird"]) {
     await page.getByLabel("Aircraft", { exact: true }).selectOption(id);
@@ -148,10 +148,10 @@ async (page) => {
     "Switching from individually loaded wing tanks to Finch resets tank IDs safely",
   );
   await page
-    .getByRole("button", { name: "Validate all four planes", exact: true })
+    .getByRole("button", { name: "Validate fleet", exact: true })
     .click();
   await page
-    .getByRole("button", { name: "Validate all four planes", exact: true })
+    .getByRole("button", { name: "Validate fleet", exact: true })
     .waitFor({ state: "visible", timeout: 60000 });
   const flightBench = page.getByRole("region", {
     name: "Flight validation bench",

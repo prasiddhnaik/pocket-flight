@@ -17,12 +17,12 @@ async (page) => {
       g.setSuspended(true);
       g.menu();
       await g.selectAircraft(id);
-      const { missions } = await import("/src/missions.ts");
+      const { missions } = await import("/src/flight/missions.ts");
       g.start(missions.find((m) => m.id === "free"));
       const p = g.physics;
       const { gearContactHeight, finchWheels, peregrineWheels, aureliaWheels } =
-        await import("/src/landing-gear.ts");
-      const { stormbirdContact } = await import("/src/stormbird-contact.ts");
+        await import("/src/aircraft/landing-gear.ts");
+      const { stormbirdContact } = await import("/src/aircraft/stormbird/stormbird-contact.ts");
       p.reset(true);
       g.replay.clear();
       g.vfx.reset();

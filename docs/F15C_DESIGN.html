@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>F-15C — aircraft design and build sequence</title>
+  <style>
+    body { max-width: 880px; margin: 40px auto; padding: 0 22px 50px; color: #202020; background: #fff; font: 16px/1.6 system-ui, sans-serif; }
+    h1 { font-size: 30px; line-height: 1.2; } h2 { margin-top: 32px; font-size: 21px; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { padding: 10px 8px; border: 1px solid #ddd; text-align: left; vertical-align: top; }
+    th { background: #f6f6f6; } a { color: #175a9e; } code { font-size: 0.9em; }
+    .status { border-left: 3px solid #777; padding-left: 14px; }
+  </style>
+</head>
+<body>
+  <main>
+    <p>23 October 2026 · Pocket Flight · Approved design</p>
+    <h1>F-15C Eagle, built one assembly at a time</h1>
+    <p class="status">The user selected the single-seat F-15C, requested a reference study before modeling, and specified usable guns. The approved build includes a flyable aircraft and its usable internal cannon. Construction and saved-artifact checks are underway. <a href="F15C_IMPLEMENTATION.html">View implementation evidence</a>. <a href="F15C_RESEARCH.html">Read the source-backed research dossier</a>.</p>
+
+    <h2>What we are making</h2>
+    <p>A detailed digital F-15C with a convincing silhouette, curved fuselage transitions, open intake mouths, a framed canopy, swept wings, twin vertical tails, separate control surfaces, detailed exhausts, and retractable landing gear. The first delivery is the fuselage and nose; the following assemblies are built and checked sequentially.</p>
+    <p>The proposed finish is gray with restrained panel seams, transparent canopy glazing, dark intake interiors, and metal exhaust sections. Small details follow the aircraft's construction and reference photographs. Surface detailing follows approval of the main shapes.</p>
+
+    <h2>Scale and references</h2>
+    <p>The F-15C-specific USAF sheet gives 63 ft 9 in length, 42 ft 9¾ in span, and 18 ft 5½ in height: approximately 19.43 × 13.05 × 5.63 m. These are the proposed overall envelope targets, not millimeter-accurate manufacturing data. The research dossier preserves the differing Smithsonian object dimensions separately. Local cross-sections, panel dimensions, and internal structures remain visual approximations unless supported by a reference.</p>
+    <ul>
+      <li><a href="https://www.af.mil/About-Us/Fact-Sheets/Display/Article/104501/f-15-eagle/">US Air Force F-15 Eagle fact sheet</a> — variant, approximate dimensions, and aircraft photographs.</li>
+      <li><a href="https://www.eglin.af.mil/Portals/56/documents/history/AFD-141104-028.pdf">USAF F-15C fact sheet</a> — variant-specific dimensions.</li>
+      <li><a href="https://ntrs.nasa.gov/api/citations/19890009868/downloads/19890009868.pdf">McDonnell/NASA CAP-TSD paper</a> — general F-15 wing geometry and original drawings, checked against production C photographs.</li>
+      <li><a href="https://www.nationalmuseum.af.mil/Visit/Museum-Exhibits/Fact-Sheets/Display/Article/3454925/mcdonnell-douglas-f-15c-historic-double-mig-killer/">NMUSAF F-15C 86-0156</a> — main production-aircraft photographic reference; displayed external tanks are omitted from the initial proposed configuration.</li>
+      <li><a href="https://www.nasa.gov/reference/f-15-flight-research-facility/">NASA F-15 Flight Research Facility</a> — general shape and three-view reference. NASA's aircraft is a modified F-15A; its research modifications will not be copied into this F-15C.</li>
+      <li><a href="https://airandspace.si.edu/collection-objects/mcdonnell-douglas-f-15c-eagle/nasm_A20260082000">Smithsonian F-15C collection entry</a> — F-15C-specific visual cross-check.</li>
+    </ul>
+
+    <h2>Construction approach</h2>
+    <p><strong>Recommended:</strong> use the existing parametric CAD workflow, keep each major assembly in its own source file, and assemble them through explicit attachment datums. Save STEP geometry and GLB previews after each stage. This supports exact contact measurements and a reproducible build.</p>
+    <p>A manually sculpted mesh offers more freedom for tiny surface details but adds work to preserve exact assembly interfaces. Importing an existing complete model would skip the requested part-by-part construction. The proposed CAD approach follows the project's established aircraft workflow.</p>
+    <p>CAD uses millimeters with +X right, +Y forward, and +Z up. Shared parameters record the aircraft scale, centerline, wing roots, engine centers, and hinge axes. Later exports convert explicitly to meters and the viewer's axis convention.</p>
+
+    <h2>Build sequence and checks</h2>
+    <table>
+      <thead><tr><th>Stage</th><th>Assembly</th><th>Checks before adding the next assembly</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Fuselage and nose</td><td>Compare side, top, front, and perspective views; inspect the nose curvature, cockpit opening, shoulder transitions, wing glove, and twin-engine rear body. Reserve speedbrake, gear bays, and right-root muzzle. Check valid closed solids, symmetry, and attachment datums.</td></tr>
+        <tr><td>2</td><td>Twin intakes and ducts</td><td>Check lip shape, visible duct depth, symmetry, and exact contact with the body. Avoid visible gaps between the intake assembly and fuselage.</td></tr>
+        <tr><td>3</td><td>Main wings, flaps, and ailerons</td><td>Use 45° leading-edge sweep, −1° dihedral, and approximately 6%-root / 3%-tip thickness as documented baseline geometry, checked against production C references. Check root integration and hinge travel. Measure the saved wing and run the lab's low-speed sweep and convergence check.</td></tr>
+        <tr><td>4</td><td>Twin vertical tails and stabilators</td><td>Check reference silhouettes, symmetry, root contact, and the swept volume of moving surfaces.</td></tr>
+        <tr><td>5</td><td>Twin exhaust assemblies</td><td>Check nozzle depth, segmented exterior detail, engine alignment, and attachment to the rear body.</td></tr>
+        <tr><td>6</td><td>Cockpit and canopy</td><td>Check canopy contour, framing, seat placement, visible instruments, cockpit enclosure, and clearance during opening.</td></tr>
+        <tr><td>7</td><td>Landing gear and doors</td><td>Check ground contact, wheel alignment, hinge attachment, retraction clearance, and the closed-door silhouette.</td></tr>
+        <tr><td>8</td><td>Speedbrake, surface details, and final assembly</td><td>Verify the dorsal speedbrake mechanism, panel seams, vents, lights, materials, and useful exterior views. Recheck saved-artifact topology, attachment paths, mechanism travel, and export scale.</td></tr>
+        <tr><td>9</td><td>Flyable F-15C and usable cannon</td><td>Add the aircraft to game and lab catalogs. Validate mass/CG, propulsion, trim, controls, takeoff, and landing. Add firing input, muzzle flash, sound, ammunition, projectile paths, targets, and impact feedback. Demonstrate successful hits, empty-ammo behavior, input release, and pause/menu handling.</td></tr>
+      </tbody>
+    </table>
+    <p>Work proceeds sequentially: build an assembly, inspect its saved output, repair findings, and then add the next one. Save a checkpoint at each stage. No additional approval is proposed between stages unless a new design decision materially changes the aircraft.</p>
+
+    <h2>How the lab will be used</h2>
+    <p>The existing <code>lab/solver.ts</code> and <code>lab/experiments.ts</code> provide the wing experiment and convergence workflow. Feed them measurements from the new aircraft instead of borrowing another aircraft's dimensions. Retain the experiment conditions, assumptions, geometry revision, results, and failures with the model.</p>
+    <p>Before the wings exist, report only geometry and attachment checks. The current wing solver accepts 5–80 m/s and −8° to +8° angle of attack. Its results cover linear attached flow; it does not establish supersonic intake performance, stall behavior, full-aircraft aerodynamic accuracy, structural strength, or flightworthiness.</p>
+
+    <h2>Files and completion criteria</h2>
+    <p>New model sources and outputs belong under <code>assets/f15c/</code>, with <code>src/</code>, <code>STEP/</code>, <code>GLB/</code>, <code>checks/</code>, and <code>review/</code> folders. A repeatable build command will build one stage or all completed stages in order. The existing lab solver remains the owner of aerodynamic calculations.</p>
+    <p>Each modeling stage includes an editable source, a validated saved model, reviewed images, and a live CAD Viewer link. Completion means all assemblies are present, every solid has a measured attachment path, mechanisms pass declared travel checks, export dimensions agree with the source, and the wing lab experiment has recorded results. The aircraft must also fly in the game and fire its cannon at targets with visible hit feedback.</p>
+    <p>The USAF specifies one internal cannon in the right wing root. Input is hold J or a touch FIRE button; Space retains its existing brake function. Include ammunition tracking, empty-ammo handling, release on blur/pause/cancellation, bounded projectile lifetime, and swept hit detection. Preserve existing aircraft behavior and old replay readability. New combat code belongs under the owning flight module, with aircraft-specific muzzle data under <code>src/aircraft/f15c/</code>.</p>
+    <p>Mass, flight coefficients, ballistics, firing cadence, and damage values remain declared estimates until supported by data and tests. Existing aircraft and unrelated working changes are preserved.</p>
+  </main>
+</body>
+</html>

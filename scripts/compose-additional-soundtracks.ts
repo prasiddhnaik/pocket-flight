@@ -1,5 +1,5 @@
 import { createSynth } from "./music-synthesis";
-import { getMusicTrack } from "../src/music-tracks";
+import { getMusicTrack } from "../src/audio/music-tracks";
 
 // Blue Hour: a nocturnal 3/4 miniature. The descending string phrase and
 // electric-piano suspensions supply an entirely different identity to Coastlines.

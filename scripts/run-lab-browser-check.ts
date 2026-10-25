@@ -1,6 +1,7 @@
 import { fileURLToPath } from "node:url";
 const root = fileURLToPath(new URL("../", import.meta.url));
-const cli = ["bun", "node_modules/.bin/playwright-cli", "-s=wind-tunnel"];
+const session = Bun.argv[2] === "aurelia" ? "aurelia-lab-model" : "wind-tunnel";
+const cli = ["bun", "node_modules/.bin/playwright-cli", `-s=${session}`];
 async function command(args: string[]) {
   const child = Bun.spawn([...cli, ...args], {
     cwd: root,
@@ -29,17 +30,20 @@ const optimize = Bun.argv[2] === "optimization";
 const chamber = Bun.argv[2] === "chamber";
 const mechanics = Bun.argv[2] === "mechanics";
 const cockpit = Bun.argv[2] === "cockpit";
-const checkFile = profile
-  ? "profile-wind-tunnel-browser.js"
-  : optimize
-    ? "check-lab-optimization-browser.js"
-    : chamber
-      ? "check-lab-chamber-browser.js"
-      : mechanics
-        ? "check-lab-mechanics-browser.js"
-        : cockpit
-          ? "check-finch-cockpit-browser.js"
-          : "check-wind-tunnel-browser.js";
+const aurelia = Bun.argv[2] === "aurelia";
+const checkFile = aurelia
+  ? "check-aurelia-lab-browser.js"
+  : profile
+    ? "profile-wind-tunnel-browser.js"
+    : optimize
+      ? "check-lab-optimization-browser.js"
+      : chamber
+        ? "check-lab-chamber-browser.js"
+        : mechanics
+          ? "check-lab-mechanics-browser.js"
+          : cockpit
+            ? "check-finch-cockpit-browser.js"
+            : "check-wind-tunnel-browser.js";
 const output = await command([
   "run-code",
   (await Bun.file(new URL(`./${checkFile}`, import.meta.url)).text())
@@ -51,17 +55,19 @@ if (!result) throw new Error(`No acceptance evidence returned:\n${output}`);
 const evidence = JSON.parse(result[1]);
 await Bun.write(
   new URL(
-    profile
-      ? "../output/wind-tunnel-performance.json"
-      : optimize
-        ? "../output/wind-tunnel-optimization.json"
-        : chamber
-          ? "../output/premium-chamber-browser-evidence.json"
-          : mechanics
-            ? "../output/mechanics-browser-evidence.json"
-            : cockpit
-              ? "../output/finch-rebuild-browser.json"
-              : "../output/wind-tunnel-browser-evidence.json",
+    aurelia
+      ? "../output/aurelia-lab-model/browser.json"
+      : profile
+        ? "../output/wind-tunnel-performance.json"
+        : optimize
+          ? "../output/wind-tunnel-optimization.json"
+          : chamber
+            ? "../output/premium-chamber-browser-evidence.json"
+            : mechanics
+              ? "../output/mechanics-browser-evidence.json"
+              : cockpit
+                ? "../output/finch-rebuild-browser.json"
+                : "../output/wind-tunnel-browser-evidence.json",
     import.meta.url,
   ),
   JSON.stringify(evidence, null, 2),

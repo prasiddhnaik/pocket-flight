@@ -9,9 +9,9 @@ import {
   finchThrust,
   GRAVITY,
   SEA_LEVEL_DENSITY,
-} from "../src/aerodynamics";
-import { finchDesign, finchMass } from "../src/finch-design";
-import { FlightPhysics } from "../src/physics";
+} from "../src/flight/aerodynamics";
+import { finchDesign, finchMass } from "../src/aircraft/finch/finch-design";
+import { FlightPhysics } from "../src/flight/physics";
 
 const zero = new Vector3();
 const attitude = new Quaternion().setFromEuler(new Euler(0.12, 0, 0));

@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import type { AircraftId } from "../src/aircraft";
+import type { AircraftId } from "../src/aircraft/aircraft";
 import type { Validation } from "./validation";
 import { aircraftCatalog } from "./aircraft";
-import { references } from "../src/flight-reference-data";
+import { references } from "../src/flight/flight-reference-data";
 const fmt = (n: number, d = 2) => n.toFixed(d);
 function Plot({
   points,
@@ -142,8 +142,8 @@ export function ValidationBench({ aircraft }: { aircraft: AircraftId }) {
         </div>
         <button onClick={run} disabled={busy}>
           {busy
-            ? `Checking fleet · ${completed}/4`
-            : "Validate all four planes"}
+            ? `Checking fleet · ${completed}/${Object.keys(aircraftCatalog).length}`
+            : "Validate fleet"}
         </button>
       </div>
       <p className="help">
@@ -151,6 +151,7 @@ export function ValidationBench({ aircraft }: { aircraft: AircraftId }) {
         model with beginner assist disabled. Published reference transfer and
         simulation checks do not establish measured aircraft performance.
       </p>
+      {aircraft === "aurelia" && <p className="help">This bench uses the game's earlier Aurelia calibration. The tunnel view and wing solver use the new Phenom model.</p>}
       {error && <p role="alert">{error}</p>}
       <div className="validation-tabs">
         {(["stall", "stability", "engine"] as const).map((v) => (
@@ -178,7 +179,7 @@ export function ValidationBench({ aircraft }: { aircraft: AircraftId }) {
         <p className="empty">
           {busy
             ? "Running worker experiments…"
-            : "Run the bench to inspect all four aircraft. The aircraft selector above also selects these results."}
+            : "Run the bench to inspect every aircraft. The aircraft selector above also selects these results."}
         </p>
       ) : (
         <>

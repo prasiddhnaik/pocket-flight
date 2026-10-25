@@ -4,7 +4,7 @@ import {
   advancePropeller,
   propellerAnimation,
   type PropellerPose,
-} from "../src/propeller";
+} from "../src/aircraft/finch/propeller";
 
 const power = {
   throttle: 1,

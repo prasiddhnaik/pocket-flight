@@ -1,10 +1,13 @@
 import * as T from "three";
-import { fuelInstallation } from "../src/fuel-loading";
-import { StormbirdMechanisms } from "../src/stormbird-mechanisms";
+import { fuelInstallation } from "../src/flight/fuel-loading";
+import { F15CMechanisms } from "../src/aircraft/f15c/mechanisms";
+import { StormbirdMechanisms } from "../src/aircraft/stormbird/stormbird-mechanisms";
 import type { LabAircraftId } from "./aircraft";
 import { FinchCockpit } from "./finch-cockpit";
+import { seatMechanicalAnchor } from "./attachment-mounts";
 import { internalControlMount } from "./internal-control-link";
-import { AURELIA_GEAR_STOW_TIME } from "../src/aurelia-motion";
+import { AURELIA_GEAR_STOW_TIME } from "../src/aircraft/aurelia/aurelia-motion";
+import { poseAureliaExterior } from "../src/aircraft/aurelia/exterior-mechanisms";
 
 export type MechanismProgramme =
   "all" | "gear" | "controls" | "power" | "cockpit";
@@ -17,6 +20,7 @@ export type MechanismPose = {
   flaps: number;
   canopy: number;
   power: number;
+  speedBrake?: number;
 };
 const smooth = T.MathUtils.smoothstep;
 const neutral: MechanismPose = {
@@ -34,17 +38,19 @@ export function mechanismPose(
   programme: MechanismProgramme,
 ): MechanismPose {
   const t = ((time % 36) + 36) % 36;
+  const phase = t * Math.PI / 18;
   const controls = programme === "all" || programme === "controls";
   const gear = programme === "all" || programme === "gear";
   const cockpit = programme === "all" || programme === "cockpit";
   const power = programme === "all" || programme === "power";
   return {
     gear: gear ? 1 - smooth(t, 6, 13) + smooth(t, 21, 28) : 1,
-    compression: gear ? 0.5 + 0.5 * Math.sin(t * 0.9) : 0,
-    roll: controls ? Math.sin(t * 0.65) * 0.85 : 0,
-    pitch: controls ? Math.sin(t * 0.45 + 0.8) * 0.75 : 0,
-    yaw: controls || gear ? Math.sin(t * 0.5) * 0.8 : 0,
-    flaps: controls ? 0.5 + 0.5 * Math.sin(t * 0.25 - Math.PI / 2) : 0,
+    compression: gear ? 0.5 + 0.5 * Math.sin(phase * 5) : 0,
+    roll: controls ? Math.sin(phase * 5) * 0.85 : 0,
+    pitch: controls ? Math.sin(phase * 3 + 0.8) * 0.75 : 0,
+    yaw: controls || gear ? Math.sin(phase * 3) * 0.8 : 0,
+    flaps: controls ? .5 - .5 * Math.cos(phase) : 0,
+    speedBrake: controls ? smooth(t, 12, 15) * (1 - smooth(t, 19, 22)) : 0,
     canopy: cockpit
       ? smooth(t, 0, 2) -
         smooth(t, 4, 6) +
@@ -127,6 +133,7 @@ export class AircraftMechanics {
   private nodes = new Map<string, T.Object3D>();
   private rest: Rest[] = [];
   private mechanisms?: StormbirdMechanisms;
+  private f15cMechanisms?: F15CMechanisms;
   private mixer?: T.AnimationMixer;
   private legs: { node: T.Object3D; side: number; nose: boolean }[] = [];
   private carriers: { node: T.Object3D; rest: T.Vector3; nose: boolean }[] = [];
@@ -151,6 +158,7 @@ export class AircraftMechanics {
   private time = 0;
   private partCount = 0;
   private nozzlePetals?: T.InstancedMesh;
+  private aureliaReference = false;
 
   constructor(
     readonly root: T.Object3D,
@@ -159,6 +167,21 @@ export class AircraftMechanics {
   ) {
     root.updateWorldMatrix(true, true);
     root.traverse((node) => this.nodes.set(node.name, node));
+    if (id === "f15c") {
+      this.f15cMechanisms = new F15CMechanisms(root);
+      for (const node of this.f15cMechanisms.getMovingRoots()) this.mark(node);
+      this.captureRest();
+      this.apply(neutral, 0);
+      return;
+    }
+    this.aureliaReference = this.nodes.has("Aurelia_Phenom300E");
+    if (this.aureliaReference) {
+      // Use the exported bearings, flap tracks, gear and doors at their own datums.
+      this.bindNative(clips);
+      this.captureRest();
+      this.apply(neutral, 0);
+      return;
+    }
     this.details.name = "Mechanical_detail_pack";
     root.add(this.details);
     const cylinder = new T.CylinderGeometry(1, 1, 1, 32);
@@ -250,6 +273,8 @@ export class AircraftMechanics {
     return result;
   }
   private anchor(node: T.Object3D, point: T.Vector3): Anchor {
+    if (this.id !== "aurelia")
+      seatMechanicalAnchor(this.root, node, point, this.moving);
     return {
       node,
       point: node.worldToLocal(this.root.localToWorld(point.clone())),
@@ -389,6 +414,14 @@ export class AircraftMechanics {
   }
 
   private bindNative(clips: T.AnimationClip[]) {
+    if (this.aureliaReference) {
+      for (const node of this.nodes.values())
+        if (
+          Array.isArray(node.userData.hingeAxis) ||
+          /retraction_hinge|door_hinge|^Passenger_entry_hinge$|^Cockpit_latch_(paddle|bolt)|^Fan_(Left|Right)$|^Nose_steering$|^Flap_carriage_/.test(node.name)
+        ) this.mark(node);
+      return;
+    }
     for (const node of this.nodes.values()) {
       if (
         /^(Aileron|Flap|Elevator|Rudder|Canard)(_(Left|Right))?$/.test(
@@ -505,6 +538,20 @@ export class AircraftMechanics {
         this.root.updateWorldMatrix(true, true);
         for (const wheel of this.wheels.filter((w) => w.parent === node))
           carrier.attach(wheel);
+        if (this.id === "aurelia" && name.startsWith("Main")) {
+          const side = name.endsWith("Left") ? "Left" : "Right";
+          for (const part of [
+            "polished_piston",
+            "trailing_link",
+            "short_axle",
+            "axle_hub",
+            "brake_rotor",
+            "brake_caliper",
+            "torque_pivot_2",
+          ])
+            if (this.nodes.has(`${side}_${part}`))
+              carrier.attach(this.nodes.get(`${side}_${part}`)!);
+        }
         this.mark(carrier);
         this.carriers.push({
           node: carrier,
@@ -518,6 +565,8 @@ export class AircraftMechanics {
   }
 
   private addControlRams() {
+    // Heron's manually operated controls already have CAD-authored mounting pins.
+    if (this.id === "heron") return;
     for (const node of this.nodes.values()) {
       if (
         !/^(Aileron|Flap|Elevator|Rudder|Canard)(_(Left|Right))?$/.test(
@@ -676,6 +725,7 @@ export class AircraftMechanics {
   }
 
   private addGearHardware() {
+    if (this.id === "heron") return; // Use the authored fixed legs and fork.
     this.root.updateWorldMatrix(true, true);
     const assemblies =
       this.id === "finch"
@@ -694,6 +744,36 @@ export class AircraftMechanics {
         return false;
       });
       if (!tires.length) continue;
+      if (this.id === "aurelia" && name.startsWith("Main")) {
+        const label = name.endsWith("Left") ? "Left" : "Right";
+        const carrier = this.carriers.find((c) => c.node.parent === leg)!.node;
+        for (const part of [
+          "torque_link_upper",
+          "torque_link_lower",
+          "torque_pivot_1",
+          "brake_hose",
+        ]) {
+          const authored = this.nodes.get(`${label}_${part}`);
+          if (authored) authored.visible = false;
+        }
+        this.scissor(
+          this.anchor(leg, this.native(leg, new T.Vector3(0, 0.02, -0.25))),
+          this.anchor(
+            carrier,
+            this.native(carrier, new T.Vector3(0, -0.4, -0.25)),
+          ),
+          0.025,
+        );
+        this.hose(
+          this.anchor(leg, this.native(leg, new T.Vector3(0.08, 0.5, -0.25))),
+          this.anchor(
+            carrier,
+            this.native(carrier, new T.Vector3(0.12, -0.48, 0.22)),
+          ),
+          0.012,
+        );
+        continue;
+      }
       const box = this.bounds(leg),
         wheel = tires[0],
         axle = this.native(wheel),
@@ -811,7 +891,7 @@ export class AircraftMechanics {
   private addCockpitControls() {
     // Finch already has authored cockpit hardware. Guessed additional controls
     // duplicate it and have no verified seat/panel clearance or mounting points.
-    if (this.id === "finch") return;
+    if (this.id === "finch" || this.id === "heron" || this.id === "f15c") return;
     const config = {
       peregrine: {
         stick: [0, 4.1, -9.0],
@@ -965,6 +1045,22 @@ export class AircraftMechanics {
       rest.node.quaternion.copy(rest.quaternion);
       rest.node.scale.copy(rest.scale);
     }
+    if (this.f15cMechanisms) {
+      this.f15cMechanisms.apply({ ...pose, speedBrake: pose.speedBrake ?? 0 });
+      this.root.updateWorldMatrix(true, true);
+      return;
+    }
+    if (this.aureliaReference) {
+      poseAureliaExterior(this.root, {
+        ...pose,
+        steering: pose.yaw,
+        fan: time * 2.4,
+        entry: pose.canopy,
+        cockpitDoor: pose.canopy,
+      });
+      this.root.updateWorldMatrix(true, true);
+      return;
+    }
     const rotate = (name: string, axis: "x" | "y", angle: number) => {
       const node = this.nodes.get(name);
       if (!node) return;
@@ -986,7 +1082,8 @@ export class AircraftMechanics {
       rotate(`Canard_${side}`, "x", pose.pitch * 0.28);
       rotate(`Flap_${side}`, "x", pose.flaps * 0.48);
     }
-    const extension = this.id === "finch" ? 1 : pose.gear;
+    const fixedGear = this.id === "finch" || this.id === "heron";
+    const extension = fixedGear ? 1 : pose.gear;
     const pressure = 0.16 * pose.compression * smooth(extension, 0.8, 1);
     if (this.mechanisms) {
       this.mechanisms.setSuspension(pressure);
@@ -1047,6 +1144,7 @@ export class AircraftMechanics {
   diagnostics() {
     return {
       id: this.id,
+      model: this.id === "f15c" ? "f15c-eagle.glb" : this.aureliaReference ? "aurelia-phenom300e.glb" : null,
       time: this.time,
       pose: this.pose,
       hardwareParts: this.partCount,
@@ -1083,8 +1181,8 @@ export class AircraftMechanics {
             }
           : null,
       articulatedAssemblies: this.moving.size,
-      fixedGear: this.id === "finch",
-      actualGearExtension: this.id === "finch" ? 1 : this.pose.gear,
+      fixedGear: this.id === "finch" || this.id === "heron",
+      actualGearExtension: this.id === "finch" || this.id === "heron" ? 1 : this.pose.gear,
       nativeGear:
         this.id === "aurelia"
           ? {
@@ -1092,14 +1190,16 @@ export class AircraftMechanics {
                 ?.rotation.z,
               mainRight: this.nodes.get("Main_gear_Right_retraction_hinge")
                 ?.rotation.z,
-              wheelDoors: [-1, 1].flatMap((side) =>
+              wheelDoors: this.aureliaReference
+                ? ["Left", "Right"].map((side) => this.nodes.get(`Main_outer_door_hinge_${side}`)?.rotation.z)
+                : [-1, 1].flatMap((side) =>
                 [0, 1].map(
                   (leaf) =>
                     this.nodes.get(`Main_tire_door_hinge_${side}_${leaf}`)
                       ?.rotation.z,
                 ),
               ),
-              doors: [-1, 1].map(
+              doors: (this.aureliaReference ? ["Left", "Right"] : [-1, 1]).map(
                 (side) => this.nodes.get(`Main_door_hinge_${side}`)?.rotation.z,
               ),
             }
@@ -1114,12 +1214,12 @@ export class AircraftMechanics {
     }
     const keys =
       name === "gear"
-        ? ["Gear_Main_Right", "Main_gear_Right"]
+        ? ["Gear_Main_Right", "Main_gear_Right", "Main_gear_Right_retraction_hinge"]
         : name === "controls"
           ? ["Wing_Right"]
           : name === "power"
             ? ["Propeller", "Engine_Right", "Compressor_1"]
-            : ["Canopy", "Cockpit"];
+            : ["Canopy", "Flight_deck", "Cockpit"];
     return keys.map((key) => this.nodes.get(key)).find(Boolean) ?? this.root;
   }
 }

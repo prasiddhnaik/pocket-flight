@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import * as T from "three";
 import { loadGeometryOnly } from "../scripts/geometry-loader";
-import { AURELIA_GEAR_STOW_TIME } from "../src/aurelia-motion";
+import { AURELIA_GEAR_STOW_TIME } from "../src/aircraft/aurelia/aurelia-motion";
 import {
   aureliaBays,
   aureliaPanels,
@@ -10,7 +10,7 @@ import {
   fairingFullness,
   makeAureliaGearBays,
 } from "../scripts/aurelia-gear-bays";
-import { wheelPose } from "../src/airframe-contact";
+import { wheelPose } from "../src/flight/airframe-contact";
 import { AircraftMechanics } from "../lab/mechanics";
 
 async function aircraft() {
@@ -410,4 +410,28 @@ test("each compact main door is shorter than its tire diameter", async () => {
       expect(size.x * 0.55).toBeLessThan(0.7);
     }
   }
+});
+
+test("blue fuselage paint stays outside the white pressure shell at ordinary side views", async () => {
+  const { scene } = await aircraft();
+  const shell = scene.getObjectByName("Continuous_pressure_shell") as T.Mesh;
+  const paint = scene.getObjectByName(
+    "Fuselage_|_Atlantic_blue_lacquer",
+  ) as T.Mesh;
+  (shell.material as T.Material).side = T.DoubleSide;
+  (paint.material as T.Material).side = T.DoubleSide;
+  let checked = 0;
+  for (const z of [-6, -4, -2, 4, 6, 8])
+    for (const side of [-1, 1]) {
+      const ray = new T.Raycaster(
+        new T.Vector3(0, 3.88, z),
+        new T.Vector3(side, -1, 0).normalize(),
+      );
+      const white = ray.intersectObject(shell, false)[0],
+        blue = ray.intersectObject(paint, false)[0];
+      if (!white || !blue) continue;
+      expect(blue.distance - white.distance).toBeGreaterThan(0.012);
+      checked++;
+    }
+  expect(checked).toBe(12);
 });

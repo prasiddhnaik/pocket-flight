@@ -1,7 +1,7 @@
 import { mkdir } from "node:fs/promises";
 import { join } from "node:path";
-import { trackDuration } from "../src/music-tracks";
-import type { MusicTrack } from "../src/music-tracks";
+import { trackDuration } from "../src/audio/music-tracks";
+import type { MusicTrack } from "../src/audio/music-tracks";
 
 export async function createSynth(track: MusicTrack, initialSeed = 0x51c0a57) {
   const rate = 44100,

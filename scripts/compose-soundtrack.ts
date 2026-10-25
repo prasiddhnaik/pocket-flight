@@ -1,5 +1,5 @@
 import { createSynth } from "./music-synthesis";
-import { getMusicTrack } from "../src/music-tracks";
+import { getMusicTrack } from "../src/audio/music-tracks";
 const { beat, bars, stereo, random, voice, drum, delay, reverb, render } =
   await createSynth(getMusicTrack("coastlines"));
 const harmony = [

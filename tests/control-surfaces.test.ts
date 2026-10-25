@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import { Group, MathUtils, Vector3 } from "three";
-import { controlSurfaces } from "../src/control-surfaces";
+import { controlSurfaces } from "../src/aircraft/finch/control-surfaces";
 
 const fixture = () => {
   const names = ["Aileron_Left", "Aileron_Right", "Elevator", "Rudder"];

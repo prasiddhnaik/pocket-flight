@@ -6,10 +6,10 @@ async (page) => {
   });
   await page.setViewportSize({ width: 1440, height: 1100 });
   await page
-    .getByRole("button", { name: "Validate all four planes", exact: true })
+    .getByRole("button", { name: "Validate fleet", exact: true })
     .click();
   await page
-    .getByRole("button", { name: "Validate all four planes", exact: true })
+    .getByRole("button", { name: "Validate fleet", exact: true })
     .waitFor({ state: "visible" });
   await page
     .getByRole("button", { name: "Export fleet evidence", exact: true })
@@ -38,9 +38,9 @@ async (page) => {
     return JSON.parse(await window.__envelopeBlob.text());
   });
   const checks = [];
-  if (Object.keys(data.results).length !== 4)
+  if (Object.keys(data.results).length !== 5)
     throw Error("Worker did not validate every aircraft");
-  for (const id of ["finch", "peregrine", "aurelia", "stormbird"]) {
+  for (const id of ["finch", "peregrine", "aurelia", "stormbird", "heron"]) {
     await page.getByLabel("Aircraft", { exact: true }).selectOption(id);
     const bench = page.getByRole("region", { name: "Flight validation bench" });
     await bench
@@ -51,7 +51,7 @@ async (page) => {
             ? "Peregrine HX–27"
             : id === "aurelia"
               ? "Aurelia S32"
-              : "Stormbird HX–40",
+              : id === "heron" ? "Heron UT–9" : "Stormbird HX–40",
         { exact: true },
       )
       .waitFor();

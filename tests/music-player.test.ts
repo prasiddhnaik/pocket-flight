@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, spyOn } from "bun:test";
-import { FlightMusic } from "../src/flight-music";
-import { getMusicTrack, trackDuration } from "../src/music-tracks";
+import { FlightMusic } from "../src/audio/flight-music";
+import { getMusicTrack, trackDuration } from "../src/audio/music-tracks";
 
 const state = {
   mode: "menu",

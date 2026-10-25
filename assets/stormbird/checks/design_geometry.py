@@ -80,7 +80,7 @@ geometry = {'units':'metres', 'up':'Y', 'forward':'-Z', 'centerOffsetY':2,
             'groundEnvelopes':envelopes,
             'planform':planform,
             'groundPitchLimit':float(np.deg2rad(envelopes[-1]['pitch_contact_degrees']-1))}
-target = root.parents[1] / 'src/stormbird-geometry.json'
+target = root.parents[1] / 'src/aircraft/stormbird/stormbird-geometry.json'
 target.write_text(json.dumps(geometry,separators=(',',':'))+'\n')
 report = {k:v for k,v in geometry.items() if k not in ['bodyHull','legs']}
 report['bodyHullVertices'] = len(hull)

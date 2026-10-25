@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { Actuator, controlCheck } from "../src/aurelia-motion";
+import { Actuator, controlCheck } from "../src/aircraft/aurelia/aurelia-motion";
 
 test("actuator converges without overshoot and remains frame-rate independent", () => {
   const values = [30, 60, 144].map(fps => {

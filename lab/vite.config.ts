@@ -32,6 +32,9 @@ export default defineConfig({
   build: {
     outDir: resolve(root, "../output/wind-tunnel-build"),
     emptyOutDir: true,
+    rollupOptions: {
+      input: { lab: resolve(root, "index.html"), f15c: resolve(root, "f15c.html") },
+    },
   },
   plugins: [
     {

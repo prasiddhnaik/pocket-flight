@@ -1,7 +1,12 @@
-import type { AircraftId } from "../src/aircraft";
-import stormbirdGeometry from "../src/stormbird-geometry.json";
+import type { AircraftId } from "../src/aircraft/aircraft";
+import stormbirdGeometry from "../src/aircraft/stormbird/stormbird-geometry.json";
 
-export const aircraftCatalog = {
+// Runtime calibration tools must keep using the assets flown by the game.
+export const runtimeAircraftCatalog = {
+  f15c: {
+    name: "F-15C Eagle", asset: "f15c-eagle.glb", scale: 1, offsetY: 0, camber: 0,
+    section: "Saved STEP wing sections, analytic 6% to 3% thickness and visual camber. Symmetric zero-lift baseline; true production-airfoil data unverified. Low-speed attached-flow wing-only VLM, not transonic or full-aircraft validation.",
+  },
   finch: {
     name: "Finch U–2",
     asset: "finch-u2.glb",
@@ -38,6 +43,10 @@ export const aircraftCatalog = {
     section:
       "Nominal authoring section: 0.4% sinusoidal camber from the aircraft design sheet. Thin-airfoil approximation; no measured polar.",
   },
+  heron: {
+    name: "Heron UT–9", asset: "heron-ut9.glb", scale: 1, offsetY: 0, camber: 0.02,
+    section: "Original CAD, 14% NACA-style section with 2% sinusoidal camber; estimated whole-aircraft polar.",
+  },
 } satisfies Record<
   AircraftId,
   {
@@ -49,6 +58,20 @@ export const aircraftCatalog = {
     section: string;
   }
 >;
+
+export const aircraftCatalog = {
+  ...runtimeAircraftCatalog,
+  aurelia: {
+    ...runtimeAircraftCatalog.aurelia,
+    asset: "aurelia-phenom300e.glb",
+    // The export already includes the current 1.155 airframe scale.
+    scale: 1,
+    offsetY: 0,
+    camber: 0.018,
+    section:
+      "Authored Phenom reference wing: 12% thickness and 1.8% sinusoidal camber. Thin-airfoil approximation; no measured polar. Winglets excluded from the planar wing solver.",
+  },
+};
 
 export type LabAircraftId = keyof typeof aircraftCatalog;
 

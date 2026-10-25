@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import type { AircraftId } from "../src/aircraft";
-import { aircraftDesign, type Loading } from "../src/aircraft-design";
-import calibration from "../src/fuel-mass-calibration.json";
+import type { AircraftId } from "../src/aircraft/aircraft";
+import { aircraftDesign, type Loading } from "../src/aircraft/aircraft-design";
+import calibration from "../src/aircraft/fuel-mass-calibration.json";
 import { aircraftCatalog } from "./aircraft";
-import { aircraftSystems, hydraulicPumpWatts } from "../src/aircraft-systems";
+import { aircraftSystems, hydraulicPumpWatts } from "../src/aircraft/aircraft-systems";
 import { loadingSnapshot, type LoadingValidation } from "./loading-validation";
 const f = (n: number, digits = 1) => n.toFixed(digits);
 
@@ -86,6 +86,7 @@ export function LoadingBench({ aircraft }: { aircraft: AircraftId }) {
       className="panel validation-bench"
       aria-label="Weight and balance bench"
     >
+      {aircraft === "aurelia" && <p className="help">Fuel and loading results use the game's earlier Aurelia calibration. The tunnel view and wing solver use the new Phenom model.</p>}
       <div className="experiment-head">
         <div>
           <p className="eyebrow">PRIVATE / MASS CALIBRATION</p>
@@ -93,15 +94,17 @@ export function LoadingBench({ aircraft }: { aircraft: AircraftId }) {
         </div>
         <button onClick={run} disabled={busy}>
           {busy
-            ? `Checking fuel · ${Object.keys(results).length}/4`
-            : "Check fuel on all four planes"}
+            ? `Checking fuel · ${Object.keys(results).length}/${Object.keys(aircraftCatalog).length}`
+            : "Check fleet fuel"}
         </button>
       </div>
       <p className="help">
-        Tank volume and settled-liquid moments come from the actual model at
-        game scale. Parts consume the existing empty-mass budget; unusable fuel
-        stays aboard at zero usable fuel. Mass allowances and limits remain
-        concept estimates.
+        {aircraft === "f15c"
+          ? design.fuel.validity
+          : <>Tank volume and settled-liquid moments come from the actual model at
+            game scale. Parts consume the existing empty-mass budget; unusable fuel
+            stays aboard at zero usable fuel. Mass allowances and limits remain
+            concept estimates.</>}
       </p>
       <div className="validation-tabs">
         <button

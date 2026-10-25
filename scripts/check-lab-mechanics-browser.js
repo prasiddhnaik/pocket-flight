@@ -45,7 +45,9 @@ async (page) => {
     assert(
       initial.mechanical &&
         initial.performance.mechanics.id === id &&
-        initial.performance.mechanics.hardwareParts > 100,
+        (id === "aurelia"
+          ? initial.performance.mechanics.model === "aurelia-phenom300e.glb" && initial.performance.mechanics.hardwareParts === 0
+          : initial.performance.mechanics.hardwareParts > 100),
       `${name} builds its detailed mechanical rig`,
     );
     await page.getByRole("button", { name: "Inspect", exact: true }).click();

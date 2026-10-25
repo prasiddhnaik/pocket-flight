@@ -1,16 +1,16 @@
 import { expect, test } from "bun:test";
-import { FlightPhysics } from "../src/physics";
-import type { AircraftId } from "../src/aircraft";
-import { aircraftDesign, massProperties } from "../src/aircraft-design";
+import { FlightPhysics } from "../src/flight/physics";
+import type { AircraftId } from "../src/aircraft/aircraft";
+import { aircraftDesign, massProperties } from "../src/aircraft/aircraft-design";
 import {
   aircraftAerodynamics,
   aircraftStallSpeed,
   aircraftThrust,
-} from "../src/aerodynamics";
-import { solveTrim } from "../src/flight-trim";
-import { integrateRotation } from "../src/rigid-body";
+} from "../src/flight/aerodynamics";
+import { solveTrim } from "../src/flight/flight-trim";
+import { integrateRotation } from "../src/flight/rigid-body";
 import { Euler, Matrix3, Quaternion, Vector3 } from "three";
-import { wingForAircraft } from "../lab/catalog";
+import { runtimeWingForAircraft } from "../lab/catalog";
 import { cachedSolveWing } from "../lab/solver";
 
 const neutral = { pitch: 0, roll: 0, yaw: 0, throttle: 0, brake: false };
@@ -104,9 +104,9 @@ for (const id of fleet) {
       massProperties(d.massBudget, { fuel: -1, payload: 1 }),
     ).toThrow();
   });
-  test(`${id}: attached lift matches measured private-tunnel geometry`, () => {
+  test(`${id}: attached lift matches its runtime asset's measured wing`, () => {
     const d = aircraftDesign(id),
-      g = wingForAircraft(id);
+      g = runtimeWingForAircraft(id);
     const a = cachedSolveWing(
       g,
       { speed: 45, density: 1.225, alpha: 0, beta: 0 },

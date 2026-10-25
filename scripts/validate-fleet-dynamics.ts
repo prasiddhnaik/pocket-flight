@@ -1,10 +1,10 @@
 import { fileURLToPath } from "node:url";
 import { Vector3 } from "three";
-import { FlightPhysics } from "../src/physics";
-import { aircraftDesign, massProperties } from "../src/aircraft-design";
-import { solveTrim } from "../src/flight-trim";
-import { aircraftStallSpeed } from "../src/aerodynamics";
-import { runways } from "../src/terrain";
+import { FlightPhysics } from "../src/flight/physics";
+import { aircraftDesign, massProperties } from "../src/aircraft/aircraft-design";
+import { solveTrim } from "../src/flight/flight-trim";
+import { aircraftStallSpeed } from "../src/flight/aerodynamics";
+import { runways } from "../src/world/terrain";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const ids = ["finch", "peregrine", "aurelia", "stormbird"] as const;

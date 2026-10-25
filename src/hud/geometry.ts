@@ -1,6 +1,6 @@
-import type { AircraftId } from "../aircraft";
-import { flightProfiles } from "../flight-profiles";
-import { islandEnvelope } from "../flight-envelope";
+import type { AircraftId } from "../aircraft/aircraft";
+import { flightProfiles } from "../flight/flight-profiles";
+import { islandEnvelope } from "../flight/flight-envelope";
 
 export const KNOTS_PER_MPS = 1.943844;
 // ISA sea level; the island ceiling is 1,800 m so the error is small.
@@ -42,7 +42,7 @@ export function unwrapHeading(previous: number, heading: number) {
 export type Band = { from: number; to: number; tone: "green" | "amber" };
 export type AirspeedScale = { max: number; majorStep: number; minorStep: number; bands: Band[]; redline: number };
 
-const airspeedDialMax: Record<AircraftId, number> = { finch: 180, aurelia: 450, peregrine: 500, stormbird: 500 };
+const airspeedDialMax: Record<AircraftId, number> = { finch: 180, heron: 240, aurelia: 450, peregrine: 500, stormbird: 500, f15c: 500 };
 
 export function airspeedScale(id: AircraftId): AirspeedScale {
   const max = airspeedDialMax[id];

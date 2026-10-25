@@ -1,6 +1,6 @@
 import * as T from "three";
-import { CockpitDisplays, displayDemo } from "../src/cockpit-displays";
-import { refineAircraftMaterials } from "../src/aircraft-materials";
+import { CockpitDisplays, displayDemo } from "../src/aircraft/cockpit-displays";
+import { refineAircraftMaterials } from "../src/aircraft/aircraft-materials";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
@@ -12,6 +12,7 @@ import {
 } from "./mechanics";
 import { aircraftCatalog, type LabAircraftId } from "./aircraft";
 import { fleetMeasurements } from "./catalog";
+import { AureliaLabDisplays, type LabDisplays } from "./aurelia-displays";
 import { wingSection, type Solution } from "./solver";
 import {
   AirframeEnvelope,
@@ -76,7 +77,7 @@ export class TunnelScene {
   private mechanicalProgramme: MechanismProgramme = "all";
   private mechanicalTime = 0;
   private displayTime = 0;
-  private displays: CockpitDisplays | null = null;
+  private displays: LabDisplays | null = null;
   private revealMechanisms = false;
   private internalFocus: "body" | "wing" = "body";
   private ghostShells = new Map<
@@ -364,7 +365,9 @@ export class TunnelScene {
       // The analytical representation retains the existing aggressively batched path.
       this.mechanicalSource = { model: gltf.scene, clips: gltf.animations, id };
       refineAircraftMaterials(gltf.scene);
-      this.displays = new CockpitDisplays(gltf.scene, id);
+      this.displays = id === "aurelia"
+        ? new AureliaLabDisplays(gltf.scene)
+        : new CockpitDisplays(gltf.scene, id);
       this.displayTime = 0;
       model.add(gltf.scene.clone(true));
       model.position.copy(pivot);
@@ -697,6 +700,7 @@ export class TunnelScene {
 
   getPerformanceDiagnostics() {
     return {
+      aircraftAsset: this.aircraftId ? aircraftCatalog[this.aircraftId].asset : null,
       cockpitDisplays: this.displays?.diagnostics(),
       drawCalls: this.renderer.info.render.calls,
       triangles: this.renderer.info.render.triangles,
@@ -1089,6 +1093,10 @@ export class TunnelScene {
         "Main_gear_Left",
         "Main_door_hinge_-1",
         "Main_door_hinge_1",
+        "Main_gear_Left_retraction_hinge",
+        "Main_gear_Right_retraction_hinge",
+        "Main_door_hinge_Left",
+        "Main_door_hinge_Right",
       ]) {
         const part = this.mechanicalAircraft?.getObjectByName(name);
         if (part) box.union(new T.Box3().setFromObject(part));
@@ -1128,11 +1136,14 @@ export class TunnelScene {
   displayView() {
     const root = (
       this.mechanicalEnabled ? this.mechanicalAircraft : this.aircraft
-    )?.getObjectByName("Cockpit_live_displays")?.parent;
-    if (!root || !this.displays) return;
+    );
+    const displayRoot = this.aircraftId === "aurelia"
+      ? root?.getObjectByName("Aurelia_Phenom300E")
+      : root?.getObjectByName("Cockpit_live_displays")?.parent;
+    if (!displayRoot || !this.displays) return;
     this.currentView = "displays";
     this.applyChamberView();
-    const target = this.displays.viewTarget(root);
+    const target = this.displays.viewTarget(displayRoot);
     this.camera.fov =
       this.aircraftId === "finch"
         ? 55
@@ -1294,6 +1305,7 @@ export class TunnelScene {
           state,
           this.camera.position.distanceTo(pivot) < 30,
           this.paused && this.dirty,
+          this.mechanicalEnabled ? mechanismPose(this.mechanicalTime, this.mechanicalProgramme) : undefined,
         )
       )
         this.dirty = true;

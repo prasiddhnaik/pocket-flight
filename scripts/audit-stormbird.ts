@@ -17,7 +17,7 @@ const result = Bun.spawnSync(
 );
 if (result.exitCode) process.exit(result.exitCode);
 const read = (path: string) => readFileSync(resolve(root, path));
-const geometry = JSON.parse(read("src/stormbird-geometry.json").toString());
+const geometry = JSON.parse(read("src/aircraft/stormbird/stormbird-geometry.json").toString());
 const file = read("public/assets/stormbird-hx40.glb");
 const document = JSON.parse(
   file.subarray(20, 20 + file.readUInt32LE(12)).toString(),

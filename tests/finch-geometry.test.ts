@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { measureFinch } from "../scripts/measure-finch";
-import { finchDesign, finchMass, finchCG } from "../src/finch-design";
-import { finchWheels } from "../src/landing-gear";
+import { finchDesign, finchMass, finchCG } from "../src/aircraft/finch/finch-design";
+import { finchWheels } from "../src/aircraft/landing-gear";
 import { Vector3 } from "three";
 
 test("Finch engineering dimensions, wing area and gear datums match the actual runtime GLB", async () => {

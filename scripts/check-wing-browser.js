@@ -13,7 +13,7 @@ async (page) => {
     g.setSuspended(true);
     await g.aircraft.ready;
     const T = await import("/node_modules/three/build/three.module.js");
-    const { makeAircraft } = await import("/src/aircraft.ts");
+    const { makeAircraft } = await import("/src/aircraft/aircraft.ts");
     const model = makeAircraft(1, "finch");
     await model.ready;
     const scene = new T.Scene();

@@ -6,8 +6,8 @@ import {
   WORLD_SIZE,
   TERRAIN_SEGMENTS,
   terrainSurfaceHeight,
-} from "../src/terrain";
-import { villageRoof, hangarRoof, groundPath } from "../src/scenery-geometry";
+} from "../src/world/terrain";
+import { villageRoof, hangarRoof, groundPath } from "../src/world/scenery-geometry";
 
 test("both runways and aprons clear the actual triangulated island", () => {
   const geometry = new T.PlaneGeometry(

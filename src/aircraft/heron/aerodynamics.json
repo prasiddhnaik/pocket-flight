@@ -1,0 +1,30 @@
+{
+  "geometryRevision": "81bc153162e94b25e74cc750aacc86628b2e6ac6d3f83e1c61c858f0bd3bba70",
+  "solver": "horseshoe-vlm-1.1",
+  "panelCount": 96,
+  "cl0": 0.2990305693598207,
+  "liftSlope": 4.91859142017757,
+  "neutralPointZ": 0.3039290195311387,
+  "pitchDamping": -35.43879497245626,
+  "elevator": 1.1962346195549667,
+  "cd0": 0.04273877819746198,
+  "estimatedDragArea": 1.1404943999999997,
+  "tail": {
+    "area": 8.242199999999999,
+    "span": 5.32,
+    "meanAerodynamicChord": 1.6048278372279243,
+    "quarterChordZ": 6.692915726383734,
+    "aspectRatio": 3.4338404794836337,
+    "liftSlope": 3.6116671092256287,
+    "volumeCoefficient": 1.2975837868147864,
+    "pressureRatio": 0.9,
+    "downwashGradient": 0.3317707327574722,
+    "bodyDestabilization": 0.05142925058134567
+  },
+  "assumptions": [
+    "Main-wing CL0 and lift slope use the private lab's attached-flow VLM at fuselage angles 0 and 4 degrees. CAD incidence and washout are included once.",
+    "Neutral point and pitch damping use an analytical finite-wing tail model. Tail pressure ratio 0.90, downwash 2a/(pi AR), body destabilization 3% MAC, elevator effectiveness 0.65 and maximum travel 25 degrees are estimates.",
+    "Whole-aircraft profile drag, Oswald efficiency, CL limits, flap increments and post-stall behavior remain game estimates. No viscous CFD, propwash or measured flight calibration.",
+    "Estimated parasite drag area is held at the previous 0.036 coefficient times 31.6804 square metres. Renormalizing by the smaller current wing area avoids claiming an unmeasured airframe drag reduction."
+  ]
+}

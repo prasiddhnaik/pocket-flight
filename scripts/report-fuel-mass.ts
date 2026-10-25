@@ -1,8 +1,8 @@
 import { validateLoading } from "../lab/loading-validation";
-import { aircraftDesign } from "../src/aircraft-design";
+import { aircraftDesign } from "../src/aircraft/aircraft-design";
 import { aircraftCatalog } from "../lab/aircraft";
-import calibration from "../src/fuel-mass-calibration.json";
-import { aircraftSystems, hydraulicPumpWatts } from "../src/aircraft-systems";
+import calibration from "../src/aircraft/fuel-mass-calibration.json";
+import { aircraftSystems, hydraulicPumpWatts } from "../src/aircraft/aircraft-systems";
 const fleet = (["finch", "peregrine", "aurelia", "stormbird"] as const).map(
   (id) => validateLoading(id),
 );

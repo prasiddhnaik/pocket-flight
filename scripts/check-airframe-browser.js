@@ -5,7 +5,7 @@ async (page) => {
   await page.setViewportSize({ width: 1200, height: 900 });
   await page.evaluate(async () => {
     const T = await import("/node_modules/three/build/three.module.js");
-    const { makeAircraft } = await import("/src/aircraft.ts");
+    const { makeAircraft } = await import("/src/aircraft/aircraft.ts");
     const { RoomEnvironment } = await import("/node_modules/three/examples/jsm/environments/RoomEnvironment.js");
     const renderer = new T.WebGLRenderer({ canvas: document.querySelector("canvas"), antialias: true, preserveDrawingBuffer: true });
     renderer.setSize(1200, 900);

@@ -2,7 +2,7 @@ import { expect, test } from "bun:test";
 import { readFileSync, readdirSync } from "node:fs";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import * as T from "three";
-import { terrainSurfaceHeight, random, runways } from "../src/terrain";
+import { terrainSurfaceHeight, random, runways } from "../src/world/terrain";
 
 function glb(name: string) {
   const bytes = readFileSync(

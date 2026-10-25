@@ -1,7 +1,7 @@
 import { describe, it, expect } from "bun:test";
-import { FlightPhysics } from "../src/physics";
-import { terrainHeight, runways, runwayLocal } from "../src/terrain";
-import { missions, scoreFlight } from "../src/missions";
+import { FlightPhysics } from "../src/flight/physics";
+import { terrainHeight, runways, runwayLocal } from "../src/world/terrain";
+import { missions, scoreFlight } from "../src/flight/missions";
 const neutral = { pitch: 0, roll: 0, yaw: 0, throttle: 0, brake: false };
 describe("Finch flight envelope", () => {
   it("binary keyboard rotation reaches the first checkpoint with climb margin", () => {
@@ -17,7 +17,7 @@ describe("Finch flight envelope", () => {
           pitch: p.airspeed * 1.943844 >= p.profile.rotationKnots ? 1 : 0,
         });
         takeoff ||= p.events.some((e) => e.type === "takeoff");
-        if (!gateHeight && p.position.z <= 130) gateHeight = p.position.y;
+        if (!gateHeight && p.position.z >= 390) gateHeight = p.position.y;
       }
       expect(takeoff).toBe(true);
       expect(gateHeight).toBeGreaterThan(35);
@@ -64,7 +64,7 @@ describe("Finch flight envelope", () => {
       });
       if (!p.grounded) {
         tookOff = true;
-        expect(p.position.z).toBeGreaterThan(25);
+        expect(p.position.z).toBeLessThan(runways[0].z + runways[0].length / 2);
         break;
       }
     }

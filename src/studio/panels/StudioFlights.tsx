@@ -1,7 +1,7 @@
 import { Film, Download, Plus } from "lucide-react";
 import type { SavedReplay } from "../../replay/replay-data";
 import { downloadData } from "../../replay/replay-data";
-import { aircraftNames } from "../../app/flight-ui";
+import { replayAircraftName } from "../../flight/combat/tape";
 import { clock, slug } from "../studio-format";
 
 export function StudioFlights({
@@ -47,7 +47,7 @@ export function StudioFlights({
                 }}
               />
               <small>
-                {aircraftNames[r.aircraft]} · {clock(r.duration)}
+                {replayAircraftName(r)} · {clock(r.duration)}
               </small>
               <small>
                 {new Date(r.createdAt).toLocaleDateString()}

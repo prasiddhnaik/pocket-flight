@@ -4,6 +4,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         game: "index.html",
+        aircraft: "aircraft.html",
         scenery: "scenery.html",
         hangar: "hangar.html",
         jet: "jet.html",

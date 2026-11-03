@@ -2,10 +2,11 @@ import * as T from "three";
 import { displayDemo } from "../aircraft/cockpit-displays";
 import { makeWorld } from "../world/world";
 import type { AircraftId, AircraftModel } from "../aircraft/aircraft";
+import type { FinchVariant } from "../aircraft/finch/attack";
 import { applyJetReplay } from "../replay/replay-jet";
 import { initialJetInput } from "../aircraft/jet-effects";
 import type { JetMotion } from "../aircraft/jet-effects";
-import { makeAircraft, disposeAircraft, isPropellerAircraft } from "../aircraft/aircraft";
+import { makeAircraft, disposeAircraft } from "../aircraft/aircraft";
 import { FlightPhysics } from "./physics";
 import { instrumentData, type InstrumentData } from "../hud/instrument-data";
 import type { Controls } from "./physics";
@@ -13,18 +14,23 @@ import type { ContactPart } from "./airframe-contact";
 import { ISLAND_FLIGHT_MODEL } from "./flight-envelope";
 import { missions, scoreFlight } from "./missions";
 import type { Mission, FlightResult } from "./missions";
-import { FlightAudio } from "../audio/audio";
-import { terrainHeight, groundHeight, runways } from "../world/terrain";
+import { engineVoice, FlightAudio } from "../audio/audio";
+import { terrainHeight, groundHeight, onPavement, rangeRunway, runways } from "../world/terrain";
 import { FlightVfx, type VfxInput } from "./flight-vfx";
 import { CannonEffects } from "./cannon-effects";
+import { CombatRange } from "./combat/combat";
+import type { CombatFrame } from "./combat/tape";
+import { supportsCombat } from "../aircraft/weapons/combat-loadouts";
 import { F15CFlightInspection } from "./f15c-inspection";
 import { applyReplaySurfaces } from "../replay/replay-surfaces";
 import { ReplayTimeline } from "../replay/replay";
 import { ReplayVideoExport } from "../replay/replay-export";
 import { ReplayLibrary } from "../replay/replay-library";
 import { saveFrames, type SavedReplay } from "../replay/replay-data";
+import { ReplayArchive } from "../replay/replay-archive";
 import { STORMBIRD_PILOT_EYE } from "../aircraft/stormbird/stormbird-config";
 import { F15C_PILOT_EYE } from "../aircraft/f15c/design";
+import { GUN_FULL_SPEED } from "../aircraft/f15c/gun-spool";
 import type { ExportState } from "../replay/replay-export";
 import type { SurfacePose } from "../aircraft/finch/control-surfaces";
 export type CameraMode = "chase" | "cockpit" | "landing" | "cinematic";
@@ -93,6 +99,7 @@ export type ReplayFrame = {
   night: boolean;
   ring: number;
   debris: { p: T.Vector3; q: T.Quaternion; visible: boolean }[];
+  combat?: CombatFrame;
 };
 export class PocketFlight {
   readonly renderer: T.WebGLRenderer;
@@ -132,6 +139,7 @@ export class PocketFlight {
   private recordingDate = Date.now();
   private recordingAircraft: AircraftId = "finch";
   private recordingPaint = 0;
+  private recordingVariant: FinchVariant = "trainer";
   private paintIndex = 0;
   private savedStamp = "";
   private nextArchive = 10;
@@ -144,10 +152,14 @@ export class PocketFlight {
     this.audio.setVisible(!value && !document.hidden);
     if (value) this.audio.update(0, 0, false);
     this.keys.clear();
-    if (value) this.cannon.suspend();
+    if (value) { this.cannon.suspend(); this.combat.suspend(); }
     this.last = performance.now();
   }
   captureSavedReplay(): SavedReplay | null {
+    const details = this.savedReplayDetails();
+    return details && { ...details, frames: saveFrames(this.replay.toArray()) };
+  }
+  private savedReplayDetails(): Omit<SavedReplay, "frames"> | null {
     if (this.replay.duration < 1) return null;
     return {
       schemaVersion: 1,
@@ -155,24 +167,25 @@ export class PocketFlight {
       id: this.recordingId,
       name: this.mission.name,
       aircraft: this.recordingAircraft,
+      ...(this.recordingVariant === "attack" ? { variant: this.recordingVariant } : {}),
       paint: this.recordingPaint,
       mission: this.mission.id,
       createdAt: this.recordingDate,
       updatedAt: Date.now(),
       duration: this.replay.duration,
       trimmed: this.replay.trimmed,
-      frames: saveFrames(this.replay.toArray()),
     };
   }
   async archiveReplay() {
     const stamp = `${this.recordingId}:${this.replay.duration}:${this.replay.length}`;
     if (stamp === this.savedStamp) return this.recordingId;
-    const replay = this.captureSavedReplay();
+    const replay = this.savedReplayDetails();
     if (!replay) return null;
-    await this.replayLibrary.saveReplay(replay);
+    await this.archive.save(replay, this.replay.toArray());
     if (replay.id === this.recordingId) this.savedStamp = stamp;
     return replay.id;
   }
+  private archive = new ReplayArchive(() => this.replayLibrary);
   private archiveQuietly() {
     void this.archiveReplay().catch(() =>
       this.onToast(
@@ -201,6 +214,7 @@ export class PocketFlight {
   }[] = [];
   readonly vfx = new FlightVfx();
   readonly cannon: CannonEffects;
+  readonly combat: CombatRange;
   private inspection?: F15CFlightInspection;
   private vfxVelocity = new T.Vector3();
   private vfxUp = new T.Vector3();
@@ -213,20 +227,23 @@ export class PocketFlight {
   constructor(
     private container: HTMLElement,
     aircraftId: AircraftId = "finch",
+    variant: FinchVariant = "trainer",
   ) {
-    this.aircraft = makeAircraft(0, aircraftId);
+    this.aircraft = makeAircraft(0, aircraftId, variant);
     this.physics.aircraftId = aircraftId;
-    this.audio.jet = !isPropellerAircraft(aircraftId);
+    this.audio.voice = engineVoice(aircraftId);
     this.renderer = new T.WebGLRenderer({
       antialias: true,
       logarithmicDepthBuffer: true,
       powerPreference: "high-performance",
     });
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = T.PCFSoftShadowMap;
     this.renderer.toneMapping = T.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.14;
+    // Scenery images are freed after upload, so a restored context needs a fresh load.
+    this.renderer.domElement.addEventListener("webglcontextrestored", () => location.reload());
     container.appendChild(this.renderer.domElement);
     this.renderer.domElement.setAttribute(
       "aria-label",
@@ -236,7 +253,19 @@ export class PocketFlight {
     this.cannon = new CannonEffects(container, (x, z) => Math.max(0, groundHeight(x, z)));
     if (import.meta.env.DEV && new URLSearchParams(location.search).get("inspect") === "f15c")
       this.inspection = new F15CFlightInspection(container);
-    this.scene.add(this.cannon.group);
+    this.combat = new CombatRange(
+      container,
+      (x, z) => Math.max(0, groundHeight(x, z)),
+      (x, z) => terrainHeight(x, z) < 0.25,
+      this.audio,
+      () => {
+        // The ramp crew reloads the gun and tops the tanks along with the stores.
+        this.cannon.simulation.reset();
+        this.physics.refuel();
+        this.onToast("Rearmed and refuelled.");
+      },
+    );
+    this.scene.add(this.cannon.group, this.combat.group, this.combat.replayGroup);
     this.scene.add(this.aircraft.group, this.ringGroup, this.camera);
     this.scene.add(this.vfx.group);
     this.physics.reset();
@@ -253,6 +282,10 @@ export class PocketFlight {
     this.camera.position.set(-740, 480, 1100);
     this.camera.lookAt(-20, 50, -120);
     this.frame = requestAnimationFrame(this.tick);
+    void Promise.all([this.aircraft.ready, this.world.ready]).then(
+      () => this.warmShaders(),
+      () => {},
+    );
   }
   private resize = () => {
     const w = this.container.clientWidth,
@@ -299,7 +332,10 @@ export class PocketFlight {
       else if (this.mode === "replay") this.stopReplay();
     }
     if (e.code === "KeyC") this.cycleCamera();
-    if (e.code === "KeyR" && this.mode !== "menu") this.start(this.mission);
+    if (e.code === "KeyR" && this.mode !== "menu") {
+      if (this.restartLocked()) this.onToast("Land and stop on a runway to rearm.");
+      else this.start(this.mission);
+    }
     if (e.code === "KeyM") this.audio.toggle();
     if (e.code === "KeyG") this.toggleGear();
     if (e.code === "KeyF") this.cycleFlaps();
@@ -363,6 +399,7 @@ export class PocketFlight {
   private blur = () => {
     this.keys.clear();
     this.cannon.suspend();
+    this.combat.suspend();
     if (this.mode === "playing") this.pause();
   };
   private visibility = () => {
@@ -412,9 +449,9 @@ export class PocketFlight {
       brake: !!k("KeyB", "Space"),
     };
   }
-  async selectAircraft(id: AircraftId) {
-    if (this.mode !== "menu" || id === this.aircraft.id) return;
-    const next = makeAircraft(0, id);
+  async selectAircraft(id: AircraftId, variant: FinchVariant = "trainer") {
+    if (this.mode !== "menu" || (id === this.aircraft.id && variant === this.aircraft.variant)) return;
+    const next = makeAircraft(0, id, variant);
     try {
       await next.ready;
     } catch (error) {
@@ -430,7 +467,25 @@ export class PocketFlight {
     this.aircraft = next;
     this.scene.add(next.group);
     this.physics.aircraftId = id;
-    this.audio.jet = !isPropellerAircraft(id);
+    this.audio.voice = engineVoice(id);
+    this.warmShaders();
+  }
+  // Programs otherwise compile on first draw: takeoff dust, flames, rings and
+  // dusk would each stall a frame. Compile hidden objects and night lighting
+  // up front, in parallel where the browser supports it.
+  private warmShaders() {
+    if (this.disposed) return;
+    const hidden: T.Object3D[] = [];
+    this.scene.traverse((object) => {
+      if (!object.visible && !(object instanceof T.Light)) {
+        hidden.push(object);
+        object.visible = true;
+      }
+    });
+    // compileAsync gathers its materials synchronously, before the next frame.
+    const ready = this.renderer.compileAsync(this.scene, this.camera);
+    hidden.forEach((object) => (object.visible = false));
+    void ready.catch(() => {});
   }
   private updateJet(dt: number) {
     this.aircraft.setConfiguration(this.mode === "menu" ? 0 : this.physics.flapPosition, this.physics.gearSteering);
@@ -467,12 +522,22 @@ export class PocketFlight {
     effects.setReducedMotion(this.reducedMotion);
     effects.update(menu && this.reducedMotion ? 0 : dt, input);
   }
+  /** In the sandbox, R cannot stand in for a landing. */
+  restartLocked() {
+    return this.mission.id === "combat" && this.mode === "playing";
+  }
   start(mission: Mission) {
+    const combatId = this.aircraft.id === "finch" && this.aircraft.variant === "attack" ? "finch-attack" : this.aircraft.id;
+    if (mission.id === "combat" && !supportsCombat(combatId)) {
+      this.onToast("Choose a combat aircraft to enter the range."); return;
+    }
+    this.combat.stop();
     this.archiveQuietly();
     this.recordingId = crypto.randomUUID();
     this.recordingDate = Date.now();
     this.recordingAircraft = this.aircraft.id;
     this.recordingPaint = this.paintIndex;
+    this.recordingVariant = this.aircraft.variant;
     this.nextArchive = 10;
     this.savedStamp = "";
     this.replayVideo.reset();
@@ -480,7 +545,7 @@ export class PocketFlight {
     this.mission = mission;
     this.crashDelay = 0;
     this.physics.strongWind = mission.id === "crosswind";
-    this.physics.reset(mission.airStart, mission.short);
+    this.physics.reset(mission.airStart, mission.short, mission.id === "combat" ? rangeRunway : undefined);
     this.aircraft.surfaces.reset();
     this.aircraft.propellerMotion.reset();
     this.aircraft.effects?.reset();
@@ -504,6 +569,12 @@ export class PocketFlight {
       );
     }
     this.aircraft.group.scale.setScalar(1);
+    this.aircraft.group.position.copy(this.physics.position);
+    this.aircraft.group.quaternion.copy(this.physics.quaternion);
+    if (mission.id === "combat" && !this.combat.start(combatId, this.aircraft.group, this.physics)) {
+      this.onToast("Combat hardpoints are not ready. Finish loading the aircraft first.");
+      this.menu(); return;
+    }
     this.aircraft.group.visible = true;
     this.aircraft.gear.visible = true;
     for (const w of this.aircraft.wings) w.visible = true;
@@ -528,7 +599,8 @@ export class PocketFlight {
     this.cameraMode = "chase";
     this.orbit = { x: 0, y: 0 };
     this.buildRings();
-    this.cannon.reset(this.physics);
+    this.warmShaders();
+    this.cannon.reset(this.physics, mission.id !== "combat");
     this.debris.forEach((d) => {
       this.scene.remove(d.mesh);
       disposeAircraft(d.mesh, false);
@@ -545,7 +617,7 @@ export class PocketFlight {
     this.audio.start();
     this.recordReplay(true);
     const departureHint =
-      !mission.airStart && !mission.short
+      !mission.airStart && !mission.short && mission.id !== "combat"
         ? " Depart toward open water; climb before turning toward the ridge."
         : "";
     this.onToast(
@@ -558,7 +630,7 @@ export class PocketFlight {
               ? `Hold Shift for thrust. Pull back with ↓ at ${this.physics.profile.rotationKnots} knots. ${this.physics.automaticConfiguration ? "Gear and flaps operate automatically." : "G toggles gear; F cycles flaps."}`
               : `Hold Shift for thrust. Pull back with ↓ at ${this.physics.profile.rotationKnots} knots. Full power lights the afterburners.`
           : `Hold Shift to add throttle. Pull back with ↓ at ${this.physics.profile.rotationKnots} knots.`) +
-        departureHint + (this.aircraft.id === "f15c" ? " Hold J or FIRE to use the cannon; aim at the orange practice targets." : ""),
+        departureHint + (mission.id === "combat" ? ` K: rocket. L: missile once the seeker locks a drone.${this.combat.hasGun ? " J: gun." : ""} Land and stop on a runway to rearm.` : this.aircraft.id === "f15c" ? " Hold J or FIRE to use the cannon; aim at the orange practice targets." : ""),
     );
     this.emit();
   }
@@ -568,6 +640,7 @@ export class PocketFlight {
       this.archiveQuietly();
       this.mode = "paused";
       this.cannon.suspend();
+    this.combat.suspend();
       this.keys.clear();
       this.touch = { pitch: 0, roll: 0, yaw: 0 };
       this.emit();
@@ -586,7 +659,9 @@ export class PocketFlight {
     if (this.mode === "replay") this.stopReplay();
     if (this.replayVideo.busy) this.replayVideo.cancel();
     this.mode = "menu";
+    this.combat.stop();
     this.cannon.suspend();
+    this.combat.suspend();
     this.cannon.render(false, this.camera, this.aircraft.group);
     this.vfx.group.visible = false;
     this.aircraft.surfaces.reset();
@@ -811,6 +886,7 @@ export class PocketFlight {
         q: d.mesh.quaternion.clone(),
         visible: d.mesh.visible,
       })),
+      ...(this.mission.id === "combat" ? { combat: this.combat.capture() } : {}),
     };
   }
   private recordReplay(force = false) {
@@ -865,6 +941,7 @@ export class PocketFlight {
       ).applyQuaternion(model.quaternion),
     );
     this.applyReplayVisuals(visual);
+    this.combat.poseReplay(T.MathUtils.lerp(a.t, b.t, mix));
     if (this.aircraft.effects) {
       applyJetReplay(this.aircraft.effects.motion, a.jet ?? {}, b.jet ?? {}, mix);
       this.aircraft.effects.update(0, { ...initialJetInput(), lights: true });
@@ -895,7 +972,8 @@ export class PocketFlight {
         engineOut: visual.engineOut,
         stall: false,
       },
-      this.camera.position.distanceTo(model.position) < 30,
+      // The orbiting replay camera stays ~30 m out; screens are unreadable there.
+      this.camera.position.distanceTo(model.position) < 10,
       snapCamera,
     );
     this.world.update(
@@ -925,11 +1003,14 @@ export class PocketFlight {
   }
   playReplay() {
     if (!this.canReplay || this.replayVideo.busy) return;
+    this.combat.suspend();
+    this.cannon.suspend();
     this.vfx.group.visible = true;
     if (this.mode !== "replay") {
       this.replayLive = this.captureReplayFrame();
       this.replayReturnCamera = this.cameraMode;
     }
+    if (this.mission.id === "combat") this.combat.beginReplay(this.replay.toArray());
     this.mode = "replay";
     this.replayClock = 0;
     this.replayEnded = false;
@@ -958,6 +1039,7 @@ export class PocketFlight {
   }
   stopReplay() {
     if (this.replayVideo.state.phase === "recording") this.replayVideo.cancel();
+    this.combat.endReplay();
     this.mode = this.result ? "result" : "paused";
     this.cameraMode = this.replayReturnCamera;
     if (this.replayLive) this.applyReplayVisuals(this.replayLive);
@@ -988,6 +1070,8 @@ export class PocketFlight {
       grounded: p.grounded,
       load: this.vfxLoad,
       suspension: p.suspension,
+      power: p.engineOut ? 0 : p.enginePower,
+      burner: this.aircraft.effects?.motion.burner ?? 0,
     };
   }
   private updateMission(previous: T.Vector3) {
@@ -1050,7 +1134,7 @@ export class PocketFlight {
         );
       }
     }
-    if (this.mission.id === "free") return;
+    if (this.mission.id === "free" || this.mission.id === "combat") return;
     if (this.ringIndex === this.mission.rings.length) {
       if (!this.mission.land) this.finish(true);
       else if (
@@ -1235,10 +1319,14 @@ export class PocketFlight {
         const input = this.controls();
         this.vfxVelocity.copy(this.physics.velocity);
         this.physics.step(1 / 60, input, this.world.collisionObstacles);
-        if (this.aircraft.id === "f15c") {
+        const combat = this.mission.id === "combat";
+        if (this.aircraft.id === "f15c" || combat) {
+          const allowed = !this.physics.crashed && !document.querySelector('[role="dialog"]');
           const result = this.cannon.step(1 / 60, this.physics,
-            this.keys.has("KeyJ") && !this.physics.crashed && !document.querySelector('[role="dialog"]'));
+            (this.keys.has("KeyJ") || (combat && this.combat.gunPressed())) && allowed && (!combat || this.combat.hasGun),
+            combat ? this.combat.targets() : undefined, combat ? this.combat.gun : undefined);
           if (result.fired) this.audio.cannonBurst();
+          if (combat) this.combat.step(1 / 60, this.physics, this.keys, allowed, result.hits, this.physics.grounded && !this.physics.crashed, onPavement(this.physics.position.x, this.physics.position.z));
         }
         if (!this.physics.crashed)
           this.aircraft.surfaces.apply(this.physics.surfaces);
@@ -1298,7 +1386,11 @@ export class PocketFlight {
               engineOut: p.engineOut || p.crashed || p.fuelKg <= 0,
               stall: p.stall,
             },
-        this.camera.position.distanceTo(this.aircraft.group.position) < 30,
+        // Chase view sits behind the pilot; redraw quickly only when screens are readable.
+        this.mode === "menu"
+          ? this.camera.position.distanceTo(this.aircraft.group.position) < 30
+          : this.cameraMode === "cockpit" ||
+              this.camera.position.distanceTo(this.aircraft.group.position) < 10,
       );
       if (this.mode === "playing") {
         this.recordReplay();
@@ -1347,7 +1439,9 @@ export class PocketFlight {
       );
     this.cameraUpdate(this.mode === "replay" ? elapsed : dt);
     this.inspection?.update(this.aircraft, this.camera, this.physics, this.mode, this.cannon.simulation.ammunition, this.cannon.firing);
-    this.cannon.render(this.aircraft.id === "f15c" && this.mode === "playing", this.camera, this.aircraft.group);
+    const combat = this.mission.id === "combat";
+    this.cannon.render((this.aircraft.id === "f15c" || (combat && this.combat.hasGun)) && this.mode === "playing", this.camera, this.aircraft.group, true, !combat);
+    this.combat.render(combat && this.mode === "playing", this.cannon.simulation.ammunition, this.camera, this.physics, combat && this.mode !== "menu" && this.mode !== "replay", this.renderer.domElement.height);
     const sound = this.replaySample;
     this.audio.update(
       sound
@@ -1359,6 +1453,12 @@ export class PocketFlight {
           : this.physics.enginePower,
       sound?.speed ?? this.physics.airspeed,
       this.mode === "playing" || this.mode === "replay",
+      1,
+      {
+        burner: this.aircraft.effects?.motion.burner ?? 0,
+        gunSpool: (this.aircraft.effects?.motion.gunSpeed ?? 0) / GUN_FULL_SPEED,
+        inferGun: this.mode === "replay",
+      },
     );
     this.audio.updateMusic({
       mode: this.mode,
@@ -1372,6 +1472,7 @@ export class PocketFlight {
         (this.physics.stall || this.physics.crashed || this.physics.engineOut),
       visible: !document.hidden && !this.suspended,
     });
+    this.world.focusSun(this.aircraft.group.position);
     this.renderer.render(this.scene, this.camera);
     this.replayVideo.draw(this.renderer.domElement);
     if (this.mode === "replay" && this.replayEnded) {
@@ -1387,6 +1488,7 @@ export class PocketFlight {
   private objective() {
     if (this.mode === "menu") return "A little escape awaits.";
     if (this.mission.id === "free") return "The islands are yours. Go explore.";
+    if (this.mission.id === "combat") return `Weapons sandbox ·${this.combat.hasGun ? " J gun ·" : ""} K rocket · L missile · land to rearm`;
     if (!this.airborne)
       return this.physics.airspeed * 1.943844 <
         this.physics.profile.rotationKnots
@@ -1583,6 +1685,8 @@ export class PocketFlight {
     this.aircraft.dispose();
     this.vfx.dispose();
     this.cannon.dispose();
+    this.combat.dispose();
+    this.archive.dispose();
     this.inspection?.dispose();
     this.world.dispose();
     this.renderer.dispose();

@@ -1,5 +1,7 @@
 import * as T from "three";
+import { addRangeScenery } from "./range-scenery";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { compactSceneryTextures } from "./texture-memory";
 import {
   random,
   terrainHeight,
@@ -7,6 +9,7 @@ import {
   runways,
   runwayLocal,
 } from "./terrain";
+import { TreeField, type TreeSite } from "./tree-field";
 import type { Obstacle } from "./world";
 
 type Placement = { matrix: T.Matrix4; tint?: T.Color };
@@ -15,6 +18,7 @@ export type VillageSite = {
   width: number;
   depth: number;
 };
+export type LandmarkSite = { asset: string; placeholder: T.Object3D[]; matrix: T.Matrix4; tint?: T.Color };
 export type HangarSite = { placeholder: T.Object3D[]; matrix: T.Matrix4 };
 
 // Instancing keeps a detailed cottage at seven submissions for the entire village.
@@ -77,6 +81,20 @@ export function clearScenery(group: T.Object3D) {
   textures.forEach((t) => t.dispose());
 }
 
+const SCENERY_TEXTURE_LIMIT = 512;
+const CLOUD_TEXTURE_LIMIT = 768;
+
+function meshTextures(asset: T.Object3D) {
+  const textures = new Set<T.Texture>();
+  asset.traverse((o) => {
+    if (!(o instanceof T.Mesh)) return;
+    for (const material of Array.isArray(o.material) ? o.material : [o.material])
+      for (const value of Object.values(material))
+        if (value instanceof T.Texture) textures.add(value);
+  });
+  return [...textures];
+}
+
 function configure(asset: T.Group, impostor = false) {
   asset.traverse((o) => {
     if (!(o instanceof T.Mesh)) return;
@@ -93,7 +111,7 @@ function configure(asset: T.Group, impostor = false) {
           map: p.map,
           alphaTest: 0.4,
           side: T.DoubleSide,
-          color: "#c8d1bd",
+          color: new T.Color(0.92, 1.3, 0.8),
         });
         p.dispose();
         return flat;
@@ -107,6 +125,8 @@ function configure(asset: T.Group, impostor = false) {
   return asset;
 }
 
+export const FOREST_TREES = 9000;
+export const FOREST_SHRUBS = 7000;
 export const TREE_LOD = { near: 24, far: 45, cell: 50, batch: 1024 } as const;
 const identity = new T.Matrix4();
 
@@ -244,11 +264,18 @@ export function makeSceneryGrove(
             shader.vertexShader.replace(
               "#include <project_vertex>",
               `#include <project_vertex>
-          if (distance(cameraPosition, treeCell) / treeLodZoom < ${switchDistance.toFixed(1)}) gl_Position = vec4(1e6, 1e6, 1e6, 1.0);`,
+          if (distance(cameraPosition, treeCell) / treeLodZoom < ${switchDistance.toFixed(1)}) gl_Position = vec4(1e6, 1e6, 1e6, 1.0);
+          ${
+            // A flat card seen edge-on is a dark slash through the forest, so it only shows from above.
+            material.userData.skyCard
+              ? `if (normalize(cameraPosition - (modelMatrix * instanceMatrix * vec4(position, 1.)).xyz).y < 0.28) gl_Position = vec4(1e6, 1e6, 1e6, 1.0);`
+              : ""
+          }`,
             );
         };
+        const skyCard = material.userData.skyCard === true;
         material.customProgramCacheKey = () =>
-          `coastal-canopy-lod-v2:${switchDistance}`;
+          `coastal-canopy-lod-v3:${switchDistance}:${skyCard}`;
         const daylight = material.color.clone();
         part.onBeforeRender = (_renderer, scene, camera) => {
           if (
@@ -277,7 +304,10 @@ export function addEnvironmentAssets(
   hangars: HangarSite[],
   obstacles: Obstacle[],
   land: T.Mesh,
+  landmarks: LandmarkSite[] = [],
+  palms: TreeSite[] = [],
 ) {
+  let treeField: TreeField | null = null;
   const root = new T.Group();
   root.name = "Blender coastal scenery";
   scene.add(root);
@@ -289,6 +319,7 @@ export function addEnvironmentAssets(
       `/assets/scenery/${name}.glb`,
     );
     configure(model, impostor);
+    await compactSceneryTextures(meshTextures(model), SCENERY_TEXTURE_LIMIT);
     if (disposed) {
       clearScenery(model);
       throw new Error("Scenery load cancelled");
@@ -299,8 +330,9 @@ export function addEnvironmentAssets(
   const ready = Promise.allSettled([
     new T.TextureLoader()
       .loadAsync("/assets/scenery/cumulus.png")
-      .then((texture) => {
+      .then(async (texture) => {
         texture.colorSpace = T.SRGBColorSpace;
+        await compactSceneryTextures([texture], CLOUD_TEXTURE_LIMIT);
         if (disposed) {
           texture.dispose();
           return;
@@ -335,6 +367,7 @@ export function addEnvironmentAssets(
         // These sprites belong to world groups so their existing deterministic drift is retained.
         root.userData.cloudMaterial = material;
       }),
+    addRangeScenery(root, land),
     load("palm-bay-terrain").then((model) => {
       if (disposed) return;
       model.updateMatrixWorld(true);
@@ -369,6 +402,14 @@ export function addEnvironmentAssets(
       });
       root.add(instances(model, sites, "Plantation village"));
     }),
+    ...[...new Set(landmarks.map((site) => site.asset))].map((asset) =>
+      load(asset).then((model) => {
+        if (disposed) return;
+        const sites = landmarks.filter((site) => site.asset === asset);
+        root.add(instances(model, sites.map(({ matrix, tint }) => ({ matrix, tint })), asset));
+        for (const site of sites) for (const part of site.placeholder) part.visible = false;
+      }),
+    ),
     load("coastal-hangar").then((model) => {
       if (disposed) return;
       root.add(
@@ -384,71 +425,19 @@ export function addEnvironmentAssets(
         }),
       );
     }),
-    Promise.all([
-      load("coastal-tree-near"),
-      load("coastal-tree-mid"),
-      load("coastal-tree-far", true),
-    ]).then(([near, middle, far]) => {
+    load("tropical-trees").then((model) => {
       if (disposed) return;
-      const rng = random(817),
-        sites: Placement[] = [];
+      const trees = new Map<string, T.BufferGeometry>();
+      model.traverse((part) => {
+        if (part instanceof T.Mesh) trees.set(part.name, part.geometry);
+      });
       for (let i = obstacles.length - 1; i >= 0; i--)
         if (obstacles[i].label === "tree") obstacles.splice(i, 1);
-      for (
-        let attempt = 0;
-        attempt < 120000 && sites.length < 6500;
-        attempt++
-      ) {
-        const x = (rng() - 0.5) * 1740,
-          z = (rng() - 0.5) * 1700,
-          h = terrainSurfaceHeight(x, z);
-        const gradient =
-          Math.hypot(terrainHeight(x + 5, z) - h, terrainHeight(x, z + 5) - h) /
-          5;
-        const density =
-          0.5 +
-          0.35 *
-            Math.sin(x * 0.017 + Math.sin(z * 0.007) * 3) *
-            Math.cos(z * 0.012);
-        if (
-          h < 12 ||
-          h > 205 ||
-          gradient > 0.9 ||
-          rng() > density ||
-          isClearanceArea(x, z)
-        )
-          continue;
-        const scale = 1.4 + rng() * 1.9;
-        const site = placement(x, h - 0.05, z, rng() * Math.PI * 2, scale);
-        site.tint = new T.Color().setHSL(
-          0.2 + rng() * 0.08,
-          0.12 + rng() * 0.16,
-          0.72 + rng() * 0.18,
-        );
-        sites.push(site);
-        obstacles.push({
-          x,
-          z,
-          y: h + 3.4 * scale,
-          radius: 1.3,
-          label: "tree",
-        });
-      }
-      const forest = makeSceneryGrove(
-        near,
-        far,
-        sites,
-        "Coastal forest",
-        TREE_LOD.far,
-        middle,
-      );
-      root.add(forest);
-      // Only hide the old crowns after the replacement has arrived.
-      scene.children
-        .filter((o) => o.name === "Forest crowns")
-        .forEach((o) => {
-          o.visible = false;
-        });
+      treeField = new TreeField(scene, trees, plantForest(obstacles).concat(palms));
+      root.add(treeField);
+      // Only hide the stand-ins after the replacement has arrived.
+      for (const object of scene.children)
+        if (object.name === "Forest crowns" || object.name === "Palm trunks" || object.name === "Palm leaves") object.visible = false;
     }),
     Promise.all([
       load("coastal-rock-near"),
@@ -516,6 +505,7 @@ export function addEnvironmentAssets(
     ready,
     dispose() {
       disposed = true;
+      treeField?.dispose();
       root.removeFromParent();
       clearScenery(root);
       models.forEach(clearScenery);
@@ -525,6 +515,49 @@ export function addEnvironmentAssets(
       cloudMaterial?.dispose();
     },
   };
+}
+
+/** Where the forest and its undergrowth stand. Trees also go into the collision list; shrubs do not. */
+export function plantForest(obstacles: Obstacle[]) {
+  const rng = random(817);
+  const sites: TreeSite[] = [];
+  const density = (x: number, z: number) =>
+    0.5 + 0.35 * Math.sin(x * 0.017 + Math.sin(z * 0.007) * 3) * Math.cos(z * 0.012);
+  const slopeAt = (x: number, z: number, h: number) =>
+    Math.hypot(terrainHeight(x + 5, z) - h, terrainHeight(x, z + 5) - h) / 5;
+  // Stands about 60 m across: crowns that overlap read as canopy, and evenly spaced ones as a lawn of mushrooms.
+  const clump = (x: number, z: number) =>
+    Math.max(0, 0.5 + 1.1 * Math.sin(x * 0.051 + Math.sin(z * 0.037) * 2.1) * Math.sin(z * 0.046 + Math.sin(x * 0.029) * 2.4));
+  let trees = 0;
+  for (let attempt = 0; attempt < 170000 && trees < FOREST_TREES; attempt++) {
+    const x = (rng() - 0.5) * 1740,
+      z = (rng() - 0.5) * 1700,
+      h = terrainSurfaceHeight(x, z);
+    if (h < 12 || h > 205 || slopeAt(x, z, h) > 0.9 || rng() > density(x, z) * clump(x, z) || isClearanceArea(x, z)) continue;
+    const scale = 1.4 + rng() * 1.9,
+      roll = rng();
+    // Spreading trees on the coast plain, rounder ones inland, tall ones up the mountains.
+    const kind =
+      h < 45
+        ? roll < 0.55 ? "broadleaf" : roll < 0.85 ? "round" : "tall"
+        : h < 120
+          ? roll < 0.2 ? "broadleaf" : roll < 0.65 ? "round" : "tall"
+          : roll < 0.12 ? "round" : "tall";
+    sites.push({ kind, x, y: h, z, scale, yaw: rng() * Math.PI * 2, stretch: 0.88 + rng() * 0.3, shade: 0.82 + rng() * 0.3 });
+    obstacles.push({ x, z, y: h + 3.4 * scale, radius: 1.3, label: "tree" });
+    trees++;
+  }
+  // Undergrowth gathers where the trees are, so the forest reads as thick from low level.
+  let shrubs = 0;
+  for (let attempt = 0; attempt < 90000 && shrubs < FOREST_SHRUBS; attempt++) {
+    const x = (rng() - 0.5) * 1740,
+      z = (rng() - 0.5) * 1700,
+      h = terrainSurfaceHeight(x, z);
+    if (h < 6 || h > 170 || slopeAt(x, z, h) > 1.1 || rng() > density(x, z) ** 2 * 1.5 || isClearanceArea(x, z)) continue;
+    sites.push({ kind: "shrub", x, y: h - 0.04, z, scale: 0.9 + rng() * 1.7, yaw: rng() * Math.PI * 2, stretch: 1 + rng() * 0.4, shade: 0.84 + rng() * 0.3 });
+    shrubs++;
+  }
+  return sites;
 }
 
 function isClearanceArea(x: number, z: number) {

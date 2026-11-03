@@ -1,19 +1,30 @@
 import { FlightMusic } from "./flight-music";
+import { GunSound, gunFiringFromSpool } from "./gun-sound";
+import { BUSINESS_JET, FIGHTER, JetEngineSound } from "./jet-engine-sound";
+import { PropEngineSound } from "./prop-engine-sound";
 import type { MusicState } from "./music-mix";
 import type { MusicTrackId } from "./music-tracks";
 
+export type EngineVoice = "fighter" | "business-jet" | "piston" | "turboprop";
+export function engineVoice(id: string): EngineVoice {
+  if (id === "finch") return "piston";
+  if (id === "heron") return "turboprop";
+  return id === "aurelia" ? "business-jet" : "fighter";
+}
+
 export class FlightAudio {
   private context: AudioContext | null = null;
-  private oscillator: OscillatorNode | null = null;
-  private engineFilter: BiquadFilterNode | null = null;
-  private gain: GainNode | null = null;
   private windGain: GainNode | null = null;
   private capture: MediaStreamAudioDestinationNode | null = null;
   private master: GainNode | null = null;
   music: FlightMusic | null = null;
   enabled = false;
   private cannonNoise: AudioBuffer | null = null;
-  jet = false;
+  private jetEngine: JetEngineSound | null = null;
+  private propEngine: PropEngineSound | null = null;
+  private gun: GunSound | null = null;
+  private previousSpool = 0;
+  voice: EngineVoice = "piston";
   private voiceGain: GainNode | null = null;
   private voiceSources: AudioBufferSourceNode[] = [];
   private voiceCache = new Map<string, Promise<AudioBuffer | null>>();
@@ -31,15 +42,6 @@ export class FlightAudio {
         /* Optional persistence. */
       }
       master.gain.value = this.enabled ? 1 : 0;
-      const osc = (this.oscillator = ctx.createOscillator());
-      osc.type = "sawtooth";
-      const filter = (this.engineFilter = ctx.createBiquadFilter());
-      filter.type = "lowpass";
-      filter.frequency.value = 280;
-      const gain = (this.gain = ctx.createGain());
-      gain.gain.value = 0;
-      osc.connect(filter).connect(gain).connect(master);
-      osc.start();
       const buffer = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
       const data = buffer.getChannelData(0);
       let last = 0;
@@ -58,7 +60,7 @@ export class FlightAudio {
     void this.context.resume();
   }
   captureTrack() {
-    if (!this.context || !this.gain || !this.windGain || !this.enabled)
+    if (!this.context || !this.windGain || !this.enabled)
       return null;
     if (!this.capture) {
       this.capture = this.context.createMediaStreamDestination();
@@ -86,6 +88,7 @@ export class FlightAudio {
   cannonBurst() {
     if (!this.enabled || !this.context || !this.master) return;
     const ctx = this.context;
+    // launch() falls back on this buffer until the first blast has made its own.
     if (!this.cannonNoise) {
       this.cannonNoise = ctx.createBuffer(1, Math.round(ctx.sampleRate * .045), ctx.sampleRate);
       const samples = this.cannonNoise.getChannelData(0);
@@ -94,11 +97,57 @@ export class FlightAudio {
         samples[i] = ((Math.random() * 2 - 1) * .7 + Math.sin(i / ctx.sampleRate * 700) * .3) * envelope;
       }
     }
-    const source = ctx.createBufferSource(), gain = ctx.createGain();
-    source.buffer = this.cannonNoise;
-    gain.gain.value = .055;
-    source.connect(gain).connect(this.master);
-    source.onended = () => { source.disconnect(); gain.disconnect(); };
+    this.gun ??= new GunSound(ctx, this.master);
+    this.gun.fired();
+  }
+  private blastNoise?: AudioBuffer;
+  private seekerTone?: { oscillator: OscillatorNode; gain: GainNode };
+  /** Seeker tone: a low growl while searching, a steady high tone once locked. */
+  seeker(state: "off" | "search" | "lock", time: number) {
+    if (!this.enabled || !this.context || !this.master) state = "off";
+    if (!this.context || !this.master) return;
+    if (!this.seekerTone) {
+      const oscillator = this.context.createOscillator(), gain = this.context.createGain();
+      oscillator.type = "triangle";
+      gain.gain.value = 0;
+      oscillator.connect(gain).connect(this.master);
+      oscillator.start();
+      this.seekerTone = { oscillator, gain };
+    }
+    const { oscillator, gain } = this.seekerTone;
+    const now = this.context.currentTime;
+    oscillator.frequency.setTargetAtTime(state === "lock" ? 1320 : 260 + Math.sin(time * 22) * 45, now, .012);
+    gain.gain.setTargetAtTime(state === "off" ? 0 : state === "lock" ? .05 : .035, now, .02);
+  }
+  /** A low thump that falls off with distance and arrives with the speed of sound. */
+  blast(distance: number) {
+    if (!this.enabled || !this.context || !this.master) return;
+    const ctx = this.context;
+    if (!this.blastNoise) {
+      this.blastNoise = ctx.createBuffer(1, Math.round(ctx.sampleRate * 1.4), ctx.sampleRate);
+      const samples = this.blastNoise.getChannelData(0);
+      for (let i = 0; i < samples.length; i++) samples[i] = (Math.random() * 2 - 1) * (1 - i / samples.length) ** 3;
+    }
+    const source = ctx.createBufferSource(), gain = ctx.createGain(), filter = ctx.createBiquadFilter();
+    source.buffer = this.blastNoise;
+    filter.type = "lowpass";
+    filter.frequency.value = Math.max(160, 1100 - distance * .5);
+    gain.gain.value = Math.min(.5, 240 / (distance + 240));
+    source.connect(filter).connect(gain).connect(this.master);
+    source.onended = () => { source.disconnect(); filter.disconnect(); gain.disconnect(); };
+    source.start(ctx.currentTime + Math.min(3, distance / 343));
+  }
+  /** The rush of a motor leaving the rail. */
+  launch() {
+    if (!this.enabled || !this.context || !this.master || !this.cannonNoise && !this.blastNoise) return;
+    const ctx = this.context;
+    const source = ctx.createBufferSource(), gain = ctx.createGain(), filter = ctx.createBiquadFilter();
+    source.buffer = this.blastNoise ?? this.cannonNoise!;
+    filter.type = "bandpass";
+    filter.frequency.value = 1500;
+    gain.gain.value = .14;
+    source.connect(filter).connect(gain).connect(this.master);
+    source.onended = () => { source.disconnect(); filter.disconnect(); gain.disconnect(); };
     source.start();
   }
   // Voice clips are optional; a missing or undecodable file resolves to null.
@@ -160,32 +209,33 @@ export class FlightAudio {
     if (!visible) void this.context.suspend();
     else void this.context.resume();
   }
-  update(throttle: number, speed: number, active: boolean, volume = 1) {
-    if (!this.context || !this.gain || !this.oscillator || !this.windGain)
-      return;
+  /** @param inferGun recordings have no trigger, so firing is read from the barrel speed. */
+  update(
+    throttle: number,
+    speed: number,
+    active: boolean,
+    volume = 1,
+    { burner = 0, gunSpool = 0, inferGun = false } = {},
+  ) {
+    if (!this.context || !this.windGain) return;
     const t = this.context.currentTime;
-    this.oscillator.type = this.jet ? "sine" : "sawtooth";
-    this.engineFilter?.frequency.setTargetAtTime(
-      this.jet ? 1600 : 280,
-      t,
-      0.15,
-    );
-    this.oscillator.frequency.setTargetAtTime(
-      this.jet ? 100 + throttle * 480 : 24 + throttle * 49 + speed * 0.2,
-      t,
-      0.15,
-    );
-    this.gain.gain.setTargetAtTime(
-      this.enabled && active ? (0.016 + throttle * 0.035) * volume : 0,
-      t,
-      0.1,
-    );
+    const on = this.enabled && active;
+    const voice = this.voice;
+    const propeller = voice === "piston" || voice === "turboprop";
+    if (propeller) {
+      this.propEngine ??= new PropEngineSound(this.context, this.master!);
+      this.propEngine.update(voice, throttle, on ? volume : 0);
+      this.jetEngine?.update(0, 0, 0, 0);
+    } else {
+      this.jetEngine ??= new JetEngineSound(this.context, this.master!);
+      this.jetEngine.update(throttle, burner, speed, on ? volume : 0, voice === "business-jet" ? BUSINESS_JET : FIGHTER);
+      this.propEngine?.update("piston", 0, 0);
+    }
+    if (inferGun && on && gunFiringFromSpool(this.previousSpool, gunSpool)) this.cannonBurst();
+    this.previousSpool = gunSpool;
+    this.gun?.update(gunSpool, on);
     this.windGain.gain.setTargetAtTime(
-      this.enabled && active
-        ? this.jet
-          ? (0.04 + throttle * 0.15) * volume
-          : Math.min(0.09, speed * 0.0012) * volume
-        : 0,
+      on && propeller ? Math.min(0.09, speed * 0.0012) * volume : 0,
       t,
       0.1,
     );

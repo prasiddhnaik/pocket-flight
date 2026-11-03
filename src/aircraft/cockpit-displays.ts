@@ -1,5 +1,6 @@
 import * as T from "three";
 import type { AircraftId } from "./aircraft";
+import { rangeLayout, rangeSurface } from "../world/range-island";
 import { runways, terrainHeight, WORLD_SIZE } from "../world/terrain";
 
 export type DisplayTelemetry = {
@@ -85,12 +86,33 @@ export function displayDemo(time: number, speed = 48): DisplayTelemetry {
   };
 }
 
+const CHARTS = [
+  { id: "palm-bay", centerX: 0, centerZ: 0, size: WORLD_SIZE },
+  { id: "anvil-key", centerX: rangeLayout.centre.x, centerZ: rangeLayout.centre.z, size: rangeLayout.size },
+];
+type Chart = (typeof CHARTS)[number];
+
+/** The navigation display charts whichever island is closest. */
+export function chartRegion(x: number, z: number) {
+  const distance = (chart: Chart) => Math.hypot(x - chart.centerX, z - chart.centerZ);
+  return distance(CHARTS[1]) < distance(CHARTS[0]) ? CHARTS[1] : CHARTS[0];
+}
+
+const METRES_PER_NM = 1852;
+
+/** The nearest airfield and how far away it is. */
+export function navigationLabel(x: number, z: number) {
+  const distance = (r: (typeof runways)[number]) => Math.hypot(x - r.x, z - r.z);
+  const nearest = runways.reduce((a, b) => (distance(b) < distance(a) ? b : a));
+  return `${nearest.name.toUpperCase()} · ${(distance(nearest) / METRES_PER_NM).toFixed(1)} NM`;
+}
+
 export class CockpitDisplays {
   readonly canvas = document.createElement("canvas");
   readonly texture: T.CanvasTexture;
   readonly mesh: T.Mesh;
   private context: CanvasRenderingContext2D;
-  private map = document.createElement("canvas");
+  private charts = new Map<string, HTMLCanvasElement>();
   private lastTime = -Infinity;
   private started: number | null = null;
   private booted = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -171,20 +193,23 @@ export class CockpitDisplays {
     this.mesh.userData.mechanical = true;
     this.mesh.userData.cockpitDisplay = true;
     root.add(this.mesh);
-    this.buildMap();
+    this.chart(CHARTS[0]);
     this.update(displayDemo(0), true, true);
     this.started = null;
     this.lastTime = -Infinity;
   }
-  private buildMap() {
-    this.map.width = this.map.height = 128;
-    const ctx = this.map.getContext("2d")!,
+  private chart(chart: Chart) {
+    const cached = this.charts.get(chart.id);
+    if (cached) return cached;
+    const map = document.createElement("canvas");
+    map.width = map.height = 128;
+    const ctx = map.getContext("2d")!,
       image = ctx.createImageData(128, 128);
     for (let y = 0; y < 128; y++)
       for (let x = 0; x < 128; x++) {
         const height = terrainHeight(
-            (x / 127 - 0.5) * WORLD_SIZE,
-            (y / 127 - 0.5) * WORLD_SIZE,
+            chart.centerX + (x / 127 - 0.5) * chart.size,
+            chart.centerZ + (y / 127 - 0.5) * chart.size,
           ),
           i = (y * 128 + x) * 4;
         const color =
@@ -194,6 +219,10 @@ export class CockpitDisplays {
         image.data.set([...color, 255], i);
       }
     ctx.putImageData(image, 0, 0);
+    // Anvil Key's height grid loads later, so its chart is only kept once it has one.
+    if (chart.id === "palm-bay" || rangeSurface(chart.centerX, chart.centerZ) !== null)
+      this.charts.set(chart.id, map);
+    return map;
   }
   update(state: DisplayTelemetry, focused = true, force = false) {
     if (this.disposed || document.hidden) return false;
@@ -471,7 +500,8 @@ export class CockpitDisplays {
   }
   private navigation(s: DisplayTelemetry) {
     const c = this.context;
-    c.drawImage(this.map, 104, 38, 304, 304);
+    const chart = chartRegion(s.x, s.z);
+    c.drawImage(this.chart(chart), 104, 38, 304, 304);
     c.strokeStyle = "#436068";
     c.lineWidth = 0.7;
     for (let i = 0; i < 6; i++) {
@@ -481,18 +511,19 @@ export class CockpitDisplays {
       c.lineTo(x, 342);
       c.stroke();
     }
-    const px = (x: number) => 104 + (x / WORLD_SIZE + 0.5) * 304,
-      pz = (z: number) => 38 + (z / WORLD_SIZE + 0.5) * 304;
+    const px = (x: number) => 104 + ((x - chart.centerX) / chart.size + 0.5) * 304,
+      pz = (z: number) => 38 + ((z - chart.centerZ) / chart.size + 0.5) * 304;
     for (const r of runways) {
       const x = px(r.x),
         y = pz(r.z);
+      if (x < 104 || x > 408 || y < 38 || y > 342) continue;
       c.save();
       c.translate(x, y);
       c.rotate(-r.heading);
       this.line(
         [
-          [0, (-r.length / WORLD_SIZE) * 152],
-          [0, (r.length / WORLD_SIZE) * 152],
+          [0, (-r.length / chart.size) * 152],
+          [0, (r.length / chart.size) * 152],
         ],
         "#e6dca7",
         4,
@@ -520,7 +551,7 @@ export class CockpitDisplays {
       c.restore();
     }
     this.text("N ↑", W - 22, 60, 17, "#d7e7e4", "right");
-    this.text("PALM BAY · 1.5 NM", 54, 327, 14, "#c9d7d1");
+    this.text(navigationLabel(s.x, s.z), 54, 327, 14, "#c9d7d1");
   }
   private engine(s: DisplayTelemetry) {
     const c = this.context;
@@ -619,6 +650,8 @@ export class CockpitDisplays {
     this.mesh.geometry.dispose();
     (this.mesh.material as T.Material).dispose();
     this.texture.dispose();
-    this.canvas.width = this.map.width = 1;
+    this.canvas.width = 1;
+    for (const map of this.charts.values()) map.width = 1;
+    this.charts.clear();
   }
 }

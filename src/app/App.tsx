@@ -1,3 +1,5 @@
+import { supportsCombat } from "../aircraft/weapons/combat-loadouts";
+import { combatMission } from "../flight/missions";
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import {
   Plane,
@@ -45,8 +47,10 @@ import type { Mission, FlightResult } from "../flight/missions";
 import type { AircraftId } from "../aircraft/aircraft";
 import { paints } from "../aircraft/aircraft";
 import { terrainHeight, runways } from "../world/terrain";
+import { rangeLayout } from "../world/range-island";
 import { flightProfiles } from "../flight/flight-profiles";
-import { aircraftNames } from "./flight-ui";
+import { type AircraftChoice, aircraftChoice, aircraftViewerUrl, choiceName, parseAircraftChoice, resolveAircraftChoice } from "./flight-ui";
+import { type FinchVariant, finchAttackPaints } from "../aircraft/finch/attack";
 import { FlightHud } from "../hud/FlightHud";
 import type { SavedReplay } from "../replay/replay-data";
 const ReplayStudio = lazy(() => import("../studio/ReplayStudio"));
@@ -57,6 +61,7 @@ const icons: Record<string, LucideIcon> = {
   landing: PlaneLanding,
   wind: Wind,
   timer: Timer,
+  flag: Flag,
 };
 const time = (s: number) =>
   `${Math.floor(s / 60)
@@ -127,6 +132,10 @@ function MiniMap({
 }) {
   const ref = useRef<HTMLCanvasElement>(null);
   const map = useRef<HTMLCanvasElement | null>(null);
+  // The sandbox flies around Anvil Key, off Palm Bay's chart.
+  const sandbox = mission.id === "combat";
+  const originX = sandbox ? rangeLayout.centre.x : 0;
+  const originZ = sandbox ? rangeLayout.centre.z : 0;
   useEffect(() => {
     const c = document.createElement("canvas");
     c.width = c.height = 256;
@@ -134,7 +143,7 @@ function MiniMap({
       image = ctx.createImageData(256, 256);
     for (let z = 0; z < 256; z++)
       for (let x = 0; x < 256; x++) {
-        const h = terrainHeight((x / 256 - 0.5) * 2600, (z / 256 - 0.5) * 2600);
+        const h = terrainHeight(originX + (x / 256 - 0.5) * 2600, originZ + (z / 256 - 0.5) * 2600);
         const i = (z * 256 + x) * 4;
         const rgb =
           h < 0
@@ -150,7 +159,7 @@ function MiniMap({
       }
     ctx.putImageData(image, 0, 0);
     map.current = c;
-  }, []);
+  }, [originX, originZ]);
   useEffect(() => {
     const canvas = ref.current;
     if (!canvas || !map.current) return;
@@ -158,6 +167,8 @@ function MiniMap({
     ctx.clearRect(0, 0, 256, 256);
     ctx.drawImage(map.current, 0, 0);
     const conv = (n: number) => (n / 2600 + 0.5) * 256;
+    const convX = (x: number) => conv(x - originX);
+    const convZ = (z: number) => conv(z - originZ);
     if (mission.rings.length) {
       ctx.setLineDash([2, 4]);
       ctx.strokeStyle = "#f8ebc8";
@@ -183,7 +194,7 @@ function MiniMap({
     }
     for (const r of runways) {
       ctx.save();
-      ctx.translate(conv(r.x), conv(r.z));
+      ctx.translate(convX(r.x), convZ(r.z));
       ctx.rotate(r.heading);
       ctx.fillStyle = "#f7f0d9";
       ctx.fillRect(-1.5, (-r.length / 2600) * 128, 3, (r.length / 2600) * 256);
@@ -191,7 +202,7 @@ function MiniMap({
     }
     if (snapshot && snapshot.mode !== "menu") {
       ctx.save();
-      ctx.translate(conv(snapshot.x), conv(snapshot.z));
+      ctx.translate(convX(snapshot.x), convZ(snapshot.z));
       ctx.rotate((snapshot.heading * Math.PI) / 180);
       ctx.fillStyle = "#fff8da";
       ctx.shadowColor = "#214d55";
@@ -209,7 +220,7 @@ function MiniMap({
   return (
     <div className={`minimap ${large ? "large" : ""}`}>
       <div className="map-top">
-        <span>PALM BAY</span>
+        <span>{sandbox ? "ANVIL KEY" : "PALM BAY"}</span>
         <span>N ↑</span>
       </div>
       <canvas
@@ -219,7 +230,7 @@ function MiniMap({
         aria-label="Island map with runways, route, and aircraft position"
       />
       <div className="map-bottom">
-        <span>22° N · 159° W</span>
+        <span>{sandbox ? "22° N · 158° W" : "22° N · 159° W"}</span>
         <Compass size={13} />
       </div>
     </div>
@@ -238,16 +249,22 @@ export default function App() {
       "missions" | "controls" | "log" | "settings" | null
     >(null),
     [paint, setPaint] = useState(() => {
-      const n = read("pocket-flight-paint", 0);
+      const requested = new URLSearchParams(location.search).get("paint");
+      const n = requested === null ? read("pocket-flight-paint", 0) : Number(requested);
       return Number.isInteger(n) && n >= 0 && n < paints.length ? n : 0;
     }),
-    [aircraftId, setAircraftId] = useState<AircraftId>(() => {
-      const id =
+    [initialChoice] = useState<AircraftChoice>(() =>
+      parseAircraftChoice(
         new URLSearchParams(location.search).get("aircraft") ??
-        read<string>("pocket-flight-aircraft", "finch");
-      return ["finch", "peregrine", "aurelia", "stormbird", "heron", "f15c"].includes(id)
-        ? (id as AircraftId)
-        : "finch";
+          read<string>("pocket-flight-aircraft", "finch"),
+      ) ?? "finch",
+    ),
+    [aircraftId, setAircraftId] = useState<AircraftId>(() => resolveAircraftChoice(initialChoice).id),
+    [finchVariant, setFinchVariant] = useState<FinchVariant>(() => resolveAircraftChoice(initialChoice).variant),
+    [attackPaint, setAttackPaint] = useState(() => {
+      const requested = new URLSearchParams(location.search).get("paint");
+      const n = requested !== null && initialChoice === "finch-attack" ? Number(requested) : read("pocket-flight-attack-paint", 0);
+      return Number.isInteger(n) && n >= 0 && n < finchAttackPaints.length ? n : 0;
     }),
     [switchingAircraft, setSwitchingAircraft] = useState(false),
     [night, setNight] = useState(false),
@@ -275,7 +292,12 @@ export default function App() {
   const mode = snapshot?.mode ?? "menu";
   const current = game.current?.mission ?? selected;
   const resumeAfterPanel = useRef(false);
-  const aircraftName = aircraftNames[aircraftId];
+  const choice = aircraftChoice(aircraftId, finchVariant);
+  const aircraftName = choiceName(choice);
+  // The A-2 has its own tactical schemes; the trainer keeps its liveries.
+  const attackFinch = choice === "finch-attack";
+  const liveries = attackFinch ? finchAttackPaints.map((p) => ({ name: p.name, color: p.body })) : paints;
+  const livery = attackFinch ? attackPaint : paint;
   const rotationKnots = flightProfiles[aircraftId].rotationKnots;
   const launchDisabled = !ready || switchingAircraft;
   const closePanel = () => {
@@ -287,8 +309,8 @@ export default function App() {
     if (!viewport.current) return;
     let instance: PocketFlight;
     try {
-      instance = new PocketFlight(viewport.current, aircraftId);
-      instance.setPaint(paint);
+      instance = new PocketFlight(viewport.current, aircraftId, finchVariant);
+      instance.setPaint(livery);
       instance.physics.beginnerAssist = beginnerAssist;
       instance.physics.setAutomaticConfiguration(automaticConfiguration);
       instance.onSnapshot = (state) => {
@@ -352,7 +374,7 @@ export default function App() {
       }
       if (!panel && e.code === "KeyR" && !e.repeat) {
         e.preventDefault();
-        fly(current);
+        if (!game.current?.restartLocked()) fly(current);
       }
       if (e.key === "Tab" && dialog) {
         const nodes = Array.from(
@@ -386,14 +408,16 @@ export default function App() {
     game.current?.start(m);
     setSound(game.current?.audio.enabled ?? false);
   };
-  const changeAircraft = async (id: AircraftId) => {
-    if (!game.current || switchingAircraft || id === aircraftId) return;
+  const changeAircraft = async (next: AircraftChoice) => {
+    if (!game.current || switchingAircraft || next === choice) return;
+    const { id, variant } = resolveAircraftChoice(next);
     setSwitchingAircraft(true);
     try {
-      await game.current.selectAircraft(id);
-      game.current.setPaint(paint);
+      await game.current.selectAircraft(id, variant);
+      game.current.setPaint(next === "finch-attack" ? attackPaint : paint);
       setAircraftId(id);
-      save("pocket-flight-aircraft", id);
+      setFinchVariant(variant);
+      save("pocket-flight-aircraft", next);
     } catch {
       setToast("Aircraft could not load. Please try again.");
     } finally {
@@ -401,9 +425,14 @@ export default function App() {
     }
   };
   const changePaint = (i: number) => {
-    setPaint(i);
+    if (attackFinch) {
+      setAttackPaint(i);
+      save("pocket-flight-attack-paint", i);
+    } else {
+      setPaint(i);
+      save("pocket-flight-paint", i);
+    }
     game.current?.setPaint(i);
-    save("pocket-flight-paint", i);
   };
   const toggleNight = () => {
     setNight(!night);
@@ -624,6 +653,7 @@ export default function App() {
               >
                 Free flight <ArrowRight size={17} />
               </button>
+              <button className="text-button" disabled={launchDisabled || !supportsCombat(choice)} onClick={() => fly(combatMission)}>Weapons sandbox</button>
             </div>
             <button
               className="quick-help"
@@ -667,14 +697,15 @@ export default function App() {
                 <h3>
                   <select
                     aria-label="Choose aircraft"
-                    value={aircraftId}
+                    value={choice}
                     disabled={switchingAircraft || !ready}
                     onChange={(e) =>
-                      void changeAircraft(e.target.value as AircraftId)
+                      void changeAircraft(parseAircraftChoice(e.target.value) ?? "finch")
                     }
                     className="aircraft-picker"
                   >
                     <option value="finch">The Finch · U–2</option>
+                    <option value="finch-attack">Finch A–2 · Attack</option>
                     <option value="peregrine">Peregrine · HX–27</option>
                     <option value="aurelia">Aurelia · S32</option>
                     <option value="stormbird">Stormbird · HX–40</option>
@@ -684,19 +715,7 @@ export default function App() {
                 </h3>
                 <p>
                   <a
-                    href={
-                      aircraftId === "f15c"
-                        ? "/docs/F15C_DESIGN.html"
-                        : aircraftId === "heron"
-                        ? "/heron.html"
-                        : aircraftId === "stormbird"
-                        ? "/stormbird.html"
-                        : aircraftId === "aurelia"
-                          ? "/civilian.html"
-                          : aircraftId === "peregrine"
-                            ? "/jet"
-                            : "/hangar.html"
-                    }
+                    href={aircraftViewerUrl(choice, livery)}
                     style={{ color: "inherit", textUnderlineOffset: 3 }}
                   >
                     Explore the aircraft ↗
@@ -706,21 +725,21 @@ export default function App() {
               {aircraftId === "finch" ? (
                 <div className="paint-options">
                   <div className="swatches">
-                    {paints.map((p, i) => (
+                    {liveries.map((p, i) => (
                       <button
                         key={p.name}
-                        className={`swatch ${paint === i ? "selected" : ""}`}
+                        className={`swatch ${livery === i ? "selected" : ""}`}
                         style={{ "--paint": p.color } as React.CSSProperties}
                         title={p.name}
                         aria-label={`${p.name} paint`}
-                        aria-pressed={paint === i}
+                        aria-pressed={livery === i}
                         onClick={() => changePaint(i)}
                       >
-                        {paint === i && <Check size={12} />}
+                        {livery === i && <Check size={12} />}
                       </button>
                     ))}
                   </div>
-                  <span>{paints[paint].name} livery</span>
+                  <span>{liveries[livery].name} {attackFinch ? "scheme" : "livery"}</span>
                 </div>
               ) : (
                 <div className="jet-flight-note">
@@ -1315,19 +1334,19 @@ export default function App() {
                   <div className="setting-row paint-setting">
                     <span>
                       <Plane size={21} />
-                      <b>Finch livery</b>
+                      <b>{attackFinch ? "Finch A–2 scheme" : "Finch livery"}</b>
                     </span>
                     <div className="swatches">
-                      {paints.map((p, i) => (
+                      {liveries.map((p, i) => (
                         <button
                           key={p.name}
-                          className={`swatch ${paint === i ? "selected" : ""}`}
+                          className={`swatch ${livery === i ? "selected" : ""}`}
                           style={{ "--paint": p.color } as React.CSSProperties}
                           aria-label={`${p.name} paint`}
-                          aria-pressed={paint === i}
+                          aria-pressed={livery === i}
                           onClick={() => changePaint(i)}
                         >
-                          {paint === i && <Check size={12} />}
+                          {livery === i && <Check size={12} />}
                         </button>
                       ))}
                     </div>

@@ -1,17 +1,17 @@
 {
   "artifact": "STEP/airframe_exhausts.step",
-  "sha256": "bd253a098d87b20d8dda2b31918ddedeb6a0df17aa4b9bb208ee8f9b1ce5481d",
+  "sha256": "e38555b4e7d0301471f793ddfdf2e9688447d1747c20339ca8de2ace933f3246",
   "units": "mm",
   "dimensionsM": [
     13.049250000200006,
     19.4310000002,
-    4.148485562995639
+    4.1461234884998035
   ],
   "boundsM": {
     "min": [
       -6.524625000100003,
       -9.431000000100001,
-      1.477614437004361
+      1.4799765115001964
     ],
     "max": [
       6.524625000100003,
@@ -1327,7 +1327,7 @@
     {
       "a": "Intake_skin_Left",
       "b": "Ramp_3_Left",
-      "gapMm": 8.981260180007666e-12,
+      "gapMm": 1.1867076273756437e-11,
       "method": "re-measured saved contact hint"
     },
     {
@@ -1339,7 +1339,7 @@
     {
       "a": "Intake_skin_Right",
       "b": "Ramp_3_Right",
-      "gapMm": 5.209785393794664e-13,
+      "gapMm": 1.4779288903810084e-12,
       "method": "re-measured saved contact hint"
     },
     {
@@ -1564,7 +1564,7 @@
   "evidence": [
     {
       "artifact": "STEP/airframe_exhausts.step",
-      "sha256": "bd253a098d87b20d8dda2b31918ddedeb6a0df17aa4b9bb208ee8f9b1ce5481d"
+      "sha256": "e38555b4e7d0301471f793ddfdf2e9688447d1747c20339ca8de2ace933f3246"
     },
     {
       "artifact": "/Users/prasiddhnaik/Documents/blender skills/pocket-flight-site/assets/f15c/STEP/exhausts_preview.step",

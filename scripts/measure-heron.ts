@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { Box3, Mesh, Vector3 } from "three";
 import { loadGeometryOnly } from "./geometry-loader";
+import { frozenFlightGeometry } from "./f15c-skin-step";
 import { zeroLiftEstimate } from "../lab/aircraft";
 
 const url = new URL("../public/assets/heron-ut9.glb", import.meta.url);
@@ -107,7 +108,7 @@ for (let i = 1; i < positive.length; i++) {
     (2 * qa * a.chord + qa * b.chord + qb * a.chord + 2 * qb * b.chord);
 }
 const dimensions = new Box3()
-  .setFromObject(scene)
+  .setFromObject(scene, true)
   .getSize(new Vector3())
   .toArray();
 const measurement = {
@@ -132,12 +133,18 @@ const measurement = {
     "Main wing only; attached flow. No fuselage, tail, propwash, viscous drag or stall-onset solution.",
   ],
 };
+// The visible skin no longer sets the flight numbers. Pass --unfreeze to re-measure them on purpose.
+const geometryFile = new URL("../src/aircraft/heron/geometry.json", import.meta.url);
 await Bun.write(
-  new URL("../src/aircraft/heron/geometry.json", import.meta.url),
-  JSON.stringify(measurement, null, 2) + "\n",
+  geometryFile,
+  JSON.stringify(
+    frozenFlightGeometry(await Bun.file(geometryFile).json(), measurement, process.argv.includes("--unfreeze")),
+    null,
+    2,
+  ) + "\n",
 );
 const cad = await Bun.file(
-  new URL("../assets/heron/checks/connectivity.json", import.meta.url),
+  new URL("../assets/heron/checks/skin-connectivity.json", import.meta.url),
 ).json();
 await Bun.write(
   new URL("../public/assets/heron-ut9.cad.json", import.meta.url),
@@ -145,7 +152,7 @@ await Bun.write(
     {
       name: "Heron UT-9",
       assetSha256: sha256,
-      source: "assets/heron/src/heron.py",
+      source: "scripts/build-heron-skin.py",
       cadVersion: "0.5.1",
       meshDeflectionMm: transfer.meshDeflectionMm,
       normalSource: transfer.normalSource,

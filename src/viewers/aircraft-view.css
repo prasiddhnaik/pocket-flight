@@ -1,0 +1,363 @@
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: #e7e9e1;
+  color: #243f3b;
+  font:
+    14px/1.5 system-ui,
+    sans-serif;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+button,
+input,
+select {
+  font: inherit;
+  accent-color: #276756;
+}
+button,
+select {
+  color: inherit;
+}
+button,
+.fly-link,
+select {
+  border-radius: 5px;
+}
+button {
+  border: 1px solid #b4c0ae;
+  background: #edf0e8;
+  padding: 9px 13px;
+  cursor: pointer;
+}
+button:hover,
+button[aria-pressed="true"] {
+  background: #d5ded0;
+  border-color: #6c8b75;
+}
+:focus-visible {
+  outline: 2px solid #276756;
+  outline-offset: 3px;
+}
+[hidden] {
+  display: none !important;
+}
+.aircraft-viewer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  grid-template-rows: 76px 1fr;
+  min-height: 100dvh;
+}
+header {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  border-bottom: 1px solid #cbd2c4;
+}
+header a {
+  font-weight: 600;
+}
+header > span,
+.eyebrow {
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: #657a69;
+}
+.viewer-stage {
+  position: sticky;
+  top: 0;
+  height: calc(100dvh - 76px);
+  min-height: 500px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.viewer-heading {
+  padding: 25px 32px 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+h1 {
+  margin: 5px 0;
+  font-size: clamp(32px, 4.2vw, 66px);
+  line-height: 1.1;
+  font-weight: 500;
+  letter-spacing: -0.055em;
+}
+.viewer-heading > p:last-child {
+  font-size: 12px;
+  color: #667a6a;
+}
+#viewport {
+  flex: 1;
+  min-height: 0;
+}
+canvas {
+  display: block;
+  touch-action: none;
+}
+.camera-views {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 20px;
+}
+.camera-views button {
+  font-size: 11px;
+}
+.orbit-help {
+  text-align: center;
+  font-size: 10px;
+  color: #70806b;
+  padding: 0 12px 15px;
+  margin: 0;
+}
+aside {
+  padding: 28px 26px;
+  background: #f1f2eb;
+  border-left: 1px solid #cbd2c4;
+}
+select {
+  width: 100%;
+  padding: 10px;
+  background: transparent;
+  border: 1px solid #b4c0ae;
+  margin-top: 8px;
+}
+#status {
+  color: #52785d;
+  font-size: 11px;
+  min-height: 2em;
+  margin: 15px 0;
+}
+dl {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin: 22px 0;
+  gap: 10px;
+}
+dt {
+  color: #70806b;
+  letter-spacing: 0.12em;
+  font-size: 9px;
+}
+dd {
+  margin: 5px 0 0;
+  font-size: 22px;
+}
+fieldset {
+  padding: 18px 0 0;
+  margin: 0;
+  border: 0;
+  border-top: 1px solid #cbd2c4;
+}
+legend {
+  padding: 0 8px 0 0;
+  font-size: 12px;
+  font-weight: 600;
+}
+fieldset:disabled {
+  opacity: 0.45;
+}
+/* System controls use full touch targets and pair sliders with exact values. */
+.systems-group {
+  padding: 20px 0;
+  border-bottom: 1px solid #d6dccf;
+}
+.systems-group h2 {
+  margin: 0 0 14px;
+  font-size: 13px;
+  font-weight: 650;
+}
+.system-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.system-heading h2 {
+  margin: 0;
+}
+#configuration-name {
+  font-size: 11px;
+  color: #52785d;
+}
+.configuration-buttons,
+.segmented {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+#systems button {
+  min-height: 44px;
+  font-size: 12px;
+  padding: 8px 10px;
+}
+.system-range {
+  margin: 0 0 20px;
+}
+.system-range:last-child {
+  margin-bottom: 0;
+}
+.range-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+.percent-input {
+  display: flex;
+  align-items: center;
+  border: 1px solid #b4c0ae;
+  border-radius: 5px;
+  background: #fafbf6;
+  padding-right: 8px;
+  font-size: 11px;
+  color: #637a65;
+}
+.percent-input input {
+  width: 65px;
+  min-height: 40px;
+  padding: 7px;
+  border: 0;
+  background: transparent;
+  color: #243f3b;
+  font-variant-numeric: tabular-nums;
+}
+.system-range input[type="range"] {
+  width: 100%;
+  height: 36px;
+  margin: 2px 0;
+  cursor: pointer;
+}
+.range-directions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 5px;
+  color: #657a69;
+  font-size: 10px;
+}
+.range-directions > span {
+  flex: 1;
+}
+.range-directions > span:last-child {
+  text-align: right;
+}
+.system-detents {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-top: 10px;
+}
+.system-switch {
+  margin: 0 0 16px;
+}
+.system-switch p {
+  font-size: 12px;
+  margin: 0 0 7px;
+}
+.system-note,
+.system-readout,
+.system-message {
+  font-size: 11px;
+  color: #657a69;
+  line-height: 1.6;
+}
+.system-readout {
+  padding: 9px 10px;
+  border-radius: 5px;
+  background: #e1e7dc;
+  color: #355f48;
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 0;
+}
+.system-positions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  margin: 18px 0 0;
+}
+.system-positions > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+.system-positions dd {
+  margin: 0;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.system-message {
+  min-height: 3.2em;
+  margin-bottom: 0;
+}
+.paint-label {
+  display: block;
+  font-size: 11px;
+  margin: 15px 0;
+}
+#reset,
+#gun {
+  width: 100%;
+  font-size: 11px;
+  margin-top: 10px;
+}
+#gun {
+  touch-action: none;
+  user-select: none;
+}
+.fly-link {
+  display: block;
+  padding: 13px 15px;
+  margin-top: 22px;
+  background: #276756;
+  color: #fff;
+  font-size: 12px;
+}
+.viewer-note {
+  color: #70806b;
+  font-size: 10px;
+  margin-bottom: 0;
+}
+@media (max-width: 800px) {
+  .aircraft-viewer {
+    grid-template-columns: 1fr;
+    grid-template-rows: 64px auto auto;
+  }
+  header {
+    padding: 0 20px;
+  }
+  header > span {
+    font-size: 8px;
+  }
+  .viewer-stage {
+    position: relative;
+    height: 70dvh;
+    min-height: 450px;
+  }
+  .viewer-heading {
+    padding: 22px 20px 0;
+  }
+  h1 {
+    font-size: 40px;
+  }
+  aside {
+    border-left: 0;
+    border-top: 1px solid #cbd2c4;
+    padding: 26px max(22px, calc((100vw - 520px) / 2));
+  }
+}

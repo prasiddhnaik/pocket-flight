@@ -1,7 +1,9 @@
+import { GUN_FULL_SPEED } from "../aircraft/f15c/gun-spool";
 import * as T from "three";
 import { makeWorld } from "../world/world";
-import { makeAircraft, isPropellerAircraft, type AircraftId, type AircraftModel } from "../aircraft/aircraft";
-import { FlightAudio } from "../audio/audio";
+import { supportsCombat } from "../aircraft/weapons/combat-loadouts";
+import { makeAircraft, type AircraftId, type AircraftModel } from "../aircraft/aircraft";
+import { engineVoice, FlightAudio } from "../audio/audio";
 import { applyJetReplay } from "../replay/replay-jet";
 import { initialJetInput } from "../aircraft/jet-effects";
 import { sampleFrames, type SavedReplay } from "../replay/replay-data";
@@ -21,19 +23,24 @@ export type SceneEditorOptions = {
   tool: TransformControlsMode;
   snap: boolean;
 };
-import { terrainHeight } from "../world/terrain";
+import { groundHeight, terrainHeight } from "../world/terrain";
+import { ReplayCombat, replayVariant } from "../flight/combat/tape";
 export class ReplayPreview {
   readonly renderer = new T.WebGLRenderer({
     antialias: true,
+    // Same as the game: draped roads and rings stay steady at long range.
+    logarithmicDepthBuffer: true,
     powerPreference: "high-performance",
   });
   readonly scene = new T.Scene();
   readonly camera = new T.PerspectiveCamera(48, 16 / 9, 0.2, 11000);
   readonly audio = new FlightAudio();
   private world = makeWorld(this.scene);
-  private models = new Map<AircraftId, AircraftModel>();
-  private ready = new Set<AircraftId>();
-  private loads = new Map<AircraftId, Promise<void>>();
+  // The Finch and its A-2 variant are different models under one aircraft id.
+  private models = new Map<string, AircraftModel>();
+  private ready = new Set<string>();
+  private loads = new Map<string, Promise<void>>();
+  private combat: { replay: string; playback: ReplayCombat } | null = null;
   private disposed = false;
   readonly assets = new StudioSceneRenderer(this.scene);
   readonly soundtrack = new StudioSoundtrack();
@@ -198,14 +205,41 @@ export class ReplayPreview {
   get canvas() {
     return this.renderer.domElement;
   }
-  isReady(id: AircraftId) {
-    return this.ready.has(id);
+  private modelKey(replay: SavedReplay) {
+    return `${replay.aircraft}:${replayVariant(replay)}`;
+  }
+  isReady(replay: SavedReplay) {
+    return this.ready.has(this.modelKey(replay));
+  }
+  /** The sandbox's dummies, rounds and blasts, and the island's shadows. */
+  private poseCombat(replay: SavedReplay, model: AircraftModel, time: number, playing: boolean) {
+    const sandbox = replay.mission === "combat";
+    if (this.combat && (!sandbox || this.combat.replay !== replay.id)) {
+      this.combat.playback.dispose();
+      this.combat = null;
+    }
+    if (!sandbox) return;
+    if (!this.combat) {
+      const id = model.id === "finch" && model.variant === "attack" ? "finch-attack" : model.id;
+      if (!supportsCombat(id)) return;
+      const playback = new ReplayCombat(
+        id,
+        model.group,
+        (x, z) => Math.max(0, groundHeight(x, z)),
+        (x, z) => terrainHeight(x, z) < 0.25,
+        (point) => this.audio.blast(point.distanceTo(this.camera.position)),
+      );
+      this.scene.add(playback.visuals.group);
+      this.combat = { replay: replay.id, playback };
+    }
+    const viewScale = this.renderer.domElement.height / (2 * Math.tan((this.camera.fov * Math.PI) / 360));
+    this.combat.playback.pose(replay.frames, time, viewScale, playing);
   }
   load(replay: SavedReplay): Promise<void> {
-    const id = replay.aircraft,
+    const id = this.modelKey(replay),
       existing = this.loads.get(id);
     if (existing) return existing;
-    const model = makeAircraft(replay.paint, id);
+    const model = makeAircraft(replay.paint, replay.aircraft, replayVariant(replay));
     this.models.set(id, model);
     this.scene.add(model.group);
     model.group.visible = false;
@@ -230,11 +264,12 @@ export class ReplayPreview {
     editor?: SceneEditorOptions,
     clip?: StudioClip,
   ) {
-    const model = this.models.get(replay.aircraft);
-    if (!model || !this.ready.has(replay.aircraft)) return;
-    for (const [id, m] of this.models) m.group.visible = id === replay.aircraft;
+    const key = this.modelKey(replay),
+      model = this.models.get(key);
+    if (!model || !this.ready.has(key)) return;
+    for (const [id, m] of this.models) m.group.visible = id === key;
     model.setPaint(replay.paint);
-    this.audio.jet = !isPropellerAircraft(replay.aircraft);
+    this.audio.voice = engineVoice(replay.aircraft);
     const { a, b, mix } = sampleFrames(replay.frames, time),
       visual = mix === 1 ? b : a;
     model.group.position.lerpVectors(
@@ -354,6 +389,7 @@ export class ReplayPreview {
       }
     } else this.orbit.update();
     this.camera.updateProjectionMatrix();
+    this.poseCombat(replay, model, time, playing);
     const night =
       project?.scene?.lighting === "night"
         ? true
@@ -406,11 +442,18 @@ export class ReplayPreview {
       T.MathUtils.lerp(a.speed, b.speed, mix),
       playing,
       volume,
+      {
+        burner: model.effects?.motion.burner ?? 0,
+        gunSpool: (model.effects?.motion.gunSpeed ?? 0) / GUN_FULL_SPEED,
+        inferGun: true,
+      },
     );
+    this.world.focusSun(model.group.position);
     this.renderer.render(this.scene, this.camera);
   }
   dispose() {
     this.disposed = true;
+    this.combat?.playback.dispose();
     this.resizeObserver.disconnect();
     this.canvas.removeEventListener("pointerdown", this.pointerDown);
     this.canvas.removeEventListener("pointerup", this.pointerUp);

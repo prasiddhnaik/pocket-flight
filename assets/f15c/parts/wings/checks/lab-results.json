@@ -71,7 +71,7 @@
   "experiment": {
     "schemaVersion": 1,
     "solver": "horseshoe-vlm-1.1",
-    "generatedAt": "2026-10-23T19:27:12.564Z",
+    "generatedAt": "2026-10-30T17:09:00.873Z",
     "aircraft": "F-15C CAD wing reconstruction",
     "geometryRevision": "eddfd4400ba5f7b2",
     "assumptions": [

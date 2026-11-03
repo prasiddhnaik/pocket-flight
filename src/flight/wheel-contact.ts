@@ -5,7 +5,7 @@ import {
   wheelPose,
   wheelSupportPoint,
 } from "./airframe-contact";
-import { groundAt } from "../world/terrain";
+import { groundAt, groundHeight, maximumGroundHeight } from "../world/terrain";
 
 export type ContactBody = {
   position: Vector3;
@@ -54,10 +54,39 @@ export function inverseContactMass(
 export function terrainNormal(x: number, z: number) {
   const h = 0.35;
   return new Vector3(
-    groundAt(x - h, z).height - groundAt(x + h, z).height,
+    groundHeight(x - h, z) - groundHeight(x + h, z),
     2 * h,
-    groundAt(x, z - h).height - groundAt(x, z + h).height,
+    groundHeight(x, z - h) - groundHeight(x, z + h),
   ).normalize();
+}
+
+// Farthest any tire surface reaches from the body origin across gear travel.
+const wheelReach = new Map<AircraftId, number>();
+function reachOf(id: AircraftId) {
+  let reach = wheelReach.get(id);
+  if (reach === undefined) {
+    reach = 0;
+    for (let index = 0; index < aircraftWheels[id].length; index++)
+      for (let step = 0; step <= 20; step++) {
+        const pose = wheelPose(id, index, step / 20);
+        reach = Math.max(reach, pose.center.length() + pose.radius);
+      }
+    // Margin covers sampling between gear steps and wide tire profiles.
+    reach += 1;
+    wheelReach.set(id, reach);
+  }
+  return reach;
+}
+/** True when no tire can touch terrain or pavement during this step. */
+export function wheelsClearOfGround(body: ContactBody, id: AircraftId, dt: number) {
+  const reach = reachOf(id);
+  const travel =
+    (body.velocity.length() + body.angularVelocity.length() * reach) * dt + 0.1;
+  const p = body.position;
+  return (
+    p.y - reach - travel >
+    maximumGroundHeight(p.x - reach, p.x + reach, p.z - reach, p.z + reach)
+  );
 }
 export type WheelContact = {
   index: number;
@@ -82,6 +111,7 @@ export function solveWheelContacts(
 ): WheelContact[] {
   const wheels = aircraftWheels[id];
   const contacts = [];
+  if (wheelsClearOfGround(body, id, dt)) return [];
   for (let index = 0; index < wheels.length; index++) {
     const pose = wheelPose(id, index, gear);
     const center = pose.center
@@ -211,6 +241,17 @@ export function resolveWheelPenetration(
   gear: number,
 ) {
   if (id !== "finch" && gear < 0.995) return 0;
+  const reach = reachOf(id);
+  if (
+    position.y - reach >
+    maximumGroundHeight(
+      position.x - reach,
+      position.x + reach,
+      position.z - reach,
+      position.z + reach,
+    )
+  )
+    return 0;
   let depth = 0;
   for (let index = 0; index < aircraftWheels[id].length; index++) {
     const pose = wheelPose(id, index, gear);

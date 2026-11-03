@@ -1,17 +1,17 @@
 {
   "artifact": "STEP/airframe_cockpit.step",
-  "sha256": "348a3ac3b56527454f853cbb8fee1b218615bf2587fe3c00a7b45cb44b785d76",
+  "sha256": "e3b761d62939f22fd27be616bcee26c0670e396e873b0ae34ae9aeb929b9ff44",
   "units": "mm",
   "dimensionsM": [
     13.049250000200006,
     19.4310000002,
-    4.148485562995639
+    4.1461234884998035
   ],
   "boundsM": {
     "min": [
       -6.524625000100003,
       -9.431000000100001,
-      1.477614437004361
+      1.4799765115001964
     ],
     "max": [
       6.524625000100003,
@@ -24,20 +24,20 @@
       "name": "All saved solids valid, closed and positive",
       "pass": true,
       "invalid": [],
-      "solidCount": 269
+      "solidCount": 279
     },
     {
       "name": "All saved parts have an exact contact path to the fuselage",
       "pass": true,
       "floating": [],
       "contactToleranceMm": 0.5,
-      "solidDistanceChecks": 262
+      "solidDistanceChecks": 276
     },
     {
       "name": "Every saved solid is valid closed and positive",
       "pass": true,
       "invalid": [],
-      "solidCount": 61
+      "solidCount": 73
     },
     {
       "name": "Intended contact tree covers every saved solid",
@@ -51,7 +51,7 @@
       "pass": true,
       "floating": [],
       "toleranceMm": 0.5,
-      "contacts": 60
+      "contacts": 72
     },
     {
       "name": "Glazing physically meets side sill rail Left",
@@ -80,31 +80,31 @@
     {
       "name": "Closed glazing clears Seat_headrest",
       "pass": true,
-      "gapMm": 125.18567415460772,
+      "gapMm": 165.90505983791275,
       "minimumMm": 5
     },
     {
       "name": "Closed glazing clears Ejection_seat_rail_Left",
       "pass": true,
-      "gapMm": 104.47108490871531,
+      "gapMm": 142.36434346517854,
       "minimumMm": 5
     },
     {
       "name": "Closed glazing clears Ejection_seat_rail_Right",
       "pass": true,
-      "gapMm": 104.47108490873237,
+      "gapMm": 142.3643434651972,
       "minimumMm": 5
     },
     {
       "name": "Closed glazing clears HUD_glass",
       "pass": true,
-      "gapMm": 12.22678030215557,
+      "gapMm": 33.549080676504694,
       "minimumMm": 5
     },
     {
       "name": "Canopy at 10 degrees clears fixed geometry beyond the hinge zone",
       "pass": true,
-      "gapMm": 5.503809299808354,
+      "gapMm": 5.044543304546015,
       "minimumMm": 0.5,
       "hingeZoneRadiusM": 0.25,
       "angleDegrees": 10,
@@ -114,12 +114,12 @@
         3.42
       ],
       "nearestFixedPart": "Cockpit_sill_Left",
-      "exactDistanceQueries": 41
+      "exactDistanceQueries": 48
     },
     {
       "name": "Canopy at 25 degrees clears fixed geometry beyond the hinge zone",
       "pass": true,
-      "gapMm": 63.29828448715764,
+      "gapMm": 62.34276482378016,
       "minimumMm": 0.5,
       "hingeZoneRadiusM": 0.25,
       "angleDegrees": 25,
@@ -129,15 +129,30 @@
         3.42
       ],
       "nearestFixedPart": "Cockpit_sill_Left",
-      "exactDistanceQueries": 18
+      "exactDistanceQueries": 20
     },
     {
       "name": "Canopy at 40 degrees clears fixed geometry beyond the hinge zone",
       "pass": true,
-      "gapMm": 113.60829561386895,
+      "gapMm": 111.29226277618739,
       "minimumMm": 0.5,
       "hingeZoneRadiusM": 0.25,
       "angleDegrees": 40,
+      "pivotM": [
+        0,
+        3.13,
+        3.42
+      ],
+      "nearestFixedPart": "Cockpit_sill_Left",
+      "exactDistanceQueries": 13
+    },
+    {
+      "name": "Canopy at 55 degrees clears fixed geometry beyond the hinge zone",
+      "pass": true,
+      "gapMm": 152.6394550888292,
+      "minimumMm": 0.5,
+      "hingeZoneRadiusM": 0.25,
+      "angleDegrees": 55,
       "pivotM": [
         0,
         3.13,
@@ -147,24 +162,35 @@
       "exactDistanceQueries": 11
     },
     {
-      "name": "Canopy at 55 degrees clears fixed geometry beyond the hinge zone",
-      "pass": true,
-      "gapMm": 157.62507648672545,
-      "minimumMm": 0.5,
-      "hingeZoneRadiusM": 0.25,
-      "angleDegrees": 55,
-      "pivotM": [
-        0,
-        3.13,
-        3.42
-      ],
-      "nearestFixedPart": "Cockpit_sill_Left",
-      "exactDistanceQueries": 11
-    },
-    {
       "name": "Every saved cockpit solid is valid and positive",
       "pass": true,
       "invalid": []
+    },
+    {
+      "name": "Upper Instrument_panel stays inside the closed canopy",
+      "pass": true,
+      "outsideMm3": 0,
+      "toleranceMm3": 1,
+      "checkedAboveM": 3.04
+    },
+    {
+      "name": "Closed glazing and frame clear Instrument_panel",
+      "pass": true,
+      "gapMm": 27.124474739446523,
+      "minimumMm": 8
+    },
+    {
+      "name": "Upper Instrument_coaming stays inside the closed canopy",
+      "pass": true,
+      "outsideMm3": 0,
+      "toleranceMm3": 1,
+      "checkedAboveM": 3.04
+    },
+    {
+      "name": "Closed glazing and frame clear Instrument_coaming",
+      "pass": true,
+      "gapMm": 15.695968468489239,
+      "minimumMm": 8
     },
     {
       "name": "Canopy_glass physically meets Canopy_front_bow",
@@ -193,31 +219,31 @@
     {
       "name": "Closed glazing clears Seat_headrest",
       "pass": true,
-      "gapMm": 125.18567415460772,
+      "gapMm": 165.90505983791275,
       "minimumMm": 5
     },
     {
       "name": "Closed glazing clears Ejection_seat_rail_Left",
       "pass": true,
-      "gapMm": 104.47108490871531,
+      "gapMm": 142.36434346517854,
       "minimumMm": 5
     },
     {
       "name": "Closed glazing clears Ejection_seat_rail_Right",
       "pass": true,
-      "gapMm": 104.47108490873237,
+      "gapMm": 142.3643434651972,
       "minimumMm": 5
     },
     {
       "name": "Closed glazing clears HUD_glass",
       "pass": true,
-      "gapMm": 12.22678030215557,
+      "gapMm": 33.549080676504694,
       "minimumMm": 5
     },
     {
       "name": "Headrest and HUD stay below the actual overhead glazing",
       "pass": true,
-      "minimumMm": 11.570812070745887,
+      "minimumMm": 40.484733752037755,
       "requiredMm": 5,
       "missingRays": []
     }
@@ -1256,12 +1282,6 @@
       "method": "re-measured saved contact hint"
     },
     {
-      "a": "Windshield_glass",
-      "b": "Cockpit_sill_Left",
-      "gapMm": 0,
-      "method": "re-measured saved contact hint"
-    },
-    {
       "a": "Seat_pan",
       "b": "Seat_back",
       "gapMm": 0,
@@ -1328,20 +1348,68 @@
       "method": "re-measured saved contact hint"
     },
     {
-      "a": "Cockpit_sill_Left",
-      "b": "Fuselage",
+      "a": "Seat_bolster_Left",
+      "b": "Seat_back",
       "gapMm": 0,
       "method": "re-measured saved contact hint"
     },
     {
-      "a": "Canopy_rail_Left_0",
-      "b": "Cockpit_sill_Left",
+      "a": "Seat_bolster_Right",
+      "b": "Seat_back",
       "gapMm": 0,
       "method": "re-measured saved contact hint"
     },
     {
-      "a": "Windshield_side_frame_Left",
-      "b": "Cockpit_sill_Left",
+      "a": "Ejection_handle",
+      "b": "Seat_pan",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Pilot_torso",
+      "b": "Seat_back",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Pilot_legs",
+      "b": "Seat_pan",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Pilot_neck",
+      "b": "Pilot_torso",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Pilot_helmet",
+      "b": "Pilot_neck",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Pilot_visor",
+      "b": "Pilot_helmet",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Pilot_mask",
+      "b": "Pilot_helmet",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Pilot_arm_Left",
+      "b": "Pilot_torso",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Pilot_arm_Right",
+      "b": "Pilot_torso",
       "gapMm": 0,
       "method": "re-measured saved contact hint"
     },
@@ -1402,24 +1470,6 @@
     {
       "a": "Canopy_rail_Left_4",
       "b": "Canopy_rail_Left_3",
-      "gapMm": 0,
-      "method": "re-measured saved contact hint"
-    },
-    {
-      "a": "Cockpit_sill_Right",
-      "b": "Fuselage",
-      "gapMm": 0,
-      "method": "re-measured saved contact hint"
-    },
-    {
-      "a": "Canopy_rail_Right_0",
-      "b": "Cockpit_sill_Right",
-      "gapMm": 0,
-      "method": "re-measured saved contact hint"
-    },
-    {
-      "a": "Windshield_side_frame_Right",
-      "b": "Cockpit_sill_Right",
       "gapMm": 0,
       "method": "re-measured saved contact hint"
     },
@@ -1600,7 +1650,7 @@
     {
       "a": "Intake_skin_Left",
       "b": "Ramp_3_Left",
-      "gapMm": 8.981260180007666e-12,
+      "gapMm": 1.1867076273756437e-11,
       "method": "re-measured saved contact hint"
     },
     {
@@ -1612,7 +1662,7 @@
     {
       "a": "Intake_skin_Right",
       "b": "Ramp_3_Right",
-      "gapMm": 5.209785393794664e-13,
+      "gapMm": 1.4779288903810084e-12,
       "method": "re-measured saved contact hint"
     },
     {
@@ -1830,26 +1880,62 @@
       "b": "Fuselage",
       "gapMm": 0,
       "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Canopy_hinge_Right",
+      "b": "Canopy_rail_Right_0",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Canopy_hinge_Left",
+      "b": "Canopy_rail_Left_0",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Windshield_side_frame_Left",
+      "b": "Canopy_rail_Left_4",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Windshield_side_frame_Right",
+      "b": "Canopy_rail_Right_4",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Windshield_side_frame_Left",
+      "b": "Windshield_front_frame",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Windshield_glass",
+      "b": "Canopy_rail_Left_4",
+      "gapMm": 0,
+      "method": "solid distance"
     }
   ],
-  "passed": 27,
+  "passed": 31,
   "failed": 0,
   "evidence": [
     {
       "artifact": "STEP/airframe_cockpit.step",
-      "sha256": "348a3ac3b56527454f853cbb8fee1b218615bf2587fe3c00a7b45cb44b785d76"
+      "sha256": "e3b761d62939f22fd27be616bcee26c0670e396e873b0ae34ae9aeb929b9ff44"
     },
     {
       "artifact": "/Users/prasiddhnaik/Documents/blender skills/pocket-flight-site/assets/f15c/STEP/cockpit_preview.step",
-      "sha256": "3134438f147e3839ed0df20194bb0614dd05fb5452a4598989d3727955ffeb25"
+      "sha256": "3d82434d9523d7d5c7baeda01334c59b48b2828ba1d6cfc4dc12d51e0ac63840"
     },
     {
       "artifact": "/Users/prasiddhnaik/Documents/blender skills/pocket-flight-site/assets/f15c/STEP/cockpit_preview.step",
-      "sha256": "3134438f147e3839ed0df20194bb0614dd05fb5452a4598989d3727955ffeb25"
+      "sha256": "3d82434d9523d7d5c7baeda01334c59b48b2828ba1d6cfc4dc12d51e0ac63840"
     },
     {
       "artifact": "/Users/prasiddhnaik/Documents/blender skills/pocket-flight-site/assets/f15c/STEP/cockpit.step",
-      "sha256": "1c6944a693447bfae3798e5b46e4b97d918d248e9a4bb0ecb6cdfc514865e48a"
+      "sha256": "ba0f3d37a9d4842c2260ff62f8f4c77b0287fe911dc43cd0133e4a2e1feb57fb"
     }
   ]
 }

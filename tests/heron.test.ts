@@ -52,7 +52,8 @@ test("Heron's runtime CAD export retains controls, propeller, scale and wheel da
     "Front_Wheel_Steering",
   ])
     expect(scene.getObjectByName(name)).toBeDefined();
-  const size = new Box3().setFromObject(scene).getSize(new Vector3());
+  // Precise: the raked rudder's mount makes the quick box overstate the height.
+  const size = new Box3().setFromObject(scene, true).getSize(new Vector3());
   expect(size.x).toBeCloseTo(15.87, 2);
   expect(size.y).toBeCloseTo(4.7, 2);
   expect(size.z).toBeCloseTo(12.67, 2);

@@ -8,6 +8,8 @@ import { STORMBIRD_CENTER, stormbirdLayout } from "./stormbird/stormbird-config"
 export type AircraftId = "finch" | "peregrine" | "aurelia" | "stormbird" | "heron" | "f15c";
 import { F15CEffects } from "./f15c/effects";
 import { f15cControlSurfaces } from "./f15c/mechanisms";
+import { addAircraftStores } from "./aircraft-stores";
+import { FINCH_ATTACK_ROOT, type FinchVariant, finchAttackStores, paintFinchAttack, removeRegistration } from "./finch/attack";
 export const isPropellerAircraft = (id: AircraftId) => id === "finch" || id === "heron";
 export const JET_SCALE = 0.7;
 export const JET_CENTER = 2.3;
@@ -45,9 +47,11 @@ export function disposeAircraft(root: T.Object3D, disposeTextures = true) {
   }
   if (disposeTextures) textures.forEach((texture) => texture.dispose());
 }
-export function makeAircraft(paintIndex = 0, id: AircraftId = "finch") {
+export function makeAircraft(paintIndex = 0, id: AircraftId = "finch", variant: FinchVariant = "trainer") {
+  const attack = id === "finch" && variant === "attack";
   const group = new T.Group();
-  group.name = `PocketFlight_${id}`;
+  group.name = `PocketFlight_${id}${attack ? "_attack" : ""}`;
+  let scene: T.Object3D | null = null;
   let selectedPaint = paintIndex;
   let disposed = false;
   const livery = new Set<T.MeshStandardMaterial>();
@@ -80,8 +84,13 @@ export function makeAircraft(paintIndex = 0, id: AircraftId = "finch") {
       const nose = controls.get("Front_Wheel_Steering");
       if (nose) nose.rotation.y = T.MathUtils.degToRad(25 * steering);
     },
+    variant: (attack ? "attack" : "trainer") as FinchVariant,
     setPaint(index: number) {
       selectedPaint = index;
+      if (attack) {
+        if (scene) paintFinchAttack(scene, index);
+        return;
+      }
       livery.forEach((material) => material.color.set(paints[index].color));
     },
     bodyCompression(meters: number, suspensionResolved = false) {
@@ -137,6 +146,10 @@ export function makeAircraft(paintIndex = 0, id: AircraftId = "finch") {
         disposeAircraft(gltf.scene);
         return;
       }
+      scene = gltf.scene;
+      // The attack variant's root name selects its tactical finish.
+      const finchRoot = attack ? gltf.scene.getObjectByName("Finch_U2") : undefined;
+      if (finchRoot) finchRoot.name = FINCH_ATTACK_ROOT;
       prepareAircraftMaterials(gltf.scene);
       model.displays = new CockpitDisplays(gltf.scene, id);
       group.add(gltf.scene);
@@ -150,13 +163,15 @@ export function makeAircraft(paintIndex = 0, id: AircraftId = "finch") {
       if (id === "f15c") {
         for (const name of ["Aileron_Left", "Aileron_Right", "Flap_Left", "Flap_Right", "Stabilator_Left", "Stabilator_Right", "Rudder_Left", "Rudder_Right", "Canopy", "Airbrake", "Gear_Nose", "Gear_Left", "Gear_Right"])
           controls.set(name, part(name));
-        model.effects = new F15CEffects(gltf.scene);
+        model.effects = new F15CEffects(gltf.scene, gltf.animations);
         model.effects.reset();
+        addAircraftStores(gltf.scene, id);
         return;
       }
       if (id === "stormbird") {
         gltf.scene.position.y = -STORMBIRD_CENTER;
         model.effects = new JetEffects(gltf.scene, stormbirdLayout);
+        addAircraftStores(gltf.scene, id);
         return;
       }
       if (id === "aurelia") {
@@ -184,6 +199,7 @@ export function makeAircraft(paintIndex = 0, id: AircraftId = "finch") {
           }
         });
         model.effects = new JetEffects(gltf.scene);
+        addAircraftStores(gltf.scene, id);
         return;
       }
       model.propeller = part("Propeller");
@@ -218,6 +234,10 @@ export function makeAircraft(paintIndex = 0, id: AircraftId = "finch") {
       });
       for (const [name, node] of model.controls)
         restPositions.set(name, node.position.clone());
+      if (attack) {
+        removeRegistration(gltf.scene);
+        addAircraftStores(gltf.scene, id, finchAttackStores());
+      }
       model.surfaces.apply(model.surfaces.snapshot());
       model.setPaint(selectedPaint);
     });

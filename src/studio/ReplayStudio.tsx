@@ -464,7 +464,7 @@ export default function ReplayStudio({
       const p = projectRef.current,
         point = locateClip(p, head.current);
       if (point) {
-        if (!view.isReady(point.source.aircraft)) {
+        if (!view.isReady(point.source)) {
           if (failed !== point.source.aircraft) {
             setLoading(true);
             void view
@@ -483,7 +483,7 @@ export default function ReplayStudio({
           if (running.current && sceneReady.current)
             head.current = Math.min(head.current + dt, projectDuration(p));
           const current = locateClip(p, head.current)!;
-          if (view.isReady(current.source.aircraft)) {
+          if (view.isReady(current.source)) {
             view.render(
               current.source,
               current.sourceTime,

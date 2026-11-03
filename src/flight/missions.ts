@@ -7,7 +7,8 @@ export type MissionId =
   | "emergency"
   | "race"
   | "crosswind"
-  | "free";
+  | "free"
+  | "combat";
 export type Mission = {
   id: MissionId;
   name: string;
@@ -200,3 +201,5 @@ export function scoreFlight(
       "gold" | "silver" | "bronze",
   };
 }
+
+export const combatMission: Mission = { id: "combat", name: "Weapons sandbox", eyebrow: "SANDBOX", description: "Fire rockets and missiles at the Anvil Key dummies", duration: "Open range", difficulty: "Practice", icon: "flag", airStart: false, rings: [], par: 0 };

@@ -89,9 +89,12 @@ export function makeExperiments(game: PocketFlight) {
     parent.add(batch);
     batches.push({ batch, bulbs });
   }
+  // The game now instances its edge lights; the experiment then equals baseline.
+  const builtIn = scene.getObjectsByProperty("name", "Runway edge lights").length === 2;
   if (
-    batches.length !== 2 ||
-    batches.reduce((n, b) => n + b.bulbs.length, 0) !== 52
+    !(builtIn && !batches.length) &&
+    (batches.length !== 2 ||
+      batches.reduce((n, b) => n + b.bulbs.length, 0) !== 52)
   )
     throw new Error("Unexpected runway light layout");
   let current: Variant = "baseline";

@@ -1,5 +1,6 @@
 import { test, expect } from "bun:test";
-import { JetMotion, initialJetInput, sequenceInput } from "../src/aircraft/jet-effects";
+import { JetMotion, initialJetInput, lightOffKick, sequenceInput } from "../src/aircraft/jet-effects";
+import { applyJetReplay } from "../src/replay/replay-jet";
 test("afterburner cannot light at idle and spools smoothly before ignition", () => {
   const s = new JetMotion(),
     i = initialJetInput();
@@ -57,4 +58,32 @@ test("persistent contrails require the high-altitude cruise preview", () => {
   expect(sequenceInput("cruise", 10).contrails).toBe(true);
   for (const mode of ["manual", "startup", "takeoff", "afterburner", "landing", "emergency"] as const)
     expect(sequenceInput(mode, 10).contrails).toBe(false);
+});
+
+test("the burner marks ignition once, and the flash dies away", () => {
+  const s = new JetMotion(), i = initialJetInput();
+  i.throttle = 1;
+  i.powerResolved = true;
+  expect(lightOffKick(s.lightOffAge)).toBeLessThan(.001);
+  for (let n = 0; n < 60; n++) s.update(1 / 60, i);
+  expect(s.burner).toBe(0);
+  i.burner = true;
+  const flash: number[] = [];
+  for (let n = 0; n < 120; n++) {
+    s.update(1 / 60, i);
+    flash.push(lightOffKick(s.lightOffAge));
+  }
+  expect(Math.max(...flash)).toBeGreaterThan(.5);
+  expect(flash.at(-1)!).toBeLessThan(.01);
+  expect(flash.filter((value, n) => n > 0 && value > flash[n - 1] + .001 && flash[n - 1] < .001).length).toBe(1);
+});
+
+test("a replay frame carries the light-off moment, and old frames do not need it", () => {
+  const s = new JetMotion();
+  expect({ ...s }).toHaveProperty("lightOffAge", 10);
+  applyJetReplay(s, { lightOffAge: .05, burner: .4 });
+  expect(lightOffKick(s.lightOffAge)).toBeGreaterThan(.5);
+  const old = new JetMotion();
+  applyJetReplay(old, { burner: .4 });
+  expect(lightOffKick(old.lightOffAge)).toBeLessThan(.001);
 });

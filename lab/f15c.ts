@@ -69,8 +69,8 @@ function view(name: string) {
     return;
   }
   if (name === "nozzle") {
-    camera.position.set(2.7, .75, 11.15); camera.up.set(0, 1, 0);
-    controls.target.set(1.025, -.125, 8.95); controls.update(); renderNeeded = true;
+    camera.position.set(2.3, .7, 9.7); camera.up.set(0, 1, 0);
+    controls.target.set(.6, -.24, 7.5); controls.update(); renderNeeded = true;
     return;
   }
   if (name === "gun") {

@@ -2,7 +2,7 @@ import { expect, test } from "bun:test";
 import { readFileSync, readdirSync } from "node:fs";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import * as T from "three";
-import { terrainSurfaceHeight, random, runways } from "../src/world/terrain";
+import { terrainSurfaceHeight, random, runways, rangeRunway } from "../src/world/terrain";
 
 function glb(name: string) {
   const bytes = readFileSync(
@@ -25,7 +25,7 @@ test("Blender terrain matches the simulator ground at coasts, mountains and airf
   scene.updateMatrixWorld(true);
   const ray = new T.Raycaster(new T.Vector3(), new T.Vector3(0, -1, 0));
   const rng = random(167);
-  const points = runways.map((r) => [r.x, r.z]);
+  const points = runways.filter((r) => r !== rangeRunway).map((r) => [r.x, r.z]);
   for (let i = 0; i < 40; i++)
     points.push([(rng() - 0.5) * 2100, (rng() - 0.5) * 2100]);
   for (const [x, z] of points) {

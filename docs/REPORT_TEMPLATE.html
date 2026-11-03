@@ -1,0 +1,370 @@
+<!doctype html>
+<!--
+  Pocket Flight report template. The styling is decoration only: every fact you
+  put in still has to be verified, and skipped checks still get reported.
+
+  How to use
+  - Copy this file to output/reports/<topic>-<YYYY-MM-DD>.html and replace each {{TOKEN}}.
+  - Status classes for .tag: ok (passed), warn (partial), fail (failed), skip (not run).
+  - Hero plane: change href="#stormbird" to #finch, #heron, #aurelia, #peregrine or #f15c
+    to match the aircraft the report is about.
+  - Delete any section that does not apply. Waypoint numbers update themselves.
+  - Copy the marked rows and items as often as needed.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{{REPORT_TITLE}} · Pocket Flight</title>
+<style>
+:root{
+  --night:#082d33;--deep:#233f42;--paper:#f6f4e9;--card:#fffdf5;--sand:#d7e1d7;
+  --gold:#ecd08c;--amber:#8a5a1c;--coral:#ffb299;--holo:#e8fbff;--sage:#496851;--red:#a8402a;
+  --line:rgba(35,63,66,.17);
+  --serif:"DM Serif Display","Iowan Old Style",Georgia,serif;
+  --sans:"DM Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --inst:Oxanium,ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --gutter:76px;--axis:30px;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{
+  margin:0;color:var(--deep);font:16px/1.65 var(--sans);background-color:var(--paper);
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='720' height='480' fill='none' stroke='%23233f42' stroke-opacity='.07'%3E%3Cpath d='M-20 120C120 40 220 190 360 120S600 30 740 110M-20 170C120 90 230 240 360 170S600 80 740 160M-20 330c140-60 240 60 380 0s240-70 380-10M-20 390c140-60 240 60 380 0s240-70 380-10'/%3E%3Ccircle cx='520' cy='270' r='44'/%3E%3Ccircle cx='520' cy='270' r='76'/%3E%3C/svg%3E"),
+    linear-gradient(rgba(35,63,66,.045) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(35,63,66,.045) 1px,transparent 1px);
+  background-size:720px 480px,160px 160px,160px 160px;
+}
+h1,h2,h3,p,ol,ul{margin:0}
+code{font:.88em var(--inst);background:rgba(35,63,66,.08);padding:.1em .4em;border-radius:5px;overflow-wrap:anywhere;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+a{color:var(--sage)}
+.plane{fill:currentColor;display:block;overflow:visible}
+
+/* Hero: dusk sky, heading tape, tracked aircraft, cloud deck */
+.hero{
+  position:relative;overflow:hidden;min-height:600px;padding:96px 24px 190px;color:var(--paper);
+  background:
+    radial-gradient(70% 55% at 76% 96%,rgba(255,178,153,.78),transparent 70%),
+    linear-gradient(180deg,var(--night) 0%,#0e3a41 38%,#2c5a5c 62%,#b58f69 84%,var(--gold) 100%);
+}
+.tape{
+  position:absolute;inset:0 0 auto;height:46px;display:flex;justify-content:center;gap:clamp(26px,6vw,72px);
+  padding-top:8px;color:var(--holo);font:12px var(--inst);letter-spacing:.14em;opacity:.72;
+  background:repeating-linear-gradient(90deg,rgba(232,251,255,.55) 0 1px,transparent 1px 18px) 0 100%/100% 7px no-repeat;
+}
+.tape::after{content:"";position:absolute;left:50%;bottom:7px;border:5px solid transparent;border-bottom:7px solid var(--gold);margin-left:-5px}
+.stars{position:absolute;inset:0;width:100%;height:62%;fill:var(--holo)}
+.hero-inner{position:relative;z-index:2;max-width:1040px;margin:auto}
+.hero-text{max-width:600px}
+.kicker,.eyebrow,.label{font:600 12px/1.4 var(--inst);letter-spacing:.17em;text-transform:uppercase}
+.kicker{color:var(--gold)}
+h1{font:400 clamp(38px,6.2vw,68px)/1.06 var(--serif);margin:14px 0 18px;text-wrap:balance}
+.hero-text p:last-child{font-size:clamp(17px,2vw,20px);line-height:1.55;color:#e4ece4;max-width:540px}
+.tracked{position:absolute;z-index:1;right:max(5%,calc(50% - 600px));top:84px;width:clamp(190px,27vw,330px);aspect-ratio:1;color:var(--paper)}
+.tracked svg{width:100%;height:100%;transform:rotate(56deg);animation:drift 8s ease-in-out infinite alternate}
+.brackets{
+  position:absolute;inset:0;--c:rgba(232,251,255,.75);
+  background:
+    linear-gradient(var(--c) 0 0) 0 0/24px 1.5px,linear-gradient(var(--c) 0 0) 0 0/1.5px 24px,
+    linear-gradient(var(--c) 0 0) 100% 0/24px 1.5px,linear-gradient(var(--c) 0 0) 100% 0/1.5px 24px,
+    linear-gradient(var(--c) 0 0) 0 100%/24px 1.5px,linear-gradient(var(--c) 0 0) 0 100%/1.5px 24px,
+    linear-gradient(var(--c) 0 0) 100% 100%/24px 1.5px,linear-gradient(var(--c) 0 0) 100% 100%/1.5px 24px;
+  background-repeat:no-repeat;
+}
+.tracked figcaption{position:absolute;top:100%;right:0;margin-top:9px;color:var(--holo);font:12px var(--inst);letter-spacing:.14em;text-transform:uppercase;white-space:nowrap}
+.tracked{margin:0}
+.clouds{position:absolute;left:0;right:0;bottom:-2px;width:100%;height:190px;z-index:3}
+@keyframes drift{to{transform:rotate(56deg) translate(0,-14px)}}
+
+/* Boarding pass */
+.pass-wrap{position:relative;z-index:4;max-width:1040px;margin:-132px auto 0;padding:0 24px;filter:drop-shadow(0 20px 26px rgba(8,45,51,.26))}
+.pass{
+  --tear:256px;display:grid;grid-template-columns:1fr var(--tear);background:var(--card);border-radius:18px;
+  -webkit-mask:radial-gradient(circle 12px at calc(100% - var(--tear)) 0,#0000 97%,#000) top/100% 51% no-repeat,radial-gradient(circle 12px at calc(100% - var(--tear)) 100%,#0000 97%,#000) bottom/100% 51% no-repeat;
+  mask:radial-gradient(circle 12px at calc(100% - var(--tear)) 0,#0000 97%,#000) top/100% 51% no-repeat,radial-gradient(circle 12px at calc(100% - var(--tear)) 100%,#0000 97%,#000) bottom/100% 51% no-repeat;
+}
+.pass-main{padding:26px 32px 28px;min-width:0}
+.label{display:block;color:var(--amber);font-size:11px}
+.route-line{display:flex;align-items:center;gap:18px;margin:6px 0 24px}
+.route-line strong{font:400 clamp(24px,3.4vw,34px)/1.15 var(--serif);color:var(--night);min-width:0}
+.route-line .track{flex:1;min-width:60px;display:flex;align-items:center;gap:6px;color:var(--amber)}
+.route-line .track::before,.route-line .track::after{content:"";flex:1;border-top:2px dashed var(--line)}
+.route-line .track svg{width:26px;height:26px;transform:rotate(90deg)}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:16px 24px;margin:0}
+.fields div{min-width:0}
+.fields div:last-child{grid-column:1/-1}
+.fields dt{font:600 11px/1.4 var(--inst);letter-spacing:.17em;text-transform:uppercase;color:var(--amber)}
+.fields dd{margin:3px 0 0;color:var(--night);font-weight:600;overflow-wrap:anywhere}
+.pass-stub{display:flex;flex-direction:column;gap:14px;padding:26px 28px;border-left:2px dashed var(--line)}
+.barcode{margin-top:auto;height:48px;opacity:.85;background:repeating-linear-gradient(90deg,var(--night) 0 2px,transparent 2px 5px,var(--night) 5px 6px,transparent 6px 8px,var(--night) 8px 12px,transparent 12px 15px)}
+
+/* Status tags: icon and text, so colour is never the only signal */
+.tag{display:inline-flex;align-items:center;gap:7px;padding:4px 11px;border-radius:99px;font:600 13px/1.3 var(--inst);letter-spacing:.04em;background:rgba(35,63,66,.1);color:var(--deep);border:1px solid currentColor}
+.tag::before{font-size:13px;font-weight:700}
+.tag.ok{color:var(--sage);background:rgba(73,104,81,.12)}.tag.ok::before{content:"✓"}
+.tag.warn{color:var(--amber);background:rgba(236,208,140,.32)}.tag.warn::before{content:"!"}
+.tag.fail{color:var(--red);background:rgba(255,178,153,.3)}.tag.fail::before{content:"✕"}
+.tag.skip{color:#5f6f6d;background:rgba(95,111,109,.1)}.tag.skip::before{content:"–"}
+.pass-stub .tag{font-size:14px;padding:8px 14px;align-self:flex-start}
+
+/* Route rail: the small plane stays in view and follows you down the page */
+main{position:relative;max-width:1040px;margin:auto;padding:72px 24px 72px var(--gutter);counter-reset:wp}
+.route{
+  position:absolute;top:44px;bottom:60px;left:calc(var(--axis) - 22px);width:44px;overflow:clip;
+  background:repeating-linear-gradient(180deg,rgba(35,63,66,.34) 0 7px,transparent 7px 15px) center/2px 100% no-repeat;
+}
+.route-plane{position:sticky;top:46vh;display:block;width:44px;height:36px;color:var(--night);z-index:2}
+.route-plane::before{content:"";position:absolute;left:21px;bottom:100%;width:2px;height:190px;background:linear-gradient(0deg,var(--amber),transparent)}
+.route-plane svg{width:36px;height:36px;margin:auto;transform:rotate(180deg)}
+.leg{position:relative;counter-increment:wp;margin-bottom:64px;scroll-margin-top:24px}
+.leg:last-child{margin-bottom:0}
+.leg::before{content:"";position:absolute;top:5px;left:calc(var(--axis) - var(--gutter) - 8px);width:16px;height:16px;transform:rotate(45deg);background:var(--paper);border:3px solid var(--deep);outline:4px solid var(--paper)}
+.eyebrow{color:var(--amber)}
+.eyebrow::before{content:"WP " counter(wp,decimal-leading-zero) "  ·  ";white-space:pre}
+h2{font:400 clamp(28px,3.6vw,36px)/1.15 var(--serif);color:var(--night);margin:6px 0 20px}
+.lead{font-size:clamp(18px,2vw,21px);line-height:1.55;color:var(--night);max-width:760px}
+
+/* Instrument cluster */
+.panel-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-top:26px}
+.gauge{display:flex;align-items:center;gap:15px;padding:15px 18px;border-radius:16px;color:var(--holo);background:radial-gradient(120% 140% at 0 0,#174850,var(--night) 70%);box-shadow:inset 0 0 0 1px rgba(232,251,255,.13)}
+.dial{position:relative;flex:none;display:grid;place-items:center;width:74px;height:74px;border-radius:50%;background:#05242a;font:600 22px/1 var(--inst);color:var(--gold)}
+.dial::before{
+  content:"";position:absolute;inset:0;border-radius:50%;
+  background:repeating-conic-gradient(rgba(232,251,255,.75) 0 2deg,transparent 2deg 30deg);
+  -webkit-mask:radial-gradient(farthest-side,#0000 calc(100% - 7px),#000 calc(100% - 6px));
+  mask:radial-gradient(farthest-side,#0000 calc(100% - 7px),#000 calc(100% - 6px));
+}
+.gauge .label{color:#bcd7d4;line-height:1.5}
+
+/* Timeline */
+.timeline{list-style:none;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:0 0}
+.timeline li{position:relative;padding:24px 20px 10px 0;border-top:2px dashed rgba(35,63,66,.34)}
+.timeline li::before{content:"";position:absolute;top:-8px;left:0;width:14px;height:14px;border-radius:50%;background:var(--gold);border:3px solid var(--deep)}
+.timeline time{display:block;font:600 13px var(--inst);letter-spacing:.06em;color:var(--amber)}
+.timeline strong{display:block;color:var(--night);margin-top:2px}
+.timeline span{font-size:15px}
+
+/* Departure-board tables */
+.board{overflow-x:auto;border-radius:14px;border:1px solid var(--line);background:var(--card)}
+table{width:100%;min-width:640px;border-collapse:collapse;font-size:15px}
+th{padding:12px 16px;text-align:left;white-space:nowrap;background:var(--night);color:var(--gold);font:600 12px var(--inst);letter-spacing:.15em;text-transform:uppercase}
+td{padding:13px 16px;vertical-align:top;border-top:1px solid var(--line)}
+tbody tr:nth-child(even){background:rgba(215,225,215,.3)}
+td:first-child{font-weight:600;color:var(--night)}
+
+/* NOTAM */
+.notam{border-radius:14px;overflow:hidden;background:var(--card);border:1px solid rgba(138,90,28,.42)}
+.notam::before{content:"";display:block;height:12px;background:repeating-linear-gradient(-45deg,var(--gold) 0 14px,var(--night) 14px 28px)}
+.notam ul{padding:18px 24px 20px 42px}
+.notam li+li{margin-top:9px}
+.notam li::marker{color:var(--amber)}
+
+/* Next legs */
+.next{list-style:none;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;counter-reset:nextleg}
+.next li{counter-increment:nextleg;padding:17px 19px;border-radius:14px;background:var(--card);border:1px solid var(--line);border-top:4px solid var(--gold)}
+.next li::before{content:"Leg " counter(nextleg);display:block;margin-bottom:4px;font:600 11px var(--inst);letter-spacing:.17em;text-transform:uppercase;color:var(--amber)}
+
+/* Fleet on the apron */
+footer{position:relative;overflow:hidden;padding:64px 24px 92px;color:var(--paper);background:radial-gradient(90% 90% at 50% 0,#17474e,var(--night) 75%)}
+.fleet{list-style:none;max-width:1040px;margin:auto;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(138px,1fr));gap:26px 8px;text-align:center}
+.fleet svg{width:96px;height:96px;margin:0 auto 9px;color:var(--sand);filter:drop-shadow(0 7px 5px rgba(0,0,0,.42))}
+.fleet b{display:block;font:400 21px/1.2 var(--serif)}
+.fleet span{font:12px var(--inst);letter-spacing:.13em;color:var(--gold)}
+.colophon{max-width:1040px;margin:34px auto 0;text-align:center;font-size:14px;color:#bcd7d4}
+.runway{position:absolute;inset:auto 0 0;height:46px;background:
+    repeating-linear-gradient(90deg,var(--paper) 0 34px,transparent 34px 72px) 50% 50%/100% 4px no-repeat,
+    repeating-linear-gradient(0deg,var(--paper) 0 4px,transparent 4px 10px) 22px 50%/70px 34px no-repeat,
+    repeating-linear-gradient(0deg,var(--paper) 0 4px,transparent 4px 10px) calc(100% - 22px) 50%/70px 34px no-repeat,
+    #123239}
+
+@media (max-width:760px){
+  :root{--gutter:48px;--axis:18px}
+  .hero{min-height:0;padding:72px 20px 170px}
+  .tracked{width:128px;top:50px;right:10px;opacity:.5}
+  .tracked figcaption{display:none}
+  .pass-wrap{padding:0 14px}
+  .pass{grid-template-columns:1fr;-webkit-mask:none;mask:none}
+  .pass-main{padding:22px 20px}
+  .pass-stub{padding:20px;border-left:0;border-top:2px dashed var(--line)}
+  .barcode{margin-top:4px;height:38px}
+  main{padding:54px 18px 56px var(--gutter)}
+  .route-line{gap:10px}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.tracked svg{animation:none}}
+@media print{
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .route-plane,.tracked svg{animation:none}.route-plane{display:none}
+  .leg,.board,.notam{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+
+<!-- Fleet silhouettes, drawn top-down with the nose up. Each is a right half, mirrored. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <path id="h-finch" d="M-.4-45H2Q4-41 4-34V-22L46-20Q49-17 46-14L4.5-12 3.2 8 2 30 17 32Q19 35 17 38L1.6 39 .8 44H-.4ZM-.4-48H15Q16-47 15-46H-.4Z"/>
+    <path id="h-heron" d="M-.4-44H2.5Q5.5-40 6-32V-16L47-14 48-9 6.5-6 5.5 14 2.5 32 20 34 21 40 2 42 1 47H-.4ZM-.4-47H13Q14-46 13-45H-.4Z"/>
+    <path id="h-aurelia" d="M-.4-48Q3.6-42 4.4-30L4.6-8 40 13 44 6 44.8 15 42 18 5 10V13H10Q11.5 13 11.5 15V26Q11.5 28 10 28H4.4L2.6 31 2 35 18 43 18.5 47 .8 43 0 44.5H-.4Z"/>
+    <path id="h-peregrine" d="M-.4-50Q2.6-40 3.6-26L5-14 12-8 36 16V23L8 18 6.5 28 20 40V45L5 42 3.5 47H-.4Z"/>
+    <path id="h-stormbird" d="M-.4-50Q2.4-42 3.4-30L5-22H9L10-10 40 14V24L12 20V30L26 42V48L9.5 44 8.5 49H4.5L3 44H-.4Z"/>
+    <path id="h-f15c" d="M-.4-50Q2-43 3-33L4.5-26H10.5L11.5-8 42 12V20L13 22V28L29 40 30 47 11 42 10 49H5L3.5 44H-.4Z"/>
+    <g id="finch"><use href="#h-finch"/><use href="#h-finch" transform="scale(-1 1)"/></g>
+    <g id="heron"><use href="#h-heron"/><use href="#h-heron" transform="scale(-1 1)"/></g>
+    <g id="aurelia"><use href="#h-aurelia"/><use href="#h-aurelia" transform="scale(-1 1)"/></g>
+    <g id="peregrine"><use href="#h-peregrine"/><use href="#h-peregrine" transform="scale(-1 1)"/></g>
+    <g id="stormbird"><use href="#h-stormbird"/><use href="#h-stormbird" transform="scale(-1 1)"/></g>
+    <g id="f15c"><use href="#h-f15c"/><use href="#h-f15c" transform="scale(-1 1)"/></g>
+    <linearGradient id="trail" gradientUnits="userSpaceOnUse" x1="0" y1="46" x2="0" y2="330">
+      <stop offset="0" stop-color="#fffdf5" stop-opacity=".78"/>
+      <stop offset="1" stop-color="#fffdf5" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+<header class="hero">
+  <div class="tape" aria-hidden="true"><span>300</span><span>330</span><span>N</span><span>030</span><span>060</span><span>E</span><span>120</span></div>
+  <svg class="stars" viewBox="0 0 1440 360" preserveAspectRatio="xMidYMin slice" aria-hidden="true">
+    <circle cx="90" cy="92" r="1.3"/><circle cx="240" cy="70" r="1"/><circle cx="388" cy="118" r="1.5"/><circle cx="520" cy="64" r="1"/><circle cx="662" cy="104" r="1.2"/>
+    <circle cx="772" cy="74" r="1.6"/><circle cx="910" cy="132" r="1"/><circle cx="1018" cy="66" r="1.2"/><circle cx="1180" cy="84" r="1"/><circle cx="1340" cy="112" r="1.5"/>
+    <circle cx="160" cy="176" r="1"/><circle cx="700" cy="190" r="1"/><circle cx="1390" cy="206" r="1"/><circle cx="46" cy="230" r="1.1"/>
+  </svg>
+
+  <figure class="tracked" aria-hidden="true">
+    <div class="brackets"></div>
+    <svg class="plane" viewBox="-52 -52 104 104">
+      <path d="M-9 46H-6V330H-9ZM6 46H9V330H6Z" fill="url(#trail)"/>
+      <use href="#stormbird"/>
+    </svg>
+    <figcaption>{{AIRCRAFT_OR_SUBJECT}}</figcaption>
+  </figure>
+
+  <div class="hero-inner">
+    <div class="hero-text">
+      <p class="kicker">Pocket Flight · Flight report</p>
+      <h1>{{REPORT_TITLE}}</h1>
+      <p>{{ONE_LINE_OUTCOME}}</p>
+    </div>
+  </div>
+
+  <svg class="clouds" viewBox="0 0 1440 190" preserveAspectRatio="none" aria-hidden="true">
+    <path fill="#ffb299" fill-opacity=".42" d="M0 190V92Q44 54 96 74 130 26 200 48 256 8 320 46 372 22 420 56 474 18 550 44 590 6 660 40 712 6 776 44 820 16 876 42 934 8 1000 50 1050 22 1104 48 1146 18 1216 40 1276 4 1340 46 1392 26 1440 56V190Z"/>
+    <path fill="#fff6df" fill-opacity=".72" d="M0 190V128Q60 88 118 112 170 70 236 100 290 68 350 106 412 76 470 110 530 72 604 106 664 76 730 112 792 84 850 110 912 74 980 110 1044 84 1106 112 1166 78 1236 108 1300 80 1362 112 1404 96 1440 112V190Z"/>
+    <path fill="#f6f4e9" d="M0 190V164Q70 132 140 154 210 122 286 152 356 128 430 156 504 126 582 154 654 130 730 156 806 128 880 154 954 130 1030 156 1104 128 1180 154 1256 130 1330 156 1390 140 1440 154V190Z"/>
+  </svg>
+</header>
+
+<div class="pass-wrap">
+  <div class="pass">
+    <div class="pass-main">
+      <div class="route-line" aria-label="From {{FROM}} to {{TO}}">
+        <div><span class="label">Departed</span><strong>{{FROM}}</strong></div>
+        <span class="track" aria-hidden="true"><svg class="plane" viewBox="-52 -52 104 104"><use href="#aurelia"/></svg></span>
+        <div><span class="label">Arrived</span><strong>{{TO}}</strong></div>
+      </div>
+      <dl class="fields">
+        <div><dt>Date</dt><dd>{{DATE}}</dd></div>
+        <div><dt>Repo</dt><dd>{{REPO}}</dd></div>
+        <div><dt>Branch</dt><dd>{{BRANCH}}</dd></div>
+        <div><dt>Scope</dt><dd>{{SCOPE}}</dd></div>
+        <div><dt>Artifact</dt><dd>{{ARTIFACT_PATH}}</dd></div>
+      </dl>
+    </div>
+    <div class="pass-stub">
+      <span class="label">Final status</span>
+      <span class="tag {{ok|warn|fail}}">{{FINAL_STATUS}}</span>
+      <div class="barcode" aria-hidden="true"></div>
+    </div>
+  </div>
+</div>
+
+<main>
+  <div class="route" aria-hidden="true">
+    <span class="route-plane"><svg class="plane" viewBox="-52 -52 104 104"><use href="#stormbird"/></svg></span>
+  </div>
+
+  <section class="leg">
+    <p class="eyebrow">Briefing</p>
+    <h2>Summary</h2>
+    <p class="lead">{{EXECUTIVE_SUMMARY}}</p>
+    <div class="panel-row">
+      <!-- Copy for each measured number. -->
+      <div class="gauge"><div class="dial">{{N}}</div><span class="label">{{MEASURE_NAME}}</span></div>
+    </div>
+  </section>
+
+  <section class="leg">
+    <p class="eyebrow">Flight path</p>
+    <h2>Timeline</h2>
+    <ol class="timeline">
+      <!-- Copy for each step. -->
+      <li><time>{{TIME}}</time><strong>{{STEP}}</strong><span>{{STEP_DETAIL}}</span></li>
+    </ol>
+  </section>
+
+  <section class="leg">
+    <p class="eyebrow">Manifest</p>
+    <h2>Changes and findings</h2>
+    <div class="board" tabindex="0">
+      <table>
+        <thead><tr><th>Item</th><th>What changed or was found</th><th>Where</th></tr></thead>
+        <tbody>
+          <!-- Copy for each change or finding. -->
+          <tr><td>{{ITEM}}</td><td>{{DESCRIPTION}}</td><td><code>{{FILE_PATH}}</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="leg">
+    <p class="eyebrow">Pre-flight checks</p>
+    <h2>Verification</h2>
+    <div class="board" tabindex="0">
+      <table>
+        <thead><tr><th>Check</th><th>Command or evidence</th><th>Result</th></tr></thead>
+        <tbody>
+          <!-- Copy for each check. Use class skip with "Not run" for anything skipped. -->
+          <tr><td>{{CHECK}}</td><td><code>{{COMMAND}}</code></td><td><span class="tag {{ok|warn|fail|skip}}">{{RESULT}}</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="leg">
+    <p class="eyebrow">Notices</p>
+    <h2>Warnings and risks</h2>
+    <div class="notam">
+      <ul>
+        <!-- Copy for each warning, blocker or scope limit. -->
+        <li>{{WARNING}}</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="leg">
+    <p class="eyebrow">Next legs</p>
+    <h2>Follow-up</h2>
+    <ol class="next">
+      <!-- Copy for each follow-up action. -->
+      <li>{{ACTION}}</li>
+    </ol>
+  </section>
+</main>
+
+<footer>
+  <ul class="fleet" aria-label="Pocket Flight fleet">
+    <li><svg class="plane" viewBox="-52 -52 104 104" aria-hidden="true"><use href="#finch"/></svg><b>Finch</b><span>U-2</span></li>
+    <li><svg class="plane" viewBox="-52 -52 104 104" aria-hidden="true"><use href="#heron"/></svg><b>Heron</b><span>UT-9</span></li>
+    <li><svg class="plane" viewBox="-52 -52 104 104" aria-hidden="true"><use href="#aurelia"/></svg><b>Aurelia</b><span>S32</span></li>
+    <li><svg class="plane" viewBox="-52 -52 104 104" aria-hidden="true"><use href="#peregrine"/></svg><b>Peregrine</b><span>HX-27</span></li>
+    <li><svg class="plane" viewBox="-52 -52 104 104" aria-hidden="true"><use href="#stormbird"/></svg><b>Stormbird</b><span>HX-40</span></li>
+    <li><svg class="plane" viewBox="-52 -52 104 104" aria-hidden="true"><use href="#f15c"/></svg><b>Eagle</b><span>F-15C</span></li>
+  </ul>
+  <p class="colophon">Pocket Flight · {{DATE}}</p>
+  <div class="runway" aria-hidden="true"></div>
+</footer>
+
+</body>
+</html>

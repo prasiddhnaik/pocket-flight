@@ -131,7 +131,9 @@ test("game wing controls rotate around the actual swept and inclined CAD hinges"
       node.getWorldQuaternion(new Quaternion()),
     );
     expect(axis.distanceTo(expected)).toBeLessThan(1e-6);
-    const origin = new Vector3(...data.hinges[name]);
+    // The visible wing sits further aft than the CAD wing; see scripts/build-heron-skin.py.
+    const origin = new Vector3(...data.hinges[name]).add(new Vector3(0, 0, 1.25));
+    expect(node.userData.hinge).toEqual(origin.toArray());
     expect(
       node.getWorldPosition(new Vector3()).distanceTo(origin),
     ).toBeLessThan(1e-5);

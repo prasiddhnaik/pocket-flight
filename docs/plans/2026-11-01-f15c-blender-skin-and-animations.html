@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>F-15C outer skin in Blender, gun and missile animations</title>
+<style>
+  body { font: 16px/1.55 system-ui, sans-serif; color: #17202a; background: #fff; max-width: 860px; margin: 0 auto; padding: 32px 20px 64px; }
+  h1 { font-size: 28px; line-height: 1.2; margin: 0 0 8px; }
+  h2 { font-size: 20px; margin: 36px 0 8px; border-top: 1px solid #d5dbe0; padding-top: 20px; }
+  h3 { font-size: 16px; margin: 20px 0 4px; }
+  table { border-collapse: collapse; width: 100%; font-size: 14.5px; }
+  th, td { text-align: left; vertical-align: top; padding: 7px 10px; border-bottom: 1px solid #e3e7ea; }
+  th { background: #f3f5f6; }
+  code { font: 13.5px ui-monospace, Menlo, monospace; background: #f3f5f6; padding: 1px 4px; border-radius: 3px; }
+  .meta { color: #55606a; font-size: 14px; }
+  .call { color: #55606a; font-size: 13px; white-space: nowrap; }
+  li { margin: 4px 0; }
+  @media print { body { max-width: none; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>F-15C outer skin in Blender, gun and missile animations</h1>
+  <p class="meta">1 November 2026 · Pocket Flight · Waiting for approval · Nothing here is built yet</p>
+</header>
+<main>
+
+<section>
+  <h2>Why</h2>
+  <p>The user wants the F-15C to look right. Its sills looked "like an extrusion", and the overall goal is an Ace Combat 6 look. A comparison against reference images (<code>assets/f15c/review/reference/</code>) shows the size is correct but the shape is not: the body is too narrow and blended, the intakes are wedges, the canopy is a bubble on a thin nose, and the wings and tail are misplaced.</p>
+  <p>The barrel animation also looks wrong: at 60 fps the barrels appear to spin backward, and they reach full speed almost at once. Missiles have no launch animation at all; they appear at the pylon and fly away.</p>
+</section>
+
+<section>
+  <h2>What gets built</h2>
+  <ol>
+    <li><strong>New outer skin</strong>, modelled in Blender against the references.</li>
+    <li><strong>New gun barrel firing animation</strong>, made in Blender.</li>
+    <li><strong>Missile launch animation</strong>, with detailed missiles made in Blender.</li>
+    <li><strong>The reference comparison</strong> re-run on the new skin, so the improvement is measured.</li>
+  </ol>
+  <h3>Not part of this</h3>
+  <ul>
+    <li>Flight handling. It does not change.</li>
+    <li>Landing gear parts, cockpit interior, pilot, engine nozzle parts and gun barrels. They stay in CAD and only move where the new skin requires.</li>
+    <li>Other aircraft's skins, a new paint scheme, bomb release, and the Palm Bay map and missions.</li>
+  </ul>
+  <h3>This fails if</h3>
+  <ul>
+    <li>Parts look laid on top of the body rather than part of it, or any part floats.</li>
+    <li>The barrels still look like they spin backward, or the gun feels laggy to fire.</li>
+    <li>The plane flies differently, or the gear, moving surfaces, replays or sandbox break.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Decisions</h2>
+  <table>
+    <tr><th>Decision</th><th>Who</th></tr>
+    <tr><td>Remodel the outer skin in Blender; mechanical parts stay in CAD.</td><td>User</td></tr>
+    <tr><td>Remake the barrel firing animation and add a missile launch, both in Blender.</td><td>User</td></tr>
+    <tr><td>Compare the model with F-15C images in Blender.</td><td>User</td></tr>
+    <tr><td>Match the real F-15's shape. The Ace Combat look comes from paint, lighting and detail. <em>The user was asked and said to continue; this is the recommendation, still open to change.</em></td><td class="call">My call</td></tr>
+    <tr><td>Flight handling stays exactly as it is, even though the wing outline changes. The numbers in <code>geometry.json</code> are kept, so the flight model no longer tracks the visible wing's exact area.</td><td class="call">My call</td></tr>
+    <tr><td>"Outer skin" includes the whole wing and all tail surfaces, the canopy glass and frames, and the gear doors, because the comparison found errors there. Moving the tail planes and nozzles is part of it.</td><td class="call">My call</td></tr>
+    <tr><td>Every existing part name stays, so moving parts, paint and game code keep working.</td><td class="call">My call</td></tr>
+    <tr><td>Firing stays immediate: the first rounds leave while the barrels are still winding up.</td><td class="call">My call</td></tr>
+    <tr><td>Missiles launch the way the real ones do: wing-pylon missiles slide off a rail; body missiles drop clear, then ignite.</td><td class="call">My call</td></tr>
+    <tr><td>The Blender missiles replace the plain stand-ins on every sandbox aircraft, not just the F-15C. Rocket pods stay as they are.</td><td class="call">My call</td></tr>
+  </table>
+</section>
+
+<section>
+  <h2>The new skin</h2>
+  <h3>References, in priority order</h3>
+  <ol>
+    <li>Production F-15C photographs: the three in <code>assets/f15c/references/</code> and the existing collection in <code>output/f15c-reference-250/</code>.</li>
+    <li>Published size: 19.43 × 13.05 × 5.63 m (<code>docs/F15C_DESIGN.html</code>).</li>
+    <li>The line drawing, for outlines. It shows an F-15A, so where it disagrees with a C photo, the photo wins.</li>
+    <li><code>docs/F15C_REFERENCE_DOSSIER.html</code> for details such as the gun port on the outer right wing-root shoulder.</li>
+  </ol>
+  <h3>Corrections to make</h3>
+  <table>
+    <tr><th>Area</th><th>Change</th><th>Measured today</th></tr>
+    <tr><td>Body</td><td>Wide flat top deck, flat sides, two distinct engine housings underneath</td><td>Seen in photos</td></tr>
+    <tr><td>Intakes</td><td>Large and square-sided, alongside the cockpit, front edge further forward</td><td>About 0.5 m too far back</td></tr>
+    <tr><td>Canopy and spine</td><td>Canopy flows into a long, lower spine; nose top rises smoothly to the windscreen</td><td>Up to 0.3–0.4 m off</td></tr>
+    <tr><td>Tail end</td><td>Tail planes reach behind the nozzles; rear belly shallower</td><td>Nozzles about 1.7 m too far aft relative to the tail planes; belly up to 0.5 m deep</td></tr>
+    <tr><td>Wings</td><td>Lower on the body, correct raked tips, trailing edge moved forward near the tip</td><td>About 0.3–0.5 m high; tip trailing edge about 0.4 m aft</td></tr>
+    <tr><td>Tail surfaces</td><td>Tail planes moved aft, fin leading edges moved aft, fin-tip fairings added</td><td>About 0.4–0.5 m</td></tr>
+  </table>
+  <h3>How it is made</h3>
+  <ul>
+    <li>A new script, <code>scripts/build-f15c-skin.py</code>, builds a subdivision-surface model and saves <code>assets/f15c-skin.blend</code>, so it can also be sculpted by hand. It is mirrored left to right, except for the gun side.</li>
+    <li>Body, intakes and wing roots are one continuous surface. Moving surfaces stay separate, with their hinge points, axes and travel preserved in the export.</li>
+    <li>The script imports the CAD mechanical parts, moves them to fit, and exports the game model.</li>
+    <li><code>scripts/prepare-f15c.ts</code> now writes straight to <code>public/assets/f15c-eagle.glb</code>. It must write to an intermediate CAD file instead, or the next CAD build would overwrite the Blender skin.</li>
+    <li>The old CAD skin stays in the repository, unused.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Gun barrels</h2>
+  <ul>
+    <li>A new <strong>motion-blurred barrel cylinder</strong> takes over from the individual barrels at speed, which removes the backward spin.</li>
+    <li><strong>Spin-up</strong> takes about a third of a second. <strong>Wind-down</strong> takes about a second, with smoke drifting from the muzzle.</li>
+    <li>A small <strong>shake at the muzzle</strong> and a flash while firing.</li>
+    <li>Blender holds the curves and the parts as clips in the model. The game sets the clip time from the trigger and the recorded replay values, so live play and Replay Studio always match.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Missile launch</h2>
+  <ul>
+    <li>Detailed AIM-9 and AIM-120 models with a motor plume, made in Blender, replace the code-built missiles and the stand-ins in the sandbox.</li>
+    <li><strong>Rail launch</strong> (wing pylon): motor lights, the missile slides off the rail, and fins twitch as it steers.</li>
+    <li><strong>Drop launch</strong> (body stations): the missile is pushed down clear of the aircraft, falls briefly, then lights.</li>
+    <li>The clip lasts under a second, then blends into the missile's simulated flight, so guidance and hit results do not change.</li>
+    <li>Only the fired missile leaves its station. The others stay visible.</li>
+    <li>Replays record each round's age, so the launch plays in Replay Studio. Older recordings keep working without the launch clip.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>What else has to follow the new skin</h2>
+  <table>
+    <tr><th>Depends on the skin</th><th>What happens</th></tr>
+    <tr><td><code>collision.json</code></td><td>Regenerated with <code>scripts/measure-collision-proxies.ts</code>; it is locked to the model's hash.</td></tr>
+    <tr><td><code>geometry.json</code></td><td>Flight values frozen. Size, revision and hash handling need care so measuring scripts do not rewrite them; <code>tests/wind-tunnel.test.ts</code> and the private lab are checked for the same reason.</td></tr>
+    <tr><td>Hinges</td><td>Tail and wing hinge points move with their surfaces. Gear, canopy and airbrake hinges are rechecked for travel and clearance.</td></tr>
+    <tr><td>Gear</td><td>Mounts and wells must sit inside the new body; doors must close flush. Ground stance stays the same.</td></tr>
+    <tr><td>Gun</td><td>The port, and the muzzle position used for firing, must agree with the new shoulder.</td></tr>
+    <tr><td>Cockpit</td><td>Interior must fit the new canopy and body. Pilot eye position stays unless it clips.</td></tr>
+    <tr><td>Stores</td><td>Pylons are ray-fitted to the skin, so missile and tank positions are rechecked (<code>tests/aircraft-stores.test.ts</code>).</td></tr>
+    <tr><td>Paint, markings, engine effects</td><td>Paint material names stay. Decal and nozzle-effect positions are rechecked.</td></tr>
+    <tr><td>Old replays</td><td>Must still open; part names and frame format stay compatible.</td></tr>
+  </table>
+</section>
+
+<section>
+  <h2>Order of work</h2>
+  <p>Each step ends with images for the user. Nothing is committed unless asked.</p>
+  <ol>
+    <li><strong>Blockout.</strong> Main shapes only, measured against the references, in Blender. The user approves the shape before any detail. This is the riskiest step and costs the least to redo.</li>
+    <li><strong>Detailed skin.</strong> Panel lines, intake mouths and ducts, wells, moving surfaces.</li>
+    <li><strong>In the game.</strong> Export, collision, hinges, gear, stores, paint. The plane must fly and behave as before.</li>
+    <li><strong>Gun animation.</strong> After the skin, because the gun port moves.</li>
+    <li><strong>Missile launch.</strong></li>
+    <li><strong>Final check.</strong> Comparison re-run, full tests, Replay Studio.</li>
+  </ol>
+</section>
+
+<section>
+  <h2>How we know it worked</h2>
+  <table>
+    <tr><th>Check</th><th>Target</th></tr>
+    <tr><td>Outline overlap with the drawing (today: top 87%, side 82%, front 56%)</td><td>At least 95% top, 93% side, 90% front, not counting the drawing's missiles</td></tr>
+    <tr><td>Side-by-side with the three photos</td><td>Reads as an F-15C at a glance; the user is the judge</td></tr>
+    <tr><td>Size</td><td>Within 0.1 m of 19.43 × 13.05 × 5.63 m</td></tr>
+    <tr><td>Weight of the model</td><td>No more than today: about 506,000 triangles, 13.4 MB</td></tr>
+    <tr><td>No floating parts</td><td>Contact check passes on every part</td></tr>
+    <tr><td>Flight</td><td><code>tests/f15c-flight.test.ts</code> passes with no flight numbers changed</td></tr>
+    <tr><td>Gun</td><td>No backward spin at 30, 60, 120 and 144 fps in video; first round on the same frame as the trigger</td></tr>
+    <tr><td>Missile</td><td>Clip seen on both station types; still hits its target; same in Replay Studio</td></tr>
+    <tr><td>Whole game</td><td>Full test suite passes, with changed expectations listed for the user</td></tr>
+  </table>
+</section>
+
+<section>
+  <h2>Risks</h2>
+  <ul>
+    <li><strong>Size of the job.</strong> This is the largest item so far. The blockout step limits how much is lost if the shape is wrong.</li>
+    <li><strong>Mechanical parts may not fit.</strong> A wider body and moved wings could force gear or cockpit changes in CAD, which rebuilds slowly (about 8 minutes from the cockpit stage).</li>
+    <li><strong>Visible wing and flight wing will differ.</strong> Accepted, to protect handling. <code>docs/F15C_CLAUDE_REFERENCE_AUDIT.html</code> already records the current wing area as about 9% above published figures.</li>
+    <li><strong>The drawing is an F-15A by one author.</strong> Overlap targets are a guide; the photos and the user decide.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Left to the builder</h2>
+  <p>Exact cage layout, panel line placement, clip lengths within the ranges above, plume look, and how the skin is split into parts, as long as existing names and hinges still work.</p>
+</section>
+
+</main>
+</body>
+</html>

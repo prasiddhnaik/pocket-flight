@@ -1,17 +1,17 @@
 {
   "artifact": "STEP/airframe_wings.step",
-  "sha256": "2620ce5e7d2b0cb794a121914d5fcc5eaf8a2118c6c4b8789b0fe7efc2999216",
+  "sha256": "2c46af6eee760e17ae588771f609c973b3e688443ef3a28006fa664d3e4ac2b0",
   "units": "mm",
   "dimensionsM": [
     13.049250000200006,
     18.920000000200154,
-    1.9770729327219354
+    1.9747108582261
   ],
   "boundsM": {
     "min": [
       -6.524625000100003,
       -8.92000000010015,
-      1.477614437004361
+      1.4799765115001964
     ],
     "max": [
       6.524625000100003,
@@ -366,7 +366,7 @@
     {
       "name": "Saved stage3 contains added root fairing volume",
       "pass": true,
-      "addedVolumeM3": 1.516387304440445
+      "addedVolumeM3": 1.516830880695488
     },
     {
       "name": "All fresh stage3 saved solids are valid closed and positive",
@@ -638,7 +638,7 @@
     {
       "a": "Intake_skin_Left",
       "b": "Ramp_3_Left",
-      "gapMm": 8.981260180007666e-12,
+      "gapMm": 1.1867076273756437e-11,
       "method": "re-measured saved contact hint"
     },
     {
@@ -650,7 +650,7 @@
     {
       "a": "Intake_skin_Right",
       "b": "Ramp_3_Right",
-      "gapMm": 5.209785393794664e-13,
+      "gapMm": 1.4779288903810084e-12,
       "method": "re-measured saved contact hint"
     },
     {
@@ -743,7 +743,7 @@
   "evidence": [
     {
       "artifact": "STEP/airframe_wings.step",
-      "sha256": "2620ce5e7d2b0cb794a121914d5fcc5eaf8a2118c6c4b8789b0fe7efc2999216"
+      "sha256": "2c46af6eee760e17ae588771f609c973b3e688443ef3a28006fa664d3e4ac2b0"
     },
     {
       "artifact": "STEP/wings.step",
@@ -759,7 +759,7 @@
     },
     {
       "artifact": "/Users/prasiddhnaik/Documents/blender skills/pocket-flight-site/assets/f15c/STEP/airframe_wings.step",
-      "sha256": "2620ce5e7d2b0cb794a121914d5fcc5eaf8a2118c6c4b8789b0fe7efc2999216"
+      "sha256": "2c46af6eee760e17ae588771f609c973b3e688443ef3a28006fa664d3e4ac2b0"
     }
   ]
 }

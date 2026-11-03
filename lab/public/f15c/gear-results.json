@@ -1,6 +1,6 @@
 {
   "artifact": "STEP/airframe_gear.step",
-  "sha256": "d50c4d28f8ea4c43f3ffd90aa4b49d73982095d7a93fbe0513554eba534675d0",
+  "sha256": "71b54a79716d4d3521b8cb1ec5f4f1fba2f2f581cca8222559ebd79095d9b309",
   "units": "mm",
   "dimensionsM": [
     13.049250000200006,
@@ -24,14 +24,14 @@
       "name": "All saved solids valid, closed and positive",
       "pass": true,
       "invalid": [],
-      "solidCount": 386
+      "solidCount": 396
     },
     {
       "name": "All saved parts have an exact contact path to the fuselage",
       "pass": true,
       "floating": [],
       "contactToleranceMm": 0.5,
-      "solidDistanceChecks": 435
+      "solidDistanceChecks": 449
     },
     {
       "name": "Saved solids valid closed positive",
@@ -337,8 +337,8 @@
     {
       "retract": 0,
       "pass": true,
-      "exactBooleanCandidates": 62,
-      "intakeExactBooleanCandidates": 38,
+      "exactBooleanCandidates": 60,
+      "intakeExactBooleanCandidates": 36,
       "bodyExactBooleanCandidates": 24,
       "intakeCandidates": [
         {
@@ -467,11 +467,6 @@
           "intersectionMm3": 0
         },
         {
-          "gear": "Door_Left_Forward",
-          "intake": "Duct_liner_Left",
-          "intersectionMm3": 0
-        },
-        {
           "gear": "Door_Left_Aft",
           "intake": "Intake_skin_Left",
           "intersectionMm3": 0
@@ -479,11 +474,6 @@
         {
           "gear": "Door_Right_Forward",
           "intake": "Intake_skin_Right",
-          "intersectionMm3": 0
-        },
-        {
-          "gear": "Door_Right_Forward",
-          "intake": "Duct_liner_Right",
           "intersectionMm3": 0
         },
         {
@@ -514,7 +504,7 @@
         {
           "gear": "Mount_Door_Left_Forward",
           "intake": "Intake_skin_Left",
-          "intersectionMm3": 5541.769379363313
+          "intersectionMm3": 0
         },
         {
           "gear": "Mount_Door_Left_Aft",
@@ -524,7 +514,7 @@
         {
           "gear": "Mount_Door_Right_Forward",
           "intake": "Intake_skin_Right",
-          "intersectionMm3": 5541.7693793571525
+          "intersectionMm3": 0
         },
         {
           "gear": "Mount_Door_Right_Aft",
@@ -657,18 +647,7 @@
       "intakeCollisions": [],
       "bodyCollisions": [],
       "collisions": [],
-      "intentionalFixedMountContacts": [
-        {
-          "gear": "Mount_Door_Left_Forward",
-          "intake": "Intake_skin_Left",
-          "intersectionMm3": 5541.769379363313
-        },
-        {
-          "gear": "Mount_Door_Right_Forward",
-          "intake": "Intake_skin_Right",
-          "intersectionMm3": 5541.7693793571525
-        }
-      ],
+      "intentionalFixedMountContacts": [],
       "name": "Gear/body/intake clearance at retraction 0"
     },
     {
@@ -841,7 +820,7 @@
         {
           "gear": "Mount_Door_Left_Forward",
           "intake": "Intake_skin_Left",
-          "intersectionMm3": 5541.769379363313
+          "intersectionMm3": 0
         },
         {
           "gear": "Mount_Door_Left_Aft",
@@ -851,7 +830,7 @@
         {
           "gear": "Mount_Door_Right_Forward",
           "intake": "Intake_skin_Right",
-          "intersectionMm3": 5541.7693793571525
+          "intersectionMm3": 0
         },
         {
           "gear": "Mount_Door_Right_Aft",
@@ -984,18 +963,7 @@
       "intakeCollisions": [],
       "bodyCollisions": [],
       "collisions": [],
-      "intentionalFixedMountContacts": [
-        {
-          "gear": "Mount_Door_Left_Forward",
-          "intake": "Intake_skin_Left",
-          "intersectionMm3": 5541.769379363313
-        },
-        {
-          "gear": "Mount_Door_Right_Forward",
-          "intake": "Intake_skin_Right",
-          "intersectionMm3": 5541.7693793571525
-        }
-      ],
+      "intentionalFixedMountContacts": [],
       "name": "Gear/body/intake clearance at retraction 0.08333333333333333"
     },
     {
@@ -1168,7 +1136,7 @@
         {
           "gear": "Mount_Door_Left_Forward",
           "intake": "Intake_skin_Left",
-          "intersectionMm3": 5541.769379363313
+          "intersectionMm3": 0
         },
         {
           "gear": "Mount_Door_Left_Aft",
@@ -1178,7 +1146,7 @@
         {
           "gear": "Mount_Door_Right_Forward",
           "intake": "Intake_skin_Right",
-          "intersectionMm3": 5541.7693793571525
+          "intersectionMm3": 0
         },
         {
           "gear": "Mount_Door_Right_Aft",
@@ -1311,18 +1279,7 @@
       "intakeCollisions": [],
       "bodyCollisions": [],
       "collisions": [],
-      "intentionalFixedMountContacts": [
-        {
-          "gear": "Mount_Door_Left_Forward",
-          "intake": "Intake_skin_Left",
-          "intersectionMm3": 5541.769379363313
-        },
-        {
-          "gear": "Mount_Door_Right_Forward",
-          "intake": "Intake_skin_Right",
-          "intersectionMm3": 5541.7693793571525
-        }
-      ],
+      "intentionalFixedMountContacts": [],
       "name": "Gear/body/intake clearance at retraction 0.16666666666666666"
     },
     {
@@ -1495,7 +1452,7 @@
         {
           "gear": "Mount_Door_Left_Forward",
           "intake": "Intake_skin_Left",
-          "intersectionMm3": 5541.769379363313
+          "intersectionMm3": 0
         },
         {
           "gear": "Mount_Door_Left_Aft",
@@ -1505,7 +1462,7 @@
         {
           "gear": "Mount_Door_Right_Forward",
           "intake": "Intake_skin_Right",
-          "intersectionMm3": 5541.7693793571525
+          "intersectionMm3": 0
         },
         {
           "gear": "Mount_Door_Right_Aft",
@@ -1638,25 +1595,14 @@
       "intakeCollisions": [],
       "bodyCollisions": [],
       "collisions": [],
-      "intentionalFixedMountContacts": [
-        {
-          "gear": "Mount_Door_Left_Forward",
-          "intake": "Intake_skin_Left",
-          "intersectionMm3": 5541.769379363313
-        },
-        {
-          "gear": "Mount_Door_Right_Forward",
-          "intake": "Intake_skin_Right",
-          "intersectionMm3": 5541.7693793571525
-        }
-      ],
+      "intentionalFixedMountContacts": [],
       "name": "Gear/body/intake clearance at retraction 0.25"
     },
     {
       "retract": 0.3333333333333333,
       "pass": true,
-      "exactBooleanCandidates": 57,
-      "intakeExactBooleanCandidates": 32,
+      "exactBooleanCandidates": 55,
+      "intakeExactBooleanCandidates": 30,
       "bodyExactBooleanCandidates": 25,
       "intakeCandidates": [
         {
@@ -1705,11 +1651,6 @@
           "intersectionMm3": 0
         },
         {
-          "gear": "Left_Retraction_rod",
-          "intake": "Intake_skin_Left",
-          "intersectionMm3": 0
-        },
-        {
           "gear": "Right_Trunnion_arm",
           "intake": "Intake_skin_Right",
           "intersectionMm3": 0
@@ -1755,11 +1696,6 @@
           "intersectionMm3": 0
         },
         {
-          "gear": "Right_Retraction_rod",
-          "intake": "Intake_skin_Right",
-          "intersectionMm3": 0
-        },
-        {
           "gear": "Door_Left_Forward",
           "intake": "Intake_skin_Left",
           "intersectionMm3": 0
@@ -1802,7 +1738,7 @@
         {
           "gear": "Mount_Door_Left_Forward",
           "intake": "Intake_skin_Left",
-          "intersectionMm3": 5541.769379363313
+          "intersectionMm3": 0
         },
         {
           "gear": "Mount_Door_Left_Aft",
@@ -1812,7 +1748,7 @@
         {
           "gear": "Mount_Door_Right_Forward",
           "intake": "Intake_skin_Right",
-          "intersectionMm3": 5541.7693793571525
+          "intersectionMm3": 0
         },
         {
           "gear": "Mount_Door_Right_Aft",
@@ -1950,25 +1886,14 @@
       "intakeCollisions": [],
       "bodyCollisions": [],
       "collisions": [],
-      "intentionalFixedMountContacts": [
-        {
-          "gear": "Mount_Door_Left_Forward",
-          "intake": "Intake_skin_Left",
-          "intersectionMm3": 5541.769379363313
-        },
-        {
-          "gear": "Mount_Door_Right_Forward",
-          "intake": "Intake_skin_Right",
-          "intersectionMm3": 5541.7693793571525
-        }
-      ],
+      "intentionalFixedMountContacts": [],
       "name": "Gear/body/intake clearance at retraction 0.3333333333333333"
     },
     {
       "retract": 0.4166666666666667,
       "pass": true,
-      "exactBooleanCandidates": 55,
-      "intakeExactBooleanCandidates": 30,
+      "exactBooleanCandidates": 53,
+      "intakeExactBooleanCandidates": 28,
       "bodyExactBooleanCandidates": 25,
       "intakeCandidates": [
         {
@@ -2012,11 +1937,6 @@
           "intersectionMm3": 0
         },
         {
-          "gear": "Left_Retraction_rod",
-          "intake": "Intake_skin_Left",
-          "intersectionMm3": 0
-        },
-        {
           "gear": "Right_Trunnion_arm",
           "intake": "Intake_skin_Right",
           "intersectionMm3": 0
@@ -2054,11 +1974,6 @@
         {
           "gear": "Right_Retraction_barrel",
           "intake": "Duct_liner_Right",
-          "intersectionMm3": 0
-        },
-        {
-          "gear": "Right_Retraction_rod",
-          "intake": "Intake_skin_Right",
           "intersectionMm3": 0
         },
         {
@@ -2104,7 +2019,7 @@
         {
           "gear": "Mount_Door_Left_Forward",
           "intake": "Intake_skin_Left",
-          "intersectionMm3": 5541.769379363313
+          "intersectionMm3": 0
         },
         {
           "gear": "Mount_Door_Left_Aft",
@@ -2114,7 +2029,7 @@
         {
           "gear": "Mount_Door_Right_Forward",
           "intake": "Intake_skin_Right",
-          "intersectionMm3": 5541.7693793571525
+          "intersectionMm3": 0
         },
         {
           "gear": "Mount_Door_Right_Aft",
@@ -2252,25 +2167,14 @@
       "intakeCollisions": [],
       "bodyCollisions": [],
       "collisions": [],
-      "intentionalFixedMountContacts": [
-        {
-          "gear": "Mount_Door_Left_Forward",
-          "intake": "Intake_skin_Left",
-          "intersectionMm3": 5541.769379363313
-        },
-        {
-          "gear": "Mount_Door_Right_Forward",
-          "intake": "Intake_skin_Right",
-          "intersectionMm3": 5541.7693793571525
-        }
-      ],
+      "intentionalFixedMountContacts": [],
       "name": "Gear/body/intake clearance at retraction 0.4166666666666667"
     },
     {
       "retract": 0.5,
       "pass": true,
-      "exactBooleanCandidates": 62,
-      "intakeExactBooleanCandidates": 30,
+      "exactBooleanCandidates": 60,
+      "intakeExactBooleanCandidates": 28,
       "bodyExactBooleanCandidates": 32,
       "intakeCandidates": [
         {
@@ -2291,11 +2195,6 @@
         {
           "gear": "Left_Upper_strut",
           "intake": "Duct_liner_Left",
-          "intersectionMm3": 0
-        },
-        {
-          "gear": "Left_Torque_pin_top",
-          "intake": "Intake_skin_Left",
           "intersectionMm3": 0
         },
         {
@@ -2336,11 +2235,6 @@
         {
           "gear": "Right_Upper_strut",
           "intake": "Duct_liner_Right",
-          "intersectionMm3": 0
-        },
-        {
-          "gear": "Right_Torque_pin_top",
-          "intake": "Intake_skin_Right",
           "intersectionMm3": 0
         },
         {
@@ -2406,7 +2300,7 @@
         {
           "gear": "Mount_Door_Left_Forward",
           "intake": "Intake_skin_Left",
-          "intersectionMm3": 5541.769379363313
+          "intersectionMm3": 0
         },
         {
           "gear": "Mount_Door_Left_Aft",
@@ -2416,7 +2310,7 @@
         {
           "gear": "Mount_Door_Right_Forward",
           "intake": "Intake_skin_Right",
-          "intersectionMm3": 5541.7693793571525
+          "intersectionMm3": 0
         },
         {
           "gear": "Mount_Door_Right_Aft",
@@ -2589,18 +2483,7 @@
       "intakeCollisions": [],
       "bodyCollisions": [],
       "collisions": [],
-      "intentionalFixedMountContacts": [
-        {
-          "gear": "Mount_Door_Left_Forward",
-          "intake": "Intake_skin_Left",
-          "intersectionMm3": 5541.769379363313
-        },
-        {
-          "gear": "Mount_Door_Right_Forward",
-          "intake": "Intake_skin_Right",
-          "intersectionMm3": 5541.7693793571525
-        }
-      ],
+      "intentionalFixedMountContacts": [],
       "name": "Gear/body/intake clearance at retraction 0.5"
     },
     {
@@ -2723,7 +2606,7 @@
         {
           "gear": "Mount_Door_Left_Forward",
           "intake": "Intake_skin_Left",
-          "intersectionMm3": 5541.769379363313
+          "intersectionMm3": 0
         },
         {
           "gear": "Mount_Door_Left_Aft",
@@ -2733,7 +2616,7 @@
         {
           "gear": "Mount_Door_Right_Forward",
           "intake": "Intake_skin_Right",
-          "intersectionMm3": 5541.7693793571525
+          "intersectionMm3": 0
         },
         {
           "gear": "Mount_Door_Right_Aft",
@@ -3041,18 +2924,7 @@
       "intakeCollisions": [],
       "bodyCollisions": [],
       "collisions": [],
-      "intentionalFixedMountContacts": [
-        {
-          "gear": "Mount_Door_Left_Forward",
-          "intake": "Intake_skin_Left",
-          "intersectionMm3": 5541.769379363313
-        },
-        {
-          "gear": "Mount_Door_Right_Forward",
-          "intake": "Intake_skin_Right",
-          "intersectionMm3": 5541.7693793571525
-        }
-      ],
+      "intentionalFixedMountContacts": [],
       "name": "Gear/body/intake clearance at retraction 0.5833333333333334"
     },
     {
@@ -3175,7 +3047,7 @@
         {
           "gear": "Mount_Door_Left_Forward",
           "intake": "Intake_skin_Left",
-          "intersectionMm3": 5541.769379363313
+          "intersectionMm3": 0
         },
         {
           "gear": "Mount_Door_Left_Aft",
@@ -3185,7 +3057,7 @@
         {
           "gear": "Mount_Door_Right_Forward",
           "intake": "Intake_skin_Right",
-          "intersectionMm3": 5541.7693793571525
+          "intersectionMm3": 0
         },
         {
           "gear": "Mount_Door_Right_Aft",
@@ -3728,18 +3600,7 @@
       "intakeCollisions": [],
       "bodyCollisions": [],
       "collisions": [],
-      "intentionalFixedMountContacts": [
-        {
-          "gear": "Mount_Door_Left_Forward",
-          "intake": "Intake_skin_Left",
-          "intersectionMm3": 5541.769379363313
-        },
-        {
-          "gear": "Mount_Door_Right_Forward",
-          "intake": "Intake_skin_Right",
-          "intersectionMm3": 5541.7693793571525
-        }
-      ],
+      "intentionalFixedMountContacts": [],
       "name": "Gear/body/intake clearance at retraction 0.6666666666666666"
     },
     {
@@ -3852,7 +3713,7 @@
         {
           "gear": "Mount_Door_Left_Forward",
           "intake": "Intake_skin_Left",
-          "intersectionMm3": 5541.769379363313
+          "intersectionMm3": 0
         },
         {
           "gear": "Mount_Door_Left_Aft",
@@ -3862,7 +3723,7 @@
         {
           "gear": "Mount_Door_Right_Forward",
           "intake": "Intake_skin_Right",
-          "intersectionMm3": 5541.7693793571525
+          "intersectionMm3": 0
         },
         {
           "gear": "Mount_Door_Right_Aft",
@@ -4405,18 +4266,7 @@
       "intakeCollisions": [],
       "bodyCollisions": [],
       "collisions": [],
-      "intentionalFixedMountContacts": [
-        {
-          "gear": "Mount_Door_Left_Forward",
-          "intake": "Intake_skin_Left",
-          "intersectionMm3": 5541.769379363313
-        },
-        {
-          "gear": "Mount_Door_Right_Forward",
-          "intake": "Intake_skin_Right",
-          "intersectionMm3": 5541.7693793571525
-        }
-      ],
+      "intentionalFixedMountContacts": [],
       "name": "Gear/body/intake clearance at retraction 0.75"
     },
     {
@@ -4529,7 +4379,7 @@
         {
           "gear": "Mount_Door_Left_Forward",
           "intake": "Intake_skin_Left",
-          "intersectionMm3": 5541.769379363313
+          "intersectionMm3": 0
         },
         {
           "gear": "Mount_Door_Left_Aft",
@@ -4539,7 +4389,7 @@
         {
           "gear": "Mount_Door_Right_Forward",
           "intake": "Intake_skin_Right",
-          "intersectionMm3": 5541.7693793571525
+          "intersectionMm3": 0
         },
         {
           "gear": "Mount_Door_Right_Aft",
@@ -5082,18 +4932,7 @@
       "intakeCollisions": [],
       "bodyCollisions": [],
       "collisions": [],
-      "intentionalFixedMountContacts": [
-        {
-          "gear": "Mount_Door_Left_Forward",
-          "intake": "Intake_skin_Left",
-          "intersectionMm3": 5541.769379363313
-        },
-        {
-          "gear": "Mount_Door_Right_Forward",
-          "intake": "Intake_skin_Right",
-          "intersectionMm3": 5541.7693793571525
-        }
-      ],
+      "intentionalFixedMountContacts": [],
       "name": "Gear/body/intake clearance at retraction 0.8333333333333334"
     },
     {
@@ -5206,7 +5045,7 @@
         {
           "gear": "Mount_Door_Left_Forward",
           "intake": "Intake_skin_Left",
-          "intersectionMm3": 5541.769379363313
+          "intersectionMm3": 0
         },
         {
           "gear": "Mount_Door_Left_Aft",
@@ -5216,7 +5055,7 @@
         {
           "gear": "Mount_Door_Right_Forward",
           "intake": "Intake_skin_Right",
-          "intersectionMm3": 5541.7693793571525
+          "intersectionMm3": 0
         },
         {
           "gear": "Mount_Door_Right_Aft",
@@ -5759,25 +5598,14 @@
       "intakeCollisions": [],
       "bodyCollisions": [],
       "collisions": [],
-      "intentionalFixedMountContacts": [
-        {
-          "gear": "Mount_Door_Left_Forward",
-          "intake": "Intake_skin_Left",
-          "intersectionMm3": 5541.769379363313
-        },
-        {
-          "gear": "Mount_Door_Right_Forward",
-          "intake": "Intake_skin_Right",
-          "intersectionMm3": 5541.7693793571525
-        }
-      ],
+      "intentionalFixedMountContacts": [],
       "name": "Gear/body/intake clearance at retraction 0.9166666666666666"
     },
     {
       "retract": 1,
       "pass": true,
-      "exactBooleanCandidates": 134,
-      "intakeExactBooleanCandidates": 28,
+      "exactBooleanCandidates": 130,
+      "intakeExactBooleanCandidates": 24,
       "bodyExactBooleanCandidates": 106,
       "intakeCandidates": [
         {
@@ -5846,38 +5674,18 @@
           "intersectionMm3": 0
         },
         {
-          "gear": "Door_Left_Forward",
-          "intake": "Duct_liner_Left",
-          "intersectionMm3": 0
-        },
-        {
           "gear": "Door_Left_Aft",
           "intake": "Intake_skin_Left",
           "intersectionMm3": 0
         },
         {
-          "gear": "Door_Left_Aft",
-          "intake": "Duct_liner_Left",
-          "intersectionMm3": 0
-        },
-        {
           "gear": "Door_Right_Forward",
           "intake": "Intake_skin_Right",
           "intersectionMm3": 0
         },
         {
-          "gear": "Door_Right_Forward",
-          "intake": "Duct_liner_Right",
-          "intersectionMm3": 0
-        },
-        {
           "gear": "Door_Right_Aft",
           "intake": "Intake_skin_Right",
-          "intersectionMm3": 0
-        },
-        {
-          "gear": "Door_Right_Aft",
-          "intake": "Duct_liner_Right",
           "intersectionMm3": 0
         },
         {
@@ -5903,7 +5711,7 @@
         {
           "gear": "Mount_Door_Left_Forward",
           "intake": "Intake_skin_Left",
-          "intersectionMm3": 5541.769379363313
+          "intersectionMm3": 0
         },
         {
           "gear": "Mount_Door_Left_Aft",
@@ -5913,7 +5721,7 @@
         {
           "gear": "Mount_Door_Right_Forward",
           "intake": "Intake_skin_Right",
-          "intersectionMm3": 5541.7693793571525
+          "intersectionMm3": 0
         },
         {
           "gear": "Mount_Door_Right_Aft",
@@ -6456,26 +6264,15 @@
       "intakeCollisions": [],
       "bodyCollisions": [],
       "collisions": [],
-      "intentionalFixedMountContacts": [
-        {
-          "gear": "Mount_Door_Left_Forward",
-          "intake": "Intake_skin_Left",
-          "intersectionMm3": 5541.769379363313
-        },
-        {
-          "gear": "Mount_Door_Right_Forward",
-          "intake": "Intake_skin_Right",
-          "intersectionMm3": 5541.7693793571525
-        }
-      ],
+      "intentionalFixedMountContacts": [],
       "name": "Gear/body/intake clearance at retraction 1"
     },
     {
       "name": "All saved physical solids remain valid closed and positive",
       "pass": true,
       "invalid": [],
-      "leafCount": 386,
-      "solidCount": 386
+      "leafCount": 396,
+      "solidCount": 396
     },
     {
       "name": "Intake_skin_Left retains its physical parent contact",
@@ -7777,12 +7574,6 @@
       "method": "re-measured saved contact hint"
     },
     {
-      "a": "Windshield_glass",
-      "b": "Cockpit_sill_Left",
-      "gapMm": 0,
-      "method": "re-measured saved contact hint"
-    },
-    {
       "a": "Seat_pan",
       "b": "Seat_back",
       "gapMm": 0,
@@ -7849,20 +7640,68 @@
       "method": "re-measured saved contact hint"
     },
     {
-      "a": "Cockpit_sill_Left",
-      "b": "Fuselage",
+      "a": "Seat_bolster_Left",
+      "b": "Seat_back",
       "gapMm": 0,
       "method": "re-measured saved contact hint"
     },
     {
-      "a": "Canopy_rail_Left_0",
-      "b": "Cockpit_sill_Left",
+      "a": "Seat_bolster_Right",
+      "b": "Seat_back",
       "gapMm": 0,
       "method": "re-measured saved contact hint"
     },
     {
-      "a": "Windshield_side_frame_Left",
-      "b": "Cockpit_sill_Left",
+      "a": "Ejection_handle",
+      "b": "Seat_pan",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Pilot_torso",
+      "b": "Seat_back",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Pilot_legs",
+      "b": "Seat_pan",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Pilot_neck",
+      "b": "Pilot_torso",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Pilot_helmet",
+      "b": "Pilot_neck",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Pilot_visor",
+      "b": "Pilot_helmet",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Pilot_mask",
+      "b": "Pilot_helmet",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Pilot_arm_Left",
+      "b": "Pilot_torso",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Pilot_arm_Right",
+      "b": "Pilot_torso",
       "gapMm": 0,
       "method": "re-measured saved contact hint"
     },
@@ -7923,24 +7762,6 @@
     {
       "a": "Canopy_rail_Left_4",
       "b": "Canopy_rail_Left_3",
-      "gapMm": 0,
-      "method": "re-measured saved contact hint"
-    },
-    {
-      "a": "Cockpit_sill_Right",
-      "b": "Fuselage",
-      "gapMm": 0,
-      "method": "re-measured saved contact hint"
-    },
-    {
-      "a": "Canopy_rail_Right_0",
-      "b": "Cockpit_sill_Right",
-      "gapMm": 0,
-      "method": "re-measured saved contact hint"
-    },
-    {
-      "a": "Windshield_side_frame_Right",
-      "b": "Cockpit_sill_Right",
       "gapMm": 0,
       "method": "re-measured saved contact hint"
     },
@@ -8911,6 +8732,18 @@
       "method": "re-measured saved contact hint"
     },
     {
+      "a": "Canopy_hinge_Right",
+      "b": "Canopy_rail_Right_0",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Canopy_hinge_Left",
+      "b": "Canopy_rail_Left_0",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
       "a": "Mount_Nose",
       "b": "Nose_Trunnion",
       "gapMm": 0,
@@ -8929,6 +8762,24 @@
       "method": "solid distance"
     },
     {
+      "a": "Windshield_side_frame_Left",
+      "b": "Canopy_rail_Left_4",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Windshield_side_frame_Right",
+      "b": "Canopy_rail_Right_4",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Windshield_side_frame_Left",
+      "b": "Windshield_front_frame",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
       "a": "Door_Left_Aft",
       "b": "Left_Retraction_barrel",
       "gapMm": 0,
@@ -8937,6 +8788,12 @@
     {
       "a": "Door_Right_Aft",
       "b": "Right_Retraction_barrel",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Windshield_glass",
+      "b": "Canopy_rail_Left_4",
       "gapMm": 0,
       "method": "solid distance"
     },
@@ -9013,19 +8870,19 @@
       "method": "solid distance"
     },
     {
-      "a": "Mount_Door_Left_Forward",
-      "b": "Intake_skin_Left",
-      "gapMm": 0,
-      "method": "solid distance"
-    },
-    {
-      "a": "Mount_Door_Right_Forward",
-      "b": "Intake_skin_Right",
-      "gapMm": 0,
-      "method": "solid distance"
-    },
-    {
       "a": "Mount_Nose",
+      "b": "Fuselage",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Mount_Right",
+      "b": "Fuselage",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Mount_Left",
       "b": "Fuselage",
       "gapMm": 0,
       "method": "solid distance"
@@ -9048,7 +8905,7 @@
   "evidence": [
     {
       "artifact": "STEP/airframe_gear.step",
-      "sha256": "d50c4d28f8ea4c43f3ffd90aa4b49d73982095d7a93fbe0513554eba534675d0"
+      "sha256": "71b54a79716d4d3521b8cb1ec5f4f1fba2f2f581cca8222559ebd79095d9b309"
     },
     {
       "artifact": "STEP/landing_gear.step",
@@ -9056,11 +8913,11 @@
     },
     {
       "artifact": "/Users/prasiddhnaik/Documents/blender skills/pocket-flight-site/assets/f15c/STEP/airframe_gear.step",
-      "sha256": "d50c4d28f8ea4c43f3ffd90aa4b49d73982095d7a93fbe0513554eba534675d0"
+      "sha256": "71b54a79716d4d3521b8cb1ec5f4f1fba2f2f581cca8222559ebd79095d9b309"
     },
     {
       "artifact": "/Users/prasiddhnaik/Documents/blender skills/pocket-flight-site/assets/f15c/STEP/airframe_gear.step",
-      "sha256": "d50c4d28f8ea4c43f3ffd90aa4b49d73982095d7a93fbe0513554eba534675d0"
+      "sha256": "71b54a79716d4d3521b8cb1ec5f4f1fba2f2f581cca8222559ebd79095d9b309"
     }
   ]
 }

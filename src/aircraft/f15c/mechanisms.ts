@@ -3,6 +3,7 @@ import type { SurfacePose } from "../finch/control-surfaces";
 import { f15cGear, f15cGearState } from "./landing-gear";
 
 import { F15CPowerplantRig } from "./powerplant-rig";
+import type { GunCurves } from "./gun-spool";
 
 type Parts = Map<string, Object3D>;
 export function f15cParts(root: Object3D): Parts {
@@ -82,16 +83,17 @@ export type F15CMechanismPose = SurfacePose & {
   power?: number;
   burner?: number;
   gunAngle?: number;
+  gunSpeed?: number;
 };
 export class F15CMechanisms {
   readonly parts: Parts;
   readonly powerplant: F15CPowerplantRig;
-  constructor(root: Object3D) {
+  constructor(root: Object3D, curves?: GunCurves) {
     this.parts = f15cParts(root);
-    this.powerplant = new F15CPowerplantRig(root);
+    this.powerplant = new F15CPowerplantRig(root, curves);
   }
   apply(pose: F15CMechanismPose) {
-    this.powerplant.apply(pose.power ?? 0, pose.burner ?? MathUtils.smoothstep(pose.power ?? 0, .88, 1), pose.gunAngle ?? 0);
+    this.powerplant.apply(pose.power ?? 0, pose.burner ?? MathUtils.smoothstep(pose.power ?? 0, .88, 1), pose.gunAngle ?? 0, pose.gunSpeed ?? 0);
     poseF15CControls(this.parts, pose, pose.flaps);
     const state = f15cGearState(pose.gear);
     for (const leg of f15cGear)

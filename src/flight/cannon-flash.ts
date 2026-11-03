@@ -1,7 +1,7 @@
 import * as T from "three";
 
 const forward = new T.Vector3(0, 0, 1);
-const capacity = 32, smokeLifetime = .65;
+const capacity = 64, smokeLifetime = 1, lingerSeconds = .9;
 const vertex = `
 #include <common>
 #include <logdepthbuf_pars_vertex>
@@ -46,6 +46,27 @@ gl_FragColor=vec4(emission/max(density,.0001),1.-exp(-density*brightness*3.));
 #include <tonemapping_fragment>
 #include <colorspace_fragment>
 }`;
+// The soft bloom around the flash. It is what the eye catches from the chase
+// camera, where the flash itself is only a few pixels across.
+const glowVertex = `
+#include <common>
+#include <logdepthbuf_pars_vertex>
+varying vec2 vUv;
+void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);
+#include <logdepthbuf_vertex>
+}`;
+const glowFragment = `
+precision highp float;
+#include <logdepthbuf_pars_fragment>
+varying vec2 vUv;uniform float brightness;
+void main(){
+#include <logdepthbuf_fragment>
+float d=length(vUv*2.-1.);
+float halo=exp(-d*d*9.)*(1.-smoothstep(.7,1.,d));
+float core=exp(-d*d*38.);
+gl_FragColor=vec4(mix(vec3(1.,.5,.16),vec3(1.,.9,.68),core)*(halo*.42+core*.55)*brightness,1.);
+#include <colorspace_fragment>
+}`;
 const smokeVertex = `
 #include <common>
 #include <logdepthbuf_pars_vertex>
@@ -62,8 +83,8 @@ void main(){
 vec2 q=vUv*2.-1.;
 float swirl=sin(q.x*8.+vSeed+vLife*3.)*sin(q.y*9.-vSeed)*.09;
 float edge=1.-smoothstep(.05,1.,length(q)+swirl);
-float alpha=edge*edge*(1.-vLife)*(1.-vLife)*.19;
-gl_FragColor=vec4(mix(vec3(.29,.30,.30),vec3(.57,.58,.58),vLife),alpha);
+float alpha=edge*edge*pow(1.-vLife,1.5)*.5;
+gl_FragColor=vec4(mix(vec3(.5,.5,.48),vec3(.8,.8,.78),vLife),alpha);
 #include <tonemapping_fragment>
 #include <colorspace_fragment>
 }`;
@@ -78,7 +99,12 @@ export class CannonFlash {
   readonly smoke = new T.InstancedMesh(new T.PlaneGeometry(1, 1), new T.ShaderMaterial({
     vertexShader: smokeVertex, fragmentShader: smokeFragment, transparent: true, depthWrite: false,
   }), capacity);
-  readonly light = new T.PointLight("#ffcf84", 0, 1.6, 2);
+  readonly glow = new T.Mesh(new T.PlaneGeometry(1, 1), new T.ShaderMaterial({
+    vertexShader: glowVertex, fragmentShader: glowFragment, uniforms: { brightness: { value: 1 } },
+    transparent: true, depthWrite: false, blending: T.AdditiveBlending, toneMapped: false,
+  }));
+  readonly light = new T.PointLight("#ffbf70", 0, 6, 2);
+  private linger = 0;
   private particles = Array.from({ length: capacity }, () => ({ position: new T.Vector3(), velocity: new T.Vector3(), slip: new T.Vector3(), age: smokeLifetime, seed: 0 }));
   private life = new T.InstancedBufferAttribute(new Float32Array(capacity), 1);
   private seeds = new T.InstancedBufferAttribute(new Float32Array(capacity), 1);
@@ -95,9 +121,11 @@ export class CannonFlash {
   constructor() {
     this.flash.name = "Cannon_muzzle_flash";
     this.smoke.name = "Cannon_gun_smoke";
-    this.flash.visible = false;
+    this.glow.name = "Cannon_muzzle_glow";
+    this.flash.visible = this.glow.visible = false;
+    this.glow.renderOrder = 3;
     // Keep the light outside the non-uniformly scaled volume.
-    this.group.add(this.flash, this.smoke, this.light);
+    this.group.add(this.flash, this.glow, this.smoke, this.light);
     this.smoke.frustumCulled = false;
     this.smoke.instanceMatrix.setUsage(T.DynamicDrawUsage);
     this.smoke.geometry.setAttribute("life", this.life);
@@ -112,19 +140,24 @@ export class CannonFlash {
   step(dt: number, fired: number, shots: number, origin: T.Vector3, direction: T.Vector3, velocity: T.Vector3, wind: T.Vector3) {
     if (dt <= 0) return;
     this.flashAge = fired ? 0 : this.flashAge + dt;
-    this.flash.visible = this.flashAge < .018;
+    this.flash.visible = this.glow.visible = this.flashAge < .018;
     if (fired) {
       const variation = (Math.sin(shots * 78.233) * 43758.5453) % 1;
       const seed = Math.abs(variation);
       this.flash.material.uniforms.phase.value = shots * 2.39996;
       this.flash.material.uniforms.brightness.value = .7 + seed * .6;
-      this.flash.scale.set(.085 + seed * .025, .085 + seed * .025, .34 + seed * .2);
+      this.flash.scale.set(.17 + seed * .08, .17 + seed * .08, .75 + seed * .6);
+      this.glow.material.uniforms.brightness.value = .65 + seed * .5;
+      this.glow.scale.setScalar(1.5 + seed * .9);
     }
-    this.light.intensity = this.flash.visible ? .22 * this.flash.material.uniforms.brightness.value : 0;
+    this.light.intensity = this.flash.visible ? 1.5 * this.flash.material.uniforms.brightness.value : 0;
     this.destination.copy(wind); this.destination.y += .6;
     for (const particle of this.particles) if (particle.age < smokeLifetime) this.advect(particle, dt);
     // One soft puff represents several discharges. Fixed pool bounds GPU cost.
-    this.emission += fired * .3;
+    this.emission += fired * .55;
+    // The hot barrels keep smoking while they wind down after the trigger is released.
+    this.linger = fired ? lingerSeconds : Math.max(0, this.linger - dt);
+    if (!fired && this.linger > 0) this.emission += dt * 14 * this.linger / lingerSeconds;
     const count = Math.min(capacity, Math.floor(this.emission));
     this.emission -= count;
     for (let i = 0; i < count; i++) {
@@ -153,11 +186,13 @@ export class CannonFlash {
     this.flash.quaternion.setFromUnitVectors(forward, direction);
     this.light.position.copy(origin).addScaledVector(direction, .06);
     camera.getWorldQuaternion(this.cameraRotation);
+    this.glow.position.copy(origin).addScaledVector(direction, .3);
+    this.glow.quaternion.copy(this.cameraRotation);
     this.cameraInverse.copy(this.cameraRotation).invert();
     let index = 0;
     for (const particle of this.particles) {
       if (particle.age >= smokeLifetime) continue;
-      const age = particle.age / smokeLifetime, size = .13 + age * .9;
+      const age = particle.age / smokeLifetime, size = .32 + Math.sqrt(age) * 2.2;
       this.dummy.position.copy(particle.position);
       this.dummy.quaternion.copy(this.cameraRotation);
       this.projectedSlip.copy(particle.slip).applyQuaternion(this.cameraInverse);
@@ -175,14 +210,15 @@ export class CannonFlash {
     this.life.needsUpdate = this.seeds.needsUpdate = true;
   }
 
-  suspend() { this.flashAge = Infinity; this.flash.visible = false; this.light.intensity = 0; this.emission = 0; }
-  reset() {
+  suspend() { this.flashAge = Infinity; this.flash.visible = this.glow.visible = false; this.light.intensity = 0; this.emission = 0; }
+  reset() { this.linger = 0;
     this.suspend(); this.sequence = 0;
     this.particles.forEach(particle => { particle.age = smokeLifetime; });
     this.smoke.count = 0;
   }
   dispose() {
     this.flash.geometry.dispose(); this.flash.material.dispose();
+    this.glow.geometry.dispose(); this.glow.material.dispose();
     this.smoke.geometry.dispose(); this.smoke.material.dispose(); this.smoke.dispose();
     this.light.dispose(); this.group.clear();
   }

@@ -243,6 +243,10 @@ export class FlightPhysics {
     this.massOverride = null;
     this.fuelKg = balance.fuelKg;
   }
+  /** Tanks back to the configured load, for a stop at the ramp. */
+  refuel() {
+    this.configureLoading(this.loading);
+  }
   get stallSpeed() {
     return aircraftStallSpeed(
       this.design,
@@ -289,7 +293,7 @@ export class FlightPhysics {
       tick: this.simulationTick,
     });
   }
-  reset(airStart = false, short = false) {
+  reset(airStart = false, short = false, runway?: (typeof runways)[number]) {
     this.configureLoading(
       this.loadingAircraft === this.aircraftId
         ? this.loading
@@ -297,7 +301,7 @@ export class FlightPhysics {
     );
     this.fuelUpdateTime = 0;
     this.installedThrust = 0;
-    const r = short ? runways[1] : runways[0];
+    const r = runway ?? (short ? runways[1] : runways[0]);
     // Palm Bay departs toward open water. Air starts keep the landing approach.
     const direction = airStart ? 1 : r.departureDirection;
     this.yaw = r.heading + (direction < 0 ? Math.PI : 0);

@@ -27,35 +27,39 @@ if(parallel.z){near.z=-1.e20;far.z=1.e20;}
 float entry=max(0.,max(near.x,max(near.y,near.z))),leave=min(far.x,min(far.y,far.z));
 if(leave<=entry)discard;`;
 
-// A cosmetic F100 plume: a bright nozzle core, compression cells, soft edges
-// and fast, small turbulence. This is emission rendering, not a flow solution.
-export const f100FlameFragment = `precision highp float;
+// A cosmetic afterburner plume, tinted per aircraft: a hot core, tight diamonds on the axis, a blue sheath at
+// the nozzle and turbulence that tears the tail apart. This is emission rendering,
+// not a flow solution. It skips tone mapping, which would wash these colours out.
+export const afterburnerFlameFragment = `precision highp float;
 #include <logdepthbuf_pars_fragment>
-varying vec3 p; uniform vec3 eye; uniform float time,strength,phase,gain;
+varying vec3 p; uniform vec3 eye,tint; uniform float time,strength,phase,gain;
+float hash(vec3 q){return fract(sin(dot(q,vec3(127.1,311.7,74.7)))*43758.5453);}
+float noise(vec3 q){vec3 i=floor(q),f=fract(q);f=f*f*(3.-2.*f);
+return mix(mix(mix(hash(i),hash(i+vec3(1,0,0)),f.x),mix(hash(i+vec3(0,1,0)),hash(i+vec3(1,1,0)),f.x),f.y),mix(mix(hash(i+vec3(0,0,1)),hash(i+vec3(1,0,1)),f.x),mix(hash(i+vec3(0,1,1)),hash(i+vec3(1,1,1)),f.x),f.y),f.z);}
 void main(){
 #include <logdepthbuf_fragment>
 ${exhaustSlabs}
-float stepSize=(leave-entry)/32.; vec3 emission=vec3(0); float density=0.;
-for(int j=0;j<32;j++){
+float stepSize=(leave-entry)/22.; vec3 emission=vec3(0); float density=0.;
+for(int j=0;j<22;j++){
  vec3 q=eye+ray*(entry+(float(j)+.5)*stepSize); float z=clamp(q.z,0.,1.);
- float wave=sin(z*34.-time*62.+phase)*sin(q.x*29.+q.y*23.+time*37.);
- float cellPhase=z*(4.2+strength*.8)*6.28318;
- float compression=.5+.5*cos(cellPhase);
- float radius=(.92-.34*z)*(1.-.13*compression)+wave*.018*z;
+ float swirl=noise(vec3(q.xy*3.2+phase,z*6.-time*9.))*.8-.4+.1*sin(z*41.-time*30.+q.x*17.+q.y*13.+phase);
+ float radius=mix(.88,.16,pow(z,.8))*(1.+swirl*z*1.2);
  float r=length(q.xy)/radius;
- float edge=1.-smoothstep(.55,1.,r);
- float fade=(1.-smoothstep(.52,1.,z))*smoothstep(0.,.014,z);
- float core=exp(-r*r*12.)*exp(-z*7.);
- float cell=abs(fract(z*(4.2+strength*.8))-.5)*2.;
- float diamondShell=exp(-pow((r-(.12+.48*cell))*13.,2.));
- float diamonds=(pow(compression,5.)*exp(-r*r*5.)+diamondShell*.45)*(1.-z);
- float d=edge*fade*(.13+core*1.5+diamonds*2.4+wave*.035)*stepSize;
- vec3 color=mix(vec3(.20,.17,.9),vec3(1.2,.31,.09),smoothstep(.08,.72,z));
- color=mix(color,vec3(2.5,1.75,1.0),clamp(core*.7+diamonds*.9,0.,.95));
+ float edge=1.-smoothstep(.42,1.,r);
+ float fade=(1.-smoothstep(.5+swirl*.4,1.,z))*smoothstep(0.,.012,z);
+ float core=exp(-r*r*8.)*exp(-z*3.);
+ float diamonds=pow(.5+.5*cos(z*(5.2+strength)*6.28318),3.)*exp(-r*r*17.)*(1.-smoothstep(.1,.6,z));
+ float axis=exp(-r*r*5.)*(1.-smoothstep(.1,.72,z));
+ float torn=1.+swirl*1.9*smoothstep(.08,.6,z);
+ float d=edge*fade*max(0.,torn)*(.24+.3*(1.-z)+core*1.1+diamonds*2.4)*stepSize;
+ vec3 color=min(vec3(1.),mix(vec3(1.,.27,.025),vec3(.8,.06,.005),smoothstep(.12,.8,z))*tint);
+ color=mix(color,vec3(.05,.11,1.),smoothstep(.34,.86,r)*(1.-smoothstep(.0,.3,z)));
+ color=mix(color,vec3(1.,.52,.07),axis);
+ color=mix(color,vec3(1.,.72,.28),clamp(core*.9,0.,1.));
+ color=mix(color,vec3(1.,.82,.42),clamp(diamonds*1.3,0.,1.));
  emission+=color*d; density+=d;
 }
-float alpha=1.-exp(-density*3.5*strength);
+float alpha=1.-exp(-density*5.*strength);
 gl_FragColor=vec4(emission/max(density,.0001)*gain,alpha);
-#include <tonemapping_fragment>
 #include <colorspace_fragment>
 }`;

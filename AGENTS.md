@@ -32,3 +32,8 @@ This is the current `pocket-flight-site` checkout. The sibling `pocket-flight` r
 For repository-navigation work, verify offline. Open the game only when the user requests browser verification.
 
 The navigation redesign is not authorization to delete ignored working data, regenerate aircraft assets, publish the site, or change flight tuning.
+
+## Reports
+
+- Build HTML reports from [docs/REPORT_TEMPLATE.html](docs/REPORT_TEMPLATE.html): copy it to `output/reports/<topic>-<YYYY-MM-DD>.html` and follow the notes at the top of the file.
+- The plane theme is decoration only. Report verified facts, and show skipped checks as not run.

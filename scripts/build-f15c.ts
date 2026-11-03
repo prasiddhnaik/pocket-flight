@@ -1,89 +1,149 @@
-import { existsSync } from "node:fs";
+import { existsSync, mkdirSync } from "node:fs";
 import { resolve } from "node:path";
+import { backupSkinScene, skinBuildCommand } from "./f15c-skin-step";
 
 const root = resolve(import.meta.dir, "..");
 const cad = resolve(root, "assets/f15c");
 const python = process.env.F15C_PYTHON ?? resolve(cad, ".venv/bin/python");
-const stages = [
-  { id: "fuselage", model: "fuselage", report: "fuselage" },
-  { id: "intakes", model: "airframe_intakes", report: "intakes" },
-  { id: "wings", model: "airframe_wings", report: "wings" },
-  { id: "tails", model: "airframe_tails", report: "tails" },
-  { id: "exhausts", model: "airframe_exhausts", report: "exhausts-assembly" },
-  { id: "cockpit", model: "airframe_cockpit", report: "cockpit-assembly" },
-  { id: "gear", model: "airframe_gear", report: "gear" },
-  { id: "complete", model: "f15c", report: "complete" },
+const logs = process.env.F15C_LOG_DIR ?? "/private/tmp/f15c-build-logs";
+const parallel = Number(process.env.F15C_JOBS ?? 3);
+
+type Step = { args: string[]; cwd?: string };
+type Stage = { id: string; model: string; report: string; build: Step[]; verify: Step[] };
+const py = (script: string, cwd?: string, ...rest: string[]): Step => ({ args: [python, script, ...rest], cwd });
+const bun = (script: string): Step => ({ args: [process.execPath, script], cwd: root });
+const intakes = resolve(cad, "parts/intakes"), wings = resolve(cad, "parts/wings");
+const tails = resolve(cad, "parts/tails"), gear = resolve(cad, "parts/gear");
+const assembly = (model: string, report: string) => py("checks/assembly.py", undefined, `STEP/${model}.step`, `checks/${report}-results.json`);
+
+// Each stage's model build composes the previous stage, so builds run strictly in
+// order. Previews and checks only read saved artifacts and never feed a later
+// build, so each stage's verification runs in the background beside the next
+// builds. Nothing is published or exported until every verification has passed.
+const stages: Stage[] = [
+  { id: "fuselage", model: "fuselage", report: "fuselage", build: [py("src/fuselage.py")], verify: [py("checks/fuselage.py")] },
+  {
+    id: "intakes", model: "airframe_intakes", report: "intakes",
+    build: [py("src/airframe_intakes.py")],
+    verify: [py("src/intakes_preview.py", intakes), py("checks/intakes.py", intakes), assembly("airframe_intakes", "intakes")],
+  },
+  {
+    id: "wings", model: "airframe_wings", report: "wings",
+    build: [py("checks/build_and_check.py", wings), bun("scripts/measure-f15c-wing.ts"), py("src/airframe_wings.py")],
+    verify: [py("parts/wings/checks/check_root_blend.py"), assembly("airframe_wings", "wings")],
+  },
+  {
+    id: "tails", model: "airframe_tails", report: "tails",
+    build: [py("src/tails.py", tails), py("src/airframe_tails.py")],
+    verify: [py("checks/tails.py", tails), py("checks/wing_tail_clearance.py"), assembly("airframe_tails", "tails")],
+  },
+  {
+    id: "exhausts", model: "airframe_exhausts", report: "exhausts-assembly",
+    build: [py("src/airframe_exhausts.py")],
+    verify: [py("src/exhausts_preview.py"), py("checks/exhausts_contact.py"), py("checks/exhausts-functional.py"), assembly("airframe_exhausts", "exhausts-assembly")],
+  },
+  {
+    id: "cockpit", model: "airframe_cockpit", report: "cockpit-assembly",
+    build: [py("src/airframe_cockpit.py")],
+    verify: [
+      py("src/cockpit_preview.py"), py("checks/cockpit_contact.py"), py("checks/cockpit-functional.py"),
+      py("checks/cockpit_refinement_check.py"), assembly("airframe_cockpit", "cockpit-assembly"),
+    ],
+  },
+  {
+    id: "gear", model: "airframe_gear", report: "gear",
+    build: [py("src/landing_gear.py", gear), py("src/airframe_gear.py")],
+    verify: [
+      py("checks/check_gear.py", gear),
+      py("parts/intakes/checks/photo_gear_intakes.py", undefined, "--integrated", "--artifact", "STEP/airframe_gear.step", "--report", "checks/gear-intake-travel-results.json"),
+      py("parts/intakes/checks/photo_integration_geometry.py", undefined, "--artifact", "STEP/airframe_gear.step", "--report", "checks/gear-intake-geometry-results.json"),
+      assembly("airframe_gear", "gear"),
+    ],
+  },
+  {
+    id: "complete", model: "f15c", report: "complete",
+    build: [py("src/gun.py"), py("src/details.py"), py("src/f15c.py")],
+    verify: [
+      py("src/gun_preview.py"), py("checks/gun.py"), py("src/details_preview.py"),
+      py("checks/details_contact.py"), py("checks/details_functional.py"), py("checks/complete.py"),
+    ],
+  },
 ];
+
+// `all`, one stage id, or `<id>+` for that stage and every later one.
 const selected = process.argv[2] ?? "all";
-if (selected !== "all" && !stages.some(stage => stage.id === selected)) {
-  throw new Error(`Unknown stage: ${selected}. Choose ${stages.map(stage => stage.id).join(", ")}, or all.`);
-}
+const from = selected.endsWith("+") ? selected.slice(0, -1) : selected;
+const first = selected === "all" ? 0 : stages.findIndex(stage => stage.id === from);
+if (first < 0) throw new Error(`Unknown stage: ${selected}. Choose ${stages.map(stage => stage.id).join(", ")}, <stage>+, or all.`);
+const chosen = selected === "all" || selected.endsWith("+") ? stages.slice(first) : [stages[first]];
 if (!existsSync(python)) throw new Error("Create assets/f15c/.venv and install assets/f15c/requirements.txt first.");
-function run(command: string[], cwd = cad) {
+mkdirSync(logs, { recursive: true });
+const env = { ...process.env, CADGEN_CACHE_DIR: process.env.F15C_CAD_CACHE ?? "/private/tmp/f15c-cadgen-cache" };
+
+function command(step: Step) {
   // The dynamically added part search paths are not fully tracked by the CAD
   // freshness gate. Rebuild authoring scripts so changed imported parts always
   // reach each cumulative saved model; ordinary verification scripts stay pure.
-  if (command[0] === python && command[1]?.startsWith("src/")) command.push("--force");
-  const result = Bun.spawnSync(command, {
-    cwd, env: { ...process.env, CADGEN_CACHE_DIR: process.env.F15C_CAD_CACHE ?? "/private/tmp/f15c-cadgen-cache" },
-    stdout: "inherit", stderr: "inherit",
-  });
+  return step.args[0] === python && /^src\//.test(step.args[1]) ? [...step.args, "--force"] : step.args;
+}
+function runNow(step: Step) {
+  const result = Bun.spawnSync(command(step), { cwd: step.cwd ?? cad, env, stdout: "inherit", stderr: "inherit" });
   if (result.exitCode) process.exit(result.exitCode);
 }
-for (const stage of stages) {
-  if (selected !== "all" && stage.id !== selected) continue;
-  if (stage.id === "intakes") {
-    run([python, "src/intakes_preview.py"], resolve(cad, "parts/intakes"));
-    run([python, "checks/intakes.py"], resolve(cad, "parts/intakes"));
-  } else if (stage.id === "wings") {
-    run([python, "checks/build_and_check.py"], resolve(cad, "parts/wings"));
-    run([process.execPath, "scripts/measure-f15c-wing.ts"], root);
-  } else if (stage.id === "tails") {
-    run([python, "src/tails.py"], resolve(cad, "parts/tails"));
-    run([python, "checks/tails.py"], resolve(cad, "parts/tails"));
-  } else if (stage.id === "exhausts") {
-    run([python, "src/exhausts_preview.py"]);
-    run([python, "checks/exhausts_contact.py"]);
-    run([python, "checks/exhausts-functional.py"]);
-  } else if (stage.id === "cockpit") {
-    run([python, "src/cockpit_preview.py"]);
-    run([python, "checks/cockpit_contact.py"]);
-    run([python, "checks/cockpit-functional.py"]);
-    run([python, "checks/cockpit_refinement_check.py"]);
-  } else if (stage.id === "gear") {
-    run([python, "src/landing_gear.py"], resolve(cad, "parts/gear"));
-    run([python, "checks/check_gear.py"], resolve(cad, "parts/gear"));
-  } else if (stage.id === "complete") {
-    run([python, "src/gun.py"]);
-    run([python, "src/gun_preview.py"]);
-    run([python, "checks/gun.py"]);
-    run([python, "src/details.py"]);
-    run([python, "src/details_preview.py"]);
-    run([python, "checks/details_contact.py"]);
-    run([python, "checks/details_functional.py"]);
-  }
-  run([python, `src/${stage.model}.py`]);
-  if (stage.id === "gear") {
-    for (const [checker, report] of [
-      ["photo_gear_intakes.py", "gear-intake-travel"],
-      ["photo_integration_geometry.py", "gear-intake-geometry"],
-    ]) {
-      run([python, `parts/intakes/checks/${checker}`,
-        ...(checker === "photo_gear_intakes.py" ? ["--integrated"] : []),
-        "--artifact", "STEP/airframe_gear.step", "--report", `checks/${report}-results.json`]);
+
+let slots = parallel;
+const waiting: (() => void)[] = [];
+async function verify(stage: Stage) {
+  if (slots > 0) slots--;
+  else await new Promise<void>(go => waiting.push(go));
+  const log = resolve(logs, `${stage.id}.log`);
+  const started = performance.now();
+  let transcript = "";
+  try {
+    for (const step of stage.verify) {
+      const child = Bun.spawn(command(step), { cwd: step.cwd ?? cad, env, stdout: "pipe", stderr: "pipe" });
+      const [out, err, code] = await Promise.all([new Response(child.stdout).text(), new Response(child.stderr).text(), child.exited]);
+      transcript += `$ ${step.args.slice(1).join(" ")}\n${out}${err}`;
+      await Bun.write(log, transcript);
+      if (code !== 0) {
+        console.error(`✗ ${stage.id} verification failed: ${step.args[1]} (log: ${log})\n${(out + err).split("\n").slice(-25).join("\n")}`);
+        return false;
+      }
     }
-  }
-  if (stage.id === "wings") run([python, "parts/wings/checks/check_root_blend.py"]);
-  if (stage.id === "tails") run([python, "checks/wing_tail_clearance.py"]);
-  if (stage.id === "fuselage") run([python, "checks/fuselage.py"]);
-  else if (stage.id === "complete") run([python, "checks/complete.py"]);
-  else run([python, "checks/assembly.py", `STEP/${stage.model}.step`, `checks/${stage.report}-results.json`]);
-  // A stage is copied into the lab only after the saved model passes its checks.
-  run([process.execPath, "scripts/publish-f15c-stages.ts", stage.id], root);
-  if (stage.id === "complete") {
-    run([python, "src/export_game.py"]);
-    run([process.execPath, "scripts/prepare-f15c.ts"], root);
-    run([process.execPath, "scripts/measure-f15c.ts"], root);
-    run([process.execPath, "scripts/publish-f15c-stages.ts"], root);
+    console.log(`✓ ${stage.id} verified in ${((performance.now() - started) / 60000).toFixed(1)} min (log: ${log})`);
+    return true;
+  } finally {
+    const next = waiting.shift();
+    if (next) next();
+    else slots++;
   }
 }
+
+const checks: Promise<boolean>[] = [];
+const began = performance.now();
+for (const stage of chosen) {
+  const started = performance.now();
+  for (const step of stage.build) runNow(step);
+  console.log(`· ${stage.id} built in ${((performance.now() - started) / 60000).toFixed(1)} min; verifying in background`);
+  checks.push(verify(stage));
+}
+const results = await Promise.all(checks);
+if (results.includes(false)) {
+  console.error("F-15C verification failed; nothing was published or exported.");
+  process.exit(1);
+}
+// A stage is copied into the lab only after its saved model passes its checks.
+const last = chosen[chosen.length - 1];
+if (last.id === "complete") {
+  runNow(py("src/export_game.py"));
+  // The CAD model holds the mechanical parts; Blender merges them with the outer skin.
+  runNow(bun("scripts/prepare-f15c.ts"));
+  const blender = process.env.BLENDER ?? "/Applications/Blender.app/Contents/MacOS/Blender";
+  const kept = backupSkinScene(resolve(root, "assets/f15c-skin.blend"), resolve(root, "assets/f15c/skin-backups"), Date.now());
+  if (kept) console.log(`Previous skin scene, with any hand sculpting, kept at ${kept}`);
+  runNow({ args: skinBuildCommand(blender, resolve(root, "scripts/build-f15c-skin.py")), cwd: root });
+  runNow({ args: skinBuildCommand(blender, resolve(root, "scripts/check-f15c-skin.py")), cwd: root });
+  runNow(bun("scripts/measure-f15c.ts"));
+  runNow(bun("scripts/publish-f15c-stages.ts"));
+} else runNow({ args: [process.execPath, "scripts/publish-f15c-stages.ts", last.id], cwd: root });
+console.log(`F-15C build finished in ${((performance.now() - began) / 60000).toFixed(1)} min.`);

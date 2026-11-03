@@ -1,4 +1,5 @@
 import { readFile, writeFile } from "node:fs/promises";
+import { frozenFlightGeometry } from "./f15c-skin-step";
 
 type Station = { x: number; y: number; leading: number; chord: number; zeroLiftAlpha: number; incidence: number };
 const source = new URL("../assets/f15c/parts/wings/checks/", import.meta.url);
@@ -22,5 +23,8 @@ const geometry = {
   wingArea: area, meanAerodynamicChord: chordSquared / area, quarterChordZ: quarterMoment / area,
   assumptions: [...measured.assumptions, "Runtime axes +X right/+Y up/+Z aft; CAD ground datum Z=2.38 m is subtracted from station heights."],
 };
-await writeFile(new URL("../src/aircraft/f15c/geometry.json", import.meta.url), `${JSON.stringify(geometry, null, 2)}\n`);
+// The flight model keeps these numbers even though the visible wing is now Blender's.
+const target = new URL("../src/aircraft/f15c/geometry.json", import.meta.url);
+const kept = frozenFlightGeometry(JSON.parse(await readFile(target, "utf8")), geometry, process.env.F15C_UNFREEZE_FLIGHT === "1");
+await writeFile(target, `${JSON.stringify(kept, null, 2)}\n`);
 console.log(JSON.stringify({ wingArea: area, meanAerodynamicChord: geometry.meanAerodynamicChord, quarterChordZ: geometry.quarterChordZ }));

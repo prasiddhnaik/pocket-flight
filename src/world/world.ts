@@ -1,10 +1,21 @@
 import * as T from "three";
 import { ObstacleIndex, type CollisionObstacles } from "../flight/obstacle-index";
-import { villageRoof, hangarRoof, groundPath } from "./scenery-geometry";
+import { villageRoof, hangarRoof, groundPath, palmGeometry, waveNormals } from "./scenery-geometry";
 import { makeTerrainMaterial } from "./terrain-material";
-import { addEnvironmentAssets, type VillageSite, type HangarSite } from "./environment-assets";
+import { loadRangeHeights, rangeLayout, rangeSurface } from "./range-island";
+import { addEnvironmentAssets, type VillageSite, type HangarSite, type LandmarkSite } from "./environment-assets";
+import type { TreeSite } from "./tree-field";
+import {
+  AIRFIELD_TOWER,
+  MARINA_PIERS,
+  PALM_BAY_AIRFIELD,
+  PALM_BAY_MARINA,
+  PALM_BAY_VILLAGE,
+  type Landmark,
+} from "./palm-bay-landmarks";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
+import { releaseAfterUpload } from "./texture-memory";
 import {
   terrainHeight,
   runways,
@@ -22,15 +33,47 @@ export type Obstacle = {
   radius: number;
   label: string;
 };
+const SHADOW_REACH = 350;
+const SUN_OFFSET = new T.Vector3(-600, 900, 500);
+// The shadow camera's own right and up directions.
+const SUN_ACROSS = new T.Vector3().crossVectors(new T.Vector3(0, 1, 0), SUN_OFFSET).normalize();
+const SUN_ALONG = new T.Vector3().crossVectors(SUN_OFFSET, SUN_ACROSS).normalize();
+
 export function makeWorld(
   scene: T.Scene,
   environmentFactory = addEnvironmentAssets,
 ) {
   const rng = random(512),
     obstacles: Obstacle[] = [];
-  const villageSites: VillageSite[] = [], hangarSites: HangarSite[] = [];
-  const mat = (color: string, roughness = 0.85) =>
-    new T.MeshStandardMaterial({ color, roughness });
+  const villageSites: VillageSite[] = [], hangarSites: HangarSite[] = [], landmarkSites: LandmarkSite[] = [];
+  /** Places a landmark's model when it loads, standing on `base`, with collision matching its walls. */
+  function addLandmark(landmark: Landmark, base: T.Matrix4, footing: number, placeholder: T.Object3D[] = []) {
+    landmarkSites.push({
+      asset: landmark.asset,
+      placeholder,
+      matrix: base.clone().multiply(
+        new T.Matrix4().compose(
+          new T.Vector3(landmark.x, 0, landmark.z),
+          new T.Quaternion().setFromAxisAngle(new T.Vector3(0, 1, 0), landmark.angle ?? 0),
+          new T.Vector3(1, 1, 1),
+        ),
+      ),
+      tint: landmark.tint ? new T.Color(landmark.tint) : undefined,
+    });
+    for (const [x, z, radius] of landmark.circles ?? []) {
+      const at = new T.Vector3(x, 0, z).applyMatrix4(base);
+      obstacles.push({ x: at.x, y: footing + (landmark.height ?? 0), z: at.z, radius, label: "building" });
+    }
+  }
+  // Scenery never edits these after creation, so equal finishes share one material.
+  const finishes = new Map<string, T.MeshStandardMaterial>();
+  const mat = (color: string, roughness = 0.85) => {
+    const key = `${color}/${roughness}`;
+    let material = finishes.get(key);
+    if (!material)
+      finishes.set(key, (material = new T.MeshStandardMaterial({ color, roughness })));
+    return material;
+  };
   const white = mat("#f8f0dd"),
     wood = mat("#796958"),
     sand = mat("#e9d7ac"),
@@ -95,14 +138,15 @@ export function makeWorld(
   const ambient = new T.HemisphereLight("#d0dce4", "#625b48", 1.55);
   scene.add(ambient);
   const sun = new T.DirectionalLight("#fff0d0", 2.7);
-  sun.position.set(-600, 900, 500);
+  sun.position.copy(SUN_OFFSET);
   sun.castShadow = true;
-  sun.shadow.mapSize.set(2048, 2048);
+  // The box follows the aircraft, so a smaller map keeps the same detail per metre.
+  sun.shadow.mapSize.set(1024, 1024);
   Object.assign(sun.shadow.camera, {
-    left: -700,
-    right: 700,
-    top: 700,
-    bottom: -700,
+    left: -SHADOW_REACH,
+    right: SHADOW_REACH,
+    top: SHADOW_REACH,
+    bottom: -SHADOW_REACH,
     near: 50,
     far: 2200,
   });
@@ -166,10 +210,38 @@ export function makeWorld(
   heightmap.needsUpdate = true;
   heightmap.magFilter = T.LinearFilter;
   heightmap.minFilter = T.LinearFilter;
+  // Anvil Key's shallows, filled in once its height grid arrives.
+  const rangeDepth = new Uint8Array(256 * 256 * 4);
+  const rangeMap = new T.DataTexture(rangeDepth, 256, 256);
+  rangeMap.magFilter = T.LinearFilter;
+  rangeMap.minFilter = T.LinearFilter;
+  const rangeHeights =
+    typeof window === "undefined"
+      ? Promise.resolve()
+      : loadRangeHeights()
+          .then(() => {
+            for (let z = 0; z < 256; z++)
+              for (let x = 0; x < 256; x++) {
+                const h =
+                  rangeSurface(
+                    rangeLayout.centre.x + (x / 255 - 0.5) * (rangeLayout.size - 1),
+                    rangeLayout.centre.z + (z / 255 - 0.5) * (rangeLayout.size - 1),
+                  ) ?? -40;
+                const i = (z * 256 + x) * 4;
+                rangeDepth[i] = Math.round(Math.max(0, Math.min(1, (h + 45) / 320)) * 255);
+                rangeDepth[i + 3] = 255;
+              }
+            rangeMap.needsUpdate = true;
+          })
+          .catch((error) => console.error("Anvil Key heights failed to load", error));
+  const oceanWaves = waveNormals();
   const oceanMaterial = new T.ShaderMaterial({
     uniforms: {
       time: { value: 0 },
+      waves: { value: oceanWaves },
       heightmap: { value: heightmap },
+      rangeMap: { value: rangeMap },
+      rangeArea: { value: new T.Vector3(rangeLayout.centre.x, rangeLayout.centre.z, rangeLayout.size) },
       night: { value: 0 },
       fogColor: { value: scene.background },
     },
@@ -185,22 +257,26 @@ export function makeWorld(
       }`,
     fragmentShader: `
  #include <logdepthbuf_pars_fragment>
- uniform float time; uniform sampler2D heightmap; uniform float night; uniform vec3 fogColor; varying vec3 vWorld;
- void main(){vec2 p=vWorld.xz;vec2 uv=p/2800.+.5;float h=texture2D(heightmap,clamp(uv,0.,1.)).r*320.-45.; if(abs(p.x)>1400.||abs(p.y)>1400.)h=-45.;float depth=max(0.,-h);
+ uniform float time; uniform sampler2D waves; uniform sampler2D heightmap; uniform sampler2D rangeMap; uniform vec3 rangeArea; uniform float night; uniform vec3 fogColor; varying vec3 vWorld;
+ void main(){vec2 p=vWorld.xz;vec2 uv=p/2800.+.5;float h=texture2D(heightmap,clamp(uv,0.,1.)).r*320.-45.; if(abs(p.x)>1400.||abs(p.y)>1400.)h=-45.;vec2 ruv=(p-rangeArea.xy)/rangeArea.z+.5;if(ruv.x>0.&&ruv.y>0.&&ruv.x<1.&&ruv.y<1.)h=texture2D(rangeMap,ruv).r*320.-45.;float depth=max(0.,-h);
  vec3 shallow=vec3(.055,.24,.20),deep=vec3(.012,.055,.082);vec3 color=mix(shallow,deep,smoothstep(0.,34.,depth));
- // Several oblique wave trains vary their phase; avoid the previous rectangular grid.
+ // Three scales at unrelated angles, so no grid can line up. Mipmaps fade each to flat water
+ // once it shrinks below a pixel, which is what stops moire at altitude.
  float warp=sin(p.x*.009+p.y*.006)*2.1+sin(p.y*.017-p.x*.003)*1.3;
- float wave=sin(p.x*.11+p.y*.043+warp+time*.7)*.55+sin(p.x*-.058+p.y*.097+warp*.6-time*.44)*.3+sin(p.x*.023-p.y*.037+time*.3)*.15;
- float footprint=max(length(dFdx(p)),length(dFdy(p)));
- float detail=1.-smoothstep(2.,12.,footprint);
- color+=wave*.007*detail;
- float foam=(1.-smoothstep(.4,3.8,depth))*smoothstep(.4,.9,sin(depth*2.1-time*.9+warp))*.32;color=mix(color,vec3(.48,.62,.55),foam);
+ vec4 swell=texture2D(waves,mat2(.83,-.56,.56,.83)*p*.0073+time*vec2(.006,.004));
+ vec4 chop=texture2D(waves,mat2(.39,.92,-.92,.39)*p*.0231+time*vec2(-.011,.016));
+ vec4 ripple=texture2D(waves,mat2(-.71,.7,-.7,-.71)*p*.067+time*vec2(.026,-.019));
+ vec4 broad=texture2D(waves,mat2(.96,.28,-.28,.96)*p*.00091);
+ color*=.9+(broad.b-.5)*.5;
+ color+=((swell.b-.5)*.5+(chop.b-.5)*.32+(ripple.b-.5)*.18)*mix(.022,.05,1.-smoothstep(0.,14.,depth));
+ float foam=(1.-smoothstep(.4,3.8,depth))*smoothstep(.4,.9,sin(depth*2.1-time*.9+warp+chop.b*4.))*.32*(.55+chop.b*.9);color=mix(color,vec3(.48,.62,.55),foam);
  vec3 view=normalize(cameraPosition-vWorld);
- vec2 slope=vec2(cos(p.x*.11+p.y*.043+warp+time*.7)*.06,cos(p.x*-.058+p.y*.097+warp*.6-time*.44)*.04)*detail;
+ vec2 slope=(swell.xy-.5)*.17+(chop.xy-.5)*.13+(ripple.xy-.5)*.1;
  vec3 normal=normalize(vec3(slope.x,1.,slope.y));
  vec3 halfVector=normalize(normalize(vec3(-.55,.82,.25))+view);
- float highlight=pow(max(0.,dot(normal,halfVector)),150.);
- color+=vec3(.27,.24,.18)*highlight;
+ float highlight=pow(max(0.,dot(normal,halfVector)),110.);
+ // From altitude the ripples have faded, so the glint would spread into a milky sheet.
+ color+=vec3(.3,.27,.2)*highlight*mix(1.,.28,smoothstep(120.,800.,length(cameraPosition-vWorld)));
  float fresnel=pow(1.-max(0.,dot(view,normal)),5.);
  color=mix(color,vec3(.20,.28,.33),fresnel*.65);
  color*=mix(1.,.29,night);float fog=smoothstep(1500.,6000.,length(p-cameraPosition.xz));
@@ -218,8 +294,7 @@ export function makeWorld(
   ocean.castShadow = false;
   ocean.receiveShadow = false;
   // Airfields: textured markings, edge lights, apron, hangars, and wind indicators.
-  const windsocks: T.Group[] = [],
-    nightLights: T.Mesh[] = [];
+  const windsocks: T.Group[] = [];
   for (const [index, r] of runways.entries()) {
     const g = new T.Group();
     g.position.set(r.x, r.y + 0.22, r.z);
@@ -254,6 +329,7 @@ export function makeWorld(
     const texture = new T.CanvasTexture(canvas);
     texture.anisotropy = 8;
     texture.colorSpace = T.SRGBColorSpace;
+    releaseAfterUpload([texture]);
     const tarmac = mesh(
       new T.PlaneGeometry(r.width, r.length),
       new T.MeshStandardMaterial({ map: texture, roughness: 0.96 }),
@@ -264,30 +340,74 @@ export function makeWorld(
     );
     tarmac.rotation.x = -Math.PI / 2;
     tarmac.castShadow = false;
+    // Edge lights are identical: one instanced batch per runway.
+    const bulbs: T.Matrix4[] = [];
     for (const side of [-1, 1])
-      for (let z = -r.length / 2 + 5; z < r.length / 2; z += 28) {
-        const bulb = ball(
-          side * (r.width / 2 + 2),
-          0.25,
-          z,
-          0.35,
-          0.3,
-          0.35,
-          new T.MeshBasicMaterial({ color: "#fff1bb" }),
-          g,
+      for (let z = -r.length / 2 + 5; z < r.length / 2; z += 28)
+        bulbs.push(
+          new T.Matrix4().compose(
+            new T.Vector3(side * (r.width / 2 + 2), 0.25, z),
+            new T.Quaternion(),
+            new T.Vector3(0.35, 0.3, 0.35),
+          ),
         );
-        nightLights.push(bulb);
-      }
+    const edgeLights = new T.InstancedMesh(
+      sphere,
+      new T.MeshBasicMaterial({ color: "#fff1bb" }),
+      bulbs.length,
+    );
+    bulbs.forEach((m, i) => edgeLights.setMatrixAt(i, m));
+    edgeLights.computeBoundingSphere();
+    edgeLights.castShadow = edgeLights.receiveShadow = true;
+    edgeLights.name = "Runway edge lights";
+    g.add(edgeLights);
+    // The apron's paint: a taxi line off the runway and a row of numbered parking stands.
+    const apronCanvas = document.createElement("canvas");
+    apronCanvas.width = 256;
+    apronCanvas.height = 440;
+    const paint = apronCanvas.getContext("2d")!;
+    paint.fillStyle = "#94948a";
+    paint.fillRect(0, 0, 256, 440);
+    // Its own stream: drawing from the world's would move every palm and cottage placed after this.
+    const speckle = random(731 + index);
+    for (let i = 0; i < 5000; i++) {
+      paint.fillStyle = `rgba(${speckle() < 0.5 ? "40,40,36" : "220,220,205"},${speckle() * 0.07})`;
+      paint.fillRect(speckle() * 256, speckle() * 440, 3, 3);
+    }
+    paint.fillStyle = "rgba(60,60,54,.35)";
+    for (let z = 0; z < 440; z += 40) paint.fillRect(0, z, 256, 1.5);
+    for (let x = 0; x < 256; x += 40) paint.fillRect(x, 0, 1.5, 440);
+    paint.fillStyle = "#d9b43c";
+    paint.fillRect(44, 0, 4, 440);
+    paint.font = "bold 22px sans-serif";
+    paint.textAlign = "center";
+    for (let i = 0; i < 3; i++) {
+      const z = 70 + i * 128;
+      paint.fillStyle = "#d9b43c";
+      paint.fillRect(48, z - 2, 104, 4);
+      paint.fillRect(148, z - 26, 4, 52);
+      // Turned to read from the taxi line, looking toward the hangars.
+      paint.save();
+      paint.translate(120, z - 14);
+      paint.rotate(Math.PI / 2);
+      paint.fillStyle = "#e9e9d7";
+      paint.fillText(String(i + 1), 0, 0);
+      paint.restore();
+    }
+    const apronTexture = new T.CanvasTexture(apronCanvas);
+    apronTexture.anisotropy = 8;
+    apronTexture.colorSpace = T.SRGBColorSpace;
+    releaseAfterUpload([apronTexture]);
     const apron = mesh(
       new T.PlaneGeometry(64, 110),
-      mat("#949482"),
+      new T.MeshStandardMaterial({ map: apronTexture, roughness: 0.95 }),
       44,
       APRON_PAVEMENT_HEIGHT - 0.22,
       70,
       g,
     );
     apron.rotation.x = -Math.PI / 2;
-    for (let i = 0; i < (index === 0 ? 3 : 1); i++) {
+    for (let i = 0; i < (index === 1 ? 1 : 3); i++) {
       const shell = box(69, 5.3, i * 32 + 25, 23, 10.6, 24, white, g);
       const covering = mesh(hangarRoof(), mat("#648b8c"), 69, 10.2, i * 32 + 25, g);
       const door = box(56.9, 4.3, i * 32 + 25, 0.5, 8, 18, dark, g);
@@ -304,10 +424,14 @@ export function makeWorld(
         label: "hangar",
       });
     }
-    box(42, 2.4, -25, 12, 4.8, 16, white, g);
-    box(42, 6.9, -25, 7, 5, 8, wood, g);
-    box(42, 9.2, -25, 9, 3, 10, mat("#8cbfc5"), g);
-    box(42, 11, -25, 11, 0.7, 12, white, g);
+    g.updateMatrixWorld(true);
+    addLandmark(AIRFIELD_TOWER, g.matrixWorld, r.y, [
+      box(42, 2.4, -25, 12, 4.8, 16, white, g),
+      box(42, 6.9, -25, 7, 5, 8, wood, g),
+      box(42, 9.2, -25, 9, 3, 10, mat("#8cbfc5"), g),
+      box(42, 11, -25, 11, 0.7, 12, white, g),
+    ]);
+    if (index === 0) for (const landmark of PALM_BAY_AIRFIELD) addLandmark(landmark, g.matrixWorld, r.y);
     const sock = new T.Group();
     sock.position.set(-r.width / 2 - 11, 0, r.length / 2 - 80);
     g.add(sock);
@@ -336,73 +460,18 @@ export function makeWorld(
     }
   }
   // Curved palm trees assembled once and instanced throughout the coast.
-  const palmParts: T.BufferGeometry[] = [];
-  for (let i = 0; i < 7; i++) {
-    const geo = new T.CylinderGeometry(
-      0.31 - i * 0.018,
-      0.34 - i * 0.018,
-      1.8,
-      7,
-    );
-    geo.translate(Math.sin(i * 0.18) * 0.65, i * 1.65 + 0.9, 0);
-    palmParts.push(geo);
-  }
-  const trunkGeo = mergeGeometries(palmParts)!;
-  const leafParts: T.BufferGeometry[] = [];
-  for (let a = 0; a < 8; a++) {
-    const verts: number[] = [],
-      idx: number[] = [];
-    const angle = (a * Math.PI) / 4;
-    for (let i = 0; i <= 10; i++) {
-      const t = i / 10;
-      const len = t * 6.6,
-        y = 12 + Math.sin(t * Math.PI) * 1.5 - t * 2.3,
-        w = Math.sin(t * Math.PI) * 0.045;
-      for (const side of [-1, 1])
-        verts.push(
-          Math.cos(angle) * len - Math.sin(angle) * w * side + 0.5,
-          y,
-          Math.sin(angle) * len + Math.cos(angle) * w * side,
-        );
-    }
-    for (let i = 0; i < 10; i++) {
-      const n = i * 2;
-      idx.push(n, n + 1, n + 2, n + 1, n + 3, n + 2);
-    }
-    // Pinnate leaflets attach to each curved frond's rachis.
-    for (let j=1;j<18;j++) {
-      const t=j/18, len=t*6.6;
-      const y=12+Math.sin(t*Math.PI)*1.5-t*2.3;
-      const width=Math.sin(t*Math.PI)*1.05;
-      for (const side of [-1,1]) {
-        const start=verts.length/3;
-        const dx=Math.cos(angle), dz=Math.sin(angle);
-        verts.push(dx*len+.5,y,dz*len,
-          dx*(len+.38)-dz*width*side+.5,y-.25,dz*(len+.38)+dx*width*side,
-          dx*(len+.12)+.5,y-.05,dz*(len+.12));
-        idx.push(start,start+1,start+2);
-      }
-    }
-    const geo = new T.BufferGeometry();
-    geo.setAttribute("position", new T.Float32BufferAttribute(verts, 3));
-    geo.setIndex(idx);
-    geo.computeVertexNormals();
-    leafParts.push(geo);
-  }
-  const trunks = new T.InstancedMesh(trunkGeo, wood, 250),
+  const palm = palmGeometry();
+  const trunks = new T.InstancedMesh(palm.trunk, mat("#85745e"), 250),
     leaves = new T.InstancedMesh(
-      mergeGeometries(leafParts)!,
-      new T.MeshStandardMaterial({
-        color: "#496f34",
-        roughness: 0.85,
-        side: T.DoubleSide,
-      }),
+      palm.fronds,
+      new T.MeshStandardMaterial({ vertexColors: true, roughness: 0.78, side: T.DoubleSide }),
       250,
     );
   scene.add(trunks, leaves);
   trunks.castShadow = true;
   leaves.castShadow = true;
   const dummy = new T.Object3D();
+  const palmSites: TreeSite[] = [];
   let count = 0;
   for (let attempt = 0; attempt < 10000 && count < 250; attempt++) {
     const x = (rng() - 0.5) * 2100,
@@ -423,6 +492,17 @@ export function makeWorld(
     dummy.updateMatrix();
     trunks.setMatrixAt(count, dummy.matrix);
     leaves.setMatrixAt(count, dummy.matrix);
+    palmSites.push({
+      kind: "palm",
+      x,
+      y: h,
+      z,
+      scale: dummy.scale.x,
+      yaw: dummy.rotation.y,
+      stretch: 1,
+      // Not from the shared stream, for the same reason as the apron's speckle.
+      shade: 0.84 + ((count * 0.618) % 1) * 0.3,
+    });
     obstacles.push({
       x,
       y: h + 12 * dummy.scale.x,
@@ -534,22 +614,18 @@ export function makeWorld(
     6,
     sand,
   );
-  for (let i = 0; i < 3; i++) {
-    const x = -505 - i * 20,
-      z = 600 + i * 8;
-    box(x, 2, z, 6, 1.6, 75, wood);
-    for (let j = 0; j < 7; j++) {
-      box(x, 1, z - 30 + j * 10, 7, 0.22, 0.35, sand);
-    }
+  const ground = new T.Matrix4();
+  for (const [x, z] of MARINA_PIERS) {
+    const fallback: T.Object3D[] = [box(x, 1.5, z, 6, 1.6, 75, wood)];
     for (const s of [-1, 1])
       for (const end of [-1, 1])
-        mesh(
-          new T.CylinderGeometry(0.35, 0.35, 6, 8),
-          wood,
-          x + s * 2.4,
-          0.5,
-          z + end * 30,
-        );
+        fallback.push(mesh(new T.CylinderGeometry(0.35, 0.35, 6, 8), wood, x + s * 2.4, 0.5, z + end * 30));
+    addLandmark({ asset: "marina-pier", x, z, reach: 38 }, ground, 0, fallback);
+  }
+  for (const landmark of [...PALM_BAY_VILLAGE, ...PALM_BAY_MARINA]) {
+    const afloat = landmark.asset === "marina-boat";
+    const footing = afloat ? 0.1 : terrainHeight(landmark.x, landmark.z);
+    addLandmark(landmark, new T.Matrix4().makeTranslation(0, footing, 0), footing);
   }
   const lighthouse = new T.Group();
   const lx = -680,
@@ -583,8 +659,16 @@ export function makeWorld(
     radius: 5,
     label: "lighthouse",
   });
+  addLandmark(
+    { asset: "palm-bay-lighthouse", x: lx, z: lz, reach: 13 },
+    new T.Matrix4().makeTranslation(0, Math.max(3, lh), 0),
+    Math.max(3, lh),
+    [lighthouse],
+  );
   const beacon = new T.PointLight("#fff0b8", 0, 180);
   beacon.position.set(lx, Math.max(3, lh) + 20, lz);
+  // A visible light costs every lit pixel even at zero intensity; add it at dusk.
+  beacon.visible = false;
   scene.add(beacon);
   // Slowly moving craft and curved wakes make the water feel inhabited.
   const boats: {
@@ -651,6 +735,7 @@ export function makeWorld(
     });
   }
   const clouds: T.Group[] = [];
+  const cloudStarts: number[] = [];
   const cloudMat = new T.MeshStandardMaterial({
     color: "#fff9e8",
     roughness: 1,
@@ -668,8 +753,10 @@ export function makeWorld(
     }
     g.scale.setScalar(0.6 + rng());
     scene.add(g);
+    // The scenery loader swaps these placeholder puffs for cloud sprites.
     g.name = "Cloud formation";
     clouds.push(g);
+    cloudStarts.push(g.position.x);
   }
   const birdGeo = new T.BufferGeometry().setFromPoints([
     new T.Vector3(-1.8, 0, 0.6),
@@ -707,11 +794,11 @@ export function makeWorld(
     sizeAttenuation: false,
   });
   scene.add(new T.Points(starsGeo, starMat));
-  const environment = typeof window === "undefined" ? undefined : environmentFactory(scene, villageSites, hangarSites, obstacles, land);
+  const environment = typeof window === "undefined" ? undefined : environmentFactory(scene, villageSites, hangarSites, obstacles, land, landmarkSites, palmSites);
   // Asset loading replaces the placeholder tree proxies and adjusts buildings.
   // Keep exhaustive collision until every replacement is complete.
   let collisionObstacles: CollisionObstacles = obstacles;
-  const ready = (environment?.ready ?? Promise.resolve()).then(() => {
+  const ready = Promise.all([environment?.ready, rangeHeights]).then(() => {
     collisionObstacles = new ObstacleIndex(obstacles);
   });
   let nightValue = 0;
@@ -720,6 +807,17 @@ export function makeWorld(
     get collisionObstacles() { return collisionObstacles; },
     sun,
     ready,
+    /** Centres the shadow map on the aircraft, on whole texels so shadow edges don't crawl. */
+    focusSun(focus: T.Vector3) {
+      const texel = (2 * SHADOW_REACH) / sun.shadow.mapSize.x,
+        a = focus.dot(SUN_ACROSS),
+        b = focus.dot(SUN_ALONG);
+      sun.target.position
+        .copy(focus)
+        .addScaledVector(SUN_ACROSS, Math.round(a / texel) * texel - a)
+        .addScaledVector(SUN_ALONG, Math.round(b / texel) * texel - b);
+      sun.position.copy(sun.target.position).add(SUN_OFFSET);
+    },
     update(time: number, night: boolean) {
       nightValue = T.MathUtils.lerp(nightValue, night ? 1 : 0, 0.022);
       oceanMaterial.uniforms.time.value = time;
@@ -728,6 +826,7 @@ export function makeWorld(
       sun.intensity = T.MathUtils.lerp(2.7, 0.45, nightValue);
       sun.color.set(nightValue > 0.5 ? "#b6cbe9" : "#fff0d0");
       beacon.intensity = nightValue * 25;
+      beacon.visible = nightValue > 0.001;
       starMat.opacity = nightValue;
       (scene.background as T.Color).lerpColors(
         new T.Color("#a7c3d3"),
@@ -756,7 +855,9 @@ export function makeWorld(
           Math.sin(time * 1.2 + a) * 0.035,
         );
       }
-      for (let i = 0; i < clouds.length; i++) clouds[i].position.x += 0.012;
+      // Drift with world time (0.72 m/s), not per frame, so speed is display-independent.
+      for (let i = 0; i < clouds.length; i++)
+        clouds[i].position.x = cloudStarts[i] + time * 0.72;
       for (let i = 0; i < birds.length; i++) {
         const a = time * 0.13 + i * 0.6;
         birds[i].position.set(
@@ -782,6 +883,7 @@ export function makeWorld(
         }
       });
       heightmap.dispose();
+      rangeMap.dispose();
     },
   };
 }

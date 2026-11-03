@@ -7,7 +7,7 @@ import {
   type StudioProject,
 } from "../studio-model";
 import type { SavedReplay } from "../../replay/replay-data";
-import { aircraftNames } from "../../app/flight-ui";
+import { replayAircraftName } from "../../flight/combat/tape";
 import { clock } from "../studio-format";
 
 export function StudioClipInspector({
@@ -38,7 +38,7 @@ export function StudioClipInspector({
           <div className="studio-selected-title">
             <b>{source.name}</b>
             <small>
-              {aircraftNames[source.aircraft]} · source {clock(source.duration)}
+              {replayAircraftName(source)} · source {clock(source.duration)}
             </small>
           </div>
           <fieldset disabled={busy}>

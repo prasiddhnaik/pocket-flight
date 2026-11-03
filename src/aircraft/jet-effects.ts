@@ -1,6 +1,6 @@
 import { peregrineLayout } from "./peregrine/layout";
 import * as T from "three";
-import { exhaustSlabs, f100FlameFragment } from "./f15c/exhaust-shader";
+import { afterburnerFlameFragment, exhaustSlabs } from "./f15c/exhaust-shader";
 import { StormbirdMechanisms } from "./stormbird/stormbird-mechanisms";
 import stormbirdGeometry from "./stormbird/stormbird-geometry.json";
 import { STORMBIRD_GEAR_SECONDS } from "./stormbird/stormbird-kinematics";
@@ -47,7 +47,9 @@ export type JetLayout = {
   flameEmission?: number;
   flameLight?: number;
   flameBlending?: "normal";
-  flameStyle?: "f100";
+  flameStyle?: "afterburner";
+  /** Multiplies the flame's body colour, so each aircraft keeps its own look. */
+  flameTint?: Point;
   afterburnerBand?: [number, number];
   gearDoorsOpen?: boolean;
   lamps?: [number, number, number, string, string][];
@@ -112,6 +114,9 @@ export function sequenceInput(mode: JetMode, t: number): JetInput {
   }
   return i;
 }
+const BURNER_LIT = 0.05;
+/** Ignition flash: 0 to 1 in a blink, then gone within about half a second. */
+export const lightOffKick = (age: number) => smooth(0, 0.035, age) * Math.exp(-age / 0.16);
 export class JetMotion {
   #mechanical: boolean;
   #afterburnerBand: [number, number];
@@ -139,12 +144,15 @@ export class JetMotion {
   gunAngle = 0;
   gunSpeed = 0;
   touchdownAge = 10;
+  /** Seconds since the burner lit. Saved with the other values, so replays show the flash. */
+  lightOffAge = 10;
   update(dt: number, i: JetInput) {
     if (dt <= 0) return;
     this.time += dt;
     this.touchdownAge += dt;
     const previousRpm = this.rpm,
-      previousSpeed = this.speed;
+      previousSpeed = this.speed,
+      previousBurner = this.burner;
     const approach = (value: number, target: number, rate: number) =>
       T.MathUtils.damp(value, target, rate, dt);
     this.rpm = i.powerResolved ? clamp(i.throttle, 0, 1) : approach(
@@ -157,6 +165,9 @@ export class JetMotion {
       i.burner ? smooth(...this.#afterburnerBand, this.rpm) : 0,
       i.powerResolved ? 12 : 3,
     );
+    this.lightOffAge = previousBurner < BURNER_LIT && this.burner >= BURNER_LIT
+      ? 0
+      : Math.min(10, this.lightOffAge + dt);
     const advance = (value: number, target: number, seconds: number) =>
       value + clamp(target - value, -dt / seconds, dt / seconds);
     this.gear = i.gearPosition === undefined
@@ -296,13 +307,14 @@ export class JetEffects {
       {
         const material = new T.ShaderMaterial({
           vertexShader: flameVertex,
-          fragmentShader: layout.flameStyle === "f100" ? f100FlameFragment : flameFragment,
+          fragmentShader: layout.flameStyle === "afterburner" ? afterburnerFlameFragment : flameFragment,
           uniforms: {
             time: { value: 0 },
             strength: { value: 0 },
             phase: { value: index * 2.3 },
             gain: { value: layout.flameEmission ?? 1.7 },
             eye: { value: new T.Vector3() },
+            tint: { value: new T.Vector3(...(layout.flameTint ?? [1, 1, 1])) },
           },
           transparent: true,
           depthWrite: false,
@@ -569,23 +581,26 @@ export class JetEffects {
       const health = index === 0 ? 1 - s.damage : 1;
       const power = s.burner * health;
       const hot = s.rpm * health;
-      const f100 = this.layout.flameStyle === "f100";
-      const flicker = f100 && !this.reduced ? 1 + .018 * Math.sin(t * 47 + index * 1.7) + .008 * Math.sin(t * 83) : 1;
+      const shaped = this.layout.flameStyle === "afterburner";
+      const flicker = shaped && !this.reduced ? 1 + .018 * Math.sin(t * 47 + index * 1.7) + .008 * Math.sin(t * 83) : 1;
+      // The engines catch a moment apart. Reduced motion skips the flash.
+      const kick = this.reduced ? 0 : lightOffKick(s.lightOffAge - index * 0.06) * health;
       this.flames[index].visible = power > 0.01;
       this.flames[index].scale.set(
         this.layout.flameRadius * this.exhaustScale * flicker,
         this.layout.flameRadius * this.exhaustScale * flicker,
-        this.layout.flameLength * (f100 ? .28 + power * .72 : .48 + power * .52) * flicker,
+        this.layout.flameLength * (shaped ? .28 + power * .72 : .48 + power * .52) * flicker * (1 + kick * .22),
       );
       const u = this.flameMaterials[index].uniforms;
       u.time.value = this.reduced ? 0 : t;
       u.strength.value = power;
+      u.gain.value = (this.layout.flameEmission ?? 1.7) * (1 + kick * .45);
       const glow = this.engineGlows[index];
-      glow.material.color.set(f100 ? "#b9acff" : "#ffd0a0");
-      glow.material.opacity = hot * 0.08 + power * (f100 ? .12 : .24);
-      glow.scale.setScalar((f100 ? .9 : .7) + power * .3);
+      glow.material.color.set(shaped ? "#ffb06a" : "#ffd0a0");
+      glow.material.opacity = (shaped ? hot * .05 + power * .16 : hot * .08 + power * .24) + kick * .55;
+      glow.scale.setScalar((shaped ? 1.1 + power * .5 : .7 + power * .3) + kick * 2.4);
       this.engineLights[index].intensity =
-        (hot * 0.4 + power * 5) * (this.layout.flameLight ?? 1);
+        (hot * 0.4 + power * 5 + kick * 10) * (this.layout.flameLight ?? 1);
     }
     for (const { sprite, kind } of this.lamps) {
       let a = input.lights ? 1 : 0;

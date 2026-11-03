@@ -166,7 +166,8 @@ await doc.transform(dedup(), prune());
 await new NodeIO()
   .setVertexLayout(VertexLayout.SEPARATE)
   .write(
-    fileURLToPath(new URL("../public/assets/heron-ut9.glb", import.meta.url)),
+    // The game model comes from scripts/build-heron-skin.py, which reads this.
+    fileURLToPath(new URL("../assets/heron/GLB/heron-ut9-cad.glb", import.meta.url)),
     doc,
   );
 console.log(

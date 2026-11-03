@@ -13,7 +13,7 @@ export class CannonEffects {
   private targets: PracticeTarget[] = [];
   private projectiles = new ProjectileVisuals();
   private discharge = new CannonFlash();
-  private impactGeometry = new T.SphereGeometry(.12, 6, 4);
+  private impactGeometry = new T.SphereGeometry(.24, 8, 6);
   private impactMaterial = new T.MeshBasicMaterial({ color: "#ffd3a0", transparent: true, depthWrite: false });
   private impacts = Array.from({ length: 24 }, () => ({ mesh: new T.Mesh(this.impactGeometry, this.impactMaterial), life: 0 }));
   private velocity = new T.Vector3();
@@ -21,6 +21,7 @@ export class CannonEffects {
   private hud = document.createElement("div");
   private reticle = document.createElement("div");
   private targetsHit = 0;
+  private customMuzzle: T.Vector3 | null = null;
 
   constructor(container: HTMLElement, private readonly surfaceHeight?: (x: number, z: number) => number) {
     this.group.add(this.projectiles.group, this.discharge.group);
@@ -35,6 +36,7 @@ export class CannonEffects {
 
   reset(physics: CannonAircraft, practiceTargets = true) {
     this.firing = false;
+    this.customMuzzle = null;
     this.simulation.reset();
     this.targetsHit = 0;
     this.targets.forEach(target => {
@@ -62,13 +64,14 @@ export class CannonEffects {
 
   suspend() { this.firing = false; this.simulation.suspend(); this.discharge.suspend(); }
 
-  step(dt: number, physics: CannonAircraft, firing: boolean) {
-    this.velocity.copy(muzzleVelocity(physics.velocity, physics.angularVelocity, physics.quaternion));
+  step(dt: number, physics: CannonAircraft, firing: boolean, externalTargets?: readonly CannonTarget[], muzzle?: T.Vector3) {
+    this.customMuzzle = muzzle?.clone() ?? null;
+    this.velocity.copy(muzzle ? physics.angularVelocity.clone().cross(muzzle).applyQuaternion(physics.quaternion).add(physics.velocity) : muzzleVelocity(physics.velocity, physics.angularVelocity, physics.quaternion));
     this.wind.copy(physics.wind);
     for (const impact of this.impacts) {
       impact.life = Math.max(0, impact.life - dt);
       impact.mesh.visible = impact.life > 0;
-      impact.mesh.scale.setScalar(.5 + (1 - impact.life / .15) * 2);
+      impact.mesh.scale.setScalar(.6 + (1 - impact.life / .15) * 3);
     }
     for (const target of this.targets) {
       target.flash = Math.max(0, target.flash - dt);
@@ -79,12 +82,13 @@ export class CannonEffects {
       target.mesh.scale.setScalar(target.flash > 0 ? 1.12 : 1);
     }
     const pose = cannonPose(physics.position, physics.quaternion);
-    const result = this.simulation.step(dt, { ...pose, firing, velocity: this.velocity }, this.targets.filter(target => target.health > 0), { wind: this.wind, surfaceHeight: this.surfaceHeight });
+    if (muzzle) pose.origin.copy(muzzle).applyQuaternion(physics.quaternion).add(physics.position);
+    const result = this.simulation.step(dt, { ...pose, firing, velocity: this.velocity }, externalTargets ?? this.targets.filter(target => target.health > 0), { wind: this.wind, surfaceHeight: this.surfaceHeight });
     if (dt > 0) this.firing = firing && (this.simulation.ammunition > 0 || result.fired > 0);
     this.discharge.step(dt, result.fired, this.simulation.shots, pose.origin, pose.direction, this.velocity, this.wind);
     for (const hit of result.hits) {
-      const target = this.targets.find(t => t.id === hit.target)!;
-      if (target.health <= 0) continue;
+      const target = this.targets.find(t => t.id === hit.target);
+      if (!target || target.health <= 0) continue;
       target.health--; target.flash = .15;
       if (!target.health) { this.targetsHit++; target.mesh.visible = false; target.respawn = 5; }
     }
@@ -96,16 +100,18 @@ export class CannonEffects {
     return result;
   }
 
-  render(visible: boolean, camera: T.Camera, aircraft: T.Object3D, showReticle = true) {
+  render(visible: boolean, camera: T.Camera, aircraft: T.Object3D, showReticle = true, showStatus = true) {
     this.group.visible = visible;
     this.hud.style.display = this.reticle.style.display = visible ? "block" : "none";
     if (!visible) return;
+    if (!showStatus) this.hud.style.display = "none";
     const label = `GUN ${this.simulation.ammunition.toString().padStart(3, "0")} / 940 · HITS ${this.simulation.hits} · TARGETS ${this.targetsHit}`;
     if (this.hud.textContent !== label) this.hud.textContent = label;
     this.hud.title = "Hold J or FIRE · 20 mm · 500 m ballistic reference · Practice targets reset after five seconds";
     // Ballistics use fixed physics steps; presentation follows the same
     // interpolated transform as the visible aircraft and its gun port.
     const pose = cannonPose(aircraft.getWorldPosition(new T.Vector3()), aircraft.getWorldQuaternion(new T.Quaternion()));
+    if (this.customMuzzle) pose.origin.copy(this.customMuzzle).applyQuaternion(aircraft.getWorldQuaternion(new T.Quaternion())).add(aircraft.getWorldPosition(new T.Vector3()));
     this.discharge.render(camera, pose.origin, pose.direction);
     if (!showReticle) { this.reticle.style.display = "none"; return; }
     const aim = pose.origin.clone(), velocity = pose.direction.clone().multiplyScalar(1030).add(this.velocity);

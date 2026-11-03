@@ -1,6 +1,7 @@
 import * as T from "three";
 import type { AircraftId } from "../aircraft/aircraft";
 import { groundAt } from "../world/terrain";
+import { F15C_NOZZLE } from "../aircraft/f15c/design";
 import {
   finchWheels,
   f15cWheels,
@@ -22,6 +23,7 @@ type Particle = {
   color: T.Color;
   seed: number;
   stretch: T.Vector3;
+  fadeIn: number;
 };
 export type VfxInput = {
   id: AircraftId;
@@ -35,6 +37,9 @@ export type VfxInput = {
   grounded: boolean;
   load: number;
   suspension: number;
+  /** Engine power and burner, 0 to 1. */
+  power?: number;
+  burner?: number;
 };
 const wheels = {
   f15c: f15cWheels,
@@ -45,14 +50,29 @@ const wheels = {
   stormbird: stormbirdWheels,
 };
 // Emission datums use the same metre scale and body offset as the flight models.
+export const f15cEmissionDatum = {
+  exhaust: [F15C_NOZZLE.x, F15C_NOZZLE.y, F15C_NOZZLE.exit],
+  wing: [6.45, -0.06, 3.85],
+};
 const datums = {
-  f15c: { exhaust: [1.025, -0.125, 9.431], wing: [6.45, 0.6, 4.2] },
+  f15c: f15cEmissionDatum,
   heron: { exhaust: [0.70, -0.16, -3.25], wing: [7.935, 1.15, -0.26] },
   finch: { exhaust: [0.42, -0.25, -1.55], wing: [5.49, 0.18, 0.55] },
   peregrine: { exhaust: [0.637, 0.406, 9.604], wing: [6.916, 1.246, 3.64] },
   aurelia: { exhaust: [1.793, 1.073, 6.82], wing: [7.315, 0.963, 2.937] },
   stormbird: { exhaust: [1.28, -0.1, 7.93], wing: [6.58, 0.11, 3.01] },
 };
+// Layers of trail behind the aircraft. Each sprite stretches back to the one
+// before it, so at any speed they read as one line.
+const trailLayers = [
+  // A tight bright core and a soft sheath, so a wingtip trail reads from the chase camera.
+  { kind: "vortex", source: "wing", hz: 60, size: 0.13, growth: 0.26, opacity: 0.66, life: 1.8, color: "vapor", fadeIn: 90, carry: 0, rise: -0.12 },
+  { kind: "vortex", source: "wing", hz: 30, size: 0.5, growth: 0.85, opacity: 0.17, life: 2.6, color: "vapor", fadeIn: 30, carry: 0, rise: -0.12 },
+  // Condensation forms a little way behind the nozzles, then spreads and lingers.
+  { kind: "contrail", source: "exhaust", hz: 30, size: 0.5, growth: 0.55, opacity: 0.72, life: 10, color: "vapor", fadeIn: 5, carry: 0, rise: -0.12 },
+  // Hot gas at any height: short and faint, and it rises as it mixes with the air.
+  { kind: "exhaust", source: "exhaust", hz: 30, size: 0.42, growth: 1.8, opacity: 0.22, life: 0.9, color: "#d4d0c8", fadeIn: 30, carry: 0.16, rise: 0.5 },
+] as const;
 const vertex = `#include <common>
 #include <logdepthbuf_pars_vertex>
 #include <fog_pars_vertex>
@@ -176,13 +196,19 @@ class ParticleBatch {
       );
       tint.setXYZ(count, p.color.r, p.color.g, p.color.b);
       size.setX(count, p.size + age * p.growth);
-      alpha.setX(count, p.opacity * Math.min(1, age * 18) * (1 - f) ** 1.6);
+      alpha.setX(count, p.opacity * Math.min(1, age * p.fadeIn) * (1 - f) ** 1.6);
       seed.setX(count, p.seed + age * 0.18);
       stretch.setXYZ(count, p.stretch.x, p.stretch.y, p.stretch.z);
       count++;
     }
-    for (const attribute of Object.values(this.geometry.attributes))
-      attribute.needsUpdate = true;
+    // Upload only the live particles, not the whole capacity.
+    if (count)
+      for (const attribute of Object.values(this.geometry.attributes)) {
+        if (!(attribute instanceof T.BufferAttribute)) continue;
+        attribute.clearUpdateRanges();
+        attribute.addUpdateRange(0, count * attribute.itemSize);
+        attribute.needsUpdate = true;
+      }
     this.geometry.setDrawRange(0, count);
     this.points.visible = count > 0;
     this.points.material.uniforms.viewportHeight.value = height;
@@ -220,13 +246,15 @@ export function tireContactPoints(input: VfxInput) {
 
 export class FlightVfx {
   readonly group = new T.Group();
-  private clouds = new ParticleBatch(8192, 512);
+  private clouds = new ParticleBatch(8192, 1024);
   private sparks = new ParticleBatch(512, 96, true);
   private nextEmission = NaN;
+  private wakeTick = 0;
   private point = new T.Vector3();
   private drift = new T.Vector3();
   private streak = new T.Vector3();
-  private colors = new Map<string, T.Color>();
+  // Vapour is brighter than white, so it survives tone mapping against a pale sky.
+  private colors = new Map<string, T.Color>([["vapor", new T.Color(1.7, 1.78, 1.85)]]);
   private randomState = 42;
   constructor() {
     this.group.name = "Flight atmosphere VFX";
@@ -248,6 +276,7 @@ export class FlightVfx {
     acceleration = 0.15,
     spark = false,
     stretch = new T.Vector3(),
+    fadeIn = 18,
   ) {
     if (!this.colors.has(color)) this.colors.set(color, new T.Color(color));
     (spark ? this.sparks : this.clouds).emit({
@@ -262,12 +291,14 @@ export class FlightVfx {
       life,
       acceleration,
       seed: this.random() * 100,
+      fadeIn,
     });
   }
   reset() {
     this.clouds.reset();
     this.sparks.reset();
     this.nextEmission = NaN;
+    this.wakeTick = 0;
     this.randomState = 42;
   }
   step(dt: number, input: VfxInput) {
@@ -278,13 +309,14 @@ export class FlightVfx {
     )
       this.nextEmission = input.time - dt;
     while (this.nextEmission < input.time - 1e-6) {
-      this.emitWake(this.nextEmission, input);
-      this.nextEmission += 1 / 30;
+      this.emitWake(this.nextEmission, input, this.wakeTick++ % 2 === 0);
+      this.nextEmission += 1 / 60;
     }
   }
-  private emitWake(time: number, i: VfxInput) {
+  /** @param coarse true on every second tick, for the layers that emit at 30 Hz. */
+  private emitWake(time: number, i: VfxInput, coarse: boolean) {
     const datum = datums[i.id];
-    if (i.damage > 0.25) {
+    if (coarse && i.damage > 0.25) {
       for (const side of i.id === "finch" ? [1] : [-1, 1]) {
         this.point.fromArray(datum.exhaust);
         this.point.x *= side;
@@ -307,40 +339,41 @@ export class FlightVfx {
         );
       }
     }
-    // Brief wingtip condensation during loaded turns; high-altitude exhaust trails.
-    const vortex =
-      !i.grounded && i.speed > 65 ? T.MathUtils.smoothstep(i.load, 1.5, 3) : 0;
-    const contrail =
-      i.id !== "finch" && i.id !== "heron" && !i.grounded
-        ? T.MathUtils.smoothstep(i.position.y, 1700, 2400)
-        : 0;
-    for (const [strength, source, life] of [
-      [vortex, datum.wing, 2.2],
-      [contrail, datum.exhaust, 8],
-    ] as const)
-      if (strength > 0.02)
-        for (const side of [-1, 1]) {
-          this.point.fromArray(source);
-          this.point.x *= side;
-          this.point.applyQuaternion(i.rotation).add(i.position);
-          this.streak.copy(i.velocity).multiplyScalar(-1 / 30);
-          this.point.addScaledVector(this.streak, 0.5);
-          this.drift.copy(i.wind);
-          this.drift.y -= 0.12;
-          this.puff(
-            time,
-            this.point,
-            this.drift,
-            "#dcebf0",
-            source === datum.wing ? 0.08 : 0.3,
-            0.13,
-            strength * 0.26,
-            life,
-            0,
-            false,
-            this.streak,
-          );
-        }
+    const jet = i.id !== "finch" && i.id !== "heron";
+    const strengths = {
+      vortex: !i.grounded && i.speed > 65 ? T.MathUtils.smoothstep(i.load, 1.3, 2.8) : 0,
+      contrail: jet && !i.grounded ? T.MathUtils.smoothstep(i.position.y, 1200, 1900) : 0,
+      exhaust: jet ? T.MathUtils.smoothstep(i.power ?? 0, 0.55, 0.9) * 0.55 + (i.burner ?? 0) * 0.45 : 0,
+    };
+    for (const layer of trailLayers) {
+      const strength = strengths[layer.kind];
+      if (strength <= 0.02 || (layer.hz === 30 && !coarse)) continue;
+      for (const side of [-1, 1]) {
+        this.point.fromArray(datum[layer.source]);
+        this.point.x *= side;
+        this.point.applyQuaternion(i.rotation).add(i.position);
+        this.streak.copy(i.velocity).multiplyScalar(-1 / layer.hz);
+        this.point.addScaledVector(this.streak, 0.5);
+        this.drift.copy(i.wind).addScaledVector(i.velocity, layer.carry);
+        this.drift.y += layer.rise;
+        // Sprites fade at their ends, so each overlaps the next to avoid a beaded line.
+        this.streak.multiplyScalar(1.7);
+        this.puff(
+          time,
+          this.point,
+          this.drift,
+          layer.color,
+          layer.size,
+          layer.growth,
+          strength * layer.opacity,
+          layer.life,
+          0,
+          false,
+          this.streak,
+          layer.fadeIn,
+        );
+      }
+    }
   }
   touchdown(i: VfxInput, sink: number) {
     const speed = Math.hypot(i.velocity.x, i.velocity.z);

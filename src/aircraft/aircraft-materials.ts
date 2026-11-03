@@ -1,4 +1,5 @@
 import * as T from "three";
+import { applyAircraftFinish } from "./aircraft-finish";
 
 // Keep authored colors, textures and material sharing; only refine the finish.
 export function refineAircraftMaterials(root: T.Object3D) {
@@ -11,6 +12,7 @@ export function refineAircraftMaterials(root: T.Object3D) {
       if (!(source instanceof T.MeshStandardMaterial)) return source;
       const glass = /glass/i.test(source.name);
       const matte =
+        source.name === "Gunmetal • F-15C Vulcan" ||
         /rubber|tire|textile|seat|leather|carbon|duct/i.test(source.name) ||
         (source.color.getHSL({ h: 0, s: 0, l: 0 }).l < 0.035 &&
           source.roughness > 0.7);
@@ -59,4 +61,5 @@ export function refineAircraftMaterials(root: T.Object3D) {
       object.renderOrder = 3;
     }
   });
+  applyAircraftFinish(root);
 }

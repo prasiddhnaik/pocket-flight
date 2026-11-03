@@ -1,5 +1,7 @@
 import type { AircraftId } from "../aircraft/aircraft";
 import type { ReplayFrame } from "../flight/game";
+import type { FinchVariant } from "../aircraft/finch/attack";
+import type { CombatFrame } from "../flight/combat/tape";
 export type SavedFrame = Omit<ReplayFrame, "p" | "q" | "debris"> & {
   p: number[];
   q: number[];
@@ -11,6 +13,8 @@ export type SavedReplay = {
   id: string;
   name: string;
   aircraft: AircraftId;
+  /** Only stored when the Finch flew as the A-2. */
+  variant?: FinchVariant;
   paint: number;
   mission: string;
   createdAt: number;
@@ -23,6 +27,17 @@ const vector = (value: unknown, length: number): value is number[] =>
   Array.isArray(value) &&
   value.length === length &&
   value.every(Number.isFinite);
+const combatFrame = (c: CombatFrame) =>
+  !!c &&
+  Number.isFinite(c.clock) &&
+  Array.isArray(c.down) &&
+  c.down.every((id) => typeof id === "string") &&
+  Array.isArray(c.stores) &&
+  c.stores.every(Number.isFinite) &&
+  Array.isArray(c.rounds) &&
+  c.rounds.every((round) => vector(round, 8)) &&
+  Array.isArray(c.blasts) &&
+  c.blasts.every((blast) => vector(blast, 5));
 export function validateReplay(value: unknown): value is SavedReplay {
   if (!value || typeof value !== "object") return false;
   const r = value as SavedReplay;
@@ -33,6 +48,7 @@ export function validateReplay(value: unknown): value is SavedReplay {
     r.id.length > 0 &&
     typeof r.name === "string" &&
     typeof r.mission === "string" &&
+    (r.variant === undefined || r.variant === "trainer" || r.variant === "attack") &&
     ["finch", "peregrine", "aurelia", "stormbird", "heron", "f15c"].includes(r.aircraft) &&
     Number.isInteger(r.paint) &&
     r.paint >= 0 &&
@@ -77,6 +93,7 @@ export function validateReplay(value: unknown): value is SavedReplay {
         (f.suspensionResolved === undefined || typeof f.suspensionResolved === "boolean") &&
         (f.elevatorTrim === undefined || (Number.isFinite(f.elevatorTrim) && Math.abs(f.elevatorTrim) <= 1)) &&
         (f.simulationTick === undefined || (Number.isInteger(f.simulationTick) && f.simulationTick >= 0)) &&
+        (f.combat === undefined || combatFrame(f.combat)) &&
         Array.isArray(f.debris) &&
         f.debris.every(
           (d) =>
@@ -90,19 +107,41 @@ export function validateReplay(value: unknown): value is SavedReplay {
     Math.abs(r.frames.at(-1)!.t - r.duration) < 0.01
   );
 }
-export function saveFrames(frames: ReplayFrame[]): SavedFrame[] {
-  const origin = frames[0]?.t ?? 0;
-  return frames.map((f) => ({
-    ...structuredClone({ ...f, p: undefined, q: undefined, debris: undefined }),
+// Frames hold only plain data; a direct copy is far cheaper than structuredClone.
+function copyPlain<T>(value: T): T {
+  if (Array.isArray(value)) return value.map(copyPlain) as T;
+  if (!value || typeof value !== "object") return value;
+  const copy: Record<string, unknown> = {};
+  for (const key in value) copy[key] = copyPlain(value[key]);
+  return copy as T;
+}
+function saveFrame(f: ReplayFrame, origin: number): SavedFrame {
+  const { p, q, debris, ...rest } = f;
+  return {
+    ...copyPlain(rest),
     t: f.t - origin,
-    p: f.p.toArray(),
-    q: f.q.toArray(),
-    debris: f.debris.map((d) => ({
+    p: p.toArray(),
+    q: q.toArray(),
+    debris: debris.map((d) => ({
       p: d.p.toArray(),
       q: d.q.toArray(),
       visible: d.visible,
     })),
-  }));
+  };
+}
+export function saveFrames(frames: ReplayFrame[]): SavedFrame[] {
+  const origin = frames[0]?.t ?? 0;
+  return frames.map((f) => saveFrame(f, origin));
+}
+/** JSON for one saved frame, keeping its absolute time until it is decoded. */
+export function encodeFrame(f: ReplayFrame) {
+  return JSON.stringify(saveFrame(f, 0));
+}
+/** Parse `[encodeFrame, …]` text and make times relative to `origin`. */
+export function decodeFrames(json: string, origin: number): SavedFrame[] {
+  const frames = JSON.parse(json) as SavedFrame[];
+  for (const f of frames) f.t -= origin;
+  return frames;
 }
 export function sampleFrames(frames: SavedFrame[], time: number) {
   let lo = 1,

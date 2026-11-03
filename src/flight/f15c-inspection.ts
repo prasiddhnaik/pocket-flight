@@ -1,3 +1,5 @@
+import { F15C_NOZZLE } from "../aircraft/f15c/design";
+import { F15C_MUZZLE } from "./cannon";
 import { Mesh, Object3D, PerspectiveCamera, Quaternion, Vector3 } from "three";
 import type { AircraftModel } from "../aircraft/aircraft";
 import type { FlightPhysics } from "./physics";
@@ -5,11 +7,20 @@ import type { FlightPhysics } from "./physics";
 export function measuredNozzleDiameter(root: Object3D, side: "Left" | "Right") {
   const ring = root.getObjectByName(`Nozzle_exit_${side}`);
   if (!(ring instanceof Mesh)) return NaN;
-  const positions = ring.geometry.getAttribute("position"), center = side === "Right" ? 1.025 : -1.025;
+  const positions = ring.geometry.getAttribute("position"), center = side === "Right" ? F15C_NOZZLE.x : -F15C_NOZZLE.x;
   let radius = Infinity;
-  for (let i = 0; i < positions.count; i++) if (positions.getZ(i) > 9.4305)
-    radius = Math.min(radius, Math.hypot(positions.getX(i) - center, positions.getY(i) + .125));
+  for (let i = 0; i < positions.count; i++) if (positions.getZ(i) > F15C_NOZZLE.exit - .0005)
+    radius = Math.min(radius, Math.hypot(positions.getX(i) - center, positions.getY(i) - F15C_NOZZLE.y));
   return radius * 2;
+}
+
+export function inspectionShot(root: Object3D, view: "gun" | "nozzle") {
+  const nozzle = view === "nozzle";
+  return {
+    position: root.localToWorld(nozzle ? new Vector3(3, .9, 10.8) : new Vector3(F15C_MUZZLE.x + .45, F15C_MUZZLE.y + .18, F15C_MUZZLE.z - .9)),
+    // localToWorld overwrites its argument, and the muzzle is shared with the cannon.
+    target: root.localToWorld(nozzle ? new Vector3(0, -.24, 7.5) : F15C_MUZZLE.clone()),
+  };
 }
 
 // Opt-in developer instrumentation observes the live aircraft. It never drives
@@ -44,10 +55,10 @@ export class F15CFlightInspection {
       `rounds ${rounds} · ${firing ? "FIRING" : "released"}`;
     if (this.view.value === "flight" || mode === "menu" || mode === "replay") return;
     root.updateWorldMatrix(true, true);
-    const nozzle = this.view.value === "nozzle";
-    camera.position.copy(root.localToWorld(nozzle ? new Vector3(3, 1, 12.3) : new Vector3(2.45, .84, -2.95)));
+    const shot = inspectionShot(root, this.view.value === "nozzle" ? "nozzle" : "gun");
+    camera.position.copy(shot.position);
     camera.up.set(0, 1, 0).applyQuaternion(root.getWorldQuaternion(new Quaternion()));
-    camera.lookAt(root.localToWorld(nozzle ? new Vector3(0, -.125, 8.95) : new Vector3(2, .66, -2.05)));
+    camera.lookAt(shot.target);
     camera.fov = 35; camera.near = .01; camera.updateProjectionMatrix();
   }
   dispose() { this.panel.remove(); }

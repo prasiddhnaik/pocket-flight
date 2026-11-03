@@ -6,6 +6,7 @@ import {
   WORLD_SIZE,
   TERRAIN_SEGMENTS,
   terrainSurfaceHeight,
+  rangeRunway,
 } from "../src/world/terrain";
 import { villageRoof, hangarRoof, groundPath } from "../src/world/scenery-geometry";
 
@@ -22,7 +23,8 @@ test("both runways and aprons clear the actual triangulated island", () => {
     vertices.setY(i, terrainHeight(vertices.getX(i), vertices.getZ(i)));
   const land = new T.Mesh(geometry, new T.MeshBasicMaterial());
   const ray = new T.Raycaster(new T.Vector3(), new T.Vector3(0, -1, 0));
-  for (const r of runways) {
+  // This mesh is Palm Bay's; tests/range-island.test.ts covers Anvil Key's airfield.
+  for (const r of runways.filter((r) => r !== rangeRunway)) {
     let highest = -Infinity;
     for (const [left, right, start, end] of [
       [-r.width / 2, r.width / 2, -r.length / 2, r.length / 2],
@@ -46,7 +48,7 @@ test("both runways and aprons clear the actual triangulated island", () => {
     expect(highest - r.y).toBeLessThan(0.1);
   }
   geometry.dispose();
-});
+}, 30000);
 
 function roofHeight(geometry: T.BufferGeometry, x: number, z: number) {
   const mesh = new T.Mesh(

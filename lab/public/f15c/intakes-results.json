@@ -1,17 +1,17 @@
 {
   "artifact": "STEP/airframe_intakes.step",
-  "sha256": "6de56d62c073439d1e6e75341aa745fce7dc692f654ab1fd27e506632044f7ef",
+  "sha256": "ed76afdd5fc35878f04a1495ace91b2dea3801a3fff625d9a925aaf5f83e6171",
   "units": "mm",
   "dimensionsM": [
     4.08246418086791,
     18.920000000200154,
-    1.9770729327219354
+    1.9747108582261
   ],
   "boundsM": {
     "min": [
       -2.041229468190516,
       -8.92000000010015,
-      1.477614437004361
+      1.4799765115001964
     ],
     "max": [
       2.0412347126773938,
@@ -37,7 +37,7 @@
       "name": "Every saved physical solid is valid, closed and positive",
       "pass": true,
       "solidCount": 14,
-      "volumeM3": 5.395365901073321
+      "volumeM3": 4.903548245751759
     },
     {
       "name": "Two skins, two liners, two splitters and six separate ramp solids",
@@ -62,8 +62,8 @@
     {
       "name": "Symmetric saved lateral envelope",
       "pass": true,
-      "minXM": -1.8557729827281544,
-      "maxXM": 1.8557729827281544,
+      "minXM": -1.8569518940597098,
+      "maxXM": 1.8569518940597098,
       "toleranceMm": 0.1
     },
     {
@@ -72,27 +72,28 @@
       "faceCount": 1
     },
     {
-      "name": "Neutral mouth height matches the photographic estimate: Left",
+      "name": "Neutral mouth height matches the reduced inlet target: Left",
       "pass": true,
-      "lowZM": 1.6599999999,
+      "lowZM": 1.9399999999,
       "highZM": 3.0000000001,
-      "heightM": 1.3400000001999999,
-      "widthM": 0.9892424378558492,
-      "rakeM": 1.3516000002000002,
-      "previousLowZM": 1.58,
-      "previousHighZM": 3.1,
-      "previousHeightM": 1.52,
+      "heightM": 1.0600000001999998,
+      "widthM": 0.8240544314145818,
+      "rakeM": 1.0691761196029996,
+      "previousLowZM": 1.66,
+      "previousHighZM": 3,
+      "previousHeightM": 1.34,
       "measurementBasis": "Exact CAD output; the real-aircraft height target is an estimate, not published mold data."
     },
     {
       "name": "Upper lip projects forward of lower lip: Left",
       "pass": true,
-      "rakeM": 1.3516000002000002,
+      "rakeM": 1.0691761196029996,
+      "targetRakeM": 1.0691760000000001,
       "previousRakeM": 1.3516,
-      "widthM": 0.9892424378558492,
-      "previousWidthM": 1.051652061,
-      "targetWidthRatio": 0.94,
-      "ratioTolerance": 0.005
+      "widthM": 0.8240544314145818,
+      "targetWidthM": 0.8276399999999999,
+      "previousWidthM": 0.98856,
+      "widthToleranceM": 0.02
     },
     {
       "name": "Saved raked mouth plane: Right",
@@ -100,38 +101,39 @@
       "faceCount": 1
     },
     {
-      "name": "Neutral mouth height matches the photographic estimate: Right",
+      "name": "Neutral mouth height matches the reduced inlet target: Right",
       "pass": true,
-      "lowZM": 1.6599999999,
+      "lowZM": 1.9399999999,
       "highZM": 3.0000000001,
-      "heightM": 1.3400000001999999,
-      "widthM": 0.989242437855818,
-      "rakeM": 1.3516000002000002,
-      "previousLowZM": 1.58,
-      "previousHighZM": 3.1,
-      "previousHeightM": 1.52,
+      "heightM": 1.0600000001999998,
+      "widthM": 0.8240544314145007,
+      "rakeM": 1.0691761196029996,
+      "previousLowZM": 1.66,
+      "previousHighZM": 3,
+      "previousHeightM": 1.34,
       "measurementBasis": "Exact CAD output; the real-aircraft height target is an estimate, not published mold data."
     },
     {
       "name": "Upper lip projects forward of lower lip: Right",
       "pass": true,
-      "rakeM": 1.3516000002000002,
+      "rakeM": 1.0691761196029996,
+      "targetRakeM": 1.0691760000000001,
       "previousRakeM": 1.3516,
-      "widthM": 0.989242437855818,
-      "previousWidthM": 1.051652061,
-      "targetWidthRatio": 0.94,
-      "ratioTolerance": 0.005
+      "widthM": 0.8240544314145007,
+      "targetWidthM": 0.8276399999999999,
+      "previousWidthM": 0.98856,
+      "widthToleranceM": 0.02
     },
     {
       "name": "Matched left/right volume: Intake_skin",
       "pass": true,
-      "relativeError": 6.597552856778735e-14,
+      "relativeError": 6.399968837236144e-14,
       "tolerance": 0.00001
     },
     {
       "name": "Matched left/right volume: Duct_liner",
       "pass": true,
-      "relativeError": 1.8304136649983662e-10,
+      "relativeError": 3.0136970843414283e-13,
       "tolerance": 0.00001
     },
     {
@@ -143,19 +145,19 @@
     {
       "name": "Matched left/right volume: Ramp_1",
       "pass": true,
-      "relativeError": 4.246861037614537e-14,
+      "relativeError": 7.85169817516359e-14,
       "tolerance": 0.00001
     },
     {
       "name": "Matched left/right volume: Ramp_2",
       "pass": true,
-      "relativeError": 1.7779482466153992e-13,
+      "relativeError": 7.457730182238189e-14,
       "tolerance": 0.00001
     },
     {
       "name": "Matched left/right volume: Ramp_3",
       "pass": true,
-      "relativeError": 1.337260395273031e-13,
+      "relativeError": 2.944278607769658e-13,
       "tolerance": 0.00001
     },
     {
@@ -203,13 +205,13 @@
       "pointInsideAuthoredCavity": true
     },
     {
-      "name": "Left duct is open at Y=2.75 Z=1.75",
+      "name": "Left duct is open at Y=2.75 Z=2.05",
       "pass": true,
       "occupied": [],
       "pointInsideAuthoredCavity": true
     },
     {
-      "name": "Left duct is open at Y=2.3 Z=2.1",
+      "name": "Left duct is open at Y=2.3 Z=2.15",
       "pass": true,
       "occupied": [],
       "pointInsideAuthoredCavity": true
@@ -263,13 +265,13 @@
       "pointInsideAuthoredCavity": true
     },
     {
-      "name": "Right duct is open at Y=2.75 Z=1.75",
+      "name": "Right duct is open at Y=2.75 Z=2.05",
       "pass": true,
       "occupied": [],
       "pointInsideAuthoredCavity": true
     },
     {
-      "name": "Right duct is open at Y=2.3 Z=2.1",
+      "name": "Right duct is open at Y=2.3 Z=2.15",
       "pass": true,
       "occupied": [],
       "pointInsideAuthoredCavity": true
@@ -368,7 +370,7 @@
     {
       "a": "Intake_skin_Left",
       "b": "Ramp_3_Left",
-      "gapMm": 8.981260180007666e-12,
+      "gapMm": 1.1867076273756437e-11,
       "method": "re-measured saved contact hint"
     },
     {
@@ -380,7 +382,7 @@
     {
       "a": "Intake_skin_Right",
       "b": "Ramp_3_Right",
-      "gapMm": 5.209785393794664e-13,
+      "gapMm": 1.4779288903810084e-12,
       "method": "re-measured saved contact hint"
     },
     {
@@ -413,11 +415,11 @@
   "evidence": [
     {
       "artifact": "STEP/airframe_intakes.step",
-      "sha256": "6de56d62c073439d1e6e75341aa745fce7dc692f654ab1fd27e506632044f7ef"
+      "sha256": "ed76afdd5fc35878f04a1495ace91b2dea3801a3fff625d9a925aaf5f83e6171"
     },
     {
       "artifact": "STEP/intakes.step",
-      "sha256": "e06a68159aa26010b75e35187a4b9fa8a70fccf1ed3f8e1d097a23c777c30db6"
+      "sha256": "97d9104fa648d4d8ae36cf44ce18190b26c4f1fef23e364b45d294ef7db9ad7b"
     }
   ]
 }

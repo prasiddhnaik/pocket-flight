@@ -1,17 +1,17 @@
 {
   "artifact": "STEP/airframe_tails.step",
-  "sha256": "039215f71fe95560b2ef20915a282c189ede8c7d8e32216426b2eaf61b08b4ad",
+  "sha256": "011a01b239e872514b7616a7a8f602da22d8fd103cbfb565935cee5e815c51b9",
   "units": "mm",
   "dimensionsM": [
     13.049250000200006,
     19.241046109222005,
-    4.148485562995639
+    4.1461234884998035
   ],
   "boundsM": {
     "min": [
       -6.524625000100003,
       -9.241046109122001,
-      1.477614437004361
+      1.4799765115001964
     ],
     "max": [
       6.524625000100003,
@@ -264,7 +264,7 @@
     {
       "a": "Intake_skin_Left",
       "b": "Ramp_3_Left",
-      "gapMm": 8.981260180007666e-12,
+      "gapMm": 1.1867076273756437e-11,
       "method": "re-measured saved contact hint"
     },
     {
@@ -276,7 +276,7 @@
     {
       "a": "Intake_skin_Right",
       "b": "Ramp_3_Right",
-      "gapMm": 5.209785393794664e-13,
+      "gapMm": 1.4779288903810084e-12,
       "method": "re-measured saved contact hint"
     },
     {
@@ -501,7 +501,7 @@
   "evidence": [
     {
       "artifact": "STEP/airframe_tails.step",
-      "sha256": "039215f71fe95560b2ef20915a282c189ede8c7d8e32216426b2eaf61b08b4ad"
+      "sha256": "011a01b239e872514b7616a7a8f602da22d8fd103cbfb565935cee5e815c51b9"
     },
     {
       "artifact": "STEP/tails.step",
@@ -509,7 +509,7 @@
     },
     {
       "artifact": "STEP/airframe_wings.step",
-      "sha256": "2620ce5e7d2b0cb794a121914d5fcc5eaf8a2118c6c4b8789b0fe7efc2999216"
+      "sha256": "2c46af6eee760e17ae588771f609c973b3e688443ef3a28006fa664d3e4ac2b0"
     }
   ]
 }

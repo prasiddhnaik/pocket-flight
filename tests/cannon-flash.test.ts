@@ -31,7 +31,7 @@ test("smoke is bounded, left behind a fast aircraft, responds to wind and expire
     effect.step(1 / 60, 2, (i + 1) * 2, point, direction, velocity, wind);
     effect.render(camera, point, direction);
     largest = Math.max(largest, effect.smoke.count);
-    expect(effect.smoke.count).toBeLessThanOrEqual(32);
+    expect(effect.smoke.count).toBeLessThanOrEqual(64);
   }
   expect(largest).toBeGreaterThan(10);
   let behind = 0, drifted = 0;
@@ -41,9 +41,13 @@ test("smoke is bounded, left behind a fast aircraft, responds to wind and expire
     if (position.x > 1) drifted++;
   }
   expect(behind).toBeGreaterThan(0); expect(drifted).toBeGreaterThan(0);
-  for (let i = 0; i < 45; i++) effect.step(1 / 60, 0, 1200, point, direction, velocity, wind);
+  // The barrels smoke for 0.9 s as they wind down, then the last puffs clear.
+  for (let i = 0; i < 30; i++) effect.step(1 / 60, 0, 1200, point, direction, velocity, wind);
   effect.render(camera, point, direction);
-  expect(effect.flash.visible).toBe(false); expect(effect.smoke.count).toBe(0);
+  expect(effect.flash.visible).toBe(false); expect(effect.smoke.count).toBeGreaterThan(0);
+  for (let i = 0; i < 90; i++) effect.step(1 / 60, 0, 1200, point, direction, velocity, wind);
+  effect.render(camera, point, direction);
+  expect(effect.smoke.count).toBe(0);
   effect.reset(); expect(effect.smoke.count).toBe(0); effect.dispose();
 });
 
@@ -67,8 +71,28 @@ test("flash follows the interpolated aircraft muzzle through translation and ban
 }));
 
 test("all discharge geometry and materials are released exactly once", () => {
-  const effect = new CannonFlash(), resources = [effect.flash.geometry, effect.flash.material, effect.smoke.geometry, effect.smoke.material];
+  const effect = new CannonFlash(), resources = [effect.flash.geometry, effect.flash.material, effect.glow.geometry, effect.glow.material, effect.smoke.geometry, effect.smoke.material];
   const counts = resources.map(resource => { const count = { value: 0 }; resource.addEventListener("dispose", () => count.value++); return count; });
   effect.dispose();
-  expect(counts.map(count => count.value)).toEqual([1, 1, 1, 1]); expect(effect.group.children).toHaveLength(0);
+  expect(counts.map(count => count.value)).toEqual([1, 1, 1, 1, 1, 1]); expect(effect.group.children).toHaveLength(0);
+});
+
+test("the flash carries a glow big enough to read from the chase camera, and it clears with the flash", () => {
+  const effect = new CannonFlash();
+  effect.step(1 / 60, 2, 2, origin, direction, still, still);
+  effect.render(camera, origin, direction);
+  expect(effect.glow.visible).toBe(true);
+  expect(effect.glow.scale.x).toBeGreaterThan(1.5);
+  expect(effect.flash.scale.z).toBeGreaterThan(.6);
+  expect(effect.light.distance).toBeGreaterThan(3);
+  expect(effect.glow.position.distanceTo(origin)).toBeLessThan(1);
+  // The flash lasts 18 ms, so it outlives one 16.7 ms step and not two.
+  effect.step(1 / 60, 0, 2, origin, direction, still, still);
+  effect.step(1 / 60, 0, 2, origin, direction, still, still);
+  expect(effect.glow.visible).toBe(false);
+  effect.step(1 / 60, 2, 4, origin, direction, still, still);
+  expect(effect.glow.visible).toBe(true);
+  effect.suspend();
+  expect(effect.glow.visible).toBe(false);
+  effect.dispose();
 });

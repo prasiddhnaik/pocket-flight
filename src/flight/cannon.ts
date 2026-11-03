@@ -3,7 +3,7 @@ import { Quaternion, Vector3 } from "three";
 // Public nominal calibre/cadence/velocity; drag and lifetime are game approximations,
 // not ammunition-specific firing tables. All motion is in metres and seconds.
 export const F15C_CANNON = { capacity: 940, roundsPerSecond: 100, muzzleSpeed: 1030, diameter: .02, projectileLength: .065, lifetime: 3, maximumProjectiles: 384, drag: .00025 } as const;
-export const F15C_MUZZLE = new Vector3(2, .66, -2.05);
+export const F15C_MUZZLE = new Vector3(1.8, .0181, -2.78);
 export type CannonTarget = { id: string; position: Vector3; radius: number };
 export type CannonInput = { firing: boolean; origin: Vector3; direction: Vector3; velocity: Vector3 };
 export type Projectile = { id: number; position: Vector3; velocity: Vector3; age: number };

@@ -12,22 +12,39 @@ const defaultState: MusicState = {
   visible: true,
 };
 const preferenceKey = "pocket-flight-music-volume";
+const maxStemDrift = 0.06;
+type Stem = {
+  element: HTMLAudioElement;
+  source: MediaElementAudioSourceNode;
+  gain: GainNode;
+};
+
+function releaseElement(element: HTMLAudioElement) {
+  element.pause();
+  element.removeAttribute("src");
+  element.load();
+}
+
+function closeStem({ element, source, gain }: Stem) {
+  releaseElement(element);
+  source.disconnect();
+  gain.disconnect();
+}
 
 export class FlightMusic {
   private readonly bus: GainNode;
   private readonly filter: BiquadFilterNode;
   private abort: AbortController | null = null;
   private requestId = 0;
-  private retiring = new Map<AudioBufferSourceNode, GainNode>();
+  private retiring = new Map<Stem, ReturnType<typeof setTimeout>>();
   private playingTrack: MusicTrack | null = null;
   track = getMusicTrack("coastlines");
-  private gains: GainNode[] = [];
-  private sources: AudioBufferSourceNode[] = [];
+  private stems: Stem[] = [];
   private disposed = false;
   private active = false;
   private state = defaultState;
   private targets: number[] = [];
-  private startedAt = 0;
+  private lastSync = 0;
   volume = 0.62;
   status: "idle" | "loading" | "ready" | "error" = "idle";
   error: string | null = null;
@@ -35,6 +52,7 @@ export class FlightMusic {
   constructor(
     private readonly context: AudioContext,
     output: AudioNode,
+    private readonly createElement: () => HTMLAudioElement = () => new Audio(),
   ) {
     try {
       this.track = getMusicTrack(
@@ -96,12 +114,13 @@ export class FlightMusic {
       mix.cutoff,
     ];
     const parameters = [
-      ...this.gains.map((gain) => gain.gain),
+      ...this.stems.map((stem) => stem.gain.gain),
       this.bus.gain,
       this.filter.frequency,
     ];
     // Only automate material changes; keep the audio queue bounded.
-    if (this.gains.length === 3)
+    this.keepStemsTogether();
+    if (this.stems.length === 3)
       parameters.forEach((parameter, i) => {
         if (
           this.targets[i] !== undefined &&
@@ -126,6 +145,59 @@ export class FlightMusic {
     }
   }
 
+  // Stems play from separate elements, so correct any drift between them.
+  private keepStemsTogether() {
+    if (this.stems.length !== 3 || !this.playingTrack) return;
+    if (Math.abs(this.context.currentTime - this.lastSync) < 1) return;
+    this.lastSync = this.context.currentTime;
+    const duration = trackDuration(this.playingTrack),
+      lead = this.stems[0].element;
+    for (const { element } of this.stems.slice(1)) {
+      const apart = Math.abs(element.currentTime - lead.currentTime);
+      if (Math.min(apart, duration - apart) > maxStemDrift)
+        element.currentTime = lead.currentTime;
+    }
+  }
+
+  // Streaming keeps a few megabytes per stem; decoding a song takes about 190 MB.
+  private openStem(url: string, duration: number, signal: AbortSignal) {
+    return new Promise<HTMLAudioElement>((resolve, reject) => {
+      const element = this.createElement();
+      const finish = (failure?: unknown) => {
+        element.removeEventListener("canplay", ready);
+        element.removeEventListener("error", failed);
+        signal.removeEventListener("abort", aborted);
+        if (failure === undefined) return resolve(element);
+        releaseElement(element);
+        reject(failure);
+      };
+      const ready = () =>
+        finish(
+          Math.abs(element.duration - duration) > 0.08
+            ? new Error("Soundtrack loop duration does not match the score.")
+            : undefined,
+        );
+      const failed = () => finish(new Error(`Music request failed: ${url}`));
+      const aborted = () => finish(signal.reason ?? new Error("Aborted"));
+      element.addEventListener("canplay", ready);
+      element.addEventListener("error", failed);
+      signal.addEventListener("abort", aborted);
+      element.loop = true;
+      element.preload = "auto";
+      element.src = url;
+    });
+  }
+
+  private retire(stem: Stem) {
+    this.retiring.set(
+      stem,
+      setTimeout(() => {
+        this.retiring.delete(stem);
+        closeStem(stem);
+      }, 1200),
+    );
+  }
+
   private async load() {
     this.status = "loading";
     this.error = null;
@@ -133,24 +205,18 @@ export class FlightMusic {
       duration = trackDuration(track),
       request = this.requestId;
     const abort = (this.abort = new AbortController());
+    let opened: HTMLAudioElement[] = [];
     try {
-      const buffers = await Promise.all(
+      const results = await Promise.allSettled(
         musicStems.map(async (stem) => {
           let failure: unknown;
           for (const extension of ["ogg", "mp3"]) {
             try {
-              const url = `${import.meta.env?.BASE_URL ?? "/"}audio/${track.id}/${stem}.${extension}`;
-              const response = await fetch(url, { signal: abort.signal });
-              if (!response.ok)
-                throw new Error(`Music request failed (${response.status})`);
-              const buffer = await this.context.decodeAudioData(
-                await response.arrayBuffer(),
+              return await this.openStem(
+                `${import.meta.env?.BASE_URL ?? "/"}audio/${track.id}/${stem}.${extension}`,
+                duration,
+                abort.signal,
               );
-              if (Math.abs(buffer.duration - duration) > 0.08)
-                throw new Error(
-                  "Soundtrack loop duration does not match the score.",
-                );
-              return buffer;
             } catch (error) {
               if (abort.signal.aborted) throw error;
               failure = error;
@@ -159,44 +225,44 @@ export class FlightMusic {
           throw failure;
         }),
       );
-      if (this.disposed || request !== this.requestId) return;
-      const at = this.context.currentTime + 0.08;
-      this.sources.forEach((source, i) => {
-        const gain = this.gains[i];
-        gain.gain.cancelScheduledValues(this.context.currentTime);
-        gain.gain.setValueAtTime(gain.gain.value, this.context.currentTime);
-        gain.gain.linearRampToValueAtTime(0, at + 1.1);
-        this.retiring.set(source, gain);
-        source.onended = () => {
-          source.disconnect();
-          gain.disconnect();
-          this.retiring.delete(source);
-        };
-        source.stop(at + 1.2);
-      });
-      this.sources = [];
-      this.gains = [];
-      buffers.forEach((buffer) => {
-        const source = this.context.createBufferSource(),
+      opened = results.flatMap((result) =>
+        result.status === "fulfilled" ? [result.value] : [],
+      );
+      for (const result of results)
+        if (result.status === "rejected") throw result.reason;
+      if (this.disposed || request !== this.requestId) {
+        opened.forEach(releaseElement);
+        return;
+      }
+      const now = this.context.currentTime;
+      for (const stem of this.stems) {
+        const gain = stem.gain.gain;
+        gain.cancelScheduledValues(now);
+        gain.setValueAtTime(gain.value, now);
+        gain.linearRampToValueAtTime(0, now + 1.1);
+        this.retire(stem);
+      }
+      this.stems = opened.map((element) => {
+        const source = this.context.createMediaElementSource(element),
           gain = this.context.createGain();
-        source.buffer = buffer;
-        source.loop = true;
-        source.loopStart = 0;
-        source.loopEnd = duration;
         gain.gain.value = 0;
         source.connect(gain).connect(this.filter);
-        source.start(at);
-        this.sources.push(source);
-        this.gains.push(gain);
+        return { element, source, gain };
       });
-      this.startedAt = at;
+      await Promise.all(opened.map((element) => element.play()));
+      if (this.disposed || request !== this.requestId) return;
       this.playingTrack = track;
       this.status = "ready";
       this.targets = [];
       this.update(this.state, this.active);
     } catch (error) {
-      if (this.disposed || request !== this.requestId || abort.signal.aborted)
+      if (this.disposed || request !== this.requestId || abort.signal.aborted) {
+        if (!this.stems.some(({ element }) => opened.includes(element)))
+          opened.forEach(releaseElement);
         return;
+      }
+      opened.forEach(releaseElement);
+      this.stems = this.stems.filter(({ element }) => !opened.includes(element));
       this.status = "error";
       this.error =
         error instanceof Error
@@ -216,15 +282,12 @@ export class FlightMusic {
       volume: this.volume,
       error: this.error,
       playing:
-        this.sources.length === 3 &&
+        this.stems.length === 3 &&
         this.active &&
         this.context.state === "running" &&
         this.state.visible &&
         this.volume > 0,
-      elapsed: this.playingTrack
-        ? Math.max(0, this.context.currentTime - this.startedAt) %
-          trackDuration(this.playingTrack)
-        : 0,
+      elapsed: this.playingTrack ? (this.stems[0]?.element.currentTime ?? 0) : 0,
       mix: musicMix(this.state),
       context: this.context.state,
     };
@@ -233,19 +296,13 @@ export class FlightMusic {
   dispose() {
     this.disposed = true;
     this.abort?.abort();
-    for (const [source, gain] of this.retiring) {
-      source.stop();
-      source.disconnect();
-      gain.disconnect();
+    for (const [stem, timer] of this.retiring) {
+      clearTimeout(timer);
+      closeStem(stem);
     }
     this.retiring.clear();
-    for (const source of this.sources) {
-      source.stop();
-      source.disconnect();
-    }
-    for (const gain of this.gains) gain.disconnect();
-    this.sources = [];
-    this.gains = [];
+    this.stems.forEach(closeStem);
+    this.stems = [];
     this.filter.disconnect();
     this.bus.disconnect();
   }

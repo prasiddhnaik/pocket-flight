@@ -242,7 +242,7 @@ footer{position:relative;overflow:hidden;padding:64px 24px 92px;color:var(--pape
     <div class="hero-text">
       <p class="kicker">Pocket Flight · Flight report</p>
       <h1>Effects, Heron, island and trees</h1>
-      <p>New effects and sound across the fleet, a Caravan-style Heron, a better first island and a far cheaper forest. All of it is still uncommitted, and none of it has been hand-flown.</p>
+      <p>New effects and sound across the fleet, a Caravan-style Heron, a better first island and a far cheaper forest. None of it has been hand-flown.</p>
     </div>
   </div>
 
@@ -285,7 +285,7 @@ footer{position:relative;overflow:hidden;padding:64px 24px 92px;color:var(--pape
   <section class="leg">
     <p class="eyebrow">Briefing</p>
     <h2>Summary</h2>
-    <p class="lead">Over two days the game got new effects and sound across the fleet, the Heron was rebuilt as a Grand Caravan-style plane, the first island and its buildings were improved, and the scanned trees were replaced with very cheap models. The missile launch animations that opened the session were not built. Only this report is committed; the work it describes is not.</p>
+    <p class="lead">Over two days the game got new effects and sound across the fleet, the Heron was rebuilt as a Grand Caravan-style plane, the first island and its buildings were improved, and the scanned trees were replaced with very cheap models. The missile launch animations that opened the session were not built. The work is committed in one commit, together with the earlier uncommitted work it depends on.</p>
     <div class="panel-row">
       <div class="gauge"><div class="dial">45KB</div><span class="label">Tree download, was 5.29 MB</span></div>
           <div class="gauge"><div class="dial">218</div><span class="label">Triangles in a close-up tree, was 31,295</span></div>
@@ -416,7 +416,7 @@ footer{position:relative;overflow:hidden;padding:64px 24px 92px;color:var(--pape
           <tr><td>Slower machines and night lighting</td><td>All timing is from one M3</td><td><span class="tag skip">Not run</span></td></tr>
           <tr><td>Heron rebuild from the CAD stage</td><td><code>scripts/build-heron.ts</code></td><td><span class="tag skip">Not run</span></td></tr>
           <tr><td>Production builds</td><td><code>bun run build</code>, <code>bun run lab:build</code>, skipped under your no-build rule</td><td><span class="tag skip">Not run</span></td></tr>
-          <tr><td>The 2 failures on a clean checkout</td><td>None</td><td><span class="tag skip">Not run</span></td></tr>
+          <tr><td>Clean copy of the committed files</td><td><code>bunx tsc --noEmit -p .</code>, <code>bun run repo:check</code> and <code>bun test ./tests</code>, outside the working folder</td><td><span class="tag fail">Types and layout pass; same 2 fail</span></td></tr>
         </tbody>
       </table>
     </div>
@@ -427,9 +427,10 @@ footer{position:relative;overflow:hidden;padding:64px 24px 92px;color:var(--pape
     <h2>Warnings and risks</h2>
     <div class="notam">
       <ul>
-        <li>Only this report is committed. It was added with <code>git add -f</code> because <code>output/</code> is ignored. The work it describes is still uncommitted, in a working tree of 157 changed or new files that also holds earlier work, such as <code>src/flight/combat/</code> and <code>src/world/range-island.ts</code>, last changed before this session began.</li>
+        <li>The commit also holds 97 files of earlier work that this session did not touch, such as <code>src/flight/combat/</code> and <code>src/world/range-island.ts</code>. This session's 65 files alone give 65 type errors, so they cannot go without it.</li>
+          <li>Four files were left out and stay uncommitted on disk: two partial PDF downloads in <code>docs/research/f15c/sources/</code>, <code>scripts/.tmp-ray.ts</code>, and the unused <code>public/assets/scenery/tree-impostor-top.png</code>. This report sits in the ignored <code>output/</code> folder, so it was added with <code>git add -f</code>.</li>
           <li>Missile launch animations were not built, and the missile flame and smoke are untouched. The plan for them is Task 5 in <code>docs/plans/2026-11-01-f15c-blender-skin-implementation.html</code>.</li>
-          <li>The 2 test failures are <code>ctx.save is not a function</code> at <code>src/world/world.ts:318</code>, seen only in the full suite. That call is already in the last commit and both tests pass alone, so another test's stub is the likely cause. That cause is not confirmed.</li>
+          <li>The 2 test failures are <code>ctx.save is not a function</code> at <code>src/world/world.ts:318</code>, seen only in the full suite. That call was already in commit <code>4239945</code>, both tests pass alone, and a clean copy of the work fails the same way, so another test's stub is the likely cause. That cause is not confirmed, and commit <code>4239945</code> itself was not tested.</li>
           <li>Gameplay changes: Peregrine and Stormbird bullets start 1 to 1.6 m from where they did. The tower, terminal, fuel farm, church, store, water tower and boathouse are now solid. There are 9,000 solid trees in new places instead of 6,500. Shrubs have no collision.</li>
           <li>Heron differences left in place: the wing is drawn about 1.25 m behind where the physics calculates lift, the propeller 0.34 m below the thrust line and about 0.62 m off the ground, and the nose wheel about 0.65 m too far back, as you decided. Crash shapes follow the new body, so a nose-low landing can strike sooner.</li>
           <li>Low flight gains least from the new trees: triangles fall only from 171,000 to 147,987, and draws rise from 14 to 17.</li>
@@ -446,7 +447,6 @@ footer{position:relative;overflow:hidden;padding:64px 24px 92px;color:var(--pape
     <ol class="next">
       <li>Fly it by hand: Heron takeoff and landing, low over the forest, and into the new collision.</li>
           <li>Listen to the Finch, Heron and Aurelia engine clips and give a verdict.</li>
-          <li>Decide whether to commit the work, ideally split by area and kept apart from the earlier uncommitted files.</li>
           <li>Decide whether to delete the unused old tree files (6.04 MB on disk), with the old forest code and the tests and scripts that use them.</li>
           <li>Run <code>bun run build</code> and <code>bun run lab:build</code> before publishing.</li>
           <li>Track down the <code>world-clouds</code> test interference.</li>

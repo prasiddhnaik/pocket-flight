@@ -1,4 +1,5 @@
 import type { AircraftId } from "../aircraft/aircraft";
+import type { FinchVariant } from "../aircraft/finch/attack";
 
 export const aircraftNames: Record<AircraftId, string> = {
   f15c: "F-15C Eagle",
@@ -8,6 +9,29 @@ export const aircraftNames: Record<AircraftId, string> = {
   aurelia: "Aurelia",
   stormbird: "Stormbird",
 };
+
+/** A menu entry: one of the aircraft, or the Finch's attack variant. */
+export type AircraftChoice = AircraftId | "finch-attack";
+
+export function resolveAircraftChoice(choice: AircraftChoice): { id: AircraftId; variant: FinchVariant } {
+  return choice === "finch-attack" ? { id: "finch", variant: "attack" } : { id: choice, variant: "trainer" };
+}
+
+export function aircraftChoice(id: AircraftId, variant: FinchVariant): AircraftChoice {
+  return id === "finch" && variant === "attack" ? "finch-attack" : id;
+}
+
+export function parseAircraftChoice(value: string | null): AircraftChoice | null {
+  if (value === "finch-attack") return value;
+  return value !== null && Object.hasOwn(aircraftNames, value) ? (value as AircraftId) : null;
+}
+
+export const choiceName = (choice: AircraftChoice) =>
+  choice === "finch-attack" ? "Finch A–2" : aircraftNames[choice];
+
+export function aircraftViewerUrl(id: AircraftChoice, paint = 0) {
+  return `/aircraft.html?aircraft=${id}&paint=${paint}`;
+}
 
 export function headingReadout(degrees: number) {
   const heading = ((Math.round(degrees) % 360) + 360) % 360;

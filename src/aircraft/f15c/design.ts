@@ -63,4 +63,13 @@ export const f15cPropulsion = {
 
 // Estimated seat-eye datum inside the authored single-seat canopy, not a
 // measured manufacturer visibility envelope. Converted from CAD(0,4.55,3.58).
-export const F15C_PILOT_EYE = [0, 1.2, -4.55] as const;
+export const F15C_PILOT_EYE = [0, 0.988, -4.55] as const;
+// Runtime positions of the Blender skin's engine nozzles (see scripts/build-f15c-skin.py).
+export const F15C_NOZZLE = {
+  x: 0.6,
+  y: -0.2419,
+  exit: 7.95,
+  /** Stations where the petals start to move, change direction and end. */
+  stations: [7.277, 7.571, 7.95],
+  radius: 0.48,
+} as const;

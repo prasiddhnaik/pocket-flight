@@ -1,3 +1,5 @@
+import { rangeLayout, rangeMaximum, rangeSurface, rangeWorld, RANGE_NAME } from "./range-island";
+
 export const WORLD_SIZE = 2800;
 export const TERRAIN_SEGMENTS = 256;
 export const RUNWAY_PAVEMENT_HEIGHT = 0.25;
@@ -28,7 +30,19 @@ export const runways = [
     departureDirection: 1,
     short: true,
   },
+  {
+    name: RANGE_NAME,
+    ...rangeWorld(rangeLayout.runway.x, rangeLayout.runway.z),
+    heading: 0,
+    length: rangeLayout.runway.length,
+    width: rangeLayout.runway.width,
+    y: rangeLayout.runway.y,
+    code: "01",
+    departureDirection: 1,
+    short: false,
+  },
 ];
+export const rangeRunway = runways[2];
 export function runwayLocal(x: number, z: number, r: (typeof runways)[number]) {
   const dx = x - r.x,
     dz = z - r.z;
@@ -67,6 +81,8 @@ function reliefNoise(x: number, z: number) {
   );
 }
 export function terrainHeight(x: number, z: number) {
+  const range = rangeSurface(x, z);
+  if (range !== null) return range;
   const edge = Math.sqrt((x + 140) ** 2 / 620 ** 2 + (z + 20) ** 2 / 800 ** 2);
   const shore =
     (1 - edge) * 69 +
@@ -142,7 +158,10 @@ export function groundAt(x: number, z: number) {
   return {
     height: groundHeight(x, z),
     runway,
-    water: terrainHeight(x, z) < 0.25,
+    // The analytic surface is expensive; most callers only need the height.
+    get water() {
+      return terrainHeight(x, z) < 0.25;
+    },
   };
 }
 
@@ -161,6 +180,16 @@ export function groundHeight(x: number, z: number) {
   }
   return height;
 }
+/** Runway or apron, the places an aircraft can rearm. */
+export function onPavement(x: number, z: number) {
+  return runways.some((r) => {
+    const p = runwayLocal(x, z, r);
+    return (
+      (Math.abs(p.x) < r.width / 2 && Math.abs(p.z) < r.length / 2) ||
+      (p.x >= 12 && p.x <= 76 && p.z >= 15 && p.z <= 125)
+    );
+  });
+}
 export function random(seed = 247) {
   return () => {
     seed = (seed * 1664525 + 1013904223) >>> 0;
@@ -170,12 +199,22 @@ export function random(seed = 247) {
 
 // Match PlaneGeometry's triangle interpolation for scenery placed on the mesh.
 const terrainVertices = new Float64Array((TERRAIN_SEGMENTS + 1) ** 2).fill(NaN);
+// Off-map vertices are evaluated on demand; keep the recent ones bounded.
+const outerVertices = new Map<number, number>();
 function vertexHeight(ix: number, iz: number) {
-  if (ix < 0 || iz < 0 || ix > TERRAIN_SEGMENTS || iz > TERRAIN_SEGMENTS)
-    return terrainHeight(
-      ix * terrainCell - WORLD_SIZE / 2,
-      iz * terrainCell - WORLD_SIZE / 2,
-    );
+  if (ix < 0 || iz < 0 || ix > TERRAIN_SEGMENTS || iz > TERRAIN_SEGMENTS) {
+    const key = ix * 1_000_003 + iz;
+    let height = outerVertices.get(key);
+    if (height === undefined) {
+      if (outerVertices.size >= 4096) outerVertices.clear();
+      height = terrainHeight(
+        ix * terrainCell - WORLD_SIZE / 2,
+        iz * terrainCell - WORLD_SIZE / 2,
+      );
+      outerVertices.set(key, height);
+    }
+    return height;
+  }
   const index = iz * (TERRAIN_SEGMENTS + 1) + ix;
   if (Number.isNaN(terrainVertices[index]))
     terrainVertices[index] = terrainHeight(
@@ -184,6 +223,12 @@ function vertexHeight(ix: number, iz: number) {
     );
   return terrainVertices[index];
 }
+const pavementCeiling = Math.max(
+  0,
+  ...runways.map(
+    (r) => r.y + Math.max(APRON_PAVEMENT_HEIGHT, RUNWAY_PAVEMENT_HEIGHT),
+  ),
+);
 // A triangle cannot rise above its vertices. Use this conservative bound to
 // reject aircraft sweeps that are entirely above the local ground and pavement.
 export function maximumGroundHeight(
@@ -196,18 +241,15 @@ export function maximumGroundHeight(
   const ix1 = Math.floor((x1 + WORLD_SIZE / 2) / terrainCell) + 1;
   const iz0 = Math.floor((z0 + WORLD_SIZE / 2) / terrainCell);
   const iz1 = Math.floor((z1 + WORLD_SIZE / 2) / terrainCell) + 1;
-  let height = Math.max(
-    0,
-    ...runways.map(
-      (r) => r.y + Math.max(APRON_PAVEMENT_HEIGHT, RUNWAY_PAVEMENT_HEIGHT),
-    ),
-  );
+  let height = Math.max(pavementCeiling, rangeMaximum(x0, x1, z0, z1) ?? -Infinity);
   for (let iz = iz0; iz <= iz1; iz++)
     for (let ix = ix0; ix <= ix1; ix++)
       height = Math.max(height, vertexHeight(ix, iz));
   return height;
 }
 export function terrainSurfaceHeight(x: number, z: number) {
+  const range = rangeSurface(x, z);
+  if (range !== null) return range;
   const gx = (x + WORLD_SIZE / 2) / terrainCell;
   const gz = (z + WORLD_SIZE / 2) / terrainCell;
   const ix = Math.floor(gx),

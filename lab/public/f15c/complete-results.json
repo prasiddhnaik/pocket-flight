@@ -1,6 +1,6 @@
 {
   "artifact": "/Users/prasiddhnaik/Documents/blender skills/pocket-flight-site/assets/f15c/STEP/f15c.step",
-  "sha256": "146e29a75206a21a9448ad70acb12edeb3bd36d0e24d85751310e62c35886d2b",
+  "sha256": "1b26a37908de42820df07ae640771e67b96a90ed92b84536fa0e49156eb87638",
   "units": "mm",
   "dimensionsM": [
     13.049250000200006,
@@ -24,14 +24,14 @@
       "name": "All saved solids valid, closed and positive",
       "pass": true,
       "invalid": [],
-      "solidCount": 440
+      "solidCount": 450
     },
     {
       "name": "All saved parts have an exact contact path to the fuselage",
       "pass": true,
       "floating": [],
       "contactToleranceMm": 0.5,
-      "solidDistanceChecks": 735
+      "solidDistanceChecks": 730
     },
     {
       "name": "Span matches the F-15C reference envelope",
@@ -71,7 +71,7 @@
       "expectedM": 6.005795910834643
     },
     {
-      "name": "Six recessed Vulcan barrels sit outboard of the right intake",
+      "name": "Six Vulcan barrels sit outboard of the right intake",
       "pass": true,
       "barrelCentreXM": [
         2.0337749907480003,
@@ -297,23 +297,35 @@
       "pass": true
     },
     {
-      "name": "Barrel faces are recessed behind the port",
+      "name": "Longer barrel faces extend just beyond the port and remain behind game emission",
       "pass": true,
       "portYM": 2,
-      "barrelFaceYM": 1.915,
-      "recessM": 0.08499999999999996
+      "barrelFaceYM": 2.023,
+      "projectionM": 0.02300000000000013
+    },
+    {
+      "name": "All six visible barrels are thirty percent longer",
+      "pass": true,
+      "barrelLengthsM": [
+        0.466,
+        0.466,
+        0.466,
+        0.466,
+        0.466,
+        0.466
+      ]
     },
     {
       "name": "Compact shoulder fairing does not become a projecting external gun",
       "pass": true,
-      "lengthM": 1.352727888390762,
+      "lengthM": 1.3747278882632308,
       "widthM": 0.4544058356735898,
       "maximumZM": 3.1350117383859244
     },
     {
       "name": "Recessed port is on the outboard right wing-root shoulder beside the intake",
       "pass": true,
-      "inletUpperOutboardXM": 1.81632,
+      "inletUpperOutboardXM": 1.65882,
       "barrelCentreRangeXM": [
         1.9662250092520002,
         2.0337749907480003
@@ -1428,12 +1440,6 @@
       "method": "re-measured saved contact hint"
     },
     {
-      "a": "Windshield_glass",
-      "b": "Cockpit_sill_Left",
-      "gapMm": 0,
-      "method": "re-measured saved contact hint"
-    },
-    {
       "a": "Seat_pan",
       "b": "Seat_back",
       "gapMm": 0,
@@ -1500,20 +1506,68 @@
       "method": "re-measured saved contact hint"
     },
     {
-      "a": "Cockpit_sill_Left",
-      "b": "Fuselage",
+      "a": "Seat_bolster_Left",
+      "b": "Seat_back",
       "gapMm": 0,
       "method": "re-measured saved contact hint"
     },
     {
-      "a": "Canopy_rail_Left_0",
-      "b": "Cockpit_sill_Left",
+      "a": "Seat_bolster_Right",
+      "b": "Seat_back",
       "gapMm": 0,
       "method": "re-measured saved contact hint"
     },
     {
-      "a": "Windshield_side_frame_Left",
-      "b": "Cockpit_sill_Left",
+      "a": "Ejection_handle",
+      "b": "Seat_pan",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Pilot_torso",
+      "b": "Seat_back",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Pilot_legs",
+      "b": "Seat_pan",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Pilot_neck",
+      "b": "Pilot_torso",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Pilot_helmet",
+      "b": "Pilot_neck",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Pilot_visor",
+      "b": "Pilot_helmet",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Pilot_mask",
+      "b": "Pilot_helmet",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Pilot_arm_Left",
+      "b": "Pilot_torso",
+      "gapMm": 0,
+      "method": "re-measured saved contact hint"
+    },
+    {
+      "a": "Pilot_arm_Right",
+      "b": "Pilot_torso",
       "gapMm": 0,
       "method": "re-measured saved contact hint"
     },
@@ -1574,24 +1628,6 @@
     {
       "a": "Canopy_rail_Left_4",
       "b": "Canopy_rail_Left_3",
-      "gapMm": 0,
-      "method": "re-measured saved contact hint"
-    },
-    {
-      "a": "Cockpit_sill_Right",
-      "b": "Fuselage",
-      "gapMm": 0,
-      "method": "re-measured saved contact hint"
-    },
-    {
-      "a": "Canopy_rail_Right_0",
-      "b": "Cockpit_sill_Right",
-      "gapMm": 0,
-      "method": "re-measured saved contact hint"
-    },
-    {
-      "a": "Windshield_side_frame_Right",
-      "b": "Cockpit_sill_Right",
       "gapMm": 0,
       "method": "re-measured saved contact hint"
     },
@@ -2862,6 +2898,18 @@
       "method": "re-measured saved contact hint"
     },
     {
+      "a": "Canopy_hinge_Right",
+      "b": "Canopy_rail_Right_0",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Canopy_hinge_Left",
+      "b": "Canopy_rail_Left_0",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
       "a": "Mount_Nose",
       "b": "Nose_Trunnion",
       "gapMm": 0,
@@ -2880,6 +2928,24 @@
       "method": "solid distance"
     },
     {
+      "a": "Windshield_side_frame_Left",
+      "b": "Canopy_rail_Left_4",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Windshield_side_frame_Right",
+      "b": "Canopy_rail_Right_4",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Windshield_side_frame_Left",
+      "b": "Windshield_front_frame",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
       "a": "Door_Left_Aft",
       "b": "Left_Retraction_barrel",
       "gapMm": 0,
@@ -2888,6 +2954,12 @@
     {
       "a": "Door_Right_Aft",
       "b": "Right_Retraction_barrel",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Windshield_glass",
+      "b": "Canopy_rail_Left_4",
       "gapMm": 0,
       "method": "solid distance"
     },
@@ -2976,18 +3048,6 @@
       "method": "solid distance"
     },
     {
-      "a": "Mount_Door_Left_Forward",
-      "b": "Intake_skin_Left",
-      "gapMm": 0,
-      "method": "solid distance"
-    },
-    {
-      "a": "Mount_Door_Right_Forward",
-      "b": "Intake_skin_Right",
-      "gapMm": 0,
-      "method": "solid distance"
-    },
-    {
       "a": "Gun_port_fairing:2",
       "b": "Duct_liner_Right",
       "gapMm": 0,
@@ -2996,11 +3056,23 @@
     {
       "a": "Gun_port_fairing:1",
       "b": "Intake_skin_Right",
-      "gapMm": 1.1368683772161603e-13,
+      "gapMm": 5.569494857771083e-13,
       "method": "solid distance"
     },
     {
       "a": "Mount_Nose",
+      "b": "Fuselage",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Mount_Right",
+      "b": "Fuselage",
+      "gapMm": 0,
+      "method": "solid distance"
+    },
+    {
+      "a": "Mount_Left",
       "b": "Fuselage",
       "gapMm": 0,
       "method": "solid distance"
@@ -3018,24 +3090,24 @@
       "method": "solid distance"
     }
   ],
-  "passed": 41,
+  "passed": 42,
   "failed": 0,
   "evidence": [
     {
       "artifact": "/Users/prasiddhnaik/Documents/blender skills/pocket-flight-site/assets/f15c/STEP/f15c.step",
-      "sha256": "146e29a75206a21a9448ad70acb12edeb3bd36d0e24d85751310e62c35886d2b"
+      "sha256": "1b26a37908de42820df07ae640771e67b96a90ed92b84536fa0e49156eb87638"
     },
     {
       "artifact": "/Users/prasiddhnaik/Documents/blender skills/pocket-flight-site/assets/f15c/STEP/details_preview.step",
-      "sha256": "d25e611e82c5746a401dc234e90927e2fd7e0cd02a6c2d6f72bc7af18f917e5e"
+      "sha256": "32c5c2b756cf787a3876c31ee7df0565a7115ca257f106b12a7a01fd3397e106"
     },
     {
       "artifact": "/Users/prasiddhnaik/Documents/blender skills/pocket-flight-site/assets/f15c/STEP/details_preview.step",
-      "sha256": "d25e611e82c5746a401dc234e90927e2fd7e0cd02a6c2d6f72bc7af18f917e5e"
+      "sha256": "32c5c2b756cf787a3876c31ee7df0565a7115ca257f106b12a7a01fd3397e106"
     },
     {
       "artifact": "STEP/gun_preview.step",
-      "sha256": "efd03024d0dd6e0068607c74bbc728997b4654afee8656d18cdfc86e2bf942e1"
+      "sha256": "0aea3196a1714b65c82713605b2982cfdaa3e9e9073f520607feadb2337db18d"
     }
   ]
 }

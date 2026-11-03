@@ -119,7 +119,7 @@ export function FlightHud({
             <i key={i} className={i < s.ring ? "done" : i === s.ring ? "next" : ""} />
           ))}
           <span>
-            {s.totalRings > 0 ? `${s.ring}/${s.totalRings}` : mission.id === "free" ? "FREE FLIGHT" : "LANDING MISSION"}
+            {s.totalRings > 0 ? `${s.ring}/${s.totalRings}` : mission.id === "free" ? "FREE FLIGHT" : mission.id === "combat" ? "FREE RANGE" : "LANDING MISSION"}
           </span>
         </div>
       </header>

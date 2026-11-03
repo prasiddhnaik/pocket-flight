@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>F-15C Blender skin and animations: implementation plan</title>
+<style>
+  body { font: 16px/1.5 system-ui, sans-serif; color: #17202a; background: #fff; max-width: 880px; margin: 0 auto; padding: 32px 20px 64px; }
+  h1 { font-size: 28px; line-height: 1.2; margin: 0 0 8px; }
+  h2 { font-size: 20px; margin: 36px 0 8px; border-top: 1px solid #d5dbe0; padding-top: 20px; }
+  h3 { font-size: 15px; margin: 16px 0 4px; }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  th, td { text-align: left; vertical-align: top; padding: 6px 9px; border-bottom: 1px solid #e3e7ea; }
+  th { background: #f3f5f6; }
+  code { font: 13px ui-monospace, Menlo, monospace; background: #f3f5f6; padding: 1px 4px; border-radius: 3px; }
+  pre { background: #f3f5f6; padding: 10px 12px; overflow-x: auto; font: 13px/1.45 ui-monospace, Menlo, monospace; }
+  .meta { color: #55606a; font-size: 14px; }
+  .gate { border-left: 4px solid #b7791f; padding: 6px 12px; background: #fdf8ee; }
+  li { margin: 3px 0; }
+</style>
+</head>
+<body>
+<header>
+  <h1>F-15C Blender skin and animations: implementation plan</h1>
+  <p class="meta">1 November 2026 · Implements <a href="2026-11-01-f15c-blender-skin-and-animations.html">the approved design</a>, which executors read alongside this</p>
+</header>
+<main>
+
+<section>
+  <p><strong>Goal:</strong> Replace the F-15C's outer skin with a Blender model that matches the real aircraft, and add Blender-made gun barrel and missile launch animations, with flight handling unchanged.</p>
+  <p><strong>Approach:</strong> A Blender script builds the skin and merges it with the CAD mechanical parts into the same game model, keeping every part name. Animations ship as clips; the game sets clip time from its own state, so live play and replays match.</p>
+  <p><strong>Tools:</strong> Blender 5.2.1 Python (bpy, bmesh, numpy), Three.js r180, TypeScript, Bun tests, build123d CAD (unchanged).</p>
+</section>
+
+<section>
+  <h2>Global constraints</h2>
+  <ul>
+    <li>Size: <code>13.04925 × 5.6261 × 19.431</code> m, pinned by <code>tests/f15c-runtime.test.ts</code>.</li>
+    <li>Flight numbers stay: <code>wingArea 61.56022521316562</code>, <code>meanAerodynamicChord 5.250250398235864</code>, <code>quarterChordZ 1.2957202936056007</code>, and everything in <code>src/aircraft/f15c/design.ts</code>.</li>
+    <li>Model budget: at most <code>506380</code> triangles and <code>13416284</code> bytes.</li>
+    <li>Part names stay, and moving nodes keep extras <code>hinge_axis</code>, <code>travel_degrees</code>, <code>hinge</code>. The root keeps <code>gunMuzzle</code>.</li>
+    <li>Every part touches or embeds into its parent. No floating parts.</li>
+    <li>Reference drawing stays out of <code>public/</code> (CC BY-SA, see <code>assets/f15c/references/CREDITS.md</code>).</li>
+    <li>Strict TypeScript, never <code>any</code>. Use Bun. No dev server or build commands unless told. A temporary server for screenshots is stopped afterwards.</li>
+    <li>No commits unless the user asks. The checkout has existing uncommitted work; preserve it.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Review focus</h2>
+  <p>Failure modes the design implies. Each has a test in the task named.</p>
+  <ol>
+    <li>Gear or canopy cycled in the aircraft viewer: doors must close flush on the new body, with nothing poking through (Task 3).</li>
+    <li>An F-15C replay or Studio project saved before this work must still open and play (Tasks 3, 5).</li>
+    <li>A short trigger tap: releasing during spin-up winds down from the current speed without a jump (Task 4).</li>
+    <li>Different frame rates and pausing: barrel speed matches at 30 and 144 fps, and pausing freezes it (Task 4).</li>
+    <li>A body missile fired on the ground or very low: its drop never goes below the surface, and the sandbox still works if the missile models fail to load (Task 5).</li>
+  </ol>
+</section>
+
+<section>
+  <h2>Files</h2>
+  <table>
+    <tr><th>File</th><th>Job</th></tr>
+    <tr><td><code>scripts/build-f15c-skin.py</code> (new)</td><td>Builds the skin, merges CAD parts, saves <code>assets/f15c-skin.blend</code>, exports the model</td></tr>
+    <tr><td><code>scripts/check-f15c-skin.py</code> (new)</td><td>Blender check: contact, symmetry, budget, names</td></tr>
+    <tr><td><code>scripts/compare-f15c-reference.py</code>, <code>measure-f15c-reference.py</code></td><td>Take any model path; pass or fail against overlap targets</td></tr>
+    <tr><td><code>scripts/prepare-f15c.ts</code></td><td>Writes <code>assets/f15c/GLB/f15c-cad.glb</code> instead of the public model</td></tr>
+    <tr><td><code>scripts/build-f15c-weapons.py</code> (new)</td><td>Builds missiles and launch clips into <code>public/assets/weapons/missiles.glb</code></td></tr>
+    <tr><td><code>src/aircraft/f15c/gun-spool.ts</code> (new)</td><td>Barrel speed and blur from clip curves</td></tr>
+    <tr><td><code>src/aircraft/weapons/missile-models.ts</code> (new)</td><td>Loads and caches missile models and clips</td></tr>
+    <tr><td><code>tests/f15c-skin.test.ts</code>, <code>tests/f15c-gun-spool.test.ts</code>, <code>tests/missile-launch.test.ts</code> (new)</td><td>Tests named below</td></tr>
+  </table>
+</section>
+
+<section>
+  <h2>Task 1: Rough shape, measured</h2>
+  <p><strong>Files:</strong> create <code>scripts/build-f15c-skin.py</code>; modify the two comparison scripts. <strong>Produces:</strong> <code>assets/f15c/GLB/f15c-skin-blockout.glb</code>, and <code>POCKET_F15C_GLB</code> and <code>POCKET_F15C_REVIEW</code> environment settings on both comparison scripts.</p>
+  <ul>
+    <li>[ ] Make both scripts read the model and output folder from those settings. Tolerate models without a <code>LandingGear</code> node.</li>
+    <li>[ ] In the measuring script, mask the drawing's missiles and pylons out of the outline with boxes per view, and exit non-zero below <code>top 0.95, side 0.93, front 0.90</code>. Run it on today's model. Expected: fails and reports raised overlap figures with the mask.</li>
+    <li>[ ] Write <code>build_body(mode: str) -> list[Object]</code>, with cross-sections placed in stations along the aircraft and subdivision surfaces: nose and radome, flat top deck, flat-sided square intakes, two engine housings, spine, canopy. Add wings, fins and tail planes as simple solids at the corrected positions from the design's table.</li>
+    <li>[ ] Run: <code>POCKET_F15C_GLB=assets/f15c/GLB/f15c-skin-blockout.glb Blender --background --python scripts/compare-f15c-reference.py</code>, then measure. Iterate until the targets pass.</li>
+    <li>[ ] Render side-by-sides with the three photos. Compare also against a sample of <code>output/f15c-reference-250</code> front, rear and top views.</li>
+  </ul>
+  <p class="gate"><strong>Stop for approval.</strong> Show the images and numbers. Nothing below starts until the user approves the shape.</p>
+</section>
+
+<section>
+  <h2>Task 2: Detailed skin</h2>
+  <p><strong>Files:</strong> <code>scripts/build-f15c-skin.py</code>, create <code>scripts/check-f15c-skin.py</code>. <strong>Produces:</strong> named skin objects, listed below, each moving surface with hinge data.</p>
+  <table>
+    <tr><th>Group</th><th>Names kept</th></tr>
+    <tr><td>Body</td><td><code>Fuselage</code>, <code>Radome</code>, <code>Intake_skin_*</code>, <code>Fin_fairing_*</code>, <code>Fin_tip_fairing_*</code></td></tr>
+    <tr><td>Intake inside</td><td><code>Duct_liner_*</code>, <code>Duct_end_*</code>, <code>Splitter_*</code>, <code>Ramp_1..3_*</code></td></tr>
+    <tr><td>Wings and tail</td><td><code>Wing_fixed_*</code>, <code>Flap_*_skin</code>, <code>Aileron_*_skin</code>, <code>Fin_*</code>, <code>Rudder_*_skin</code>, <code>Stabilator_*_skin</code>, <code>Stabilator_shaft_*_skin</code></td></tr>
+    <tr><td>Canopy</td><td><code>Canopy_glass</code>, <code>Canopy_rail_*</code>, <code>Windshield_*</code></td></tr>
+    <tr><td>Panels and fittings</td><td><code>Door_*_skin</code>, <code>Airbrake_panel</code>, <code>Gun_port_fairing</code>, <code>Gun_recess_liner</code>, <code>Gun_vent_*</code>, <code>Dorsal_*</code>, <code>Upper_beacon*</code>, <code>Formation_light_*</code></td></tr>
+  </table>
+  <ul>
+    <li>[ ] Write the check first: for each object, closest distance to its parent is at most <code>0</code> (touching or overlapping); left and right match within 1 cm except the gun side; every name above exists; triangles within budget. Run it. Expected: fails on missing parts.</li>
+    <li>[ ] Build the detail: one continuous skin for body, intakes and wing roots; panel lines; real depth in intakes; moving surfaces split with running gaps; gun port on the outer right wing-root shoulder.</li>
+    <li>[ ] Run the check and the comparison. Expected: both pass. Show images to the user.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Task 3: In the game</h2>
+  <p><strong>Files:</strong> <code>scripts/prepare-f15c.ts</code>, <code>scripts/build-f15c.ts</code>, <code>scripts/build-f15c-skin.py</code>, <code>src/aircraft/f15c/collision.json</code>, <code>src/flight/cannon.ts</code> (only if the muzzle moves), <code>src/aircraft/aircraft-stores.ts</code> layout values, <code>src/aircraft/aircraft-finish.ts</code> decals, <code>tests/f15c-skin.test.ts</code>. <strong>Produces:</strong> <code>public/assets/f15c-eagle.glb</code> from Blender.</p>
+  <ul>
+    <li>[ ] Write <code>tests/f15c-skin.test.ts</code>:
+      <ul>
+        <li><code>flight numbers are frozen</code>: the three constants above, exactly.</li>
+        <li><code>model stays within budget</code>: triangles and bytes.</li>
+        <li><code>closed doors sit flush</code>: rays through each <code>Door_*_skin</code> find the door within 3 cm of the body surface around its edge.</li>
+        <li><code>gear folds inside the body</code>: retracted gear has no vertex outside the skin by more than 3 cm.</li>
+        <li><code>a saved replay from before the new skin still plays</code>: a recorded fixture frame set passes <code>validateReplay</code>, and every animated name it drives exists.</li>
+      </ul>
+      Run against the Task 2 model. Expected: the door and gear tests fail until the mechanical parts are fitted.
+    </li>
+    <li>[ ] Point <code>prepare-f15c.ts</code> at <code>assets/f15c/GLB/f15c-cad.glb</code>, and make the last step of <code>build-f15c.ts</code> run the Blender script, so a CAD rebuild cannot overwrite the skin.</li>
+    <li>[ ] Have the Blender script import the CAD model, delete replaced parts, move mechanical parts to fit, and export with extras kept. Guard <code>measure-f15c-wing.ts</code> so it cannot rewrite the frozen flight numbers.</li>
+    <li>[ ] Run <code>bun scripts/measure-collision-proxies.ts</code> to regenerate collision. Update <code>F15C_MUZZLE</code> and <code>gunMuzzle</code> together if the port moved.</li>
+    <li>[ ] Run: <code>bun test ./tests/f15c-skin.test.ts ./tests/f15c-runtime.test.ts ./tests/f15c-flight.test.ts ./tests/aircraft-stores.test.ts ./tests/aircraft-mechanics.test.ts ./tests/wind-tunnel.test.ts --timeout 60000</code>. Expected: all pass, with any changed expectation listed for the user.</li>
+    <li>[ ] Screenshot the game and <code>aircraft.html?aircraft=f15c</code>: paint and markings, gear and canopy cycle, stores, cockpit camera. Show the user.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Task 4: Gun barrels</h2>
+  <p><strong>Files:</strong> <code>scripts/build-f15c-skin.py</code>, create <code>src/aircraft/f15c/gun-spool.ts</code>, modify <code>effects.ts</code>, <code>powerplant-rig.ts</code>, <code>src/flight/cannon-effects.ts</code>. <strong>Consumes:</strong> <code>motion.gunAngle</code>, <code>motion.gunSpeed</code>. <strong>Produces:</strong> <code>class GunSpool { step(dt: number, firing: boolean): void; readonly speed: number; readonly blur: number }</code>, with <code>speed</code> in radians per second.</p>
+  <ul>
+    <li>[ ] Add clips and parts in Blender: <code>Gun_spin_up</code> (about 0.33 s), <code>Gun_wind_down</code> (about 1 s), <code>Gun_muzzle_shake</code> (looping), and the mesh <code>Gun_barrel_blur</code>.</li>
+    <li>[ ] Write <code>tests/f15c-gun-spool.test.ts</code>:
+      <ul>
+        <li><code>reaches full speed in about a third of a second</code>: at 0.33 s, <code>speed</code> is within 2% of <code>100 / 6 * 2π</code>.</li>
+        <li><code>barrels blur before they can alias</code>: any speed moving a barrel more than 25° per frame at 60 fps has <code>blur</code> of 1.</li>
+        <li><code>a tap winds down from where it was</code>: release at 0.1 s; the next step's speed changes by a small amount, with no jump to full speed or zero.</li>
+        <li><code>frame rate does not change the spin</code>: speed after 0.2 s at 30 and 144 fps agrees within 2%.</li>
+        <li><code>a zero step changes nothing</code>, which covers pausing.</li>
+        <li><code>the first round leaves on the trigger frame</code>, via <code>CannonSimulation</code>.</li>
+      </ul>
+      Run. Expected: fails, module missing.
+    </li>
+    <li>[ ] Implement <code>GunSpool</code> reading curves sampled from the clips, with a fallback curve in code for tests. Replace the damping in <code>effects.ts</code>, keeping <code>gunAngle</code> and <code>gunSpeed</code> meaningful so <code>tests/aircraft-preview.test.ts</code> and replays hold.</li>
+    <li>[ ] Add blur crossfade, muzzle shake, and wind-down smoke using the existing discharge effect.</li>
+    <li>[ ] Run the new test with <code>tests/f15c-cannon.test.ts</code>, <code>f15c-effects.test.ts</code>, <code>f15c-animation-regressions.test.ts</code>, <code>aircraft-preview.test.ts</code>. Expected: all pass.</li>
+    <li>[ ] Capture video at 30, 60, 120 and 144 fps timing, close on the muzzle. Expected: no backward spin. Show the user.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Task 5: Missile launch</h2>
+  <p><strong>Files:</strong> create <code>scripts/build-f15c-weapons.py</code>, <code>src/aircraft/weapons/missile-models.ts</code>, <code>tests/missile-launch.test.ts</code>; modify <code>src/flight/combat/{simulation,visuals,tape}.ts</code>, <code>src/aircraft/weapons/combat-loadouts.ts</code>, <code>src/replay/replay-data.ts</code>. <strong>Produces:</strong> <code>Hardpoint.launch?: "rail" | "drop"</code>; <code>launchOffset(kind: "rail" | "drop", age: number): Vector3</code> in aircraft axes at launch; rounds on the replay tape gain age and launch kind.</p>
+  <ul>
+    <li>[ ] In Blender, build <code>Missile_aim9</code> and <code>Missile_aim120</code> with plume meshes, and clips <code>Launch_rail</code> (under 1 s), <code>Launch_drop</code> (under 1 s), <code>Fins_steer</code>. Sizes follow <code>aim9()</code> and <code>aim120()</code> in <code>aircraft-stores.ts</code>.</li>
+    <li>[ ] Write <code>tests/missile-launch.test.ts</code>:
+      <ul>
+        <li><code>the launch blends into flight</code>: <code>launchOffset</code> is zero after the clip ends, and has no jump between neighbouring samples.</li>
+        <li><code>the launch is visual only</code>: hits and path match with and without the launch clip.</li>
+        <li><code>a drop stays above the ground</code>: fired on the runway, the drawn missile never goes below the surface.</li>
+        <li><code>only the fired missile leaves</code>: other stations stay visible; rearming restores all.</li>
+        <li><code>station types</code>: F-15C wing is rail and body is drop; A-2 inner pylons are rail.</li>
+        <li><code>it works without the models</code>: with models unavailable, visuals use the simple body and do not throw.</li>
+        <li><code>old tapes still play</code>: an 8-number round validates and shows no launch clip; a 10-number round plays it.</li>
+      </ul>
+      Run. Expected: fails, module missing.
+    </li>
+    <li>[ ] Implement them. In the sandbox, the Blender missile takes each station's place, hiding the code-built one. Update <code>validateReplay</code> for both round lengths, and <code>captureCombat</code> for the new fields.</li>
+    <li>[ ] Run the new test with <code>tests/combat-simulation.test.ts</code> and <code>combat-loadout.test.ts</code>. Expected: all pass.</li>
+    <li>[ ] Screenshot both launch kinds in flight and in Replay Studio. Show the user.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Task 6: Final check</h2>
+  <ul>
+    <li>[ ] Re-run the comparison. Expected: targets pass. Update <code>assets/f15c/review/reference/</code>.</li>
+    <li>[ ] Run <code>bunx tsc --noEmit -p .</code> and <code>bun run repo:check</code>. Expected: clean.</li>
+    <li>[ ] Run <code>bun run test</code>. Expected: all pass. Report any baseline failures separately.</li>
+    <li>[ ] Fly the sandbox and open the flight in Replay Studio: skin, gun, missile. Add the README row. Report what was seen, what only tests cover, and what was not checked.</li>
+  </ul>
+</section>
+
+</main>
+</body>
+</html>

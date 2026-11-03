@@ -2,7 +2,7 @@
 
 **Fly Palm Bay, inspect the aircraft, and turn a replay into a film.**
 
-Pocket Flight is a browser flight game with five aircraft, missions, free flight, a glass instrument HUD, adaptive audio, and Scene Studio. A separate private wind-tunnel app uses the shared aircraft and flight models for experiments and inspection.
+Pocket Flight is a browser flight game with six aircraft, missions, free flight, a glass instrument HUD, adaptive audio, and Scene Studio. A separate private wind-tunnel app uses the shared aircraft and flight models for experiments and inspection.
 
 **TypeScript · React · Three.js · Vite · Bun**
 
@@ -24,6 +24,7 @@ The game requires a browser with WebGL. Runtime assets are already under `public
 | Experience                          | Local route                                             |
 | ----------------------------------- | ------------------------------------------------------- |
 | Game, HUD, replay, and Scene Studio | `/` — open Studio from the game UI                      |
+| Fleet aircraft viewer | `/aircraft.html?aircraft=f15c` — choose any of the six aircraft; uses the flight models and moving systems |
 | Finch U-2 viewer                    | `/hangar.html`                                          |
 | Aurelia S32 viewer                  | `/civilian.html`                                        |
 | Aurelia Phenom-based reconstruction | `/aurelia-reference.html` — enlarged airframe, original-size fittings, mechanisms, animated cockpit and cabin inspection |
@@ -96,6 +97,11 @@ output/          Local generated builds, reports, captures and working data
 | Aircraft shape, mechanisms or materials | [aircraft/aircraft.ts](src/aircraft/aircraft.ts)                                                                                 | Aircraft-specific helpers in the same directory; asset and mechanism tests      |
 | Mass, fuel or systems                   | [aircraft/aircraft-design.ts](src/aircraft/aircraft-design.ts), [aircraft/aircraft-systems.ts](src/aircraft/aircraft-systems.ts) | [flight/fuel-loading.ts](src/flight/fuel-loading.ts), `tests/fuel-mass.test.ts` |
 | Terrain or scenery                      | [world/world.ts](src/world/world.ts), [world/terrain.ts](src/world/terrain.ts)                                                   | `tests/scenery.test.ts`, `tests/coastal-assets.test.ts`                         |
+| F-15C outer skin, pylons and gun clips    | [scripts/build-f15c-skin.py](scripts/build-f15c-skin.py), [aircraft/f15c/gun-spool.ts](src/aircraft/f15c/gun-spool.ts) | `tests/f15c-skin.test.ts`, `tests/f15c-gun-spool.test.ts`, `scripts/check-f15c-skin.py` |
+| Heron outer skin, modelled on the Grand Caravan | [scripts/build-heron-skin.py](scripts/build-heron-skin.py), [scripts/check-heron-skin.py](scripts/check-heron-skin.py) | `tests/heron-skin.test.ts`, `tests/heron.test.ts` |
+| Island trees: cheap models, one draw per kind and level | [scripts/build-tropical-trees.py](scripts/build-tropical-trees.py), [world/tree-field.ts](src/world/tree-field.ts) |
+| Palm Bay landmarks: tower, terminal, lighthouse, marina, church | [scripts/build-palm-bay-buildings.py](scripts/build-palm-bay-buildings.py), [world/palm-bay-landmarks.ts](src/world/palm-bay-landmarks.ts) | `tests/palm-bay-landmarks.test.ts` |
+| Anvil Key, the weapons sandbox island   | [scripts/build-range-island.py](scripts/build-range-island.py), [world/range-layout.json](src/world/range-layout.json), [world/range-island.ts](src/world/range-island.ts) | `tests/range-island.test.ts`                                                    |
 | Music or spoken warnings                | [audio/flight-music.ts](src/audio/flight-music.ts), [audio/betty.ts](src/audio/betty.ts)                                         | Music and Betty tests; `public/audio/`                                          |
 | Replay storage or format                | [replay/replay-data.ts](src/replay/replay-data.ts), [replay/replay-library.ts](src/replay/replay-library.ts)                     | `tests/replay.test.ts`, `tests/studio.test.ts`                                  |
 | Scene Studio                            | [studio/ReplayStudio.tsx](src/studio/ReplayStudio.tsx), [studio/studio-model.ts](src/studio/studio-model.ts)                     | `tests/studio.test.ts`, `tests/studio-scene.test.ts`                            |

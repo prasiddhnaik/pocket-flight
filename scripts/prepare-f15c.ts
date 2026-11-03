@@ -40,12 +40,13 @@ for (const part of transfer.parts) {
   }
   const origin = origins.get(parent) ?? [0, 0, 0];
   const glass = /glass/i.test(part.name), rubber = /tire|seal/i.test(part.name), metal = /Nozzle|nozzle|petal|actuator|hinge|shaft|bearing|collar|rail|hub|Hub|rim|Oleo|oleo|strut|Torque|trunnion|Mount|HUD_support|Gun_(barrel|muzzle_face|retainer|hub)|M61_/.test(part.name);
-  const key = `${part.color.join(",")}:${glass}:${rubber}:${metal}`;
+  const gunFinish = /^(Gun_(barrel|muzzle_face|support|recess_liner)|M61_)/.test(part.name);
+  const key = `${part.color.join(",")}:${glass}:${rubber}:${metal}:${gunFinish}`;
   let material = materials.get(key);
   if (!material) {
-    material = doc.createMaterial(glass ? "Glass • F-15C canopy" : metal ? "Metal • F-15C fittings" : rubber ? "Rubber • F-15C tire" : "Paint • F-15C gray")
+    material = doc.createMaterial(gunFinish ? "Gunmetal • F-15C Vulcan" : glass ? "Glass • F-15C canopy" : metal ? "Metal • F-15C fittings" : rubber ? "Rubber • F-15C tire" : "Paint • F-15C gray")
       .setBaseColorFactor([part.color[0], part.color[1], part.color[2], glass ? .24 : 1])
-      .setMetallicFactor(metal ? .65 : .04).setRoughnessFactor(glass ? .09 : rubber ? .9 : metal ? .4 : .53);
+      .setMetallicFactor(gunFinish ? .25 : metal ? .65 : .04).setRoughnessFactor(gunFinish ? .8 : glass ? .09 : rubber ? .9 : metal ? .4 : .53);
     if (glass) material.setAlphaMode("BLEND").setDoubleSided(true);
     materials.set(key, material);
   }
@@ -56,5 +57,5 @@ for (const part of transfer.parts) {
   ensure(parent).addChild(doc.createNode(part.name === parent ? `${part.name}_skin` : part.name).setMesh(doc.createMesh(part.name).addPrimitive(primitive)));
 }
 await doc.transform(dedup(), prune());
-await new NodeIO().setVertexLayout(VertexLayout.SEPARATE).write(fileURLToPath(new URL("../public/assets/f15c-eagle.glb", import.meta.url)), doc);
+await new NodeIO().setVertexLayout(VertexLayout.SEPARATE).write(fileURLToPath(new URL("../assets/f15c/GLB/f15c-cad.glb", import.meta.url)), doc);
 console.log(`F-15C: ${transfer.parts.length} named CAD leaves, ${Object.keys(transfer.mechanisms).length} hinges, ${materials.size} materials.`);

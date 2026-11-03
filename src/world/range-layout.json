@@ -1,0 +1,50 @@
+{
+  "name": "Anvil Key",
+  "centre": { "x": 3600, "z": -2400 },
+  "size": 2400,
+  "segments": 256,
+  "runway": { "x": -620, "z": 130, "length": 560, "width": 30, "y": 12 },
+  "roads": [
+    [[-544, 190], [-300, 170], [-60, 210], [180, 190], [400, 120], [540, -10]],
+    [[-300, 170], [-330, -160], [-400, -460], [-420, -660]],
+    [[-60, 210], [-60, 90]],
+    [[400, 120], [340, -130], [330, -210]]
+  ],
+  "rings": [{ "x": -60, "z": -60, "radii": [30, 60, 95] }],
+  "pads": [
+    { "x": -60, "z": -60, "radius": 110, "y": 18 },
+    { "x": 330, "z": -300, "radius": 105, "y": 22 },
+    { "x": 610, "z": -430, "radius": 30 },
+    { "x": -420, "z": -700, "radius": 55 }
+  ],
+  "berms": [
+    { "x": 280, "z": -310, "radius": 15, "open": 3.14 },
+    { "x": 330, "z": -280, "radius": 15, "open": 3.14 },
+    { "x": 380, "z": -325, "radius": 15, "open": 3.14 }
+  ],
+  "buildings": [
+    { "kind": "tower", "x": -175, "z": 60, "heading": 0.6 },
+    { "kind": "bunker", "x": -490, "z": 90, "heading": 1.57 },
+    { "kind": "tanks", "x": -500, "z": 290, "heading": 0 }
+  ],
+  "targets": [
+    { "id": "alpha-hulk", "model": "tank", "kind": "ground", "x": -60, "z": -60, "heading": 0.7, "radius": 5.5, "aim": 1.5, "health": 6 },
+    { "id": "alpha-board-1", "model": "board", "kind": "ground", "x": -60, "z": 18, "heading": 0, "radius": 5, "aim": 3.5, "health": 3 },
+    { "id": "alpha-board-2", "model": "board", "kind": "ground", "x": -138, "z": -60, "heading": 1.57, "radius": 5, "aim": 3.5, "health": 3 },
+    { "id": "convoy-1", "model": "truck", "kind": "ground", "x": 60, "z": 200, "heading": -1.49, "radius": 5, "aim": 1.6, "health": 3 },
+    { "id": "convoy-2", "model": "truck", "kind": "ground", "x": 110, "z": 195.8, "heading": -1.49, "radius": 5, "aim": 1.6, "health": 3 },
+    { "id": "convoy-3", "model": "truck", "kind": "ground", "x": 160, "z": 191.7, "heading": -1.49, "radius": 5, "aim": 1.6, "health": 3 },
+    { "id": "armour-1", "model": "tank", "kind": "ground", "x": 280, "z": -310, "heading": 0, "radius": 5.5, "aim": 1.5, "health": 6 },
+    { "id": "armour-2", "model": "tank", "kind": "ground", "x": 330, "z": -280, "heading": 0, "radius": 5.5, "aim": 1.5, "health": 6 },
+    { "id": "armour-3", "model": "tank", "kind": "ground", "x": 380, "z": -325, "heading": 0, "radius": 5.5, "aim": 1.5, "health": 6 },
+    { "id": "radar", "model": "radar", "kind": "ground", "x": 610, "z": -430, "heading": 2.4, "radius": 6, "aim": 3.5, "health": 3 },
+    { "id": "cape-truck-1", "model": "truck", "kind": "ground", "x": -440, "z": -690, "heading": 0.4, "radius": 5, "aim": 1.6, "health": 3 },
+    { "id": "cape-truck-2", "model": "truck", "kind": "ground", "x": -395, "z": -715, "heading": -0.5, "radius": 5, "aim": 1.6, "health": 3 },
+    { "id": "barge", "model": "barge", "kind": "ground", "x": 110, "z": 640, "heading": 0.9, "radius": 16, "aim": 3, "health": 12 }
+  ],
+  "drones": [
+    { "id": "drone-1", "x": -60, "z": -60, "orbit": 520, "altitude": 190, "speed": 55, "direction": 1, "phase": 0 },
+    { "id": "drone-2", "x": 250, "z": 250, "orbit": 380, "altitude": 230, "speed": 48, "direction": -1, "phase": 2 },
+    { "id": "drone-3", "x": 300, "z": -480, "orbit": 460, "altitude": 330, "speed": 62, "direction": 1, "phase": 4 }
+  ]
+}

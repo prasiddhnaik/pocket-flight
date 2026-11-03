@@ -2,7 +2,7 @@
 // This runner closes its own browser session even when an assertion fails.
 import { fileURLToPath } from "node:url";
 const root = fileURLToPath(new URL("../", import.meta.url));
-const url = "http://127.0.0.1:5299/";
+const url = process.env.POCKET_FLIGHT_BASE_URL ?? "http://127.0.0.1:5299/";
 async function command(args: string[]) {
   const child = Bun.spawn(
     ["bun", "node_modules/.bin/playwright-cli", "-s=combat-check", ...args],

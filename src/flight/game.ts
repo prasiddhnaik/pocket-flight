@@ -482,10 +482,10 @@ export class PocketFlight {
         object.visible = true;
       }
     });
-    // compileAsync gathers its materials synchronously, before the next frame.
-    const ready = this.renderer.compileAsync(this.scene, this.camera);
+    // Async readiness polling outlives materials removed by aircraft and mission switches.
+    // Compile ahead of the first draw without retaining those materials in a poller.
+    this.renderer.compile(this.scene, this.camera);
     hidden.forEach((object) => (object.visible = false));
-    void ready.catch(() => {});
   }
   private updateJet(dt: number) {
     this.aircraft.setConfiguration(this.mode === "menu" ? 0 : this.physics.flapPosition, this.physics.gearSteering);

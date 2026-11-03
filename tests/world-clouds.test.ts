@@ -2,14 +2,20 @@ import { afterAll, beforeAll, expect, test } from "bun:test";
 import * as T from "three";
 
 const context = new Proxy({}, { get: () => () => {}, set: () => true });
-const original = Reflect.get(globalThis, "document");
+let original: PropertyDescriptor | undefined;
 beforeAll(() => {
-  Reflect.set(globalThis, "document", {
-    createElement: () => ({ width: 0, height: 0, getContext: () => context }),
+  original = Object.getOwnPropertyDescriptor(globalThis, "document");
+  Object.defineProperty(globalThis, "document", {
+    configurable: true,
+    writable: true,
+    value: {
+      createElement: () => ({ width: 0, height: 0, getContext: () => context }),
+    },
   });
 });
 afterAll(() => {
-  Reflect.set(globalThis, "document", original);
+  if (original) Object.defineProperty(globalThis, "document", original);
+  else Reflect.deleteProperty(globalThis, "document");
 });
 
 test("clouds stay groups of placeholder puffs for the sprite swap", async () => {

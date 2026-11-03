@@ -17,7 +17,7 @@ async (page) => {
       .getByLabel("Choose aircraft", { exact: true })
       .selectOption("f15c");
     await page
-      .getByRole("button", { name: "Combat range", exact: true })
+      .getByRole("button", { name: "Weapons sandbox", exact: true })
       .click();
     await page.waitForFunction(
       () => window.pocketFlight.mission.id === "combat",
@@ -42,16 +42,21 @@ async (page) => {
       initial.mode !== "playing" ||
       initial.rockets !== 8 ||
       !initial.missiles ||
-      initial.targets !== 4
+      initial.targets < 4
     )
       throw new Error(JSON.stringify(initial));
     // Set an aiming pose, then exercise real keyboard input and the running game loop.
     await page.evaluate(() => {
       const game = window.pocketFlight,
         p = game.physics;
-      p.pitch = 0;
+      const target = game.combat.simulation.targets.find((target) => target.model === "board");
+      p.position.copy(target.position).add(p.position.clone().set(0, 120, 400));
+      const direction = target.position.clone().sub(p.position).normalize();
+      p.initializeAirStart(160);
+      p.velocity.copy(direction).multiplyScalar(160);
+      p.pitch = Math.asin(direction.y);
       p.roll = 0;
-      p.yaw = 0;
+      p.yaw = Math.atan2(-direction.x, -direction.z);
       p.updateQuaternion();
       game.previousPosition.copy(p.position);
       game.previousQuaternion.copy(p.quaternion);
@@ -60,7 +65,12 @@ async (page) => {
     stage = "gun hits";
     await page.keyboard.down("j");
     await page.waitForFunction(
-      () => window.pocketFlight.combat.simulation.destroyed >= 1,
+      () => {
+        const game = window.pocketFlight;
+        if (game.combat.simulation.destroyed < 1) return false;
+        game.setSuspended(true);
+        return true;
+      },
       null,
       { timeout: 15000 },
     );
@@ -86,10 +96,12 @@ async (page) => {
       game.start(combatMission);
       const p = game.physics,
         sim = game.combat.simulation;
-      const target = sim.targets.find((target) => target.kind === "ground");
+      const target = sim.targets.find((target) => target.model === "board");
       const station = sim.stations.find(
         (station) => station.store === "rocket",
       );
+      p.position.copy(target.position).add(p.position.clone().set(0, 150, 650));
+      p.initializeAirStart(160);
       const { Vector3, Quaternion } =
         await import("/node_modules/.vite/deps/three.js");
       const offset = new Vector3(...station.hardpoint.position);
@@ -124,7 +136,12 @@ async (page) => {
     );
     await page.keyboard.up("k");
     await page.waitForFunction(
-      () => window.pocketFlight.combat.simulation.destroyed >= 1,
+      () => {
+        const game = window.pocketFlight;
+        if (game.combat.simulation.destroyed < 1) return false;
+        game.setSuspended(true);
+        return true;
+      },
       null,
       { timeout: 15000 },
     );
@@ -154,10 +171,22 @@ async (page) => {
       const game = window.pocketFlight;
       const { combatMission } = await import("/src/flight/missions.ts");
       game.start(combatMission);
+      const p = game.physics;
+      const target = game.combat.simulation.targets.find((target) => target.kind === "air");
+      p.position.copy(target.position).add(p.position.clone().set(0, 0, 650));
+      const direction = target.position.clone().sub(p.position).normalize();
+      p.initializeAirStart(180);
+      p.velocity.copy(direction).multiplyScalar(180);
+      p.pitch = Math.asin(direction.y);
+      p.yaw = Math.atan2(-direction.x, -direction.z);
+      p.roll = 0;
+      p.updateQuaternion();
+      game.previousPosition.copy(p.position);
+      game.previousQuaternion.copy(p.quaternion);
       game.setSuspended(false);
     });
     await page.waitForFunction(
-      () => window.pocketFlight.combat.simulation.lockTime >= 0.6,
+      () => window.pocketFlight.combat.simulation.locked,
       null,
       { timeout: 15000 },
     );
@@ -168,7 +197,12 @@ async (page) => {
     );
     await page.keyboard.up("l");
     await page.waitForFunction(
-      () => window.pocketFlight.combat.simulation.destroyed >= 1,
+      () => {
+        const game = window.pocketFlight;
+        if (game.combat.simulation.destroyed < 1) return false;
+        game.setSuspended(true);
+        return true;
+      },
       null,
       { timeout: 15000 },
     );
@@ -201,7 +235,7 @@ async (page) => {
         .getByLabel("Choose aircraft", { exact: true })
         .selectOption(choice);
       await page
-        .getByRole("button", { name: "Combat range", exact: true })
+        .getByRole("button", { name: "Weapons sandbox", exact: true })
         .click();
       const result = await page.evaluate(() => {
         const game = window.pocketFlight;

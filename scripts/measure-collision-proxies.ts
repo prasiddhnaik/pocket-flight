@@ -1,6 +1,7 @@
 import { Box3, Mesh, Vector3 } from "three";
 import { loadGeometryOnly } from "./geometry-loader";
 import { runtimeAircraftCatalog as aircraftCatalog } from "../lab/aircraft";
+import { aureliaFlightOffsetY } from "../src/aircraft/aurelia/flight-model";
 import type { AircraftId } from "../src/aircraft/aircraft";
 import type { ContactPart } from "../src/flight/airframe-contact";
 // Offline metrology; no render mesh queries in the physics loop. The release
@@ -12,7 +13,9 @@ for (const id of [
   "peregrine",
   "stormbird",
 ] as AircraftId[]) {
-  const config = aircraftCatalog[id];
+  const config = id === "aurelia"
+    ? { asset: "aurelia-phenom300e.glb", scale: 1, offsetY: aureliaFlightOffsetY }
+    : aircraftCatalog[id];
   const { scene, sha256 } = await loadGeometryOnly(
     new URL("../public/assets/" + config.asset, import.meta.url),
   );
@@ -32,6 +35,7 @@ for (const id of [
     ["Engine_Left", "engine"],
     ["Engine_Right", "engine"],
     ["Propeller", "propeller"],
+    ...(id === "aurelia" ? [["Empennage", "tail"] as [string, ContactPart]] : []),
   ];
   for (const [name, part] of groups) {
     const group = scene.getObjectByName(name);

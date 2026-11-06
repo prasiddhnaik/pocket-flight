@@ -10,7 +10,7 @@ import {
   fairingFullness,
   makeAureliaGearBays,
 } from "../scripts/aurelia-gear-bays";
-import { wheelPose } from "../src/flight/airframe-contact";
+import { legacyAureliaWheelPose } from "../src/flight/airframe-contact";
 import { AircraftMechanics } from "../lab/mechanics";
 
 async function aircraft() {
@@ -290,7 +290,7 @@ test("belly doors stay clear of the actual tire surfaces throughout travel and c
   }
 });
 
-test("flight contact geometry follows the four rendered wheels through nose and inboard main folds", async () => {
+test("legacy S32 contact geometry follows the four rendered wheels through nose and inboard main folds", async () => {
   const { scene, pose } = await aircraft();
   const names = [
     "Nose_wheel_-1",
@@ -309,13 +309,13 @@ test("flight contact geometry follows the four rendered wheels through nose and 
       rendered.y -= 1.265;
       // Native curves are sampled at 24 fps; contacts use their analytic path.
       expect(
-        rendered.distanceTo(wheelPose("aurelia", index, extension).center),
+        rendered.distanceTo(legacyAureliaWheelPose(index, extension).center),
       ).toBeLessThan(0.0005);
       const axle = new T.Vector3(1, 0, 0).applyQuaternion(
         scene.getObjectByName(name)!.getWorldQuaternion(new T.Quaternion()),
       );
       expect(
-        axle.distanceTo(wheelPose("aurelia", index, extension).axle),
+        axle.distanceTo(legacyAureliaWheelPose(index, extension).axle),
       ).toBeLessThan(0.0005);
       if (extension === 0 && index >= 2) {
         // A flat tire fits an underfloor wing-root bay; an upright tire doesn't.

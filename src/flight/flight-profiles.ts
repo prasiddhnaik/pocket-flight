@@ -20,6 +20,12 @@ function profile(
     1.225,
     id === "finch" ? 0 : id === "heron" ? 0.5 : 0.65,
   );
+  const landingStall = aircraftStallSpeed(
+    design,
+    design.nominal.mass,
+    1.225,
+    id === "finch" ? 0 : 1,
+  );
   return {
     pitchRate,
     rollRate,
@@ -30,7 +36,7 @@ function profile(
     stallSpeed,
     trimSpeed: design.trimSpeed,
     rotationKnots: Math.round(departureStall * 1.2 * 1.943844),
-    approachKnots: Math.round(departureStall * 1.35 * 1.943844),
+    approachKnots: Math.round(landingStall * 1.3 * 1.943844),
     gearSpeed: stallSpeed * 1.5,
     afterburner: design.propulsion.dryThrust
       ? design.propulsion.afterburningThrust / design.propulsion.dryThrust - 1

@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "f15c:build": "bun scripts/build-f15c.ts",
+    "cockpit:build": "bash scripts/build-cockpit.sh",
+    "pilot:build": "bash scripts/build-pilot.sh",
     "scenery:tree-lod": "bun scripts/build-tree-lod.ts",
     "build": "tsc -b && vite build",
     "preview": "vite preview --host 0.0.0.0",

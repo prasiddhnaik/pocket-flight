@@ -4,7 +4,7 @@ import { loadGeometryOnly } from "../scripts/geometry-loader";
 import { Quaternion, Vector3 } from "three";
 import { AureliaEffects } from "../src/aircraft/aurelia/aurelia-effects";
 import { initialJetInput } from "../src/aircraft/jet-effects";
-import { wheelPose } from "../src/flight/airframe-contact";
+import { legacyAureliaWheelPose } from "../src/flight/airframe-contact";
 let gltf: Pick<GLTF, "scene" | "animations">;
 beforeAll(async () => {
   const loaded = await loadGeometryOnly(
@@ -13,7 +13,7 @@ beforeAll(async () => {
   );
   gltf = loaded;
 });
-test("exported Aurelia gear retracts all four wheels along their contact paths and returns to its original pose", () => {
+test("legacy S32 export gear retracts all four wheels along their contact paths and returns to its original pose", () => {
   const e = new AureliaEffects(gltf.scene, gltf.animations),
     i = initialJetInput();
   const wheels = [
@@ -40,7 +40,7 @@ test("exported Aurelia gear retracts all four wheels along their contact paths a
         const position = wheel.getWorldPosition(new Vector3());
         const rendered = position.clone().multiplyScalar(0.55);
         rendered.y -= 1.265;
-        const contact = wheelPose("aurelia", index, extension);
+        const contact = legacyAureliaWheelPose(index, extension);
         expect(rendered.distanceTo(contact.center)).toBeLessThan(0.0005);
         const axle = new Vector3(1, 0, 0).applyQuaternion(
           wheel.getWorldQuaternion(new Quaternion()),

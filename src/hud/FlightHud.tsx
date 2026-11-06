@@ -4,10 +4,13 @@ import type { AircraftId } from "../aircraft/aircraft";
 import type { PocketFlight, Snapshot } from "../flight/game";
 import type { Mission } from "../flight/missions";
 import { Betty } from "../audio/betty";
+import { cockpitSpecs } from "../aircraft/cockpit-specs";
+import { hasSpeedBrake } from "../flight/flight-envelope";
 import { flightProfiles } from "../flight/flight-profiles";
 import { aircraftNames, climbReadout, formatClock } from "../app/flight-ui";
 import { BarGauge } from "./BarGauge";
 import { isNewFlight } from "./boot";
+import { landingCue } from "./landing-cue";
 import { CompassRose } from "./CompassRose";
 import { Dial } from "./Dial";
 import { airspeedScale, clamp01 } from "./geometry";
@@ -75,6 +78,12 @@ export function FlightHud({
   const [warnings, setWarnings] = useState<WarningId[]>([]);
   const profile = flightProfiles[aircraftId];
   const jet = aircraftId !== "finch" && aircraftId !== "heron";
+  const cue = landingCue({
+    active: s.mode === "playing" && s.slowingToLand && !s.grounded,
+    speed: s.speed,
+    approachKnots: profile.approachKnots,
+    speedBrake: hasSpeedBrake(aircraftId),
+  });
 
   useEffect(() => {
     if (game && !betty.current) betty.current = new Betty(game.audio);
@@ -106,7 +115,7 @@ export function FlightHud({
   const flightWarning = s.stall || s.hint.startsWith("Engine out");
 
   return (
-    <div className={`holo-hud ${boot !== "off" ? "booting" : ""}`}>
+    <div className={`holo-hud ${boot !== "off" ? "booting" : ""} ${s.camera === "cockpit" && cockpitSpecs[aircraftId] ? "hud-in-cockpit" : ""}`}>
       <WarningBanner warning={warnings[0] ?? null} />
 
       <CompassRose heading={s.heading} />
@@ -181,6 +190,7 @@ export function FlightHud({
             {damaged.map(([part, d]) => ` · ${part.toUpperCase()} ${Math.round((1 - d) * 100)}%`).join("")}
           </div>
         )}
+        {cue && <div className={`hud-landing-cue hud-glass ${cue.state}`}>{cue.text}</div>}
         <div className="hud-row">
           <Dial
             label="KNOTS" size="large" min={0} max={speed.max} value={sweeping ? speed.max : s.speed}
@@ -231,6 +241,7 @@ export function FlightHud({
             <b>{s.automaticConfiguration ? "AUTO" : "MAN"}</b>
           </div>
         )}
+        {s.speedBrake > 0.05 && <div className="hud-speed-brake hud-glass">SPEED BRAKE</div>}
         <div className="hud-row">
           <div className="hud-slots">
             {aircraftId !== "finch" && <SlotGauge label="FLAPS" position={s.flapPosition} readout={`${Math.round(s.flapPosition * 100)}%`} />}

@@ -11,6 +11,7 @@ export const aircraftDefinitionSources = [
   "src/aircraft/f15c/geometry.json",
   "src/aircraft/f15c/collision.json",
   "src/aircraft/f15c/effects.ts",
+  "src/aircraft/aurelia/flight-model.ts",
   ...["finch", "peregrine", "aurelia", "stormbird", "heron", "f15c"].flatMap((id) =>
     ["design.ts", "landing-gear.ts", "systems.ts"].map(
       (file) => `src/aircraft/${id}/${file}`,

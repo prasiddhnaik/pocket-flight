@@ -2468,6 +2468,8 @@ button:disabled { cursor: not-allowed; }
 .configuration-readout .envelope-warning { color:#a05c27; }
 .controls-settings { margin-top:24px; border-top:1px solid rgba(80,100,86,.2); padding-top:16px; }
 .controls-settings h3 { margin:0 0 8px; font-size:18px; }
+.settings-credits { margin:18px 0 0; font-size:13px; line-height:1.45; opacity:.78; }
+.settings-credits a { color:inherit; text-decoration:underline; text-underline-offset:2px; }
 .controls-setting-note { font-size:13px; line-height:1.6; color:#637269; }
 .controls-help-button { display:flex; align-items:center; gap:8px; padding:9px 0; color:inherit; background:none; border:0; cursor:pointer; }
 .touch-configuration { display:flex; gap:6px; align-self:end; }

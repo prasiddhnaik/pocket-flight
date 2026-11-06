@@ -15,7 +15,17 @@ import {
 } from "three/examples/jsm/controls/TransformControls.js";
 import { StudioSceneRenderer } from "./studio-scene-renderer";
 import { StudioSoundtrack } from "./studio-soundtrack";
-import { sampleCamera, type CameraKey, type Transform } from "./studio-scene";
+import {
+  sampleCamera,
+  type CameraKey,
+  type SceneObject,
+  type Transform,
+} from "./studio-scene";
+import {
+  measureObject,
+  placeSceneObject,
+  type PlacementAction,
+} from "./studio-placement";
 import type { StudioAsset } from "./studio-assets";
 export type SceneEditorOptions = {
   editing: boolean;
@@ -182,6 +192,27 @@ export class ReplayPreview {
       .copy(center)
       .add(new T.Vector3(distance, 0.6 * distance, distance));
     this.orbit.update();
+  }
+  objectDimensions(id: string | null) {
+    return id && !this.transforms.dragging
+      ? measureObject(this.assets.getObject(id))
+      : null;
+  }
+  placeObject(
+    object: SceneObject,
+    time: number,
+    action: PlacementAction,
+    meters?: number,
+  ) {
+    if (this.transforms.dragging) return null;
+    return placeSceneObject(
+      object,
+      this.assets.getObject(object.id),
+      time,
+      action,
+      { origin: this.origin, aircraft: this.subject, height: groundHeight },
+      meters,
+    );
   }
   setView(axis: "front" | "side" | "top") {
     const distance = this.camera.position.distanceTo(this.orbit.target) || 26;

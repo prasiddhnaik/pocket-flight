@@ -1,8 +1,14 @@
 import * as T from "three";
 import { CockpitDisplays } from "./cockpit-displays";
+import { CockpitInterior } from "./cockpit-interior";
+import { cockpitSpecs } from "./cockpit-specs";
+import { cockpitDriver, type CockpitSpec, type CockpitState } from "./cockpit-state";
 import { refineAircraftMaterials as prepareAircraftMaterials } from "./aircraft-materials";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { AureliaEffects } from "./aurelia/aurelia-effects";
+import { AureliaFlightDisplays } from "./aurelia/flight-displays";
+import { aureliaFlightOffsetY } from "./aurelia/flight-model";
+import { Pilot } from "./pilot";
 import { JetEffects } from "./jet-effects";
 import { STORMBIRD_CENTER, stormbirdLayout } from "./stormbird/stormbird-config";
 export type AircraftId = "finch" | "peregrine" | "aurelia" | "stormbird" | "heron" | "f15c";
@@ -13,6 +19,7 @@ import { FINCH_ATTACK_ROOT, type FinchVariant, finchAttackStores, paintFinchAtta
 export const isPropellerAircraft = (id: AircraftId) => id === "finch" || id === "heron";
 export const JET_SCALE = 0.7;
 export const JET_CENTER = 2.3;
+export const HERON_SEAT_SHIFT = 0.45;
 import { controlSurfaces } from "./finch/control-surfaces";
 import { propellerAnimation } from "./finch/propeller";
 export const paints = [
@@ -61,7 +68,10 @@ export function makeAircraft(paintIndex = 0, id: AircraftId = "finch", variant: 
   const model = {
     group,
     id,
-    displays: null as CockpitDisplays | null,
+    displays: null as CockpitDisplays | AureliaFlightDisplays | null,
+    interior: null as CockpitInterior<CockpitState> | null,
+    pilot: null as Pilot | null,
+    cockpit: (cockpitSpecs[id] ?? null) as CockpitSpec | null,
     effects: null as JetEffects | AureliaEffects | F15CEffects | null,
     cameraScale: id === "f15c" ? 1.9 : id === "aurelia" ? 1.8 : id === "heron" ? 1.55 : id === "finch" ? 1 : 1.4,
     wings: [new T.Group(), new T.Group()] as T.Object3D[],
@@ -123,6 +133,8 @@ export function makeAircraft(paintIndex = 0, id: AircraftId = "finch", variant: 
     dispose() {
       disposed = true;
       model.displays?.dispose();
+      model.interior?.dispose();
+      model.pilot?.dispose();
       if (model.effects instanceof F15CEffects) model.effects.dispose();
       disposeAircraft(group);
     },
@@ -136,7 +148,7 @@ export function makeAircraft(paintIndex = 0, id: AircraftId = "finch", variant: 
         : id === "stormbird"
         ? "/assets/stormbird-hx40.gltf"
         : id === "aurelia"
-          ? "/assets/aurelia-flight.glb"
+          ? "/assets/aurelia-phenom300e.glb"
           : id === "peregrine"
             ? "/assets/peregrine-hx27.glb"
             : AIRCRAFT_URL,
@@ -151,8 +163,16 @@ export function makeAircraft(paintIndex = 0, id: AircraftId = "finch", variant: 
       const finchRoot = attack ? gltf.scene.getObjectByName("Finch_U2") : undefined;
       if (finchRoot) finchRoot.name = FINCH_ATTACK_ROOT;
       prepareAircraftMaterials(gltf.scene);
-      model.displays = new CockpitDisplays(gltf.scene, id);
+      if (id !== "aurelia") model.displays = new CockpitDisplays(gltf.scene, id);
+      if (model.cockpit) model.interior = new CockpitInterior(gltf.scene, cockpitDriver(model.cockpit));
       group.add(gltf.scene);
+      // The Heron's front seats overlap its panel; moved aft, they leave room for the pilot's legs.
+      if (id === "heron")
+        for (const name of ["Seat_cushion_0_-1", "Seat_back_0_-1", "Seat_pedestal_0_-1", "Seat_cushion_0_1", "Seat_back_0_1", "Seat_pedestal_0_1"])
+          gltf.scene.getObjectByName(name)!.position.z += HERON_SEAT_SHIFT;
+      // The rigged pilot replaces the F-15C's simple mannequin.
+      if (id === "f15c") gltf.scene.traverse((node) => { if (node.name.startsWith("Pilot_")) node.visible = false; });
+      model.pilot = new Pilot(group, id);
       const part = (name: string) => {
         const node = gltf.scene.getObjectByName(name);
         if (!node) throw new Error(`The ${id} aircraft is missing ${name}.`);
@@ -175,9 +195,9 @@ export function makeAircraft(paintIndex = 0, id: AircraftId = "finch", variant: 
         return;
       }
       if (id === "aurelia") {
-        gltf.scene.scale.setScalar(0.55);
-        gltf.scene.position.y = -2.3 * 0.55;
+        gltf.scene.position.y = aureliaFlightOffsetY;
         model.effects = new AureliaEffects(gltf.scene, gltf.animations);
+        model.displays = new AureliaFlightDisplays(gltf.scene, () => model.effects!.motion);
         return;
       }
       if (id === "peregrine") {

@@ -4,6 +4,9 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import "./civilian.css";
 import { Actuator, controlCheck } from "../aircraft/aurelia/aurelia-motion";
+import { bindAureliaFlightControls } from "../aircraft/aurelia/flight-model";
+import { AureliaFlightDisplays } from "../aircraft/aurelia/flight-displays";
+import { displayDemo } from "../aircraft/cockpit-displays";
 const renderer = new T.WebGLRenderer({
   antialias: true,
   preserveDrawingBuffer: true,
@@ -65,18 +68,21 @@ orbit.maxDistance = 160;
 orbit.maxPolarAngle = Math.PI * 0.515;
 orbit.autoRotateSpeed = 0.6;
 const views = {
-  beauty: { p: [36, 23, -44], t: [0, 3.8, 0] },
-  front: { p: [0, 8, -58], t: [0, 4, 0] },
-  back: { p: [0, 8, 58], t: [0, 4, 0] },
-  left: { p: [-58, 8, 0], t: [0, 4, 0] },
-  right: { p: [58, 8, 0], t: [0, 4, 0] },
-  top: { p: [0, 67, 0.1], t: [0, 0, 0] },
-  cockpit: { p: [9, 9, -19], t: [0, 4.6, -10.6] },
-  engine: { p: [12, 8, -3], t: [3.26, 4.25, 6.0] },
+  beauty: { p: [23, 14, -28], t: [0, 2.3, 0] },
+  front: { p: [0, 5, -36], t: [0, 2.3, 0] },
+  back: { p: [0, 5, 36], t: [0, 2.3, 0] },
+  left: { p: [-36, 5, 0], t: [0, 2.3, 0] },
+  right: { p: [36, 5, 0], t: [0, 2.3, 0] },
+  top: { p: [0, 40, 0.1], t: [0, 0, 0] },
+  cockpit: { p: [-0.40425, 2.7242, -6.0425], t: [-0.40425, 2.5, -8] },
+  engine: { p: [7, 5, 9], t: [1.5015, 3.21, 4.158] },
 };
 type View = keyof typeof views;
 let current: View = "beauty",
   model: T.Group | undefined;
+let controls: ReturnType<typeof bindAureliaFlightControls> | undefined;
+let displays: AureliaFlightDisplays | undefined;
+let fanPhase = 0;
 let cameraMove: { position: T.Vector3; target: T.Vector3 } | undefined;
 let initialized = false;
 function showView(view: View) {
@@ -129,13 +135,15 @@ document.querySelector<HTMLButtonElement>("#photo")!.onclick = () => {
   renderer.render(scene, camera);
   const a = document.createElement("a");
   a.href = renderer.domElement.toDataURL("image/png");
-  a.download = `Aurelia-S32-${current}.png`;
+  a.download = `Aurelia-Phenom-${current}.png`;
   a.click();
 };
 new GLTFLoader()
-  .loadAsync("/assets/aurelia-s32.glb")
+  .loadAsync("/assets/aurelia-phenom300e.glb")
   .then((gltf) => {
     model = gltf.scene;
+    controls = bindAureliaFlightControls(model);
+    displays = new AureliaFlightDisplays(model, () => ({ gear: 1, flaps: flapActuator.value }));
     model.traverse((o) => {
       if (o instanceof T.Mesh) {
         o.castShadow = true;
@@ -180,24 +188,15 @@ document.addEventListener("visibilitychange", () => { last = performance.now(); 
 let last = performance.now();
 function tick(now: number) {
   requestAnimationFrame(tick);
+  if (document.hidden) { last = now; return; }
   const dt = Math.min(0.05, (now - last) / 1000);
   if (demo) { demoTime += dt; controlTarget = controlCheck(demoTime); surfaceInput.value = String(controlTarget * 100); }
   const deflection = actuator.step(controlTarget, dt);
   const flap = flapActuator.step(Math.max(0, controlTarget), dt, 3);
-  for (const [name, axis, value] of [
-    ["Aileron_Left", "x", deflection * .35], ["Aileron_Right", "x", -deflection * .35],
-    ["Elevator_Left", "x", -deflection * .35], ["Elevator_Right", "x", -deflection * .35],
-    ["Rudder", "y", deflection * .35],
-    ["Flap_Left", "x", -flap * .5], ["Flap_Right", "x", -flap * .5],
-  ] as const) {
-    const part = model?.getObjectByName(name);
-    if (part) part.rotation[axis] = value;
-  }
   const fanSpeed = engine.step(engineOn ? 15 : 0, dt, 1.2);
-  for (const name of ["Fan_Left", "Fan_Right"]) {
-    const fan = model?.getObjectByName(name);
-    if (fan) fan.rotation.z = (fan.rotation.z + fanSpeed * dt) % (Math.PI * 2);
-  }
+  fanPhase = (fanPhase + fanSpeed * dt) % (Math.PI * 2);
+  controls?.({ roll: deflection, pitch: deflection, yaw: deflection, flaps: flap, fanPhase });
+  displays?.update(displayDemo(demoTime), current === "cockpit");
   if (cameraMove) {
     const blend = 1 - Math.exp(-5 * dt);
     camera.position.lerp(cameraMove.position, blend);

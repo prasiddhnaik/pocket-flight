@@ -1,6 +1,7 @@
 import * as T from "three";
 import { JetMotion, type JetInput } from "../jet-effects";
 import { AURELIA_GEAR_STOW_TIME } from "./aurelia-motion";
+import { bindAureliaFlightControls } from "./flight-model";
 
 /** Uses the exported Blender gear curves; flight input drives the other rig nodes. */
 export class AureliaEffects {
@@ -10,10 +11,16 @@ export class AureliaEffects {
   private heat: T.Mesh[] = [];
   private clock = { value: 0 };
   private reduced = false;
+  private reference = false;
+  private referenceControls?: ReturnType<typeof bindAureliaFlightControls>;
+  private gearAction: T.AnimationAction;
   constructor(
     private root: T.Object3D,
     clips: T.AnimationClip[],
   ) {
+    this.reference = !!root.getObjectByName("Aurelia_Phenom300E");
+    if (this.reference)
+      this.referenceControls = bindAureliaFlightControls(root);
     this.mixer = new T.AnimationMixer(root);
     const tracks = clips
       .flatMap((c) => c.tracks)
@@ -21,16 +28,28 @@ export class AureliaEffects {
     if (!tracks.length)
       throw new Error("Aurelia Blender gear animation is missing");
     const unique = [...new Map(tracks.map((t) => [t.name, t])).values()];
-    this.mixer
-      .clipAction(new T.AnimationClip("Blender gear cycle", -1, unique))
-      .play();
-    for (const [x, y, z, color] of [
-      [-13.3, 4.05, 5.34, 0xff2415],
-      [13.3, 4.05, 5.34, 0x19ff70],
-      [-13.3, 4.15, 5.5, 0xffffff],
-      [13.3, 4.15, 5.5, 0xffffff],
-      [0, 6.05, 2, 0xff2010],
-    ]) {
+    this.gearAction = this.mixer.clipAction(
+      new T.AnimationClip("Blender gear cycle", -1, unique),
+    );
+    this.gearAction.setLoop(T.LoopOnce, 1);
+    this.gearAction.clampWhenFinished = true;
+    this.gearAction.play();
+    const lightPositions = this.reference
+      ? [
+          [-8.9397, 2.94525, 3.03765, 0xff2415],
+          [8.9397, 2.94525, 3.03765, 0x19ff70],
+          [-8.9397, 3.0, 3.05, 0xffffff],
+          [8.9397, 3.0, 3.05, 0xffffff],
+          [0, 3.5, 1.5, 0xff2010],
+        ]
+      : [
+          [-13.3, 4.05, 5.34, 0xff2415],
+          [13.3, 4.05, 5.34, 0x19ff70],
+          [-13.3, 4.15, 5.5, 0xffffff],
+          [13.3, 4.15, 5.5, 0xffffff],
+          [0, 6.05, 2, 0xff2010],
+        ];
+    for (const [x, y, z, color] of lightPositions) {
       const light = new T.Mesh(
         new T.SphereGeometry(0.065, 8, 6),
         new T.MeshBasicMaterial({ color, toneMapped: false }),
@@ -60,7 +79,11 @@ export class AureliaEffects {
         );
       };
       const heat = new T.Mesh(new T.SphereGeometry(1, 20, 12), m);
-      heat.position.set(side * 3.26, 4.25, 12.4);
+      heat.position.set(
+        side * (this.reference ? 1.5015 : 3.26),
+        this.reference ? 3.21 : 4.25,
+        this.reference ? 6.6 : 12.4,
+      );
       heat.scale.set(0.48, 0.48, 2.5);
       heat.frustumCulled = false;
       root.add(heat);
@@ -81,21 +104,28 @@ export class AureliaEffects {
     this.motion.update(dt, { ...input, burner: false });
     const s = this.motion;
     s.fanPhase = (s.fanPhase + s.rpm * 18 * dt) % (Math.PI * 2);
-    this.mixer.setTime((1 - s.gear) * AURELIA_GEAR_STOW_TIME);
+    this.gearAction.paused = false;
+    this.gearAction.enabled = true;
+    this.mixer.setTime(
+      (1 - s.gear) * (this.reference ? 6 : AURELIA_GEAR_STOW_TIME),
+    );
     const rotate = (name: string, axis: "x" | "y" | "z", angle: number) => {
       const o = this.root.getObjectByName(name);
       if (o) o.rotation[axis] = angle;
     };
-    rotate("Aileron_Left", "x", s.roll * 0.26);
-    rotate("Aileron_Right", "x", -s.roll * 0.26);
-    rotate("Elevator_Left", "x", -s.pitch * 0.2);
-    rotate("Elevator_Right", "x", -s.pitch * 0.2);
-    rotate("Rudder", "y", s.yaw * 0.24);
-    rotate("Flap_Left", "x", s.flaps * 0.38);
-    rotate("Flap_Right", "x", s.flaps * 0.38);
-    // Deterministic phase keeps saved replays and paused frames stable.
-    rotate("Fan_Left", "z", s.fanPhase);
-    rotate("Fan_Right", "z", s.fanPhase);
+    if (this.referenceControls) this.referenceControls(s);
+    else {
+      rotate("Aileron_Left", "x", s.roll * 0.26);
+      rotate("Aileron_Right", "x", -s.roll * 0.26);
+      rotate("Elevator_Left", "x", -s.pitch * 0.2);
+      rotate("Elevator_Right", "x", -s.pitch * 0.2);
+      rotate("Rudder", "y", s.yaw * 0.24);
+      rotate("Flap_Left", "x", s.flaps * 0.38);
+      rotate("Flap_Right", "x", s.flaps * 0.38);
+      // Deterministic phase keeps saved replays and paused frames stable.
+      rotate("Fan_Left", "z", s.fanPhase);
+      rotate("Fan_Right", "z", s.fanPhase);
+    }
     const phase = s.time % 1.25;
     this.lights.forEach(
       (o, i) =>

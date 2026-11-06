@@ -83,6 +83,17 @@ export class CombatRange {
   targets() {
     return this.simulation?.targets.filter((target) => target.health > 0) ?? [];
   }
+  /** Rounds left by weapon type, for the cockpit displays. */
+  magazine() {
+    if (!this.simulation) return null;
+    let rockets = 0;
+    let missiles = 0;
+    for (const station of this.simulation.stations) {
+      if (stores[station.store].kind === "rocket") rockets += station.remaining;
+      else missiles += station.remaining;
+    }
+    return { rockets, missiles, locked: this.simulation.locked };
+  }
   private note(text: string) {
     this.feedback = text;
     this.feedbackTime = 1.4;

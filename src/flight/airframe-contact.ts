@@ -6,6 +6,7 @@ import { f15cTires, f15cWheelPose } from "../aircraft/f15c/landing-gear";
 import heronCollision from "../aircraft/heron/collision.json";
 import {
   aureliaWheels,
+  legacyAureliaWheels,
   finchWheels,
   f15cWheels,
   heronWheels,
@@ -15,6 +16,10 @@ import {
 import geometry from "../aircraft/stormbird/stormbird-geometry.json";
 import { gearEase, gearPhase } from "../aircraft/stormbird/stormbird-kinematics";
 import { AURELIA_MAIN_GEAR, aureliaGearFold } from "../aircraft/aurelia/aurelia-motion";
+import {
+  aureliaReferenceWheelPose,
+  aureliaTires,
+} from "../aircraft/aurelia/flight-model";
 
 export type ContactPart =
   "gear" | "body" | "leftWing" | "rightWing" | "tail" | "engine" | "propeller";
@@ -74,18 +79,7 @@ export function wheelPose(id: AircraftId, index: number, extension: number) {
     center.y -= geometry.centerOffsetY;
     axle.applyQuaternion(q);
   } else if (id === "aurelia") {
-    const nose = index < 2;
-    const pivot = new Vector3(
-      center.x,
-      ((nose ? 2.35 : AURELIA_MAIN_GEAR.pivotY) - 2.3) * 0.55,
-      (nose ? -10.65 : 1.1) * 0.55,
-    );
-    const q = new Quaternion().setFromAxisAngle(
-      new Vector3(nose ? 1 : 0, 0, nose ? 0 : 1),
-      aureliaGearFold(extension, nose) * (nose ? 1 : Math.sign(center.x)),
-    );
-    center.sub(pivot).applyQuaternion(q).add(pivot);
-    axle.applyQuaternion(q);
+    return aureliaReferenceWheelPose(index, extension);
   } else if (id !== "finch" && id !== "heron") {
     center.y += (1 - extension) * 1.6;
   }
@@ -133,7 +127,39 @@ export function wheelSupportPoint(
       .addScaledVector(axle, -Math.sign(axial) * axialOffset);
   }
   const wheel = aircraftWheels[id][index];
+  if (id === "aurelia") {
+    const halfWidth = aureliaTires[index].halfWidth;
+    const minorSupport = Math.hypot(wheel.minor * radial, halfWidth * axial);
+    if (minorSupport > 1e-10)
+      return center
+        .addScaledVector(
+          radialDirection,
+          -wheel.major - (wheel.minor ** 2 * radial) / minorSupport,
+        )
+        .addScaledVector(axle, (-(halfWidth ** 2) * axial) / minorSupport);
+  }
   return center
     .addScaledVector(radialDirection, -wheel.major)
     .addScaledVector(normal, -wheel.minor);
+}
+
+/** Contact path retained for offline validation of the legacy S32 authoring export. */
+export function legacyAureliaWheelPose(index: number, extension: number) {
+  const wheel = legacyAureliaWheels[index];
+  const center = wheel.center.clone(),
+    axle = new Vector3(1, 0, 0);
+  const nose = index < 2;
+  const pivot = new Vector3(
+    center.x,
+    ((nose ? 2.35 : AURELIA_MAIN_GEAR.pivotY) - 2.3) * 0.55,
+    (nose ? -10.65 : 1.1) * 0.55,
+  );
+  const q = new Quaternion().setFromAxisAngle(
+    new Vector3(nose ? 1 : 0, 0, nose ? 0 : 1),
+    aureliaGearFold(extension, nose) * (nose ? 1 : Math.sign(center.x)),
+  );
+  center.sub(pivot).applyQuaternion(q).add(pivot);
+  axle.applyQuaternion(q);
+
+  return { center, axle, radius: wheel.major + wheel.minor };
 }

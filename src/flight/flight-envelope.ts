@@ -5,16 +5,18 @@ export const ISLAND_FLIGHT_MODEL = "island-rigid-body-1";
 // Release scope, not a claim of certified flight limits. Keep the lab's engine
 // reference maps intact; the island game governs thrust and adds a speed brake.
 export const islandEnvelope = {
-  f15c: { maximumMach: 0.7, maximumAltitude: 1800 },
-  heron: { maximumMach: 0.32, maximumAltitude: 1800 },
-  aurelia: { maximumMach: 0.6, maximumAltitude: 1800 },
-  finch: { maximumMach: 0.25, maximumAltitude: 1800 },
-  peregrine: { maximumMach: 0.7, maximumAltitude: 1800 },
-  stormbird: { maximumMach: 0.7, maximumAltitude: 1800 },
+  f15c: { maximumMach: 0.7, maximumAltitude: 1800, speedBrakeDrag: 0.14 },
+  heron: { maximumMach: 0.32, maximumAltitude: 1800, speedBrakeDrag: 0 },
+  aurelia: { maximumMach: 0.6, maximumAltitude: 1800, speedBrakeDrag: 0.1 },
+  finch: { maximumMach: 0.25, maximumAltitude: 1800, speedBrakeDrag: 0 },
+  peregrine: { maximumMach: 0.7, maximumAltitude: 1800, speedBrakeDrag: 0.09 },
+  stormbird: { maximumMach: 0.7, maximumAltitude: 1800, speedBrakeDrag: 0.1 },
 } satisfies Record<
   AircraftId,
-  { maximumMach: number; maximumAltitude: number }
+  { maximumMach: number; maximumAltitude: number; speedBrakeDrag: number }
 >;
+
+export const hasSpeedBrake = (id: AircraftId) => islandEnvelope[id].speedBrakeDrag > 0;
 
 export function islandSpeedProtection(id: AircraftId, mach: number) {
   const limit = islandEnvelope[id].maximumMach;

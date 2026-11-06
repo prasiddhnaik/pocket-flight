@@ -17,7 +17,7 @@ bun install
 bun run dev
 ```
 
-Open the local URL printed by Vite. Choose an aircraft, then **First light** for a runway departure or **Free flight** to explore. Hold **Shift** for power; gently hold **↓ / S** to raise the nose at the rotation speed shown in the HUD. The controls panel gives aircraft-specific guidance. Flight assistance can be changed in Settings.
+Open the local URL printed by Vite. Choose an aircraft, then **First light** for a runway departure or **Free flight** to explore. Hold **Shift** for power; gently hold **↓ / S** to raise the nose at the rotation speed shown in the HUD. To land, close the throttle with **Ctrl**: the gear and flaps come down and the HUD shows your approach speed. Jets can hold **B** to slow down faster. The controls panel gives aircraft-specific guidance. Flight assistance can be changed in Settings.
 
 The game requires a browser with WebGL. Runtime assets are already under `public/`; ordinary development does not require Blender, Python, API keys, or an application server beyond Vite.
 
@@ -46,9 +46,10 @@ The Aurelia reference cockpit accepts typed flight and map snapshots. See [Avion
 | Bank left / right            | **← / A** and **→ / D**              |
 | Rudder                       | **Q / E**                            |
 | Increase / decrease throttle | **Shift / Ctrl**, or the HUD slider  |
-| Wheel brakes                 | Hold **B** or **Space**              |
+| Speed brake (jets), wheel brakes | Hold **B** or **Space**          |
 | Cycle camera                 | **C**                                |
 | Look around                  | Hold **right mouse button** and drag |
+| Zoom in the cockpit view     | Hold **Z**                           |
 | Pause / resume               | **Esc / P**                          |
 | Restart flight               | **R**                                |
 | Toggle sound                 | **M**                                |
@@ -98,6 +99,8 @@ output/          Local generated builds, reports, captures and working data
 | Mass, fuel or systems                   | [aircraft/aircraft-design.ts](src/aircraft/aircraft-design.ts), [aircraft/aircraft-systems.ts](src/aircraft/aircraft-systems.ts) | [flight/fuel-loading.ts](src/flight/fuel-loading.ts), `tests/fuel-mass.test.ts` |
 | Terrain or scenery                      | [world/world.ts](src/world/world.ts), [world/terrain.ts](src/world/terrain.ts)                                                   | `tests/scenery.test.ts`, `tests/coastal-assets.test.ts`                         |
 | F-15C outer skin, pylons and gun clips    | [scripts/build-f15c-skin.py](scripts/build-f15c-skin.py), [aircraft/f15c/gun-spool.ts](src/aircraft/f15c/gun-spool.ts) | `tests/f15c-skin.test.ts`, `tests/f15c-gun-spool.test.ts`, `scripts/check-f15c-skin.py` |
+| Detail cockpits for the jets: gauges, live screens and HUD | [scripts/cockpit/kit.py](scripts/cockpit/kit.py) and one layout per jet beside it, [aircraft/cockpit-specs.ts](src/aircraft/cockpit-specs.ts), [aircraft/cockpit-state.ts](src/aircraft/cockpit-state.ts), [aircraft/cockpit-avionics.ts](src/aircraft/cockpit-avionics.ts) | `tests/cockpit-interiors.test.ts`; rebuild one with `bun run cockpit:build <id>` |
+| Seated pilot in every aircraft: eye fit, hands and feet on the controls, head folded away from the seat | [aircraft/pilot.ts](src/aircraft/pilot.ts), [scripts/measure-pilot-seats.ts](scripts/measure-pilot-seats.ts) → `aircraft/pilot-seats.json`, [scripts/build-pilot.py](scripts/build-pilot.py) | `tests/pilot.test.ts`; rebuild with `bun run pilot:build <unpacked download>`, remeasure seats after a cockpit rebuild |
 | Heron outer skin, modelled on the Grand Caravan | [scripts/build-heron-skin.py](scripts/build-heron-skin.py), [scripts/check-heron-skin.py](scripts/check-heron-skin.py) | `tests/heron-skin.test.ts`, `tests/heron.test.ts` |
 | Island trees: cheap models, one draw per kind and level | [scripts/build-tropical-trees.py](scripts/build-tropical-trees.py), [world/tree-field.ts](src/world/tree-field.ts) |
 | Palm Bay landmarks: tower, terminal, lighthouse, marina, church | [scripts/build-palm-bay-buildings.py](scripts/build-palm-bay-buildings.py), [world/palm-bay-landmarks.ts](src/world/palm-bay-landmarks.ts) | `tests/palm-bay-landmarks.test.ts` |
@@ -124,7 +127,7 @@ Each aircraft has its own folder under `src/aircraft/`. Start there when changin
 | --- | --- |
 | [Finch](src/aircraft/finch/) | Design and mass budget, systems, landing gear, control surfaces, propeller, and the original Finch reference design |
 | [Peregrine](src/aircraft/peregrine/) | Design and mass budget, systems, landing gear, and jet effects layout |
-| [Aurelia](src/aircraft/aurelia/) | Design and mass budget, systems, landing gear, motion, and effects |
+| [Aurelia](src/aircraft/aurelia/) | Design and mass budget, systems, landing gear, motion, and effects; the flown Phenom 300E-based airframe's tires, hinges and screens in `flight-model.ts` and `flight-displays.ts` |
 | [Stormbird](src/aircraft/stormbird/) | Design and mass budget, systems, landing gear, configuration, measured geometry, contacts, kinematics, and mechanisms |
 
 Every aircraft folder has `design.ts`, `systems.ts`, and `landing-gear.ts`. The design file groups that aircraft's component mass budget, geometry, aerodynamic coefficients, and propulsion data. Add future aircraft-specific parts beside these files.
@@ -138,6 +141,7 @@ Offline report fingerprints include the per-aircraft definition files through `s
 - [`studio/ReplayStudio.tsx`](src/studio/ReplayStudio.tsx) coordinates session state, undo/redo, save queuing, preview lifecycle, and export.
 - [`studio/panels/`](src/studio/panels/) contains the library, timeline, controls, and inspectors. Shared numeric/vector inputs live in `fields.tsx`.
 - [`studio/studio-editing.ts`](src/studio/studio-editing.ts) performs clip and object edits as data transformations. It does not save projects or control playback.
+- [`studio/studio-placement.ts`](src/studio/studio-placement.ts) measures scene objects and computes the Object inspector's placement commands.
 - `studio-model.ts`, `studio-scene.ts`, and `studio-assets.ts` retain the project, scene, and backup contracts; `replay-preview.ts` owns the Three.js preview.
 
 For an editor change, run `bun test ./tests/studio-editing.test.ts ./tests/studio.test.ts ./tests/studio-scene.test.ts ./tests/replay.test.ts`. See the [Studio split and offline verification](docs/SCENE_STUDIO_REFACTOR.html) for scope and compatibility evidence.
@@ -205,6 +209,10 @@ Use [package.json](package.json) for the complete command list. Common task grou
 Authoring sources under `assets/` and browser assets under `public/` have separate roles. Blender/CAD generation may require local source files, Python tooling, or the configured Blender installation. Soundtrack generation and verification use FFmpeg. These tools are optional for running the existing game.
 
 Ignored `assets/` and `output/` content can include editable masters, worktrees, backups, and verification evidence. Keep it unless a cleanup task explicitly covers it.
+
+## Credits
+
+The pilot (`public/assets/pilot/fighter-pilot.glb`) is based on ["Fighter Pilot Character"](https://sketchfab.com/3d-models/fighter-pilot-character-9c53b42d13994cefa8916729021b3104) by [SoftNote](https://sketchfab.com/softnote), licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). It was reduced, re-textured into one atlas and rigged for Pocket Flight; see [CREDITS.txt](public/assets/pilot/CREDITS.txt). The game's Settings panel shows the same credit. Keep the original download outside the repository.
 
 ## Further reading
 

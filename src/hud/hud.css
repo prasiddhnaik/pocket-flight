@@ -293,6 +293,16 @@
 .holo-hud .hud-status b { font-weight: 500; color: var(--hud-green); }
 .holo-hud .hud-status b.ground { color: var(--hud-amber); }
 .holo-hud .hud-damage { padding: 5px 12px; border-color: var(--hud-amber); border-radius: 999px; color: var(--hud-amber); font-size: 12px; font-weight: 600; letter-spacing: 0.06em; }
+/* The real instruments take over in the detailed cockpit. */
+.holo-hud.hud-in-cockpit .hud-row,
+.holo-hud.hud-in-cockpit .hud-status,
+.holo-hud.hud-in-cockpit .hud-gear,
+.holo-hud.hud-in-cockpit .hud-speed-brake,
+.holo-hud.hud-in-cockpit .center-reticle { display: none; }
+.holo-hud .hud-landing-cue { padding: 5px 12px; border-radius: 999px; color: var(--hud-amber); font-size: 12px; font-weight: 600; letter-spacing: 0.06em; }
+.holo-hud .hud-landing-cue.on-speed { color: var(--hud-green); }
+.holo-hud .hud-landing-cue.slow { color: var(--hud-red); }
+.holo-hud .hud-speed-brake { padding: 5px 12px; border-radius: 999px; color: var(--hud-amber); font-size: 11px; font-weight: 600; letter-spacing: 0.08em; }
 .holo-hud .hud-gear { display: flex; align-items: center; gap: 9px; padding: 6px 14px; border-radius: 999px; font-size: 11px; }
 .holo-hud .hud-gear i { width: 10px; height: 10px; border-radius: 50%; background: rgba(120, 230, 255, 0.15); transition: background 0.2s; }
 .holo-hud .hud-gear.down i { background: var(--hud-green); box-shadow: 0 0 8px var(--hud-green); }

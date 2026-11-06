@@ -1,11 +1,14 @@
+import { useEffect, useState } from "react";
 import { Diamond } from "lucide-react";
 import {
   sampleTransform,
   type SceneObject,
   type Transform,
   type Ease,
+  type Vec3,
 } from "../studio-scene";
 import { type StudioAsset } from "../studio-assets";
+import type { PlacementAction } from "../studio-placement";
 import { NumberField, VectorFields, XIcon } from "./fields";
 import { seconds } from "../studio-format";
 
@@ -14,6 +17,9 @@ export function SceneObjectInspector({
   asset,
   time,
   disabled,
+  dimensions,
+  placementDisabled,
+  onPlace,
   onUpdate,
   onPose,
   onKey,
@@ -24,6 +30,9 @@ export function SceneObjectInspector({
   asset?: StudioAsset;
   time: number;
   disabled: boolean;
+  dimensions: Vec3 | null;
+  placementDisabled: boolean;
+  onPlace: (action: PlacementAction, meters?: number) => void;
   onUpdate: (v: Partial<SceneObject>) => void;
   onPose: (pose: Transform) => void;
   onKey: (ease: Ease) => void;
@@ -31,6 +40,8 @@ export function SceneObjectInspector({
   onSeek: (t: number) => void;
 }) {
   const pose = sampleTransform(object, time);
+  const [targetSize, setTargetSize] = useState("");
+  useEffect(() => setTargetSize(""), [object.id]);
   return (
     <fieldset className="scene-fields" disabled={disabled || object.locked}>
       <label>
@@ -74,6 +85,65 @@ export function SceneObjectInspector({
       />
       <p className="studio-hint">
         Position in meters · rotation in degrees · Y points up.
+      </p>
+      <h3 className="scene-subtitle">Placement</h3>
+      <div className="scene-placement-dimensions" aria-live="polite">
+        {dimensions
+          ? `W ${dimensions[0]} · H ${dimensions[1]} · D ${dimensions[2]} m`
+          : "Select a visible, loaded model to measure its size."}
+      </div>
+      <p className="studio-hint">
+        Dimensions at this pose, in{" "}
+        {object.anchor === "world" ? "world" : "aircraft-local"} axes.
+      </p>
+      <div className="scene-pair scene-placement-actions">
+        <button disabled={placementDisabled} onClick={() => onPlace("beside")}>
+          Place beside aircraft
+        </button>
+        <button
+          disabled={placementDisabled || object.anchor !== "world"}
+          onClick={() => onPlace("ground")}
+        >
+          Place on ground
+        </button>
+      </div>
+      <label>
+        Largest dimension · meters
+        <input
+          aria-label="Target object size in meters"
+          type="number"
+          min="0.001"
+          step="0.1"
+          placeholder={dimensions ? String(Math.max(...dimensions)) : "Size"}
+          value={targetSize}
+          disabled={placementDisabled}
+          onChange={(e) => setTargetSize(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              if (targetSize.trim() && Number(targetSize) > 0)
+                onPlace("size", Number(targetSize));
+            }
+          }}
+        />
+      </label>
+      <button
+        className="scene-wide"
+        disabled={
+          placementDisabled ||
+          !targetSize.trim() ||
+          !Number.isFinite(Number(targetSize)) ||
+          Number(targetSize) <= 0
+        }
+        onClick={() => onPlace("size", Number(targetSize))}
+      >
+        Apply size · keep proportions
+      </button>
+      <p className="studio-hint">
+        {object.anchor === "world"
+          ? "Ground placement samples terrain and runway height beneath the object's bounds."
+          : "Ground placement is available for World-anchored objects."}
+        {object.keys.length ? " Placement updates a key at the playhead." : ""}
       </p>
       <div className="scene-key-header">
         <h3>Transform keyframes</h3>

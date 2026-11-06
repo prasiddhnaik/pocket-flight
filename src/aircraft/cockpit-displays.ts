@@ -29,8 +29,9 @@ type DisplayFace = {
 export function cockpitDisplayFaces(id: AircraftId): DisplayFace[] {
   // This CAD stage has no authored live-screen bezels yet.
   if (id === "f15c") return [];
-  if (id === "heron") return [-0.42, 0, 0.42].map((x, i) => ({
-    center: [x, 0.15, -2.02], width: 0.30, height: 0.22, page: i as 0 | 1 | 2,
+  // Just aft of the three bezels on the Heron's panel face (z -1.77 to -1.71).
+  if (id === "heron") return [-0.425, 0, 0.425].map((x, i) => ({
+    center: [x, 0.09, -1.705], width: 0.30, height: 0.22, page: i as 0 | 1 | 2,
   }));
   if (id === "finch")
     return [-0.295, 0.295].map((x, i) => ({

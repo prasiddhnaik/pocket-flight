@@ -48,6 +48,7 @@ import type { AircraftId } from "../aircraft/aircraft";
 import { paints } from "../aircraft/aircraft";
 import { terrainHeight, runways } from "../world/terrain";
 import { rangeLayout } from "../world/range-island";
+import { hasSpeedBrake } from "../flight/flight-envelope";
 import { flightProfiles } from "../flight/flight-profiles";
 import { type AircraftChoice, aircraftChoice, aircraftViewerUrl, choiceName, parseAircraftChoice, resolveAircraftChoice } from "./flight-ui";
 import { type FinchVariant, finchAttackPaints } from "../aircraft/finch/attack";
@@ -1103,8 +1104,8 @@ export default function App() {
                   </div>
                   <div>
                     <span>
-                      <b>{aircraftId === "f15c" ? "Airbrake / wheel brakes" : "Wheel brakes"}</b>
-                      <small>{aircraftId === "f15c" ? "Hold to deploy the dorsal speedbrake in flight, or brake after touchdown." : "Hold after touchdown to slow to a stop."}</small>
+                      <b>{hasSpeedBrake(aircraftId) ? "Speed brake / wheel brakes" : "Wheel brakes"}</b>
+                      <small>{hasSpeedBrake(aircraftId) ? "Hold to slow down in flight, or to brake after touchdown." : "Hold after touchdown to slow to a stop."}</small>
                     </span>
                     <span>
                       <kbd>B</kbd>
@@ -1119,11 +1120,12 @@ export default function App() {
                   <div>
                     <span>
                       <b>Camera / free-look</b>
-                      <small>Cycle views / hold right mouse and drag.</small>
+                      <small>Cycle views / hold right mouse and drag. Hold Z to zoom in the cockpit view.</small>
                     </span>
                     <span>
                       <kbd>C</kbd>
                       <kbd>RMB</kbd>
+                      <kbd>Z</kbd>
                     </span>
                   </div>
                   {aircraftId !== "finch" && <div>
@@ -1152,7 +1154,7 @@ export default function App() {
                     power. At {rotationKnots} knots, gently hold ↓ or S to raise
                     the nose. Once airborne, release to let beginner assist
                     trim, if enabled.
-                    {` For landing, reduce power and approach near ${flightProfiles[aircraftId].approachKnots} knots at standard loading.`}
+                    {` For landing, close the throttle and approach near ${flightProfiles[aircraftId].approachKnots} knots at standard loading.${hasSpeedBrake(aircraftId) ? " Hold B to slow down faster." : ""}`}
                     {aircraftId === "heron" ? automaticConfiguration ? " Approach flaps deploy automatically; gear stays down." : " Press F for approach flaps; gear stays down." : aircraftId !== "finch" && (automaticConfiguration ? " Landing gear and approach flaps deploy automatically." : " Press G for gear down and F for approach flaps before landing.")}{" "}
                     Gently raise the nose just above the runway, then hold B
                     after touchdown.
@@ -1327,7 +1329,7 @@ export default function App() {
                     {automaticConfiguration ? "Automatic" : "Manual"}
                   </button>
                 </div>
-                <p className="controls-setting-note">Manual: G toggles gear, F cycles flaps. Finch has fixed gear and no movable flaps. Flight assistance is a separate choice.</p>
+                <p className="controls-setting-note">Automatic: closing the throttle in flight lowers the gear and flaps; pushing it past 70% cleans up again. Manual: G toggles gear, F cycles flaps. Finch has fixed gear and no movable flaps. Flight assistance is a separate choice.</p>
                 <button className="controls-help-button" onClick={() => setPanel("controls")}>View flight controls <ArrowUpRight size={16} /></button>
                 </section>
                 {aircraftId === "finch" && (
@@ -1362,6 +1364,13 @@ export default function App() {
                     control, with the aircraft’s natural stability and inertia.
                   </p>
                 </div>
+                <p className="settings-credits">
+                  Pilot model:{" "}
+                  <a href="https://sketchfab.com/3d-models/fighter-pilot-character-9c53b42d13994cefa8916729021b3104" target="_blank" rel="noreferrer">“Fighter Pilot Character”</a>{" "}
+                  by <a href="https://sketchfab.com/softnote" target="_blank" rel="noreferrer">SoftNote</a>, licensed under{" "}
+                  <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">CC BY 4.0</a>.
+                  Reduced, re-textured and rigged for Pocket Flight.
+                </p>
               </>
             )}
           </section>

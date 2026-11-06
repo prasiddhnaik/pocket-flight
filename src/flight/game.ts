@@ -29,7 +29,9 @@ import { ReplayLibrary } from "../replay/replay-library";
 import { saveFrames, type SavedReplay } from "../replay/replay-data";
 import { ReplayArchive } from "../replay/replay-archive";
 import { STORMBIRD_PILOT_EYE } from "../aircraft/stormbird/stormbird-config";
-import { F15C_PILOT_EYE } from "../aircraft/f15c/design";
+import { aureliaPilotEye } from "../aircraft/aurelia/flight-model";
+import { pilotSeats } from "../aircraft/pilot";
+import type { CockpitState } from "../aircraft/cockpit-state";
 import { GUN_FULL_SPEED } from "../aircraft/f15c/gun-spool";
 import type { ExportState } from "../replay/replay-export";
 import type { SurfacePose } from "../aircraft/finch/control-surfaces";
@@ -55,6 +57,8 @@ export type Snapshot = {
   gearPosition: number;
   flapPosition: number;
   automaticConfiguration: boolean;
+  slowingToLand: boolean;
+  speedBrake: number;
   speedProtection: boolean;
   elevatorTrim: number;
   damage: FlightPhysics["damage"];
@@ -950,6 +954,12 @@ export class PocketFlight {
       T.MathUtils.lerp(a.suspension, b.suspension, mix),
     );
     applyReplaySurfaces(this.aircraft, a, b, mix);
+    this.aircraft.pilot?.update({
+      pitch: T.MathUtils.lerp(a.surfaces.pitch, b.surfaces.pitch, mix),
+      roll: T.MathUtils.lerp(a.surfaces.roll, b.surfaces.roll, mix),
+      yaw: T.MathUtils.lerp(a.surfaces.yaw, b.surfaces.yaw, mix),
+      power: T.MathUtils.lerp(a.throttle, b.throttle, mix),
+    });
     this.aircraft.propellerMotion.apply({
       angle: T.MathUtils.lerp(a.propAngle, b.propAngle, mix),
       rpm: T.MathUtils.lerp(a.propRpm, b.propRpm, mix),
@@ -1155,9 +1165,59 @@ export class PocketFlight {
       this.onToast("Heading back toward the islands.");
     }
   }
+  private cockpitState(fuel: number | null): CockpitState {
+    const p = this.physics;
+    const input = this.controls();
+    const aero = p.aerodynamics;
+    const ring = this.mission.rings[this.ringIndex];
+    const field = this.mission.land ? runways.find((r) => r.name === this.mission.land) : undefined;
+    const magazine = this.mission.id === "combat" ? this.combat.magazine() : null;
+    return {
+      time: p.flightTime,
+      mode: "flight",
+      speed: p.airspeed,
+      altitude: p.position.y,
+      pitch: p.pitch,
+      roll: p.roll,
+      heading: -p.yaw,
+      verticalSpeed: p.velocity.y,
+      power: p.enginePower,
+      fuel,
+      x: p.position.x,
+      z: p.position.z,
+      engineOut: p.engineOut || p.crashed || p.fuelKg <= 0,
+      stall: p.stall,
+      aoa: aero && !p.grounded ? T.MathUtils.radToDeg(aero.alpha + p.design.geometry.incidence) : 0,
+      gLoad: aero && !p.grounded ? aero.lift / (p.loadedMass * 9.81) : 1,
+      gear: p.gearPosition,
+      flaps: p.flapPosition,
+      stick: {
+        pitch: T.MathUtils.clamp(input.pitch, -1, 1),
+        roll: T.MathUtils.clamp(input.roll, -1, 1),
+        yaw: T.MathUtils.clamp(input.yaw, -1, 1),
+      },
+      speedBrake: p.airbrakePosition,
+      night: this.night,
+      grounded: p.grounded,
+      slowingToLand: p.slowingToLand,
+      approachKnots: p.profile.approachKnots,
+      target: ring ? { x: ring.x, z: ring.z } : field ? { x: field.x, z: field.z } : null,
+      contacts: this.combat.targets().map((target) => ({
+        x: target.position.x,
+        z: target.position.z,
+        y: target.position.y,
+        air: target.kind === "air",
+      })),
+      stores: magazine && { ...magazine, gun: this.cannon.simulation.ammunition },
+    };
+  }
   private cameraUpdate(dt: number) {
     const p = this.physics,
       model = this.aircraft.group;
+    this.aircraft.interior?.setActive(
+      this.cameraMode === "cockpit" && this.mode !== "menu" && this.mode !== "replay",
+    );
+    this.aircraft.pilot?.setFirstPerson(this.cameraMode === "cockpit" && this.mode !== "menu");
     this.cockpit.visible =
       this.aircraft.id === "finch" &&
       this.cameraMode === "cockpit" &&
@@ -1225,23 +1285,25 @@ export class PocketFlight {
         this.camera.position
           .copy(position)
           .add(
-            (this.aircraft.id === "f15c"
-              ? new T.Vector3().fromArray(F15C_PILOT_EYE)
+            (this.aircraft.cockpit
+              ? new T.Vector3(...this.aircraft.cockpit.eye)
               : this.aircraft.id === "stormbird"
               ? new T.Vector3().fromArray(STORMBIRD_PILOT_EYE)
               : this.aircraft.id === "heron"
-                ? new T.Vector3(-0.40, 0.75, -1.8)
+                ? new T.Vector3(...pilotSeats.heron.eye)
               : this.aircraft.id === "aurelia"
-                ? new T.Vector3(0, 1.265, -5.83)
+                ? new T.Vector3().fromArray(aureliaPilotEye)
                 : this.physics.jet
                   ? new T.Vector3(0, 1.855, -6.68)
-                  : new T.Vector3(-0.3, 1.01, 0.1)
+                  : new T.Vector3(...pilotSeats.finch.eye)
             ).applyQuaternion(quaternion),
           );
         this.camera.quaternion.copy(quaternion);
         this.camera.rotateY(this.orbit.x);
-        this.camera.rotateX(-this.orbit.y);
-        this.camera.fov = 68;
+        // Detailed cockpits rest the view a little low so the panel stays in frame.
+        this.camera.rotateX(-this.orbit.y - (this.aircraft.cockpit?.lookDown ?? 0));
+        // Hold Z to lean in and read the instruments.
+        this.camera.fov = T.MathUtils.damp(this.camera.fov, this.keys.has("KeyZ") ? 30 : 68, 9, dt);
       } else {
         let offset = new T.Vector3(
           0,
@@ -1389,9 +1451,15 @@ export class PocketFlight {
         // Chase view sits behind the pilot; redraw quickly only when screens are readable.
         this.mode === "menu"
           ? this.camera.position.distanceTo(this.aircraft.group.position) < 30
-          : this.cameraMode === "cockpit" ||
+          : (this.cameraMode === "cockpit" && !this.aircraft.interior?.active) ||
               this.camera.position.distanceTo(this.aircraft.group.position) < 10,
       );
+      if (this.aircraft.interior?.active)
+        this.aircraft.interior.update(this.cockpitState(fuelCapacity ? p.fuelKg / fuelCapacity : null), dt);
+      if (this.aircraft.pilot && this.mode !== "menu") {
+        const input = this.controls();
+        this.aircraft.pilot.update({ pitch: input.pitch, roll: input.roll, yaw: input.yaw, power: p.enginePower });
+      }
       if (this.mode === "playing") {
         this.recordReplay();
         if (this.physics.flightTime >= this.nextArchive) {
@@ -1573,6 +1641,8 @@ export class PocketFlight {
         : p.flapPosition,
       automaticConfiguration:
         this.replaySample?.automaticConfiguration ?? p.automaticConfiguration,
+      slowingToLand: !this.replaySample && p.slowingToLand,
+      speedBrake: this.replaySample ? 0 : p.airbrakePosition,
       speedProtection: p.speedProtectionActive,
       elevatorTrim: this.replaySample?.elevatorTrim ?? p.elevatorTrim,
       damage: { ...p.damage },

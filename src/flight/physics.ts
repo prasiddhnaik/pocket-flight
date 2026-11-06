@@ -28,7 +28,7 @@ import {
 } from "./wheel-contact";
 import type { ContactBody, WheelContact } from "./wheel-contact";
 import { sweepAirframe } from "./collision";
-import { islandEnvelope, islandSpeedProtection } from "./flight-envelope";
+import { hasSpeedBrake, islandEnvelope, islandSpeedProtection } from "./flight-envelope";
 import {
   peregrineWheels,
   aureliaWheels,
@@ -60,6 +60,9 @@ export type FlightEvent = {
   impulse?: number;
   tick?: number;
 };
+const CLOSED_THROTTLE = 0.05;
+const GO_AROUND_THROTTLE = 0.7;
+
 export class FlightPhysics {
   aircraftId: AircraftId = "finch";
   get jet() {
@@ -109,6 +112,8 @@ export class FlightPhysics {
     return this.automaticGearTarget;
   }
   private automaticGearTarget = true;
+  /** The throttle was closed in flight. Stays set through the rollout until a go-around. */
+  slowingToLand = false;
   automaticConfiguration = true;
   private manualGearTarget = 1;
   private manualFlapTarget = 0;
@@ -132,10 +137,15 @@ export class FlightPhysics {
     return this.hasFlaps
       ? this.automaticConfiguration
         ? this.automaticGearTarget
-          ? this.aircraftId === "heron" ? 0.5 : 0.65
+          ? this.slowingToLand ? this.landingFlaps : this.aircraftId === "heron" ? 0.5 : 0.65
           : 0
         : this.manualFlapTarget
       : 0;
+  }
+  // Flaps come out as the aircraft slows, so they don't balloon it at high speed.
+  private get landingFlaps() {
+    const clean = this.profile.stallSpeed;
+    return MathUtils.clamp((clean * 2.4 - this.airspeed) / (clean * 0.6), 0, 1);
   }
   toggleGear() {
     if (!this.jet || this.automaticConfiguration) return false;
@@ -152,6 +162,7 @@ export class FlightPhysics {
   }
   gearPosition = 1;
   airbrakePosition = 0;
+  liftDumpPosition = 0;
   gearSteering = 0;
   position = new Vector3();
   velocity = new Vector3();
@@ -347,7 +358,9 @@ export class FlightPhysics {
     this.suspension = 0;
     this.gearPosition = this.jet && airStart ? 0 : 1;
     this.airbrakePosition = 0;
+    this.liftDumpPosition = 0;
     this.automaticGearTarget = this.gearPosition > 0.5;
+    this.slowingToLand = false;
     this.gearSteering = 0;
     this.manualGearTarget = this.gearPosition;
     this.manualFlapTarget = this.flapPosition;
@@ -497,11 +510,16 @@ export class FlightPhysics {
     const air = this.velocity.clone().sub(this.wind);
     const speed = air.length();
     this.airspeed = speed;
+    // Engine-out glides stay clean so they keep their range.
+    if (this.engineOut || this.crashed || this.fuelKg <= 0 || this.throttle > GO_AROUND_THROTTLE)
+      this.slowingToLand = false;
+    else if (!this.grounded && this.throttle <= CLOSED_THROTTLE)
+      this.slowingToLand = true;
     if (this.hasFlaps) {
       if (this.automaticConfiguration) {
         const agl =
           this.position.y - groundHeight(this.position.x, this.position.z);
-        if (this.grounded || agl < 35 || speed < this.stallSpeed * 1.5)
+        if (this.slowingToLand || this.grounded || agl < 35 || speed < this.stallSpeed * 1.5)
           this.automaticGearTarget = true;
         else if (agl > 60 && speed > this.stallSpeed * 1.65)
           this.automaticGearTarget = false;
@@ -579,9 +597,16 @@ export class FlightPhysics {
     }
     this.verticalSpeed = this.velocity.y;
     if (this.attitudeDirty) this.updateQuaternion();
-    this.airbrakePosition = this.aircraftId === "f15c"
+    this.airbrakePosition = hasSpeedBrake(this.aircraftId)
       ? MathUtils.damp(this.airbrakePosition, input.brake ? 1 : 0, 3, dt)
       : 0;
+    // Braking on the wheels spoils the wing, so the weight lands on the brakes.
+    this.liftDumpPosition = MathUtils.damp(
+      this.liftDumpPosition,
+      this.grounded && input.brake ? 1 : 0,
+      6,
+      dt,
+    );
     const design = this.design,
       balance = this.massProperties;
     const config = {
@@ -590,6 +615,7 @@ export class FlightPhysics {
       wingDamage: this.damage.wing,
       gearDamage: this.damage.gear,
       airbrake: this.airbrakePosition,
+      liftDump: this.liftDumpPosition,
       leftWingDamage:
         this.wingDamage.left ||
         (this.wingDamage.right === 0 ? this.damage.wing : 0),

@@ -63,6 +63,7 @@ import { SceneCameraInspector } from "./panels/SceneCameraInspector";
 import { SceneProjectInspector } from "./panels/SceneProjectInspector";
 
 import type { SceneEditorOptions } from "./replay-preview";
+import type { PlacementAction } from "./studio-placement";
 export default function ReplayStudio({
   library,
   initialReplay,
@@ -85,6 +86,7 @@ export default function ReplayStudio({
     "clip" | "object" | "camera" | "project"
   >("clip");
   const [sceneSelected, setSceneSelected] = useState<string | null>(null);
+  const [objectDimensions, setObjectDimensions] = useState<Vec3 | null>(null);
   const [editingMode, setEditingMode] = useState(false),
     [tool, setTool] = useState<SceneEditorOptions["tool"]>("translate"),
     [snap, setSnap] = useState(false),
@@ -511,6 +513,18 @@ export default function ReplayStudio({
       if (now - lastUI > 100) {
         lastUI = now;
         setTime(head.current);
+        const measured = p.scene?.objects.find(
+          (o) => o.id === editorState.current.selected,
+        );
+        const dimensions =
+          sceneReady.current && measured?.kind !== "light"
+            ? view.objectDimensions(editorState.current.selected)
+            : null;
+        setObjectDimensions((old) =>
+          old?.every((n, i) => n === dimensions?.[i]) && dimensions
+            ? old
+            : dimensions,
+        );
         setExportState((old) =>
           old.phase === exporter.current.state.phase
             ? old
@@ -591,6 +605,7 @@ export default function ReplayStudio({
   }
   function selectObject(id: string | null) {
     setSceneSelected(id);
+    setObjectDimensions(null);
     if (id) {
       setInspectorTab("object");
       setLibraryTab("scene");
@@ -611,6 +626,48 @@ export default function ReplayStudio({
         ? setTransformKey(object, head.current, pose, "smooth")
         : { ...object, transform: pose };
     changeObject(id, next);
+  }
+  function placeObject(action: PlacementAction, meters?: number) {
+    const p = projectRef.current,
+      view = preview.current,
+      selected = p.scene?.objects.find((o) => o.id === sceneSelected),
+      point = locateClip(p, head.current);
+    if (
+      !selected ||
+      !point ||
+      !view ||
+      running.current ||
+      busy ||
+      !sceneReady.current ||
+      !view.isReady(point.source)
+    )
+      return;
+    const draw = () =>
+      view.render(
+        point.source,
+        point.sourceTime,
+        point.clip.camera,
+        false,
+        point.clip.volume,
+        projectRef.current,
+        head.current,
+        editorState.current,
+        point.clip,
+      );
+    // Evaluate the exact playhead before measuring or converting coordinates.
+    draw();
+    const pose = view.placeObject(selected, head.current, action, meters);
+    if (!pose) {
+      setError(
+        "This placement could not be applied. Check the object's visibility, dimensions, and scale limits.",
+      );
+      return;
+    }
+    changeObjectPose(selected.id, pose);
+    if (action === "beside") {
+      draw();
+      view.frameObject(selected.id);
+    }
   }
   function keyObject(id: string, ease: Ease = "smooth") {
     const o = projectRef.current.scene?.objects.find((o) => o.id === id);
@@ -1078,6 +1135,17 @@ export default function ReplayStudio({
                 }
                 time={time}
                 disabled={busy}
+                dimensions={objectDimensions}
+                placementDisabled={
+                  busy ||
+                  playing ||
+                  sceneLoading ||
+                  loading ||
+                  !active ||
+                  !editingMode ||
+                  !objectDimensions
+                }
+                onPlace={placeObject}
                 onUpdate={(v) => changeObject(object.id, v)}
                 onPose={(pose) => changeObjectPose(object.id, pose)}
                 onKey={(ease) => keyObject(object.id, ease)}

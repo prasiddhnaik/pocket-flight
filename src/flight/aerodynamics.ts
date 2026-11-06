@@ -5,6 +5,7 @@ import {
   referenceJetThrust,
   interpolate,
 } from "./engine-map";
+import { islandEnvelope } from "./flight-envelope";
 import {
   fighterAlphaDegrees,
   fighterPitchDamping,
@@ -209,6 +210,7 @@ export type AerodynamicConfiguration = {
   wingDamage: number;
   gearDamage: number;
   airbrake?: number;
+  liftDump?: number;
   leftWingDamage?: number;
   rightWingDamage?: number;
   leftWingDetached?: boolean;
@@ -284,7 +286,7 @@ export function aircraftAerodynamics(
     cl ** 2 / (Math.PI * aspectRatio * a.efficiency) +
     a.gearDrag * MathUtils.clamp(config.gear, 0, 1) +
     a.flapDrag * flap ** 2 +
-    (design.id === "f15c" ? 0.085 * MathUtils.clamp(config.airbrake ?? 0, 0, 1) : 0) +
+    islandEnvelope[design.id].speedBrakeDrag * MathUtils.clamp(config.airbrake ?? 0, 0, 1) +
     separation * 1.8 * Math.sin(alpha) ** 2 +
     a.sideslipDrag * Math.sin(flow.beta) ** 2 +
     config.wingDamage * 0.08 +
@@ -294,10 +296,11 @@ export function aircraftAerodynamics(
     qS = dynamicPressure * g.wingArea;
   const leftDamage = config.leftWingDamage ?? config.wingDamage;
   const rightDamage = config.rightWingDamage ?? config.wingDamage;
+  const liftKept = 1 - 0.8 * MathUtils.clamp(config.liftDump ?? 0, 0, 1);
   const leftLift =
-    qS * cl * 0.5 * (config.leftWingDetached ? 0 : 1 - leftDamage * 0.62);
+    qS * cl * 0.5 * liftKept * (config.leftWingDetached ? 0 : 1 - leftDamage * 0.62);
   const rightLift =
-    qS * cl * 0.5 * (config.rightWingDetached ? 0 : 1 - rightDamage * 0.62);
+    qS * cl * 0.5 * liftKept * (config.rightWingDetached ? 0 : 1 - rightDamage * 0.62);
   const lift = leftLift + rightLift,
     drag = qS * cd;
   const right = new Vector3(1, 0, 0).applyQuaternion(orientation);

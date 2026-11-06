@@ -1,0 +1,8 @@
+fighter-pilot.glb is based on "Fighter Pilot Character"
+(https://sketchfab.com/3d-models/fighter-pilot-character-9c53b42d13994cefa8916729021b3104)
+by SoftNote (https://sketchfab.com/softnote), licensed under CC-BY-4.0
+(http://creativecommons.org/licenses/by/4.0/).
+
+Changes for Pocket Flight: reduced from 143,051 to 42,524 triangles, the twelve 4K texture sets packed into one
+atlas, scaled to 1.83 m, turned to face forward and given a 19-bone skeleton for seating and hand/foot IK.
+Built by scripts/build-pilot-atlas.py and scripts/build-pilot.py.

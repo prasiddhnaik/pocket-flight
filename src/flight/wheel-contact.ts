@@ -168,7 +168,7 @@ export function solveWheelContacts(
       // Tire exclusion is rigid; overlap recovery never injects kinetic energy.
       bias: Math.max(0, gap) / dt,
       traction: (surface.runway ? 0.8 : 0.55) * (1 - damage * 0.55),
-      rolling: brake && !nose ? 0.65 : surface.runway ? 0.016 : 0.08,
+      rolling: brake && !nose ? 1 : surface.runway ? 0.016 : 0.08,
     });
   }
   for (let iteration = 0; iteration < 10; iteration++) {

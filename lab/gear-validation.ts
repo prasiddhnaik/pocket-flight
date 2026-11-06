@@ -1,4 +1,5 @@
 import { Quaternion, TorusGeometry, Vector3 } from "three";
+import { aureliaTires } from "../src/aircraft/aurelia/flight-model";
 import type { AircraftId } from "../src/aircraft/aircraft";
 import { aircraftWheels, wheelPose } from "../src/flight/airframe-contact";
 import { groundAt } from "../src/world/terrain";
@@ -36,7 +37,11 @@ function tireVertices(id: AircraftId) {
     const attribute = mesh.getAttribute("position"),
       points = [];
     for (let i = 0; i < attribute.count; i++)
-      points.push(new Vector3().fromBufferAttribute(attribute, i));
+      {
+      const point = new Vector3().fromBufferAttribute(attribute, i);
+      if (id === "aurelia") point.x *= aureliaTires[index].halfWidth / wheel.minor;
+      points.push(point);
+    }
     mesh.dispose();
     return points;
   });

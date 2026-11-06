@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pocket Flight directory cleanup plan</title>
+  <style>
+    :root { color-scheme: light; --ink:#18242b; --muted:#53636b; --line:#d7e0e2; --accent:#176b70; --paper:#fff; --wash:#f3f7f7; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--wash); color:var(--ink); font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif; }
+    main { width:min(960px,100% - 32px); margin:36px auto 64px; padding:clamp(22px,5vw,48px); background:var(--paper); border:1px solid var(--line); }
+    header { border-bottom:2px solid var(--ink); padding-bottom:24px; }
+    .eyebrow { margin:0 0 8px; color:var(--accent); font-size:.76rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; }
+    h1 { margin:0; font-size:clamp(2rem,6vw,3.2rem); line-height:1.1; letter-spacing:-.035em; }
+    h2 { margin:34px 0 10px; font-size:1.3rem; line-height:1.25; }
+    p { margin:8px 0 14px; }
+    .lede { max-width:70ch; color:var(--muted); font-size:1.08rem; }
+    .meta { color:var(--muted); font-size:.9rem; }
+    table { width:100%; border-collapse:collapse; margin:14px 0 20px; font-size:.94rem; }
+    th,td { padding:10px 12px; text-align:left; vertical-align:top; border:1px solid var(--line); }
+    th { background:#eaf1f2; }
+    code { overflow-wrap:anywhere; font-size:.9em; }
+    ul,ol { padding-left:1.3rem; }
+    li { margin:7px 0; }
+    .note { padding:12px 15px; border-left:4px solid var(--accent); background:#edf6f5; }
+    footer { margin-top:36px; padding-top:14px; border-top:1px solid var(--line); color:var(--muted); font-size:.86rem; }
+    @media (max-width:600px) { body { font-size:15px; } main { width:100%; margin:0; border:0; } table { font-size:.85rem; } th,td { padding:8px; } }
+    @media print { body { background:#fff; } main { width:100%; margin:0; border:0; padding:0; } }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <p class="eyebrow">Pocket Flight · maintenance plan</p>
+      <h1>File directory cleanup</h1>
+      <p class="lede">A careful pass to recover local disk space and make the game repository easier to navigate, while protecting active work, aircraft sources, runtime assets, and useful evidence.</p>
+      <p class="meta">Target: <code>/Users/prasiddhnaik/Documents/blender skills/pocket-flight</code> · Inventory observed 15 October 2026</p>
+    </header>
+
+    <section>
+      <h2>Current picture</h2>
+      <p>The repository already has clear homes for application code (<code>src/</code>), tests, scripts, docs, public runtime files, aircraft authoring assets, and locally generated output. Most cleanup opportunity is in ignored or nested working data, rather than moving source files around.</p>
+      <table>
+        <thead><tr><th>Area</th><th>Observed size</th><th>Initial treatment</th></tr></thead>
+        <tbody>
+          <tr><td><code>.venv-cad/</code></td><td>1.3 GB</td><td>Check its purpose and active processes. The current CAD scripts point to a sibling <code>../.venv-cad312</code>; confirm this local environment is unused before archiving or removing it.</td></tr>
+          <tr><td><code>node_modules/</code></td><td>190 MB</td><td>Regenerable from <code>package.json</code> and <code>bun.lock</code>; remove only when no dev/build process depends on it.</td></tr>
+          <tr><td><code>output/</code></td><td>82 MB</td><td>Mixed content: browser captures, exports, reports, and a 15 MB site archive. Review item by item; do not treat the whole folder as disposable.</td></tr>
+          <tr><td><code>.playwright-cli/</code></td><td>29 MB</td><td>Inspect session state and active browser jobs before clearing; preserve useful captures or traces.</td></tr>
+          <tr><td><code>.code-review-graph/</code></td><td>14 MB</td><td>Generated navigation data; retain during work, and regenerate if intentionally removed.</td></tr>
+          <tr><td><code>assets/map-verification/</code></td><td>About 228 MB</td><td>A nested project snapshot containing source, a built <code>dist/</code>, and copied public files. Establish why it exists and check all references before optional external archiving.</td></tr>
+          <tr><td><code>assets/</code>, <code>public/</code>, <code>src/</code>, <code>docs/</code></td><td>Substantial project data</td><td>Keep aircraft CAD/Blender sources, references, validation evidence, runtime models/audio, and documentation unless a specific duplicate is proven safe to archive.</td></tr>
+        </tbody>
+      </table>
+      <p class="note"><strong>Working-tree protection:</strong> the inventory includes modified tracked files, a modified 64 MB Blender coastal-kit source, and new source, tests, soundtrack files, docs, and artifacts. Treat every one as intentional user work until reviewed with its owner. This plan does not authorize deleting or resetting any of it.</p>
+    </section>
+
+    <section>
+      <h2>Recommended sequence</h2>
+      <ol>
+        <li><strong>Capture a baseline.</strong> Record free disk space, directory sizes, Git status, and hashes or backup locations for large editable files. Keep cleanup separate from ongoing feature edits.</li>
+        <li><strong>Map dependencies and ownership.</strong> For each large or confusing directory, identify scripts, docs, runtime URLs, and build steps that refer to it. Confirm whether local Python/browser tools or generated evidence are in use.</li>
+        <li><strong>Recover space from confirmed local caches.</strong> After checking running processes and regeneration instructions, clear only confirmed-unused dependency/install caches. Reinstall with Bun from the lockfile if the project needs to run again. Keep graph data unless it is a measured space priority.</li>
+        <li><strong>Sort <code>output/</code> by value.</strong> Keep evidence referenced by README/docs and any deliverable exports. For old, unreferenced captures, compare dates and content; move chosen archives outside the working repository only after making and checking a recoverable copy.</li>
+        <li><strong>Review nested snapshots and Blender backups.</strong> For <code>assets/map-verification/</code> and <code>*.blend1</code> files, verify provenance, compare with current sources, search for inbound links, and make a separate archive before any removal. Do not prune aircraft references, editable masters, or validation records as a bulk operation.</li>
+        <li><strong>Improve navigation only where it pays off.</strong> Keep the existing top-level layout. If repeated loose reports or artifacts remain hard to find, group future items under their current <code>docs/</code> or <code>artifacts/</code> categories, updating every link in the same change. Avoid broad moves of source files and assets.</li>
+        <li><strong>Close out the pass.</strong> Compare before/after sizes and Git status, confirm archived files open from their new location, and ensure documented commands and runtime asset references still resolve. Report recovered disk space separately from data merely moved elsewhere.</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Decision gates</h2>
+      <ul>
+        <li>Archive candidates only after confirming they are not active, not the sole copy, and not needed by a script, README, report, or runtime route.</li>
+        <li>Prefer moving to a dated archive outside the repository over deletion when a file has historical or evidentiary value. Verify the copy before removing the original.</li>
+        <li>Do not stage, commit, reset, or rewrite the existing dirty work as part of directory cleanup.</li>
+        <li>Measure actual disk-space recovery after cleanup; a move to another local folder improves repository clarity but does not free disk space.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Success criteria</h2>
+      <ul>
+        <li>Unneeded local caches are removed only after their use and recreation path are confirmed.</li>
+        <li>Useful outputs, source models, references, validation artifacts, runtime files, and all pre-existing work remain recoverable.</li>
+        <li>Any archive has a clear date/name and a verified copy; links are updated where files move.</li>
+        <li>The repository has a short, understandable top-level layout, and before/after directory sizes and Git status are recorded.</li>
+      </ul>
+    </section>
+
+    <footer>Planning artifact only. No cleanup, deletion, archive move, or Git mutation was performed while preparing this plan.</footer>
+  </main>
+</body>
+</html>

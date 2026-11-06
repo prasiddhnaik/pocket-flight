@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scene Studio — useful additions and recommended next upgrade</title>
+<style>
+:root{color-scheme:light;--ink:#233035;--muted:#526268;--line:#d9e2e3;--accent:#285d61;--soft:#f2f6f6}*{box-sizing:border-box}body{margin:0;background:#fff;color:var(--ink);font:16px/1.7 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}main{max-width:1060px;margin:auto;padding:44px 28px 65px}h1{font-size:34px;line-height:1.2;margin:12px 0 18px}h2{font-size:24px;line-height:1.3;margin:0 0 16px}h3{font-size:19px;margin:25px 0 8px}header{padding-bottom:22px;border-bottom:1px solid var(--line)}p{margin:12px 0}.eyebrow{font-size:13px;color:var(--accent);letter-spacing:.08em}.lead{font-size:19px}.meta,.source,footer{font-size:14px;color:var(--muted)}a{color:var(--accent);text-underline-offset:3px}section{padding-top:34px;scroll-margin-top:20px}li{margin:8px 0}.note{border-left:3px solid var(--accent);padding:12px 18px;background:var(--soft);margin:20px 0}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:15px}th,td{padding:12px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{background:var(--soft)}code{font: .91em ui-monospace,SFMono-Regular,Consolas,monospace;background:var(--soft);padding:2px 4px;border-radius:3px}.source{overflow-wrap:anywhere}.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:20px 0}.steps div{padding:14px;border:1px solid var(--line)}.steps b,.steps span{display:block}.steps span{font-size:14px;margin-top:7px}nav{padding:16px 0;border-bottom:1px solid var(--line)}nav ul{display:flex;flex-wrap:wrap;gap:10px 22px;padding:0;margin:0;list-style:none}.equation{padding:14px;border:1px solid var(--line);font:14px/1.7 ui-monospace,SFMono-Regular,Consolas,monospace;overflow-wrap:anywhere}footer{border-top:1px solid var(--line);padding-top:18px;margin-top:35px}@media(max-width:650px){main{padding:28px 18px 45px}h1{font-size:28px}.steps{grid-template-columns:1fr}}@media print{body{font-size:11pt}main{padding:0;max-width:none}nav{display:none}h1{font-size:25pt}h2{font-size:18pt}h2,h3{break-after:avoid}tr,.note,.steps{break-inside:avoid}a{color:inherit}}
+</style>
+</head>
+<body><main>
+<header>
+<div class="eyebrow">POCKET FLIGHT · FEATURE ASSESSMENT</div>
+<h1>Make Scene Studio easier to build and direct with</h1>
+<p class="lead">Start by helping users place objects confidently, then make animation timing and camera direction easier to control.</p>
+<p>This assessment ranks useful additions against the editor code reviewed before the placement upgrade. The three recommended placement tools have now been implemented locally; see the <a href="../SCENE_STUDIO_PLACEMENT_REPORT.html">implementation and verification report</a>. Remaining additions below are recommendations.</p>
+<p class="meta">11 October 2026 · local working tree at HEAD <code>249032d</code> · focus selected: object placement and scene assembly</p>
+</header>
+<nav aria-label="Contents"><ul><li><a href="#baseline">Current baseline</a></li><li><a href="#priorities">Ranked additions</a></li><li><a href="#first">Recommended first upgrade</a></li><li><a href="#later">Later work</a></li><li><a href="#choices">Approach tradeoffs</a></li><li><a href="#verification">Evidence and review</a></li></ul></nav>
+
+<section id="baseline"><h2>1. What already works, and where effort remains</h2>
+<p>The editor already imports models, images, and audio; supports primitives and lights; exposes position/rotation/scale and World/Aircraft anchoring; provides transform and camera keys; offers visibility ranges; and saves projects with portable asset backups. The next changes should improve these flows instead of duplicating them.</p>
+<div class="table-wrap"><table><thead><tr><th>Observed implementation</th><th>Current user effort</th><th>Useful extension</th></tr></thead><tbody>
+<tr><td>Imports are centered and normalized to a maximum dimension of six meters.</td><td>Users must infer real size from scale factors and compensate for a centered pivot when setting ground height.</td><td>Dimensions in meters, uniform target-size input, and ground placement based on bounds.</td></tr>
+<tr><td>New objects spawn at the sampled aircraft position plus a fixed world-axis offset.</td><td>Placement does not account for which direction the aircraft faces.</td><td>A command that places the object alongside the aircraft using its current orientation.</td></tr>
+<tr><td>Object keys are clickable timeline dots; the inspector edits easing and removes keys.</td><td>Keys can be visited but their times cannot be edited directly through the current controls.</td><td>Edit, copy, and move key times, followed by timeline dragging.</td></tr>
+<tr><td>Selection is a single object ID and the scene list is flat.</td><td>Repeated placements and moving several props require individual edits.</td><td>Multi-selection and batch transforms; later, reusable collections.</td></tr>
+<tr><td>Camera poses use numeric position/target and source-time keys.</td><td>It is difficult to inspect an entire camera path or keep an imported subject framed.</td><td>Editing-only path visualization and explicit target selection.</td></tr>
+<tr><td>Sound layers have range, volume, offset, loop, and fade settings.</td><td>Users must line up cuts and sound by numbers and playback.</td><td>Audio waveforms and film markers.</td></tr>
+<tr><td>Clip title is screen-space text; imported images are 3D planes.</td><td>Logos may turn edge-on; designed title placement is limited.</td><td>An optional billboard mode for scene images, and a separate designed overlay track.</td></tr>
+<tr><td>MediaRecorder captures the film in real time.</td><td>Requested frame rate does not establish actual capture performance.</td><td>A short export check that reports observed preview cadence and selected output settings.</td></tr>
+</tbody></table></div>
+<p class="source">Sources: <a href="../../src/studio-scene-renderer.ts">studio-scene-renderer.ts</a>, <a href="../../src/ReplayStudio.tsx">ReplayStudio.tsx</a>, <a href="../../src/StudioScenePanels.tsx">StudioScenePanels.tsx</a>, <a href="../../src/replay-preview.ts">replay-preview.ts</a>, and <a href="../../src/replay-export.ts">replay-export.ts</a>.</p>
+</section>
+
+<section id="priorities"><h2>2. Ranked additions</h2>
+<p>Ranking assumes the main goal is placing imported objects into recorded flight films. Relative effort is an engineering estimate from the touched systems, not a delivery-time promise.</p>
+<div class="table-wrap"><table><thead><tr><th>Priority</th><th>Addition</th><th>User value</th><th>Relative effort / dependencies</th></tr></thead><tbody>
+<tr><td>First</td><td><strong>Place on ground</strong></td><td>A building or prop can rest on the terrain without guessing its center height.</td><td>Moderate: transformed bounds, terrain/ground sampling, anchor conversion, existing pose commit path.</td></tr>
+<tr><td>First</td><td><strong>Place beside aircraft</strong></td><td>Recover an object that is far away, and put it in a useful position near the current recorded pose.</td><td>Small to moderate: interpolated pose, aircraft-local offset, world/local conversion.</td></tr>
+<tr><td>First</td><td><strong>Dimensions and size in meters</strong></td><td>Set an imported tower to a chosen size directly; avoid trial-and-error scale factors.</td><td>Moderate: bounds inspection, proportional scaling, a clearly defined measurement frame.</td></tr>
+<tr><td>Next</td><td><strong>Editable keyframe times</strong></td><td>Move a reveal from second 5 to second 8 without recreating the animation.</td><td>Moderate: timestamp editing, collision rules, ordering, undo and track controls.</td></tr>
+<tr><td>Next</td><td><strong>Multi-selection and batch edits</strong></td><td>Arrange several props, duplicate a set, and apply shared visibility times.</td><td>Larger: selection model, inspector aggregation, group pivot, mixed anchors/keys.</td></tr>
+<tr><td>Next</td><td><strong>Camera path and object targeting</strong></td><td>See the shot path and direct the camera toward a placed model.</td><td>Path display is moderate; persistent targeting needs schema, sampling, and export support.</td></tr>
+<tr><td>Later</td><td><strong>Waveforms and film markers</strong></td><td>Align camera moves and cuts with music or narration.</td><td>Moderate to larger: decoded waveform data, shared timeline scale, marker persistence.</td></tr>
+<tr><td>Later</td><td><strong>Reusable scene collections</strong></td><td>Save a tower-and-lights arrangement or a ring sequence for another film.</td><td>Larger: collection format, asset dependency packaging, ID remapping, anchor/origin policy.</td></tr>
+<tr><td>Later</td><td><strong>Billboard images and designed overlays</strong></td><td>Keep a logo facing the camera or place readable text independently of scene depth.</td><td>Billboards and 2D overlays are distinct features; overlays need layout and preview/export parity.</td></tr>
+<tr><td>Later</td><td><strong>Export performance check</strong></td><td>Make a better-informed choice between 720p/1080p and 30/60 fps.</td><td>Moderate: short sampling pass, readiness checks, device-specific observations.</td></tr>
+</tbody></table></div>
+<div class="note"><strong>Recommendation:</strong> ship the three placement tools as the first coherent upgrade. A user should be able to import a model, put it beside the route, place it on the ground, set its size, and film it without calculating coordinates or scale ratios manually.</div>
+</section>
+
+<section id="first"><h2>3. Recommended first upgrade: placement tools</h2>
+<p>This is a proposed bounded extension to the existing Object inspector and pose-edit flow. It can use existing transform serialization and history; it does not require a new project-file format. Existing backups should retain their current meaning.</p>
+<div class="steps" role="img" aria-label="Proposed flow: place a selected object beside the aircraft, set its size in meters, and lower it onto ground using its actual bounds."><div><b>Locate</b><span>Place beside aircraft at the current film moment, then frame the selection.</span></div><div><b>Size</b><span>Read current dimensions and set its largest dimension in meters.</span></div><div><b>Ground</b><span>Adjust height using the transformed bottom bound and the ground surface.</span></div></div>
+<h3>Place beside aircraft</h3>
+<p><strong>Proposed behavior:</strong> at the current playhead, move the selected object to a fixed offset in the aircraft’s local frame. Preserve its rotation, scale, and anchor. Frame the object after placement so the result is visible in Scene mode.</p>
+<p>Sample the same interpolated aircraft pose used by the renderer, rotate the offset by its quaternion, add its world position, and convert the result into the object’s current anchor. This avoids the existing world-X-only placement behavior. The implementation should obtain the rendered subject pose where possible so suspension and interpolation agree.</p>
+<div class="equation">targetWorld = aircraftPosition + aircraftRotation × localOffset<br>newPosition = convert targetWorld into the selected object's anchor</div>
+<p>The final offset should be a small project default; the first version does not need a new placement preset library. This command moves the selected instance, rather than changing the default size or moving the aircraft.</p>
+<h3>Dimensions and target size</h3>
+<p><strong>Proposed behavior:</strong> show Width, Height, and Depth in meters for the selected object and add one numeric command: <strong>Largest dimension</strong>. Entering 30 meters scales the object uniformly until its largest measured dimension reaches 30 meters.</p>
+<p>Measure bounds in the object’s anchor frame at the current evaluated pose. This keeps measurement axes stable for World objects and local to the aircraft for Aircraft objects. Label the frame so dimensions are not mistaken for authored Blender-local geometry extents. Proportional scaling preserves the existing relative X/Y/Z scale ratios.</p>
+<div class="equation">factor = requestedLargestDimension / currentLargestDimension<br>nextScale = currentScale × factor</div>
+<p>Use the current evaluated transform and enforce the same valid-scale limits as other edits. For embedded animated models, displayed dimensions can vary with the sampled pose; show that they describe the current pose instead of promising a fixed envelope over the whole animation.</p>
+<h3>Place on ground</h3>
+<p><strong>Proposed behavior:</strong> for a selected, unlocked, World-anchored visual object, adjust only its height until the bottom of its transformed bounds rests on the computed ground surface. Preserve X/Z, rotation, and scale.</p>
+<p>Use the existing ground/terrain functions in world coordinates, including the runway/apron heights where they apply. Compute a world-space Box3 after the current transform and animation pose have been evaluated. Account for the centered imported pivot, and sample the ground beneath the projected bounding footprint rather than only the object’s center.</p>
+<div class="equation">heightDelta = max(sampledGroundHeights) − worldBounds.min.y<br>nextLocalY = currentLocalY + heightDelta  (World anchor)</div>
+<p><strong>Scope:</strong> this is ground placement against the terrain/ground model. It does not snap to the roof of an imported building or every rendered scenery mesh. Sampling the footprint is an approximation on sloped terrain; the command places the bounding bottom above sampled ground rather than solving exact mesh contact. Water uses the ground helper’s zero-height surface, not a gameplay collision claim.</p>
+<h3>Editing behavior shared by all three tools</h3>
+<ul>
+<li>Enable commands only with a selected, loaded, unlocked visual object and an active flight clip. Keep placement unavailable during playback and export.</li>
+<li>Use the existing pose-edit handler: a static object updates its transform; an animated object creates or updates a key at the playhead. Make that effect visible in the inspector.</li>
+<li>Use one committed edit per action so Undo returns to the previous pose. Changing input text before submission should not produce a stack of edits.</li>
+<li>Do not let dimension measurement or placement fight an active gizmo drag.</li>
+<li>Keep ground placement unavailable for Aircraft-anchored objects; attaching something to a flying aircraft and grounding it are different intents.</li>
+<li>Use the Object inspector for these controls and retain numeric transforms as the fine-adjustment path.</li>
+</ul>
+<h3>Likely implementation surface</h3>
+<div class="table-wrap"><table><thead><tr><th>Current file</th><th>Expected responsibility</th></tr></thead><tbody>
+<tr><td><a href="../../src/StudioScenePanels.tsx">StudioScenePanels.tsx</a></td><td>Placement controls, dimensions display, target-size submission, and disabled states.</td></tr>
+<tr><td><a href="../../src/replay-preview.ts">replay-preview.ts</a></td><td>Expose an evaluated pose/bounds interface and derive placement in the current scene frame.</td></tr>
+<tr><td><a href="../../src/ReplayStudio.tsx">ReplayStudio.tsx</a></td><td>Connect commands to selection, transform/key creation, history, and save flow.</td></tr>
+<tr><td><a href="../../src/terrain.ts">terrain.ts</a> / a small new placement helper</td><td>Reuse ground height sampling; isolate reusable placement calculations for focused tests.</td></tr>
+<tr><td><a href="../../src/studio-scene-renderer.ts">studio-scene-renderer.ts</a></td><td>Reuse selected runtime object and evaluated bounds. Change only if the existing accessors are insufficient.</td></tr>
+<tr><td><a href="../../src/studio.css">studio.css</a></td><td>Compact layout for placement controls at desktop and narrow widths.</td></tr>
+</tbody></table></div>
+<h3>Acceptance criteria</h3>
+<ol>
+<li>A centered and scaled tower can be placed on runway ground without burying its base; a rotated model uses its transformed bounds.</li>
+<li>Placing beside a turning aircraft follows its local orientation at the playhead, rather than the world X axis.</li>
+<li>A requested target dimension preserves proportions, respects valid scale limits, and appears correctly in Rendered preview.</li>
+<li>Static and keyed objects follow the documented edit semantics. Undo/Redo restores each action.</li>
+<li>Hidden/out-of-range, locked, unprepared, or missing-asset cases are handled without silently committing invalid transforms.</li>
+<li>Save/reopen and backup/restore retain the resulting transforms. Existing projects remain loadable.</li>
+<li>Focused placement tests pass; an actual in-app editor session verifies the commands, camera view, focus, and rendered result. A short exported video is inspected separately.</li>
+</ol>
+</section>
+
+<section id="later"><h2>4. Next capabilities and design dependencies</h2>
+<h3>Keyframe editing before a curve editor</h3>
+<p>Add an editable time field, Copy key, and Move key before introducing a full curve editor. Keep timestamp sorting and the existing interpolation semantics. If a move lands on another key, reject the move with a clear conflict message rather than silently overwriting it. Dragging should preview movement and commit once on release.</p>
+<p>Object keys use film seconds; camera keys use source seconds. Camera controls should display both the recording time and its mapped position in the film. Decisions about moving whole clips together with object events belong to a later explicit linking model.</p>
+<h3>Multi-selection before reusable collections</h3>
+<p>Start with Shift-select, clear selection, delete/duplicate as one operation, and shared visibility settings. A transform group needs an explicit pivot and a policy for World versus Aircraft anchors. Prefer transforming in world space and converting each result back to its own anchor; define how animated selections receive keys. Persistent parent/child scene hierarchies are a larger design change.</p>
+<h3>Camera path visualization before dynamic targeting</h3>
+<p>Draw a sampled camera path, key markers, and target lines in Scene mode only. Convert source-time keys through their selected clip and account for the current camera anchor. Export should exclude these helpers. Dynamic targeting of an imported object needs a stable object-ID reference, a deleted-target fallback, validation, and backup compatibility.</p>
+<h3>Waveforms before audio automation</h3>
+<p>Create a cached, downsampled waveform from decoded AudioBuffers and show it on the same film-time scale as sound-layer ranges. Add timeline markers for beats or narration cues. The current volume and fade controls already cover basic mixing; automatic ducking or arbitrary envelopes require a separate audio-automation design.</p>
+<h3>Billboards and overlays have different purposes</h3>
+<p>A billboard remains a 3D scene object and faces the camera, so depth and occlusion still apply. A 2D overlay sits in video coordinates and must produce the same result in preview and capture. Treat these as separate additions rather than a single ambiguous “keep image visible” toggle.</p>
+<h3>Measure export performance before changing the renderer</h3>
+<p>A short readiness/performance pass can report observed preview cadence at the chosen resolution and the MIME type the browser would select. It is a recommendation aid, not a promise about the encoded frame rate. Offline frame rendering or export queues would require a separate capture architecture and should be evaluated as their own project.</p>
+</section>
+
+<section id="choices"><h2>5. Three directions for the next iteration</h2>
+<div class="table-wrap"><table><thead><tr><th>Direction</th><th>First deliverable</th><th>Tradeoff</th></tr></thead><tbody>
+<tr><td><strong>Placement first — recommended</strong></td><td>Ground placement, aircraft-relative placement, and target dimensions.</td><td>Immediate scene-building value; less work on cinematic timing in this iteration.</td></tr>
+<tr><td>Direction and animation first</td><td>Editable key times and camera path helpers, then object targeting.</td><td>Better control of already assembled scenes; initial object positioning stays manual.</td></tr>
+<tr><td>Finishing first</td><td>Waveforms/markers and an export performance check.</td><td>Better music alignment and output decisions; scene assembly friction remains.</td></tr>
+</tbody></table></div>
+<p><strong>Focus selected:</strong> object placement and scene assembly. The user selected this direction on 11 October. The three-tool design above is ready for review; implementation has not started.</p>
+<p>Once a direction is selected, resolve its interaction details one at a time and present a concrete first change. Larger ideas such as persistent groups, designed overlay tracks, and offline capture need their own designs.</p>
+</section>
+
+<section id="verification"><h2>6. Evidence, scope, and verification</h2>
+<ul>
+<li>The repository graph was checked and refreshed. Imports identified the editor model, inspector, renderer, asset, persistence, preview, soundtrack, and exporter dependencies.</li>
+<li>Important conclusions were checked against current source: imported normalization, initial placement, selection, keyframe controls, camera handling, ground helpers, and export path.</li>
+<li>The document's HTML structure and source links were checked. A browser preview attempt was blocked by the browser URL policy because file: navigation is disallowed. Visual layout has not been verified in a browser for this proposal. It is an assessment, not a deployed editor upgrade.</li>
+<li>No product code, package dependencies, or saved film data were changed for this feature assessment. Existing unrelated working-tree changes were preserved.</li>
+<li>No new application build, test suite, gameplay check, or video export was run. The acceptance checks above describe work required when a feature is implemented.</li>
+</ul>
+<p class="source">Related context: <a href="../SCENE_STUDIO_EXPLAINED.html">Scene Studio technical report</a>. Current implementation sources are linked alongside each proposal. The technical report was written on 3 October; this assessment rechecked the relevant source on 11 October.</p>
+</section>
+<footer>Proposed functionality is explicitly marked as such. This file is a feature assessment and discussion draft, not an approved implementation spec.</footer>
+</main></body></html>

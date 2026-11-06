@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scene Studio — object placement implementation report</title>
+<style>
+:root{color-scheme:light;--ink:#253237;--muted:#546369;--line:#dce3e4;--soft:#f4f7f7;--accent:#285e62}*{box-sizing:border-box}body{margin:0;background:white;color:var(--ink);font:16px/1.65 system-ui,-apple-system,sans-serif}main{max-width:1000px;margin:auto;padding:40px 24px 60px}h1{font-size:32px;line-height:1.2}h2{font-size:23px;margin-top:36px}h3{font-size:18px;margin-top:26px}header,footer{border-bottom:1px solid var(--line);padding-bottom:20px}.meta,footer{font-size:14px;color:var(--muted)}a{color:var(--accent)}code{font-size:.9em;background:var(--soft);padding:2px 4px;overflow-wrap:anywhere}pre{white-space:pre-wrap;padding:16px;background:var(--soft);font-size:13px}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:14px}th,td{padding:12px 10px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}th{background:var(--soft)}.note{border-left:3px solid var(--accent);background:var(--soft);padding:12px 16px}.flow{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.flow div{border:1px solid var(--line);padding:14px}.flow b{display:block}li{margin:8px 0}footer{margin-top:36px;border-bottom:0;border-top:1px solid var(--line);padding-top:16px}@media(max-width:650px){main{padding:24px 16px}h1{font-size:27px}.flow{grid-template-columns:1fr}}@media print{main{padding:0}h2{break-after:avoid}tr,.note{break-inside:avoid}}
+</style>
+</head>
+<body><main>
+<header>
+<p class="meta">POCKET FLIGHT · IMPLEMENTATION REPORT · 11 October 2026</p>
+<h1>Object placement in Scene Studio</h1>
+<p>The Object inspector now measures the selected model and provides three commands: place it beside the aircraft, set its largest dimension in meters, and place it on terrain or runway ground. Edits use the existing transform, keyframe, undo, and save paths.</p>
+<p class="meta">Repository: <code>pocket-flight</code> · local working tree based on <code>249032d</code> · implemented locally; no commit or deployment performed.</p>
+</header>
+
+<h2>Using the tools</h2>
+<p>Open a recorded flight in Replay Studio. Pause playback, select a visible model in Scene mode, and use the new Placement section in the Object inspector.</p>
+<div class="flow" role="img" aria-label="Place an object beside the aircraft, set its size, and place it on ground."><div><b>1. Locate</b>Choose Place beside aircraft. The object moves near the current aircraft pose and the viewport frames it.</div><div><b>2. Size</b>Read W/H/D, enter the desired largest dimension in meters, and choose Apply size.</div><div><b>3. Ground</b>For a World-anchored object, choose Place on ground. Its bottom bound moves to the highest sampled ground height.</div></div>
+<p>Set size before grounding: resizing a centered model later can move its base above or below the ground. Ground placement is a command at the current moment, rather than a persistent constraint.</p>
+
+<h2>Technical behavior</h2>
+<div class="table-wrap"><table><thead><tr><th>Capability</th><th>Implemented behavior</th><th>Boundary</th></tr></thead><tbody>
+<tr><td>Dimensions</td><td>Measures visible mesh bounds at the evaluated pose; displays width, height, and depth to three decimal places. Child transforms, scale, rotation, current skinning, instancing, and morph pose are included.</td><td>Dimensions use world axes for World objects and aircraft-local axes for Aircraft objects. They describe an axis-aligned bound, so rotation can change the values. Animated models can change dimensions over time.</td></tr>
+<tr><td>Place beside aircraft</td><td>Uses offset <code>[8, 2, 0]</code> in the rendered aircraft's local axes. For World objects, rotates this offset by the aircraft quaternion, adds its position, then subtracts the project origin. Aircraft objects receive that local offset directly.</td><td>Preserves anchor, rotation, and scale. The offset follows bank and pitch as well as heading. It does not solve collisions with the aircraft or scenery.</td></tr>
+<tr><td>Apply size</td><td>Multiplies all existing scale components by <code>target / largest measured dimension</code>. Preserves existing relative scale ratios, position, and rotation.</td><td>Rejects empty dimensions, nonfinite or nonpositive targets, and resulting scale components outside <code>0.001–10000</code>. The target uses the current pose, not an animation-wide envelope.</td></tr>
+<tr><td>Place on ground</td><td>Samples <code>groundAt(x, z)</code> on a 5 × 5 grid covering world-space bounds. Moves Y by <code>highest sampled height − bottom bound</code>. Ground sampling includes terrain and runway/apron elevations from the existing ground model.</td><td>World objects only. Preserves X/Z, rotation, and scale. It does not place onto imported models, building roofs, or arbitrary scene surfaces. Uneven ground and narrow features between sample points can leave gaps or intersections.</td></tr>
+<tr><td>Edit history and persistence</td><td>Commands commit through the existing pose-edit path. A static object updates its transform; an object with keys, or with Auto Key enabled, receives a key at the playhead. Existing undo/redo and browser saves apply.</td><td>No project schema or backup format was changed. A placement key uses existing smooth easing behavior.</td></tr>
+<tr><td>Readiness and locks</td><td>Controls wait for a loaded, measurable model and a paused, editable scene. Locked and hidden objects cannot be placed; lights do not provide mesh dimensions.</td><td>Ground placement is disabled for Aircraft anchors. Export, loading, and transform dragging prevent placement commands.</td></tr>
+</tbody></table></div>
+
+<h3>Coordinate and measurement flow</h3>
+<p>The UI asks the preview to render the exact current film playhead before applying a command. This ensures the aircraft pose, object transform, and embedded animation agree at measurement time. The preview obtains the selected renderer instance and delegates geometry calculations to a small placement module.</p>
+<pre>Object inspector → ReplayStudio.placeObject
+  → render current playhead
+  → ReplayPreview.placeObject
+  → boundsInFrame / fitObjectSize / placeBesideAircraft / placeOnGround
+  → changeObjectPose → existing history + project save
+
+For a point v in a child mesh:
+  anchor-space point = inverse(anchor matrix) × mesh world matrix × v
+
+For ground placement:
+  nextY = currentY + max(25 ground samples) − worldBounds.min.y</pre>
+<p>Regular static mesh bounds reuse the geometry bounding box. Morph meshes measure their evaluated vertices; skinned and instanced meshes compute their object bounds. Dimensions refresh with inspector updates about ten times per second. Large animated models may make these calculations more expensive; no performance benchmark for such assets was run.</p>
+
+<h2>Changed files</h2>
+<div class="table-wrap"><table><thead><tr><th>File</th><th>Responsibility</th></tr></thead><tbody>
+<tr><td><a href="../src/studio-placement.ts">studio-placement.ts</a></td><td>Bounds, proportional sizing, aircraft-relative placement, and sampled ground support.</td></tr>
+<tr><td><a href="../src/replay-preview.ts">replay-preview.ts</a></td><td>Connects loaded scene instances and evaluated aircraft poses to the placement helpers.</td></tr>
+<tr><td><a href="../src/ReplayStudio.tsx">ReplayStudio.tsx</a></td><td>Measures the selection, checks readiness, commits edits, and frames beside placement.</td></tr>
+<tr><td><a href="../src/StudioScenePanels.tsx">StudioScenePanels.tsx</a>, <a href="../src/studio.css">studio.css</a></td><td>Placement controls, dimension labels, target-size input, and compact responsive styling.</td></tr>
+<tr><td><a href="../tests/studio-placement.test.ts">studio-placement.test.ts</a></td><td>Ten tests covering coordinate frames, transformed bounds, proportions, invalid inputs, ground height, and current morph pose.</td></tr>
+</tbody></table></div>
+
+<h2>Verification</h2>
+<div class="table-wrap"><table><thead><tr><th>Check</th><th>Result</th></tr></thead><tbody>
+<tr><td><code>bun run build</code></td><td>Passed TypeScript and production Vite build. Vite reports a chunk-size warning above 500 kB.</td></tr>
+<tr><td>Focused editor and replay tests</td><td><code>bun test ./tests/studio-placement.test.ts ./tests/studio.test.ts ./tests/studio-scene.test.ts ./tests/replay.test.ts</code>: 35 passed, zero failed; 117 assertions across four files.</td></tr>
+<tr><td>Full repository suite</td><td><code>bun test --timeout 60000</code>: 157 passed, two failed; 159 tests across 35 files. Both failures concern the separate Stormbird feature: approach health expected 100, received 45.68; CAD asset test could not find a named wheel. Those files were outside this change. A clean-baseline comparison was not run.</td></tr>
+<tr><td>Diff and graph</td><td><code>git diff --check</code> passed. Code review graph refreshed and source/diff reviewed.</td></tr>
+<tr><td>In-app browser editing</td><td>Used a recorded Finch flight. Verified cube sizing from 4 m to 12 m, ground placement, undo/redo, aircraft-relative placement, and placement on a keyed object at a later playhead.</td></tr>
+<tr><td>Imported-model checks</td><td>Imported a simple tower OBJ, resized it to W 9.6 / H 24 / D 9.6 m, placed it on the runway, and framed it. Verified disabled placement when locked or hidden, and disabled ground placement for Aircraft anchoring.</td></tr>
+<tr><td>Save and reopen</td><td>Reloaded the page and reopened “Placement tools QA — Finch.” Tower dimensions, scale <code>[4,4,4]</code>, and position <code>[20.231, −60.956, −681.58]</code> were retained.</td></tr>
+<tr><td>Short video export</td><td>The editor reported export completion. Its exported video decoded at 1920 × 1080, duration 1.7905 seconds. Selected settings were 1080p / 30 fps; those settings do not prove captured frame rate or frame-accurate timing. Browser download retrieval timed out, so independent file inspection was not completed.</td></tr>
+<tr><td>Browser logs</td><td>No warning or error entries returned during the inspected editing/export session. Mobile interaction and large imported-asset performance were not tested.</td></tr>
+</tbody></table></div>
+<p><a href="../artifacts/studio-placement-qa/placement-controls.jpg">Saved browser screenshot: restored tower and Placement controls</a> · <a href="../artifacts/studio-placement-qa/tower.obj">Tower QA fixture</a></p>
+
+<h2>Repository state and useful next work</h2>
+<p>The repository already contained separate aircraft, effects, world, asset, and test edits. They were preserved. This report describes the placement module, inspector integration, styling, and placement tests only; it does not claim the entire dirty working tree is validated.</p>
+<p>The next useful scene-assembly upgrade is multi-selection with batch transforms: select several props, move or duplicate them together, and apply shared visibility timing. Persistent terrain contact and exact surface picking would require additional behavior beyond these three placement commands.</p>
+<footer>Related documents: <a href="SCENE_STUDIO_EXPLAINED.html">Scene Studio technical guide</a> · <a href="plans/2026-10-11-scene-studio-improvements.html">Feature assessment and remaining roadmap</a>.</footer>
+</main></body></html>

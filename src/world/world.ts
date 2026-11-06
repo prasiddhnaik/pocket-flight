@@ -802,6 +802,9 @@ export function makeWorld(
     collisionObstacles = new ObstacleIndex(obstacles);
   });
   let nightValue = 0;
+  let lastTime = 0;
+  const daySky = new T.Color("#a7c3d3"), nightSky = new T.Color("#101f35");
+  const dayFog = new T.Color("#c5d0d1"), nightFog = new T.Color("#14283a");
   return {
     obstacles,
     get collisionObstacles() { return collisionObstacles; },
@@ -819,7 +822,10 @@ export function makeWorld(
       sun.position.copy(sun.target.position).add(SUN_OFFSET);
     },
     update(time: number, night: boolean) {
-      nightValue = T.MathUtils.lerp(nightValue, night ? 1 : 0, 0.022);
+      // Fade by elapsed time, not per frame: the same 0.022-per-frame feel at 60 FPS at any frame rate.
+      if (time < lastTime) nightValue = night ? 1 : 0;
+      nightValue = T.MathUtils.damp(nightValue, night ? 1 : 0, 1.335, time - lastTime);
+      lastTime = time;
       oceanMaterial.uniforms.time.value = time;
       oceanMaterial.uniforms.night.value = nightValue;
       ambient.intensity = T.MathUtils.lerp(1.55, 0.6, nightValue);
@@ -828,16 +834,8 @@ export function makeWorld(
       beacon.intensity = nightValue * 25;
       beacon.visible = nightValue > 0.001;
       starMat.opacity = nightValue;
-      (scene.background as T.Color).lerpColors(
-        new T.Color("#a7c3d3"),
-        new T.Color("#101f35"),
-        nightValue,
-      );
-      (scene.fog as T.FogExp2).color.lerpColors(
-        new T.Color("#c5d0d1"),
-        new T.Color("#14283a"),
-        nightValue,
-      );
+      (scene.background as T.Color).lerpColors(daySky, nightSky, nightValue);
+      (scene.fog as T.FogExp2).color.lerpColors(dayFog, nightFog, nightValue);
       for (const flag of windsocks) {
         flag.rotation.y = -0.5 + Math.sin(time * 0.5) * 0.15;
         flag.rotation.z = Math.sin(time * 2.8) * 0.06;

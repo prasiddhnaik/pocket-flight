@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="36" viewBox="0 0 1000 36" role="img" aria-label="Waypoint 05: FURTHER READING">
+  <style>
+    .d{fill:#f6f4e9;stroke:#233f42;stroke-width:3}
+    .t{font:600 12px Oxanium,ui-monospace,"SF Mono",Menlo,Consolas,monospace;letter-spacing:2px;fill:#8a5a1c;white-space:pre}
+    .l{stroke:#233f42;stroke-opacity:.3;stroke-width:2;stroke-dasharray:7 7}
+    .p{fill:#082d33}
+    @media (prefers-color-scheme:dark){.d{fill:#0d1117;stroke:#ecd08c}.t{fill:#ecd08c}.l{stroke:#e8fbff;stroke-opacity:.32}.p{fill:#f6f4e9}}
+  </style>
+  <rect class="d" x="10" y="13" width="10" height="10" transform="rotate(45 15 18)"/>
+  <text class="t" x="34" y="23">WP 05  ·  FURTHER READING</text>
+  <line class="l" x1="302" y1="18" x2="962" y2="18"/>
+  <g transform="translate(982 18) rotate(90) scale(.8) translate(-12 -12)"><path class="p" d="M12 2l2 7 8 4v2l-8-2-1 6 3 2v1l-4-1-4 1v-1l3-2-1-6-8 2v-2l8-4z"/></g>
+</svg>

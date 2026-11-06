@@ -1,12 +1,12 @@
-# Pocket Flight
-
-**Fly Palm Bay, inspect the aircraft, and turn a replay into a film.**
+<h1 align="center"><img src="docs/readme/banner.svg" alt="Pocket Flight: fly Palm Bay, inspect the aircraft, and turn a replay into a film." width="100%"></h1>
 
 Pocket Flight is a browser flight game with six aircraft, missions, free flight, a glass instrument HUD, adaptive audio, and Scene Studio. A separate private wind-tunnel app uses the shared aircraft and flight models for experiments and inspection.
 
 **TypeScript · React · Three.js · Vite · Bun**
 
 [Run locally](#run-locally) · [Find the code](#find-the-code) · [Development checks](#development-checks) · [Saved projects](#saved-projects) · [Agent guide](AGENTS.md)
+
+<img src="docs/readme/divider-run-locally.svg" alt="" width="100%">
 
 ## Run locally
 
@@ -20,6 +20,8 @@ bun run dev
 Open the local URL printed by Vite. Choose an aircraft, then **First light** for a runway departure or **Free flight** to explore. Hold **Shift** for power; gently hold **↓ / S** to raise the nose at the rotation speed shown in the HUD. To land, close the throttle with **Ctrl**: the gear and flaps come down and the HUD shows your approach speed. Jets can hold **B** to slow down faster. The controls panel gives aircraft-specific guidance. Flight assistance can be changed in Settings.
 
 The game requires a browser with WebGL. Runtime assets are already under `public/`; ordinary development does not require Blender, Python, API keys, or an application server beyond Vite.
+
+<img src="docs/readme/fleet.svg" alt="The fleet: Finch U-2, Aurelia S32, Peregrine HX-27, Stormbird HX-40, Heron UT-9 and F-15C." width="100%">
 
 | Experience                          | Local route                                             |
 | ----------------------------------- | ------------------------------------------------------- |
@@ -63,6 +65,8 @@ bun run lab:dev
 ```
 
 The lab runs separately at `http://127.0.0.1:5186`. It shares flight and aircraft modules with the game, but has its own UI, workers, assets, and Vite configuration. `bun run build` builds the game and viewers; `bun run lab:build` builds the lab into `output/wind-tunnel-build/`.
+
+<img src="docs/readme/divider-find-the-code.svg" alt="" width="100%">
 
 ## Find the code
 
@@ -146,6 +150,8 @@ Offline report fingerprints include the per-aircraft definition files through `s
 
 For an editor change, run `bun test ./tests/studio-editing.test.ts ./tests/studio.test.ts ./tests/studio-scene.test.ts ./tests/replay.test.ts`. See the [Studio split and offline verification](docs/SCENE_STUDIO_REFACTOR.html) for scope and compatibility evidence.
 
+<img src="docs/readme/divider-development-checks.svg" alt="" width="100%">
+
 ## Development checks
 
 ```sh
@@ -194,6 +200,8 @@ bun scripts/report-uncapped-benchmark.ts my-run
 
 The uncapped path creates its own browser configuration and timestamped output tree under `output/full-game-uncapped/`. It checks idle-page, animated DOM and WebGL controls before and after the game; active controls must exceed 90 FPS with hardware acceleration. It also rejects a result when WebGL control headroom is less than 1.5 times the fastest game trial. The shared browser settings and earlier capped evidence are preserved. These measurements describe uncapped local development throughput.
 
+<img src="docs/readme/divider-saved-projects.svg" alt="" width="100%">
+
 ## Saved projects
 
 Replay frames, projects, and imported assets are stored in IndexedDB (`pocket-flight-studio`); settings and the flight log use local storage. Data belongs to the browser profile and origin, including host and port.
@@ -210,9 +218,7 @@ Authoring sources under `assets/` and browser assets under `public/` have separa
 
 Ignored `assets/` and `output/` content can include editable masters, worktrees, backups, and verification evidence. Keep it unless a cleanup task explicitly covers it.
 
-## Credits
-
-The pilot (`public/assets/pilot/fighter-pilot.glb`) is based on ["Fighter Pilot Character"](https://sketchfab.com/3d-models/fighter-pilot-character-9c53b42d13994cefa8916729021b3104) by [SoftNote](https://sketchfab.com/softnote), licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). It was reduced, re-textured into one atlas and rigged for Pocket Flight; see [CREDITS.txt](public/assets/pilot/CREDITS.txt). The game's Settings panel shows the same credit. Keep the original download outside the repository.
+<img src="docs/readme/divider-further-reading.svg" alt="" width="100%">
 
 ## Further reading
 
@@ -224,3 +230,7 @@ The pilot (`public/assets/pilot/fighter-pilot.glb`) is based on ["Fighter Pilot 
 - [Wind-tunnel chamber](docs/WIND_TUNNEL_CHAMBER.html) — lab design and scope.
 
 Recorded reports describe their own verification date and scope. Use the current source and tests to establish today's behavior.
+
+<img src="docs/readme/footer.svg" alt="Arrival at Palm Bay. Thanks for flying." width="100%">
+
+<p align="center"><sub><sub>Pilot (<code>public/assets/pilot/fighter-pilot.glb</code>) based on <a href="https://sketchfab.com/3d-models/fighter-pilot-character-9c53b42d13994cefa8916729021b3104">“Fighter Pilot Character”</a> by <a href="https://sketchfab.com/softnote">SoftNote</a>, <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>; reduced, re-textured into one atlas and rigged for Pocket Flight. See <a href="public/assets/pilot/CREDITS.txt">CREDITS.txt</a>; Settings shows the same credit. Keep the original download outside the repository.</sub></sub></p>

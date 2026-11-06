@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="132" viewBox="0 0 1000 132" role="img" aria-label="The fleet: Finch U-2, Aurelia S32, Peregrine HX-27, Stormbird HX-40, Heron UT-9 and F-15C">
+  <defs>
+    <radialGradient id="c" cx="0" cy="0" r="1.3"><stop offset="0" stop-color="#174850"/><stop offset=".7" stop-color="#082d33"/></radialGradient>
+  </defs>
+  <style>
+    .n{font:700 15px Oxanium,ui-monospace,Menlo,Consolas,monospace;fill:#ecd08c}
+    .s{font:600 10px Oxanium,ui-monospace,Menlo,Consolas,monospace;letter-spacing:1.5px;fill:#9fc3c0}
+  </style>
+  <g>
+    <rect x="0" width="150" height="132" rx="14" fill="url(#c)"/>
+    <rect x=".5" y=".5" width="149" height="131" rx="13.5" fill="none" stroke="#e8fbff" stroke-opacity=".14"/>
+    <g transform="translate(75 44) scale(1.7) translate(-12 -12)" fill="#f6f4e9"><path d="M12 3l1.5 6 9 3v2l-9-1-.5 5 3 2v1l-4-1-4 1v-1l3-2-.5-5-9 1v-2l9-3z"/></g>
+    <text class="n" x="75" y="94" text-anchor="middle">Finch</text>
+    <text class="s" x="75" y="113" text-anchor="middle">U-2 · PROPELLER</text>
+  </g>
+  <g>
+    <rect x="170" width="150" height="132" rx="14" fill="url(#c)"/>
+    <rect x="170.5" y=".5" width="149" height="131" rx="13.5" fill="none" stroke="#e8fbff" stroke-opacity=".14"/>
+    <g transform="translate(245 44) scale(1.7) translate(-12 -12)" fill="#f6f4e9"><path d="M12 2l1.5 7 8 4v2l-8-1-.5 5 2.5 2v1l-3.5-1-3.5 1v-1l2.5-2-.5-5-8 1v-2l8-4z"/></g>
+    <text class="n" x="245" y="94" text-anchor="middle">Aurelia</text>
+    <text class="s" x="245" y="113" text-anchor="middle">S32 · CIVILIAN</text>
+  </g>
+  <g>
+    <rect x="340" width="150" height="132" rx="14" fill="url(#c)"/>
+    <rect x="340.5" y=".5" width="149" height="131" rx="13.5" fill="none" stroke="#e8fbff" stroke-opacity=".14"/>
+    <g transform="translate(415 44) scale(1.7) translate(-12 -12)" fill="#f6f4e9"><path d="M12 1l1.8 8 6.2 5v2l-6.2-2-.8 5 2 1.5v1.5L12 21l-3 1.5V21L11 19.5l-.8-5L4 16v-2l6.2-5z"/></g>
+    <text class="n" x="415" y="94" text-anchor="middle">Peregrine</text>
+    <text class="s" x="415" y="113" text-anchor="middle">HX-27 · JET</text>
+  </g>
+  <g>
+    <rect x="510" width="150" height="132" rx="14" fill="url(#c)"/>
+    <rect x="510.5" y=".5" width="149" height="131" rx="13.5" fill="none" stroke="#e8fbff" stroke-opacity=".14"/>
+    <g transform="translate(585 44) scale(1.7) translate(-12 -12)" fill="#f6f4e9"><path d="M12 1l1.4 7 8.6 7v2l-8.6-3-.9 5 2.5 2v1l-3-.7-3 .7v-1l2.5-2-.9-5-8.6 3v-2l8.6-7z"/></g>
+    <text class="n" x="585" y="94" text-anchor="middle">Stormbird</text>
+    <text class="s" x="585" y="113" text-anchor="middle">HX-40 · JET</text>
+  </g>
+  <g>
+    <rect x="680" width="150" height="132" rx="14" fill="url(#c)"/>
+    <rect x="680.5" y=".5" width="149" height="131" rx="13.5" fill="none" stroke="#e8fbff" stroke-opacity=".14"/>
+    <g transform="translate(755 44) scale(1.7) translate(-12 -12)" fill="#f6f4e9"><path d="M12 3l1.6 6 9.4 2v2l-9.4-.5-.6 6 3 1.5v1.5l-4-.8-4 .8v-1.5l3-1.5-.6-6L1 13v-2l9.4-2z"/></g>
+    <text class="n" x="755" y="94" text-anchor="middle">Heron</text>
+    <text class="s" x="755" y="113" text-anchor="middle">UT-9 · TURBOPROP</text>
+  </g>
+  <g>
+    <rect x="850" width="150" height="132" rx="14" fill="url(#c)"/>
+    <rect x="850.5" y=".5" width="149" height="131" rx="13.5" fill="none" stroke="#e8fbff" stroke-opacity=".14"/>
+    <g transform="translate(925 44) scale(1.7) translate(-12 -12)" fill="#f6f4e9"><path d="M12 1l1.3 7 8.7 5v2l-8.7-2-.5 4 2.2 2v1.5L12 21l-3 .5V20l2.2-2-.5-4L2 15v-2l8.7-5z"/></g>
+    <text class="n" x="925" y="94" text-anchor="middle">F-15C</text>
+    <text class="s" x="925" y="113" text-anchor="middle">FIGHTER</text>
+  </g>
+</svg>

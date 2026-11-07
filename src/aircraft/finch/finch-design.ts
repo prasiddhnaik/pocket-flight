@@ -1,6 +1,6 @@
 // Measured geometry and conceptual mass/propulsion. The station-integrated
 // runtime wing uses the shared design in aircraft-design.ts; see
-// docs/FLEET_DYNAMICS_VALIDATION.html for current provenance and validity.
+// docs/validation/FLEET_DYNAMICS_VALIDATION.html for current provenance and validity.
 export const finchDesign = {
   geometry: {
     span: 10.98,

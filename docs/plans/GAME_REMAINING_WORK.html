@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pocket Flight — remaining work</title>
+<style>
+body{max-width:950px;margin:40px auto;padding:0 22px;color:#20262b;background:#fafaf8;font:16px/1.6 system-ui,sans-serif}h1{line-height:1.2}h2{font-size:22px;margin-top:32px}table{border-collapse:collapse;width:100%;font-size:15px}td,th{padding:12px;border:1px solid #cbd0d2;text-align:left;vertical-align:top}th{background:#eef0ef}a{color:#155778}code{overflow-wrap:anywhere}.scroll{overflow-x:auto}.note{padding:12px 16px;border-left:3px solid #627483;background:#eef1f3}small{color:#53616b}
+</style>
+<main>
+<h1>What is left in Pocket Flight?</h1>
+<p>20 October 2026 · Current <code>pocket-flight-site</code> checkout · <code>codex/private-wind-tunnel</code></p>
+<p>The main game already exists: four aircraft, eight mission/free-flight entries, scenery, glass instruments, spoken warnings, music, replay and Scene Studio. All 411 current tests pass. The immediate priority is recording complete gameplay acceptance. Settings and the approved agent interface remain separate feature work; high-altitude and supersonic flight are later expansions.</p>
+<h2>Recommended order</h2>
+<div class="scroll"><table>
+<thead><tr><th>Priority</th><th>Work</th><th>Evidence and completion target</th></tr></thead>
+<tbody>
+<tr><td>Passed</td><td>Current automated checks</td><td id="regression-status">Today: 411 passed, zero failed, across 59 files, with 3,327,951 assertions in 99.17 seconds. The three failures recorded on 18 October do not reproduce in this run. Both builds and repository navigation also pass.</td></tr>
+<tr><td>1</td><td>Verify complete flights</td><td>Play full missions with all four aircraft; verify takeoff, route feasibility, landing, braking, damage and manual/automatic configuration. Existing calibration and seeded landing checks do not establish complete mission acceptance. <a href="../validation/ISLAND_PHYSICS_IMPLEMENTATION.html">Recorded physics scope</a>.</td></tr>
+<tr><td>2</td><td>Verify replay and Studio in use</td><td>Verify a new flight recording, older replay/project loading, editing, backup round trip and an encoded video export after the recent module moves. The Studio refactor recorded offline compatibility checks, with browser interaction and actual video output outside that pass. <a href="../studio/SCENE_STUDIO_REFACTOR.html">Studio evidence</a>.</td></tr>
+<tr><td>3</td><td>Measure and improve performance where needed</td><td>Record sustained flight and Studio performance on desktop and mobile. The saved physics snapshot was 40 FPS; it is historical and does not measure today's checkout or establish sustained 60 FPS. Both current builds still warn about large JavaScript chunks. Use current measurements before choosing optimizations.</td></tr>
+<tr><td>4</td><td>Finish the wider Settings redesign</td><td>The automatic gear/flap toggle and separate beginner assistance already exist. Remaining queued scope includes clearer grouping of preferences, desktop/mobile presentation, accessibility, control reset and consistent help/input behavior. <a href="pocket-flight-redo-backlog.html">Requested scope</a>.</td></tr>
+<tr><td>5</td><td>Implement the approved local agent-flight interface</td><td>Its design remains proposed. Implement structured commands and telemetry, stepped/live clocks, physical takeoff/waypoint/landing maneuvers, human takeover and the local bridge; record all-aircraft acceptance. Current source search found no proposed bridge or command registration. <a href="AGENT_FLIGHT_DESIGN.html">Interface design</a>.</td></tr>
+<tr><td>Later</td><td>High-altitude and supersonic expansion</td><td>Both are explicitly queued after a stable island flight core. Decide the flight envelopes, then extend atmosphere/propulsion/aerodynamics, boundaries, missions and validation. The existing 1,800 m ceiling still clamps position and upward velocity; this needs attention when expanding altitude. <a href="pocket-flight-redo-backlog.html">Expansion dependencies</a>.</td></tr>
+<tr><td>Release</td><td>Consolidate and publish the verified work</td><td>The checkout contains extensive uncommitted source relocation, aircraft, HUD and Studio work. Review and commit the intended changes together with their required assets before a release. Current public deployment was not checked in this audit.</td></tr>
+</tbody></table></div>
+<h2>Already implemented</h2>
+<ul>
+<li>Shared flight/contact/damage model and manual gear/flap commands.</li>
+<li>Four aircraft, eight mission/free-flight entries, coastal scenery and aircraft viewers.</li>
+<li>Glass HUD, Betty warnings and three soundtrack tracks.</li>
+<li>Replay recording, Scene Studio editing, project backups and video-export implementation.</li>
+<li>Feature-based source organization and Studio panel/edit-operation split.</li>
+<li>Recent aircraft attachment repairs: the saved fleet repair report records all 2,414 tested poses passing. Aurelia attachment evidence separately records zero failed poses. These saved checks were inspected, not rerun here.</li>
+</ul>
+<h2>Checks performed for this status</h2>
+<ul>
+<li>Repository navigation check passed: 296 code files and 748 local imports/entries.</li>
+<li>Main game/viewer TypeScript and production build passed.</li>
+<li>Private wind-tunnel TypeScript and production build passed.</li>
+<li id="test-status">Active suite passed: 411 tests, zero failures, 59 files, 3,327,951 assertions, 99.17 seconds. Command: <code>bun run test --timeout 30000</code>.</li>
+<li>Code graph updated and queried. Relocated untracked flight paths were not indexed, so current source, tests and reports supplied the relevant evidence.</li>
+</ul>
+<p class="note">This is a local status assessment. No browser gameplay, sustained performance run, current deployment comparison or asset regeneration was performed. Existing source and asset work was preserved. The only authored project change for this assessment is this report.</p>
+<p><small>Sources: current README, package scripts, app/settings source, flight physics and mission source, departure tests, physics implementation report, Studio refactor report, redo backlog, agent-flight design and saved aircraft attachment evidence.</small></p>
+</main>
+</html>

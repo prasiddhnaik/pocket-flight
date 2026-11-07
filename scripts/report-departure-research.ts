@@ -84,6 +84,6 @@ function draw(){const r=d.runs.find(r=>r.id===el('aircraft').value&&r.load===el(
 }
 for(const id of ['aircraft','load','mode','wind'])el(id).addEventListener('change',draw);draw();
 </script></body></html>`;
-await Bun.write(root + "docs/DEPARTURE_RESEARCH.html", html);
+await Bun.write(root + "docs/validation/DEPARTURE_RESEARCH.html", html);
 await Bun.write(root + "lab/public/departure-research.html", html);
-console.log("Saved docs/DEPARTURE_RESEARCH.html and local-only tester copy.");
+console.log("Saved docs/validation/DEPARTURE_RESEARCH.html and local-only tester copy.");

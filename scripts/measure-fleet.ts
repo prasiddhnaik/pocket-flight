@@ -6,7 +6,7 @@ import {
 } from "../lab/aircraft";
 import { loadGeometryOnly } from "./geometry-loader";
 import { measureFinch } from "./measure-finch";
-import stormbirdDesign from "../docs/stormbird-design.json";
+import stormbirdDesign from "../docs/aircraft/stormbird-design.json";
 
 async function measureAircraft(id: LabAircraftId) {
   const config = aircraftCatalog[id];

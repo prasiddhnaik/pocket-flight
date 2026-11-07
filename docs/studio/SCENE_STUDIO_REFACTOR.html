@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Scene Studio module split</title>
+    <style>
+      body {
+        max-width: 960px;
+        margin: 40px auto;
+        padding: 0 24px 60px;
+        font:
+          16px/1.6 system-ui,
+          sans-serif;
+        color: #20262b;
+        background: #fff;
+      }
+      h1 {
+        font-size: 2rem;
+        line-height: 1.2;
+      }
+      h2 {
+        font-size: 1.3rem;
+        margin-top: 32px;
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 8px;
+      }
+      a {
+        color: #176574;
+      }
+      code {
+        font-size: 0.9em;
+        overflow-wrap: anywhere;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 16px 0;
+      }
+      td,
+      th {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: left;
+        vertical-align: top;
+      }
+      th {
+        background: #f4f6f6;
+      }
+      li {
+        margin: 6px 0;
+      }
+      .note {
+        border-left: 3px solid #176574;
+        padding-left: 16px;
+      }
+      pre {
+        background: #f6f6f6;
+        padding: 16px;
+        overflow: auto;
+      }
+      @media (max-width: 600px) {
+        body {
+          margin: 20px auto;
+          padding: 0 16px 32px;
+        }
+        td,
+        th {
+          padding: 7px;
+          font-size: 0.85rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <p>Pocket Flight · 15 October 2026 · offline verification</p>
+      <h1>Scene Studio: separate editing operations and views.</h1>
+      <p>
+        The current <code>pocket-flight-site/</code> checkout on
+        <code>codex/private-wind-tunnel</code> now separates Studio's
+        project-editing operations and UI panels from its session coordinator.
+        Gameplay code, styles, project schemas, and browser storage contracts
+        were preserved.
+      </p>
+      <p>
+        <a href="../../README.md#scene-studio-internals">README navigation</a> ·
+        <a href="../REPOSITORY_NAVIGATION.html">Repository guide</a> ·
+        <a href="../../tests/studio-editing.test.ts">Editing regression tests</a>
+      </p>
+    </header>
+    <h2>What changed</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Module</th>
+          <th>Responsibility after the split</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <a href="../../src/studio/ReplayStudio.tsx">ReplayStudio.tsx</a
+            ><br />1,803 → 1,163 lines
+          </td>
+          <td>
+            Session state, command wiring, selection, undo/redo, save queuing,
+            preview lifecycle, playback, import coordination, and export. It
+            composes the views and commits the results of editing operations.
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <a href="../../src/studio/studio-editing.ts">studio-editing.ts</a
+            ><br />219 lines
+          </td>
+          <td>
+            Clip edits, splitting/reordering/duplication/removal, camera clock
+            conversion, camera/object anchor conversion, object duplication, and
+            spawn position. Inputs are project data; outputs are edited data.
+            New identities are generated for duplicates and split clips. The
+            module does not render, persist, or control playback.
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <a href="../../src/studio/panels/">panels/</a><br />14 files; largest
+            234 lines
+          </td>
+          <td>
+            Asset browser, outliner, object/camera/project/clip inspectors,
+            saved flights and projects, timeline, transport, scene tools, and
+            export status. <code>fields.tsx</code> contains shared
+            numeric/vector controls and the existing close icon. The old
+            887-line <code>StudioScenePanels.tsx</code> has been replaced by
+            direct imports of these modules.
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <a href="../../src/studio/studio-format.ts">studio-format.ts</a><br />9
+            lines
+          </td>
+          <td>
+            The existing time, filename, and error-message formatting used by
+            the extracted views.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <p>
+      This is an incremental split. Playback/export lifecycle and persistence
+      remain together in the coordinator. Moving those would require a separate
+      lifecycle-focused change; they were not rewritten merely to reduce the
+      file's line count.
+    </p>
+    <h2>Compatibility evidence</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Check</th>
+          <th>Observed result</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Existing coordinator logic</td>
+          <td>
+            AST comparison confirms all 25 retained functions and all five
+            lifecycle effects are unchanged, including commit/history, save
+            serialization, preview setup/cleanup, playback, export
+            preparation/cancellation, and visibility handling.
+          </td>
+        </tr>
+        <tr>
+          <td>UI structure</td>
+          <td>
+            50 server-rendered HTML comparisons match the pre-refactor UI
+            exactly. Cases include empty/populated editor states,
+            enabled/disabled library and inspector controls, scene mode,
+            timeline history controls, and
+            idle/preparing/recording/finishing/ready/error export views.
+          </td>
+        </tr>
+        <tr>
+          <td>Styling</td>
+          <td>
+            <code>studio.css</code> is byte-for-byte unchanged. Extracted views
+            retain the original DOM structure, classes, labels, and control
+            attributes in the compared cases.
+          </td>
+        </tr>
+        <tr>
+          <td>Existing saved project</td>
+          <td>
+            The older “Island reel” backup loads with two clips and three
+            assets. Its 497,680-character portable round trip remains identical
+            to the pre-refactor baseline.
+          </td>
+        </tr>
+        <tr>
+          <td>Data and gameplay scope</td>
+          <td>
+            77 runtime files outside the two split modules still match the
+            navigation-pass baseline. This includes flight/aircraft code and the
+            existing project, scene, asset, preview, and storage modules
+            represented in that baseline.
+          </td>
+        </tr>
+        <tr>
+          <td>Focused tests</td>
+          <td>
+            34 passed, 0 failed, 133 assertions across Studio editing,
+            project/storage, scene/assets, and replay tests. Nine new tests
+            cover the extracted editing operations and persistence of edited
+            projects.
+          </td>
+        </tr>
+        <tr>
+          <td>Full active suite</td>
+          <td>
+            314 passed, 3 failed across 46 files. The nine added tests pass; the
+            existing three failure names match the previous full-suite baseline.
+          </td>
+        </tr>
+        <tr>
+          <td>Builds</td>
+          <td>
+            Main game/viewer and private lab production builds pass. Existing
+            large-chunk warnings remain.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <p>The three pre-existing failures remain:</p>
+    <ul>
+      <li>
+        <code
+          >exported Blender gear retracts into the hull and returns to its
+          original pose</code
+        >
+      </li>
+      <li>
+        <code
+          >peregrine: Palm Bay departure clears the entire climb-out at dispatch
+          weight</code
+        >
+      </li>
+      <li>
+        <code
+          >stormbird: Palm Bay departure clears the entire climb-out at dispatch
+          weight</code
+        >
+      </li>
+    </ul>
+    <p class="note">
+      All verification in this pass was offline. Server-rendered HTML checks
+      establish markup parity, not dynamic browser behavior, GPU rendering,
+      audio output, or an encoded video export. No game preview or browser
+      session was opened for this pass.
+    </p>
+    <h2>How to work on Studio next</h2>
+    <ul>
+      <li>
+        For a panel's presentation or input controls, begin in
+        <code>panels/</code>. Keep project commits and asynchronous lifecycle
+        coordination in the parent.
+      </li>
+      <li>
+        For clip/object transformations, use <code>studio-editing.ts</code> and
+        its tests. Preserve source time versus film time and avoid mutating the
+        input project.
+      </li>
+      <li>
+        For schemas or portable backups, inspect <code>studio-model.ts</code>,
+        <code>studio-scene.ts</code>, <code>studio-assets.ts</code>, and
+        <code>replay/replay-library.ts</code>. Their formats were unchanged in
+        this pass.
+      </li>
+      <li>
+        For playback, export, cancellation, or save-queue changes, trace the
+        coordinator's effects and refs before extracting another module.
+      </li>
+    </ul>
+    <pre><code>bun run repo:check
+bun test ./tests/studio-editing.test.ts ./tests/studio.test.ts ./tests/studio-scene.test.ts ./tests/replay.test.ts
+bun run test --timeout 30000
+bun run build
+bun run lab:build</code></pre>
+    <p>
+      Before/after editor copies, HTML comparison scripts, lifecycle comparison,
+      and logs are saved locally under <code>output/studio-refactor/</code>. The
+      graph was refreshed, but its current indexing does not return nodes for
+      the untracked relocated Studio paths; direct source/AST inspection and
+      import checks supplied the structural verification.
+    </p>
+  </body>
+</html>

@@ -38,7 +38,7 @@ The game requires a browser with WebGL. Runtime assets are already under `public
 
 These are separate Vite entry pages. Their URLs are independent of the internal source folder names.
 
-The Aurelia reference cockpit accepts typed flight and map snapshots. See [Avionics data contract](docs/AURELIA_AVIONICS.html) for units, the telemetry adapter, map coordinates and display lifecycle. The reference viewer uses an explicitly labelled demonstration source.
+The Aurelia reference cockpit accepts typed flight and map snapshots. See [Avionics data contract](docs/aircraft/AURELIA_AVIONICS.html) for units, the telemetry adapter, map coordinates and display lifecycle. The reference viewer uses an explicitly labelled demonstration source.
 
 ### Flight controls
 
@@ -148,7 +148,7 @@ Offline report fingerprints include the per-aircraft definition files through `s
 - [`studio/studio-placement.ts`](src/studio/studio-placement.ts) measures scene objects and computes the Object inspector's placement commands.
 - `studio-model.ts`, `studio-scene.ts`, and `studio-assets.ts` retain the project, scene, and backup contracts; `replay-preview.ts` owns the Three.js preview.
 
-For an editor change, run `bun test ./tests/studio-editing.test.ts ./tests/studio.test.ts ./tests/studio-scene.test.ts ./tests/replay.test.ts`. See the [Studio split and offline verification](docs/SCENE_STUDIO_REFACTOR.html) for scope and compatibility evidence.
+For an editor change, run `bun test ./tests/studio-editing.test.ts ./tests/studio.test.ts ./tests/studio-scene.test.ts ./tests/replay.test.ts`. See the [Studio split and offline verification](docs/studio/SCENE_STUDIO_REFACTOR.html) for scope and compatibility evidence.
 
 <img src="docs/readme/divider-development-checks.svg" alt="" width="100%">
 
@@ -223,11 +223,11 @@ Ignored `assets/` and `output/` content can include editable masters, worktrees,
 ## Further reading
 
 - [Repository navigation and relocation map](docs/REPOSITORY_NAVIGATION.html) — folder ownership, old-to-new paths, and validation of the navigation pass.
-- [Aircraft design principles](docs/PRINCIPLES_OF_MAKING_PLANES.md) — design references and acceptance criteria.
-- [Aircraft mechanisms](docs/AIRCRAFT_MECHANISMS.html) — mechanism behavior and inspection.
-- [Fuel and mass calibration](docs/FUEL_MASS_CALIBRATION.html) — data sources and modelling limits.
-- [Studio guide](docs/SCENE_STUDIO.html) — editing workflow.
-- [Wind-tunnel chamber](docs/WIND_TUNNEL_CHAMBER.html) — lab design and scope.
+- [Aircraft design principles](docs/aircraft/PRINCIPLES_OF_MAKING_PLANES.md) — design references and acceptance criteria.
+- [Aircraft mechanisms](docs/aircraft/AIRCRAFT_MECHANISMS.html) — mechanism behavior and inspection.
+- [Fuel and mass calibration](docs/validation/FUEL_MASS_CALIBRATION.html) — data sources and modelling limits.
+- [Studio guide](docs/studio/SCENE_STUDIO.html) — editing workflow.
+- [Wind-tunnel chamber](docs/wind-tunnel/WIND_TUNNEL_CHAMBER.html) — lab design and scope.
 
 Recorded reports describe their own verification date and scope. Use the current source and tests to establish today's behavior.
 

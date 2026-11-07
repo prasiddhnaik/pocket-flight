@@ -110,6 +110,6 @@ export async function measureFinch() {
 
 if (import.meta.main) {
   const json = JSON.stringify(await measureFinch(), null, 2);
-  if (Bun.argv.includes("--save")) await Bun.write(new URL("../docs/finch-geometry.json", import.meta.url), `${json}\n`);
+  if (Bun.argv.includes("--save")) await Bun.write(new URL("../docs/aircraft/finch-geometry.json", import.meta.url), `${json}\n`);
   else console.log(json);
 }

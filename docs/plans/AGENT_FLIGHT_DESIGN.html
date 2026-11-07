@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pocket Flight — agent flight interface design</title>
+<style>
+body{max-width:1000px;margin:40px auto;padding:0 22px;font:16px/1.6 system-ui,sans-serif;color:#20252b;background:#fff}
+h1,h2,h3{line-height:1.25}h2{margin-top:34px}table{border-collapse:collapse;width:100%}th,td{padding:10px;border:1px solid #ddd;text-align:left;vertical-align:top}th{background:#f4f4f4}code,pre{background:#f3f3f3}pre{padding:16px;overflow:auto}a{color:#245c86}.status{padding:12px 16px;border-left:4px solid #617b6b;background:#f5f7f5}.flow{padding:14px 0;font-weight:600}.small{font-size:14px;color:#505963}
+</style>
+</head>
+<body>
+<h1>Agent flight interface</h1>
+<p>13 October 2026 · Pocket Flight · Design for review</p>
+<p class="status">Agreed scope: stepped simulation by default, optional continuous live flight, precise commands plus physical pilot maneuvers, local development only. This document describes proposed behavior; the interface has not been implemented.</p>
+
+<h2>1. Intended outcome</h2>
+<p>An AI agent can select any of the four aircraft, start an island flight, send commands, advance simulation, observe the result, and perform takeoff, waypoint flight and landing through a supported programmatic interface. It does not need to synthesize keyboard events, manipulate touch controls, or inspect pixels to obtain basic flight state.</p>
+<p>Human inputs and agent commands feed the same physics, contact, damage and mission updates. A pilot maneuver changes throttle and control-surface commands on each simulation tick. Its success depends on the resulting aircraft motion.</p>
+<div class="flow">Player input / agent command / pilot controller → shared flight update → aircraft motion, collision, mission events, replay and telemetry</div>
+<p>First-release flight limits remain subsonic around the island with the current 1,800 m ceiling. Detached debris remains visual. The public version 21 release, broad Settings redesign, high-altitude flight and supersonic flight are outside this local change.</p>
+
+<h2>2. Connection options and recommendation</h2>
+<table>
+<thead><tr><th>Approach</th><th>Strength</th><th>Cost or limit</th></tr></thead>
+<tbody>
+<tr><td><strong>Recommended: shared TypeScript API, browser tools, and a local development bridge</strong></td><td>Operates the rendered game, keeps telemetry and visuals together, and gives browser and terminal agents access to the same commands.</td><td>Requires a small Vite development bridge and client lifecycle handling. Native browser tool support is feature-detected.</td></tr>
+<tr><td>Standalone MCP server running the simulation</td><td>Works for clients that speak MCP without needing a browser.</td><td>Requires separate rendered-session attachment or a headless world runner, adding work to maintain the same scenery collision data.</td></tr>
+<tr><td>Direct JavaScript API only</td><td>Smallest adapter and useful for local scripts.</td><td>Every agent host needs its own attachment method; tool discovery and transport are less convenient.</td></tr>
+</tbody>
+</table>
+<p>The recommended core API can support a standalone MCP server later. The first version includes browser WebMCP tools and a loopback development bridge, which is usable with a small Bun client without browser-specific scripting.</p>
+
+<h2>3. Agent session and control ownership</h2>
+<ul>
+<li>An agent session identifies one game instance, its aircraft, simulation clock, configuration and active maneuver. Only one controller owns that aircraft at a time.</li>
+<li>Starting a session awaits the aircraft and world assets, then uses a declared runway-departure or trimmed airborne start. Reset is an explicit operation.</li>
+<li>The screen shows that an agent is flying, its active maneuver, and a Take control action. A human takeover cancels the active agent operation, clears its commands and hands back the existing physical aircraft state.</li>
+<li>Agent runs are tagged in recordings and results. They do not earn human medals or write entries into the player's flight log. Player assistance and configuration preferences are restored on handback rather than overwritten persistently.</li>
+<li>Pause, restart, leaving the flight, closing the page, and disposal terminate or suspend operations consistently. A stale session identifier cannot command a replacement aircraft.</li>
+<li>Mutating commands are serialized. A low-level command cancels the active maneuver and reports that cancellation.</li>
+</ul>
+
+<h2>4. Simulation clock</h2>
+<h3>Stepped mode — default</h3>
+<p>The aircraft advances only when an agent requests a step. A request applies precise commands or the active pilot maneuver for a bounded amount of simulation time. Physics uses its existing 120 Hz substeps inside the common 60 Hz game update. Mission logic, events, replay, control surfaces and simulated aircraft animations advance through that same update.</p>
+<p>Each request is rounded to whole 60 Hz game-update ticks, is limited to five simulated seconds, and returns the actual time advanced. Each game-update tick includes the existing 120 Hz physics substeps. Work is chunked so cancellation and human takeover can interrupt it. Rendering and UI remain responsive between steps. A crash or completed flight can end a request early.</p>
+<h3>Live mode — optional</h3>
+<p>The same command source or pilot controller advances with the normal game clock. Precise command holds have an explicit duration; when their duration ends, live flight pauses and reports expiration. A maneuver has a simulation-time deadline and explicit running, completed, failed or cancelled status. Normal page visibility and pause behavior still apply.</p>
+<p>Switching clocks resets render accumulator timing so elapsed wall time cannot become an unexpected physics jump. Agent thinking time has no effect on stepped flight time.</p>
+
+<h2>5. Public command contract within local development</h2>
+<p>The following names describe the proposed versioned contract. Results are JSON-serializable, include the session ID and simulation tick, and acknowledge the actual effect. Read operations do not advance time.</p>
+<table>
+<thead><tr><th>Operation</th><th>Inputs and effect</th><th>Result</th></tr></thead>
+<tbody>
+<tr><td><code>get_flight_capabilities</code></td><td>Read aircraft, runway and scenario IDs; supported commands; clock limits and units.</td><td>Catalog, declared aircraft envelope and interface version.</td></tr>
+<tr><td><code>start_agent_flight</code></td><td>Select aircraft, scenario, clock, assistance, loading and wind preset. Initialize a named agent session after assets are ready.</td><td>Session ID, initial observation and effective configuration.</td></tr>
+<tr><td><code>read_agent_flight</code></td><td>Read the current session.</td><td>Telemetry, world context, command targets and maneuver status.</td></tr>
+<tr><td><code>advance_agent_flight</code></td><td>Advance up to five simulated seconds in stepped mode using precise commands or the active maneuver.</td><td>Final observation, events collected across every update, actual duration and termination reason.</td></tr>
+<tr><td><code>set_agent_commands</code></td><td>Set throttle, pitch, roll, rudder and brakes; in live mode include the command hold duration.</td><td>Accepted commands and the effect on any active maneuver.</td></tr>
+<tr><td><code>set_aircraft_configuration</code></td><td>Command gear, flap preset and trim through normal actuator targets.</td><td>Accepted targets, current positions and any rejected aircraft-specific actions.</td></tr>
+<tr><td><code>start_flight_maneuver</code></td><td>Start takeoff, fly-to, hold or landing with validated targets and an explicit deadline.</td><td>Maneuver ID and running phase; acceptance does not claim completion.</td></tr>
+<tr><td><code>cancel_flight_maneuver</code></td><td>Cancel the active maneuver and pause live agent flight.</td><td>Cancellation reason and final observation.</td></tr>
+<tr><td><code>set_agent_clock</code></td><td>Change between stepped and live mode.</td><td>Effective clock and pending-operation status.</td></tr>
+<tr><td><code>reset_agent_flight</code></td><td>Explicitly reset the agent session to a named start scenario.</td><td>New run identity and initial observation.</td></tr>
+<tr><td><code>release_agent_control</code></td><td>Cancel agent operations and hand control back to the player, initially paused.</td><td>Handback state with commands cleared.</td></tr>
+</tbody>
+</table>
+<p>Throttle is an absolute target from 0 to 1; pitch, roll and rudder commands are normalized from -1 to 1; trim is from -1 to 1; brakes are boolean. The adapter translates these into the physical command path. Gear is up/down and flaps use the aircraft's supported presets. Finch's fixed gear and absent movable flaps are reported explicitly. Ground gear retraction remains blocked.</p>
+<p>Missing attitude commands default to neutral in a new precise command request. Throttle and configuration targets persist until replaced. Non-finite values, invalid IDs, unknown fields, unsupported actions and expired session IDs return structured errors.</p>
+
+<h2>6. Physical pilot maneuvers</h2>
+<p>The pilot controller consumes aircraft telemetry and world geometry, calculates desired flight behavior, and outputs bounded physical commands on every simulation update. It uses aircraft-specific stall speed, trim, rotation guidance, loaded mass, actuator state and propulsion response. It does not write an aircraft's pose or velocity during a maneuver.</p>
+<table>
+<thead><tr><th>Maneuver</th><th>Phases</th><th>Completion and failure</th></tr></thead>
+<tbody>
+<tr><td>Takeoff</td><td>Runway alignment, acceleration, rotation and climb-out.</td><td>Complete after supported liftoff and a stable climb with clearance and airspeed margins. Report crash, timeout, insufficient available runway or inability to climb as failure.</td></tr>
+<tr><td>Fly to waypoint</td><td>Plan a feasible island route, track heading/altitude/airspeed, then capture the target.</td><td>Complete within declared position and altitude tolerances. Reject targets outside the island envelope and report blocked or unreachable routes.</td></tr>
+<tr><td>Hold</td><td>Maintain a declared heading, altitude and airspeed.</td><td>Continue until cancelled or the requested simulation duration ends; expose tracking errors and envelope limits.</td></tr>
+<tr><td>Land</td><td>Choose runway direction, approach setup, alignment, descent, flare, touchdown and braking.</td><td>Complete only after wheel-supported touchdown on the requested runway and ground speed below 1 m/s. An unstable approach attempts a physical go-around if feasible; otherwise it reports failure and pauses.</td></tr>
+</tbody>
+</table>
+<p>Landing and route feasibility use the current aircraft's envelope and world terrain/scenery, with conservative clearance. A maneuver is allowed to report failure rather than claim an impossible goal was completed. Initial calibration order remains Aurelia, Finch, Peregrine, then Stormbird.</p>
+<p>Assistance mode is explicit in telemetry. The pilot controller and precise commands must both work through the selected physical command interpretation; using beginner assistance is disclosed and does not change the underlying force/contact engine.</p>
+
+<h2>7. Observations and world context</h2>
+<ul>
+<li>Aircraft ID, interface/physics version, session/run IDs, simulation tick, simulation time, clock and control owner.</li>
+<li>World position and velocity, quaternion, body angular rates, heading, pitch, roll, airspeed, ground speed, vertical speed and altitude above ground.</li>
+<li>Angle of attack, sideslip, Mach, stall flag, current stall speed, wind vector, fuel, loaded mass and balance information.</li>
+<li>Throttle target and engine power; actual control-surface, gear and flap positions; trim; wheel contact loads and ground state.</li>
+<li>Health, component damage, detached wing flags, engine-out state and crash/flight result.</li>
+<li>Maneuver phase, target, tracking errors, time remaining, completion/failure reason and events across the requested step.</li>
+<li>Runway positions, elevation, orientation, width and length; local terrain/obstacle queries needed for route and landing decisions.</li>
+</ul>
+<p>Use metres, metres per second and seconds. Expose headings and attitude angles in degrees with explicitly documented axes: world X points east, Y is altitude, and positive Z points south; heading 0° is north and 90° is east. Body angular rates retain radians per second and are labeled. Observations report commanded and actual actuator states separately.</p>
+
+<h2>8. Local access and lifecycle</h2>
+<p>Expose the typed API only in Vite development. Register equivalent browser tools through feature-detected <code>document.modelContext.registerTool</code>, and unregister them using an AbortSignal during disposal. The production build does not register agent tools, expose the agent API or include the agent-control UI.</p>
+<p>A Vite development plugin provides a loopback-only command bridge at <code>/__flight_agent</code>. It discovers connected local game sessions and forwards a command to one selected session using Vite's development WebSocket. Replies are correlated by request ID, bounded by a timeout and cancelled when a session disconnects. The bridge rejects non-loopback peers and unrelated browser origins.</p>
+<p>A Bun client calls that bridge to let a terminal agent discover sessions, start flight, request maneuvers, advance, read state and stop. This is an application command transport, so no keyboard or touch event synthesis is needed. WebMCP and the Bun client invoke the same validated API methods.</p>
+<p>Feature detection reports native browser-tool availability. Unsupported browsers still retain the typed local API and loopback bridge. Disconnects, cancellation and component cleanup clear pending requests and invalidate session ownership.</p>
+
+<h2>9. Integration boundaries</h2>
+<table>
+<thead><tr><th>Existing source</th><th>Proposed change</th></tr></thead>
+<tbody>
+<tr><td><code>src/flight/game.ts</code></td><td>Extract the shared fixed update from requestAnimationFrame, choose human/agent/controller inputs, add stepped clock execution and collect per-step events.</td></tr>
+<tr><td><code>src/flight/physics.ts</code></td><td>Add explicit validated actuator-target commands while retaining existing keyboard helpers and physical limits.</td></tr>
+<tr><td><code>src/flight/flight-trim.ts</code>, <code>src/aircraft/aircraft-design.ts</code>, <code>src/world/terrain.ts</code>, <code>src/world/world.ts</code></td><td>Reuse existing trim, aircraft envelope, runway and collision data for maneuver control and observations.</td></tr>
+<tr><td><code>src/app/App.tsx</code>, <code>src/replay/replay-data.ts</code></td><td>Local agent ownership/status, human takeover, explicit provenance and protection of player log/preferences.</td></tr>
+<tr><td>New agent API, pilot controller and development adapters</td><td>Keep validation/session management, flight-control policy, WebMCP registration and transport separate modules.</td></tr>
+<tr><td><code>vite.config.ts</code>, <code>scripts/</code>, <code>package.json</code></td><td>Development-only bridge and a repeatable Bun command workflow. No new hosted backend is required.</td></tr>
+</tbody>
+</table>
+<p>Current source facts were checked against commit <code>5e66d0ab0d0d1a8e8c08ddf8c4af5a085995afd4</code> and the refreshed code graph. The current keyboard/touch adapter feeds the game loop; the <code>window.pocketFlight</code> development hook exposes internal state but is not a stable agent command contract.</p>
+
+<h2>10. Acceptance evidence to record during execution</h2>
+<ol>
+<li>Build the local game and private lab without changing the public publication.</li>
+<li>Use structured commands to operate all four aircraft in alphabetical order. Record actual takeoff, waypoint and landing phase outcomes and telemetry, including any failures.</li>
+<li>Demonstrate stepped thinking time does not move the aircraft; compare equal fixed-tick command sequences for repeatability.</li>
+<li>Demonstrate the same controller in optional live mode, with command expiry, pause, cancellation and human takeover.</li>
+<li>Confirm HUD, cockpit displays, mission events and replay agree with the commanded flight, and that agent runs do not add human rewards or alter persisted controls preferences.</li>
+<li>Confirm development bridge and browser tools are absent from a production build.</li>
+</ol>
+<p>No tests have been added or run for this proposed interface. These are acceptance criteria, not claims of completed verification.</p>
+
+<h2>11. References</h2>
+<ul>
+<li><a href="https://webmachinelearning.github.io/webmcp/">WebMCP specification</a> — structured JavaScript tools exposed by a page.</li>
+<li><a href="https://developer.chrome.com/docs/ai/webmcp/imperative-api">Official imperative WebMCP API</a> — tool registration, cancellation and lifecycle.</li>
+<li><a href="https://gymnasium.farama.org/api/env/">Gymnasium environment API</a> — a reference for the action → step → observation/reset pattern; no Gymnasium dependency is proposed.</li>
+<li><a href="../validation/ISLAND_PHYSICS_IMPLEMENTATION.html">Current island physics implementation and recorded limits</a>.</li>
+</ul>
+</body>
+</html>

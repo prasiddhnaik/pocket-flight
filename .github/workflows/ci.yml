@@ -1,0 +1,95 @@
+# Every pull request to main must pass these checks before it can merge; main only accepts such merges,
+# and Vercel publishes main. No secrets: forks' pull requests run the same checks read-only.
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  BUN_VERSION: 1.3.14
+
+jobs:
+  build:
+    name: Build (clean checkout, Vercel's commands)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 1 }
+      - uses: oven-sh/setup-bun@v2
+        with: { bun-version: "${{ env.BUN_VERSION }}" }
+      - uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+      - run: bun install --frozen-lockfile
+      - run: bun run repo:check
+      - run: bun run build
+      - uses: actions/upload-artifact@v4
+        with: { name: dist, path: dist, retention-days: 3 }
+
+  tests:
+    name: Tests (physics and the rest)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 1 }
+      - uses: oven-sh/setup-bun@v2
+        with: { bun-version: "${{ env.BUN_VERSION }}" }
+      - uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+      - run: bun install --frozen-lockfile
+      - run: bun test ./tests
+
+  fit:
+    name: Pilot fit
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 1 }
+      - uses: oven-sh/setup-bun@v2
+        with: { bun-version: "${{ env.BUN_VERSION }}" }
+      - uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+      - run: bun install --frozen-lockfile
+      - run: bun run fit all
+
+  e2e:
+    name: Startup and flight
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - run: echo "Startup and flight check arrives in the next commit."
+
+  ci-passed:
+    name: CI passed
+    needs: [build, tests, fit, e2e]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Every check succeeded
+        env:
+          BUILD: ${{ needs.build.result }}
+          TESTS: ${{ needs.tests.result }}
+          FIT: ${{ needs.fit.result }}
+          E2E: ${{ needs.e2e.result }}
+        run: |
+          echo "build=$BUILD tests=$TESTS fit=$FIT e2e=$E2E"
+          for result in "$BUILD" "$TESTS" "$FIT" "$E2E"; do test "$result" = success; done

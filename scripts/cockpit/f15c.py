@@ -75,6 +75,13 @@ ANNUNCIATORS = [
     ["BLEED", "AIR"], ["ECS", "HOT"], ["HYD", "LOW"], ["FUEL", "LOW"], ["CADC", "FAIL"], ["PITCH", "RATIO"],
 ]
 
+def moved(entry, dy):
+    """A plate with its legends and controls slid along its surface."""
+    return dict(entry, y0=entry["y0"] + dy, y1=entry["y1"] + dy, legends=[dict(l, y=l["y"] + dy) for l in entry["legends"]], controls=[dict(c, y=c["y"] + dy) for c in entry["controls"]])
+
+
+# The throttle block sits aft of the fuel panel, within the seated pilot's reach.
+THROTTLE_SHIFT = -0.21
 PLATES = [
     # ---- Main panel, top band ----
     plate("fire", "main", -0.405, 0.13, -0.335, 0.3, legends=[L("FIRE", -0.37, 0.289, 0.0062), L("L", -0.388, 0.238), L("R", -0.352, 0.238), L("AMAD", -0.37, 0.2, 0.005), L("TEST", -0.37, 0.14, 0.0046)],
@@ -132,6 +139,7 @@ PLATES = [
     plate("lights", "right", 0.21, -0.62, 0.44, -0.36, title="LIGHTS", legends=[L("POSITION", 0.255, -0.415, 0.0047), L("FORM", 0.325, -0.415, 0.0047), L("ANTI-COLL", 0.4, -0.415, 0.0042), L("INST", 0.255, -0.505, 0.0047), L("CONSOLE", 0.325, -0.505, 0.0045), L("FLOOD", 0.4, -0.505, 0.0047), L("LDG TAXI", 0.3, -0.59, 0.0047), L("TEST", 0.4, -0.59, 0.0047)],
           controls=[toggle(0.255, -0.44), knob(0.325, -0.445, r=0.009), toggle(0.4, -0.44), knob(0.255, -0.532, r=0.0095), knob(0.325, -0.532, r=0.0095), knob(0.4, -0.532, r=0.0095), toggle(0.3, -0.566), button(0.4, -0.566, face="LAMP", w=0.03, h=0.015)]),
 ]
+PLATES = [moved(p, {"throttle": THROTTLE_SHIFT, "engine": THROTTLE_SHIFT, "trim": THROTTLE_SHIFT, "fuel_control": 0.45}.get(p["id"], 0.0)) if p["surface"] == "left" else p for p in PLATES]
 
 
 SILL = 0.385
@@ -173,12 +181,14 @@ def build(k):
     k.map_case(0.45, 4.45, 0.27)
     k.breaker_panel(0.45, 5.05, 0.285)
     k.floor(-0.245, 3.96, 5.3, 0.207)
-    k.knee_well(-0.245, 0.05, 5.34, 0.45, 0.118, 5.235, -0.05)
+    k.knee_well(-0.245, 0.05, 5.34, 0.45, 0.065, 5.235, -0.05)
     k.pedals(0.165, 5.16, -0.245)
     k.stick(4.84, -0.245)
-    k.throttle("left", -0.405, -0.365, 0.2, 0.55, 0.34, 0.292)
+    k.throttle("left", -0.405, -0.365, 0.2 + THROTTLE_SHIFT, 0.55 + THROTTLE_SHIFT, 0.34 + THROTTLE_SHIFT, 0.292 + THROTTLE_SHIFT)
     side = SILL + 0.005
     k.hood([(5.37, 0.452, 0.644, side), (5.4, 0.455, 0.66, side), (5.47, 0.458, 0.668, side), (5.72, 0.46, 0.68, side), (6.0, 0.435, 0.64, SILL + 0.012), (6.3, 0.39, 0.58, SILL + 0.03), (6.6, 0.32, 0.5, SILL + 0.05)], [(5.43, 0.448, 0.61, SILL), (5.38, 0.448, 0.624, SILL), (5.36, 0.451, 0.634, SILL + 0.002), (5.37, 0.452, 0.644, side)], stud_y=5.46)
     k.hud_unit()
     k.canopy_trim(GLASS, 5.69, [5.68, 2.84])
-    k.seat()
+    # Forward under the eye, so the seated pilot's back and hips rest on the cushions; the pan stops short of the stick.
+    with k.placed((0.0, 0.375, 0.0)):
+        k.seat(top=0.123, front=4.29)

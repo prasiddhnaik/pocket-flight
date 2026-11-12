@@ -1,14 +1,15 @@
+@import "../app/theme.css";
 @import url("https://fonts.googleapis.com/css2?family=Oxanium:wght@400;500;600;700;800&display=swap");
 
 .holo-hud {
-  --hud-cyan: #5ff0ff;
-  --hud-cyan-soft: #8feaff;
-  --hud-text: #e8fbff;
+  --hud-cyan: #8CA5FF;
+  --hud-cyan-soft: #C1CEFF;
+  --hud-text: #F2F5FF;
   --hud-green: #4dffa6;
   --hud-amber: #ffd34d;
   --hud-red: #ff4d63;
-  --hud-glass: rgba(6, 18, 28, 0.55);
-  --hud-rim: rgba(120, 230, 255, 0.42);
+  --hud-glass: rgba(7, 14, 37, 0.55);
+  --hud-rim: rgba(155, 178, 255, 0.42);
   --dial-lg: clamp(150px, 15.5vw, 228px);
   --dial-sm: clamp(78px, 7.4vw, 106px);
   --compass: clamp(112px, 11vw, 156px);
@@ -34,7 +35,7 @@
   border-radius: 10px;
   backdrop-filter: blur(10px) saturate(1.25);
   -webkit-backdrop-filter: blur(10px) saturate(1.25);
-  box-shadow: inset 0 1px 0 rgba(200, 250, 255, 0.18), inset 0 0 18px rgba(95, 240, 255, 0.06), 0 8px 24px rgba(0, 10, 20, 0.25);
+  box-shadow: inset 0 1px 0 rgba(218, 228, 255, 0.18), inset 0 0 18px rgba(112, 143, 255, 0.06), 0 8px 24px rgba(7, 14, 37, 0.25);
 }
 .holo-hud .hud-label {
   font-size: 10px;
@@ -46,7 +47,7 @@
 .holo-hud .hud-value {
   font-size: 13px;
   font-weight: 600;
-  text-shadow: 0 0 8px rgba(95, 240, 255, 0.45);
+  text-shadow: 0 0 8px rgba(112, 143, 255, 0.45);
 }
 
 /* Dials */
@@ -65,10 +66,10 @@
   position: absolute;
   inset: 2%;
   border-radius: 50%;
-  background: radial-gradient(circle at 50% 28%, rgba(34, 78, 98, 0.5), rgba(4, 12, 20, 0.74) 72%);
+  background: radial-gradient(circle at 50% 28%, rgba(32, 53, 107, 0.5), rgba(7, 14, 37, 0.74) 72%);
   backdrop-filter: blur(8px) saturate(1.2);
   -webkit-backdrop-filter: blur(8px) saturate(1.2);
-  box-shadow: inset 0 2px 0 rgba(200, 250, 255, 0.22), inset 0 -8px 20px rgba(0, 0, 0, 0.38), 0 10px 30px rgba(0, 10, 20, 0.32);
+  box-shadow: inset 0 2px 0 rgba(218, 228, 255, 0.22), inset 0 -8px 20px rgba(0, 0, 0, 0.38), 0 10px 30px rgba(7, 14, 37, 0.32);
 }
 .holo-hud .hud-dial svg,
 .holo-hud .hud-compass svg {
@@ -79,7 +80,7 @@
   overflow: visible;
 }
 .holo-hud .hud-rim { fill: none; stroke: var(--hud-rim); stroke-width: 1.8; }
-.holo-hud .hud-rim-inner { fill: none; stroke: rgba(120, 230, 255, 0.12); stroke-width: 1; }
+.holo-hud .hud-rim-inner { fill: none; stroke: rgba(155, 178, 255, 0.12); stroke-width: 1; }
 .holo-hud .hud-tick { stroke: var(--hud-cyan-soft); stroke-width: 1.1; opacity: 0.45; }
 .holo-hud .hud-tick.mid { stroke-width: 1.5; opacity: 0.7; }
 .holo-hud .hud-tick.major { stroke-width: 2.6; opacity: 1; stroke: var(--hud-text); }
@@ -100,11 +101,11 @@
 .holo-hud .hud-band-green.lit { opacity: 1; filter: drop-shadow(0 0 4px rgba(77, 255, 166, 0.9)); }
 .holo-hud .hud-band-amber.lit { opacity: 1; filter: drop-shadow(0 0 4px rgba(255, 211, 77, 0.9)); }
 .holo-hud .hud-redline { stroke: var(--hud-red); stroke-width: 4; stroke-linecap: round; }
-.holo-hud .hud-needle path { fill: var(--hud-cyan); filter: drop-shadow(0 0 3px rgba(95, 240, 255, 0.95)); }
-.holo-hud .hud-hub { fill: #0b2230; stroke: var(--hud-cyan); stroke-width: 2; }
+.holo-hud .hud-needle path { fill: var(--hud-cyan); filter: drop-shadow(0 0 3px rgba(112, 143, 255, 0.95)); }
+.holo-hud .hud-hub { fill: #0B1543; stroke: var(--hud-cyan); stroke-width: 2; }
 .holo-hud .hud-hub-cap { fill: var(--hud-cyan); }
-.holo-hud .hud-lubber { fill: var(--hud-cyan); filter: drop-shadow(0 0 3px rgba(95, 240, 255, 0.9)); }
-.holo-hud .hud-aircraft { fill: var(--hud-cyan); filter: drop-shadow(0 0 4px rgba(95, 240, 255, 0.9)); }
+.holo-hud .hud-lubber { fill: var(--hud-cyan); filter: drop-shadow(0 0 3px rgba(112, 143, 255, 0.9)); }
+.holo-hud .hud-aircraft { fill: var(--hud-cyan); filter: drop-shadow(0 0 4px rgba(112, 143, 255, 0.9)); }
 
 .holo-hud .hud-readout {
   position: absolute;
@@ -115,14 +116,14 @@
   align-items: baseline;
   gap: 0.28em;
   padding: 0.08em 0.45em;
-  border: 1px solid rgba(95, 240, 255, 0.5);
+  border: 1px solid rgba(112, 143, 255, 0.5);
   border-radius: 4px;
-  background: rgba(95, 240, 255, 0.1);
+  background: rgba(112, 143, 255, 0.1);
   font-size: calc(var(--dial-lg) * 0.115);
   font-weight: 600;
   line-height: 1.1;
   white-space: nowrap;
-  text-shadow: 0 0 8px rgba(95, 240, 255, 0.6);
+  text-shadow: 0 0 8px rgba(112, 143, 255, 0.6);
 }
 .holo-hud .hud-readout small { font-size: 0.42em; letter-spacing: 0.16em; color: var(--hud-cyan-soft); }
 .holo-hud .hud-dial > .hud-label { position: absolute; left: 50%; top: 82%; transform: translateX(-50%); }
@@ -150,19 +151,19 @@
   transform: translateX(-50%);
   display: flex;
   padding: 2px 9px;
-  border: 1px solid rgba(95, 240, 255, 0.6);
+  border: 1px solid rgba(112, 143, 255, 0.6);
   border-radius: 4px;
-  background: rgba(6, 18, 28, 0.8);
+  background: rgba(7, 14, 37, 0.8);
   font-size: 15px;
   font-weight: 600;
-  text-shadow: 0 0 8px rgba(95, 240, 255, 0.6);
+  text-shadow: 0 0 8px rgba(112, 143, 255, 0.6);
 }
 
 /* Bars and slots */
 .holo-hud .hud-bar,
 .holo-hud .hud-slot { display: flex; flex-direction: column; align-items: center; gap: 4px; }
 .holo-hud .hud-bar { --tone: var(--hud-green); --tone-glow: rgba(77, 255, 166, 0.7); }
-.holo-hud .hud-bar.tone-cyan { --tone: var(--hud-cyan); --tone-glow: rgba(95, 240, 255, 0.7); }
+.holo-hud .hud-bar.tone-cyan { --tone: var(--hud-cyan); --tone-glow: rgba(112, 143, 255, 0.7); }
 .holo-hud .hud-bar.tone-amber { --tone: var(--hud-amber); --tone-glow: rgba(255, 211, 77, 0.7); }
 .holo-hud .hud-bar.tone-red { --tone: var(--hud-red); --tone-glow: rgba(255, 77, 99, 0.8); }
 .holo-hud .hud-bar-track {
@@ -188,7 +189,7 @@
   background: linear-gradient(to top, var(--tone), color-mix(in srgb, var(--tone) 70%, white));
   box-shadow: 0 0 8px var(--tone-glow);
 }
-.holo-hud .hud-bar-track i { flex: 1; border-radius: 1px; background: rgba(120, 230, 255, 0.12); transition: background 0.2s; }
+.holo-hud .hud-bar-track i { flex: 1; border-radius: 1px; background: rgba(155, 178, 255, 0.12); transition: background 0.2s; }
 .holo-hud .hud-bar-track i.on { background: var(--hud-green); box-shadow: 0 0 6px rgba(77, 255, 166, 0.7); }
 .holo-hud .hud-bar-track i.on:nth-child(n + 7) { background: var(--hud-amber); box-shadow: 0 0 6px rgba(255, 211, 77, 0.8); }
 .holo-hud .hud-bar.pulse .hud-bar-track { animation: hud-pulse 0.6s ease-in-out infinite alternate; }
@@ -210,7 +211,7 @@
   border-radius: 2px;
   transform: translate(-50%, -50%);
   background: var(--hud-cyan);
-  box-shadow: 0 0 10px rgba(95, 240, 255, 0.8);
+  box-shadow: 0 0 10px rgba(112, 143, 255, 0.8);
 }
 
 @keyframes hud-pulse { from { box-shadow: 0 0 0 rgba(255, 211, 77, 0); } to { box-shadow: 0 0 14px rgba(255, 211, 77, 0.9); } }
@@ -241,8 +242,8 @@
 }
 .holo-hud .hud-objective h3 { margin: 3px 0 7px; font-size: 15px; font-weight: 600; letter-spacing: 0.02em; }
 .holo-hud .hud-progress { display: flex; justify-content: center; align-items: center; gap: 4px; }
-.holo-hud .hud-progress i { width: 12px; height: 4px; border-radius: 1px; background: rgba(120, 230, 255, 0.25); }
-.holo-hud .hud-progress i.done { background: var(--hud-cyan); box-shadow: 0 0 6px rgba(95, 240, 255, 0.8); }
+.holo-hud .hud-progress i { width: 12px; height: 4px; border-radius: 1px; background: rgba(155, 178, 255, 0.25); }
+.holo-hud .hud-progress i.done { background: var(--hud-cyan); box-shadow: 0 0 6px rgba(112, 143, 255, 0.8); }
 .holo-hud .hud-progress i.next { background: var(--hud-amber); animation: hud-blink 1s steps(1) infinite; }
 .holo-hud .hud-progress span { margin-left: 8px; font-size: 11px; letter-spacing: 0.12em; color: var(--hud-cyan-soft); }
 .holo-hud .hud-tools { position: absolute; top: 18px; right: 18px; display: flex; gap: 8px; }
@@ -262,7 +263,7 @@
 }
 .holo-hud .hud-wind { cursor: default; }
 .holo-hud .hud-wind small { font-size: 10px; color: var(--hud-cyan-soft); }
-.holo-hud .hud-tools button:hover { border-color: var(--hud-cyan); box-shadow: 0 0 14px rgba(95, 240, 255, 0.35); }
+.holo-hud .hud-tools button:hover { border-color: var(--hud-cyan); box-shadow: 0 0 14px rgba(112, 143, 255, 0.35); }
 .holo-hud .hud-tools button:focus-visible { outline: 2px solid var(--hud-cyan); outline-offset: 2px; }
 .holo-hud .hud-map { position: absolute; top: 72px; right: 18px; width: 164px; display: grid; gap: 8px; }
 .holo-hud .minimap {
@@ -275,7 +276,7 @@
   color: var(--hud-cyan-soft);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  box-shadow: inset 0 1px 0 rgba(200, 250, 255, 0.18), 0 8px 24px rgba(0, 10, 20, 0.25);
+  box-shadow: inset 0 1px 0 rgba(218, 228, 255, 0.18), 0 8px 24px rgba(7, 14, 37, 0.25);
 }
 .holo-hud .minimap .map-top,
 .holo-hud .minimap .map-bottom { font: 500 10px "Oxanium", sans-serif; letter-spacing: 0.15em; color: var(--hud-cyan-soft); }
@@ -289,7 +290,7 @@
 .holo-hud .hud-row { display: flex; align-items: flex-end; gap: 14px; }
 .holo-hud .hud-bars,
 .holo-hud .hud-slots { display: flex; align-items: flex-end; gap: 12px; margin-bottom: 4px; }
-.holo-hud .hud-status { font-size: 12px; font-weight: 600; letter-spacing: 0.16em; text-shadow: 0 1px 6px rgba(0, 10, 20, 0.6); }
+.holo-hud .hud-status { font-size: 12px; font-weight: 600; letter-spacing: 0.16em; text-shadow: 0 1px 6px rgba(7, 14, 37, 0.6); }
 .holo-hud .hud-status b { font-weight: 500; color: var(--hud-green); }
 .holo-hud .hud-status b.ground { color: var(--hud-amber); }
 .holo-hud .hud-damage { padding: 5px 12px; border-color: var(--hud-amber); border-radius: 999px; color: var(--hud-amber); font-size: 12px; font-weight: 600; letter-spacing: 0.06em; }
@@ -304,7 +305,7 @@
 .holo-hud .hud-landing-cue.slow { color: var(--hud-red); }
 .holo-hud .hud-speed-brake { padding: 5px 12px; border-radius: 999px; color: var(--hud-amber); font-size: 11px; font-weight: 600; letter-spacing: 0.08em; }
 .holo-hud .hud-gear { display: flex; align-items: center; gap: 9px; padding: 6px 14px; border-radius: 999px; font-size: 11px; }
-.holo-hud .hud-gear i { width: 10px; height: 10px; border-radius: 50%; background: rgba(120, 230, 255, 0.15); transition: background 0.2s; }
+.holo-hud .hud-gear i { width: 10px; height: 10px; border-radius: 50%; background: rgba(155, 178, 255, 0.15); transition: background 0.2s; }
 .holo-hud .hud-gear.down i { background: var(--hud-green); box-shadow: 0 0 8px var(--hud-green); }
 .holo-hud .hud-gear.moving i { background: var(--hud-amber); box-shadow: 0 0 8px var(--hud-amber); animation: hud-blink 0.5s steps(1) infinite; }
 .holo-hud .hud-gear b { margin-left: 6px; font-size: 11px; }
@@ -319,9 +320,9 @@
   -webkit-backdrop-filter: blur(8px);
 }
 .holo-hud .target-label b { color: var(--hud-cyan); }
-.holo-hud .target-diamond { border-color: var(--hud-cyan); box-shadow: 0 0 10px rgba(95, 240, 255, 0.7); }
+.holo-hud .target-diamond { border-color: var(--hud-cyan); box-shadow: 0 0 10px rgba(112, 143, 255, 0.7); }
 .holo-hud .center-reticle span,
-.holo-hud .center-reticle i { background: var(--hud-cyan); box-shadow: 0 0 6px rgba(95, 240, 255, 0.8); }
+.holo-hud .center-reticle i { background: var(--hud-cyan); box-shadow: 0 0 6px rgba(112, 143, 255, 0.8); }
 .holo-hud .flight-center-bottom { position: absolute; left: 50%; bottom: 26px; transform: translateX(-50%); }
 .holo-hud .flight-hint {
   background: var(--hud-glass);
@@ -333,17 +334,17 @@
 }
 .holo-hud .flight-hint.warning { border-color: var(--hud-red); color: #ffd6db; }
 .app.in-flight .toast {
-  background: rgba(6, 18, 28, 0.7);
-  border: 1px solid var(--hud-rim, rgba(120, 230, 255, 0.42));
-  color: #e8fbff;
+  background: rgba(7, 14, 37, 0.7);
+  border: 1px solid var(--hud-rim, rgba(155, 178, 255, 0.42));
+  color: #F2F5FF;
   font-family: "Oxanium", sans-serif;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
 .app.in-flight .replay-bar {
-  background: rgba(6, 18, 28, 0.7);
-  border: 1px solid rgba(120, 230, 255, 0.42);
-  color: #e8fbff;
+  background: rgba(7, 14, 37, 0.7);
+  border: 1px solid rgba(155, 178, 255, 0.42);
+  color: #F2F5FF;
   font-family: "Oxanium", sans-serif;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
@@ -376,7 +377,7 @@
 }
 @keyframes hud-strobe {
   0%, 49.9% { background: rgba(255, 40, 60, 0.9); color: #fff; box-shadow: 0 0 30px rgba(255, 40, 60, 0.75); }
-  50%, 100% { background: rgba(6, 18, 28, 0.65); color: var(--hud-red); box-shadow: none; }
+  50%, 100% { background: rgba(7, 14, 37, 0.65); color: var(--hud-red); box-shadow: none; }
 }
 @keyframes hud-edge { 0%, 49.9% { opacity: 1; } 50%, 100% { opacity: 0.12; } }
 @keyframes hud-shake {

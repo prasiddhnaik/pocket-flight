@@ -2,8 +2,18 @@ import ts from "typescript";
 import { readdirSync, readFileSync, existsSync, statSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { checkDocumentation } from "./documentation";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
+if (process.argv.includes("--built")) {
+  const result = checkDocumentation(resolve(root, "dist"), true);
+  if (result.failures.length) {
+    console.error(result.failures.join("\n"));
+    process.exit(1);
+  }
+  console.log(`Production documentation OK: ${result.files} HTML files and ${result.references} local references checked.`);
+  process.exit(0);
+}
 const walk = (directory: string): string[] =>
   readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
     const path = resolve(directory, entry.name);
@@ -62,24 +72,12 @@ for (const file of readdirSync(root).filter((path) => path.endsWith(".html"))) {
   ))
     checkImport(resolve(root, file), match[1]);
 }
-// Validate navigation links without requiring a browser or starting the game.
-for (const file of ["README.md", "AGENTS.md"]) {
-  for (const match of readFileSync(resolve(root, file), "utf8").matchAll(
-    /\[[^\]]*\]\(([^)]+)\)/g,
-  )) {
-    const target = match[1].split("#")[0];
-    if (
-      target &&
-      !/^[a-z]+:/i.test(target) &&
-      !existsSync(resolve(root, target))
-    )
-      failures.push(`${file}: ${target}`);
-  }
-}
+const documents = checkDocumentation(root);
+failures.push(...documents.failures);
 if (failures.length) {
   console.error(failures.join("\n"));
   process.exit(1);
 }
 console.log(
-  `Repository navigation OK: ${files.length} code files, ${imports} local imports/entries, and README/agent links checked.`,
+  `Repository navigation OK: ${files.length} code files, ${imports} local imports/entries, ${documents.files} documents and ${documents.references} local references checked.`,
 );

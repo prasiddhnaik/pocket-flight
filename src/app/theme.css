@@ -1,0 +1,22 @@
+:root {
+  --brand: #0000ff;
+  --brand-hover: #0000cc;
+  --blue-50: #f8faff;
+  --blue-100: #edf2ff;
+  --blue-200: #dce5ff;
+  --blue-300: #bbcbfa;
+  --blue-400: #8ca5ed;
+  --blue-500: #6d88ce;
+  --blue-600: #526789;
+  --blue-700: #30466f;
+  --blue-800: #20356b;
+  --blue-850: #15254f;
+  --blue-900: #0b1543;
+  --blue-950: #070e25;
+  --ink: var(--blue-900);
+  --muted: var(--blue-600);
+  --paper: var(--blue-50);
+  --accent: var(--brand);
+  --line: #15254f24;
+  --focus: #3455ff;
+}

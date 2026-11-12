@@ -1,0 +1,17 @@
+@import "../app/theme.css";
+
+body button,
+body input,
+body select {
+  accent-color: var(--brand);
+}
+body button[aria-pressed="true"],
+body .fly-link {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: white;
+}
+body :focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}

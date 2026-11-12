@@ -1,9 +1,10 @@
+@import "./theme.css";
 :root {
   font:
     14px/1.5 system-ui,
     sans-serif;
-  color: #26353e;
-  background: #e7ecec;
+  color: var(--blue-900);
+  background: var(--blue-100);
 }
 * {
   box-sizing: border-box;
@@ -20,8 +21,8 @@ body {
 header {
   grid-column: 1/-1;
   padding: 16px 24px;
-  background: #f9faf8;
-  border-bottom: 1px solid #d5dddd;
+  background: var(--blue-50);
+  border-bottom: 1px solid var(--blue-200);
   display: flex;
   align-items: center;
   gap: 24px;
@@ -38,7 +39,7 @@ h1 span {
   display: block;
   font-size: 12px;
   font-weight: 400;
-  color: #61727c;
+  color: var(--blue-600);
 }
 #status {
   margin-left: auto;
@@ -55,29 +56,29 @@ canvas {
 }
 aside {
   overflow: auto;
-  background: #f9faf8;
-  border-left: 1px solid #d5dddd;
+  background: var(--blue-50);
+  border-left: 1px solid var(--blue-200);
   padding: 20px;
 }
 a {
-  color: #23556b;
+  color: var(--blue-700);
 }
 button {
   font: inherit;
   color: inherit;
   background: #fff;
-  border: 1px solid #c8d2d5;
+  border: 1px solid var(--blue-200);
   border-radius: 5px;
   padding: 7px 10px;
   cursor: pointer;
 }
 button:hover {
-  background: #edf2f3;
+  background: var(--blue-50);
 }
 button[aria-pressed="true"] {
   color: #fff;
-  background: #284f63;
-  border-color: #284f63;
+  background: var(--blue-800);
+  border-color: var(--blue-800);
 }
 .views,
 .actions {
@@ -88,7 +89,7 @@ button[aria-pressed="true"] {
 }
 .avionics-controls {
   grid-column: 1/-1;
-  border-block: 1px solid #d5dddd;
+  border-block: 1px solid var(--blue-200);
   padding-block: 12px;
   margin-bottom: 16px;
 }
@@ -102,12 +103,12 @@ label {
 output {
   float: right;
   font-variant-numeric: tabular-nums;
-  color: #657984;
+  color: var(--blue-600);
 }
 input {
   display: block;
   width: 100%;
-  accent-color: #315f75;
+  accent-color: var(--blue-700);
 }
 .actions {
   margin-top: 22px;
@@ -118,7 +119,7 @@ input {
 }
 .note {
   font-size: 12px;
-  color: #657780;
+  color: var(--blue-600);
 }
 aside > a {
   font-size: 12px;
@@ -126,7 +127,7 @@ aside > a {
 button:focus-visible,
 a:focus-visible,
 input:focus-visible {
-  outline: 3px solid #d0a84c;
+  outline: 3px solid var(--accent);
   outline-offset: 3px;
 }
 @media (max-width: 720px) {
@@ -148,7 +149,7 @@ input:focus-visible {
   }
   aside {
     border-left: 0;
-    border-top: 1px solid #d5dddd;
+    border-top: 1px solid var(--blue-200);
     padding: 16px;
     display: grid;
     grid-template-columns: 1fr 1fr;

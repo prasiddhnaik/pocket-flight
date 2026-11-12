@@ -1,6 +1,7 @@
 import * as T from "three";
 import { rangeLayout, rangeSurface } from "../world/range-island";
 import { runways, terrainHeight } from "../world/terrain";
+import { isProLineKind, ProLineSuite } from "./aurelia/pro-line-displays";
 import { chartRegion, navigationLabel } from "./cockpit-displays";
 import type { CockpitSpec, CockpitState, HudGeometry } from "./cockpit-state";
 
@@ -266,6 +267,8 @@ function paintChart(size: number, chart: ReturnType<typeof chartRegion>) {
 }
 
 const KEYS = ["NAV", "ARM", "FUEL", "ENG", "BIT"];
+// Attitude displays stay smooth; the rest take turns so only one uploads each tick.
+const SMOOTH: readonly CockpitSpec["screens"][number]["kind"][] = ["hud", "flight", "pfd", "esis"];
 
 export function drawMpcd(c: Ctx, size: number, s: CockpitState, chart?: CanvasImageSource, fuelPounds = 13455) {
   const white = "#eef3ea", amber = "#ffc24a", cyan = "#7fe7ff";
@@ -496,6 +499,7 @@ export class CockpitAvionics {
   private clock = 0;
   private turn = 0;
   private hudClock = 0;
+  private suite: ProLineSuite | null = null;
   constructor(cabin: T.Object3D, private spec: CockpitSpec) {
     for (const screen of spec.screens) this.surface(cabin, screen);
   }
@@ -551,19 +555,23 @@ export class CockpitAvionics {
     if (surface.kind === "readout") drawUfc(c, canvas.width, canvas.height, s, fuel);
     if (surface.kind === "flight") drawFlight(c, canvas.width, canvas.height, s);
     if (surface.kind === "engines") drawEngines(c, canvas.width, canvas.height, s, fuel);
+    if (isProLineKind(surface.kind)) (this.suite ??= new ProLineSuite(fuel)).draw(surface.kind, c, canvas.width, canvas.height, s);
     surface.texture.needsUpdate = true;
   }
+  /** Master lights from the crew alerting system, on the cockpits that have one. */
+  alerts() {
+    return this.suite?.alerts() ?? null;
+  }
   update(s: CockpitState, dt: number) {
-    // Flight surfaces stay smooth; the rest take turns so only one uploads each tick.
     this.hudClock -= dt;
     if (this.hudClock <= 0) {
       this.hudClock = 1 / 30;
-      for (const surface of this.surfaces) if (surface.kind === "hud" || surface.kind === "flight") this.draw(surface, s);
+      for (const surface of this.surfaces) if (SMOOTH.includes(surface.kind)) this.draw(surface, s);
     }
     this.clock -= dt;
     if (this.clock > 0) return;
     this.clock = 1 / 24;
-    const others = this.surfaces.filter((surface) => surface.kind !== "hud" && surface.kind !== "flight");
+    const others = this.surfaces.filter((surface) => !SMOOTH.includes(surface.kind));
     if (others.length) this.draw(others[this.turn++ % others.length], s);
   }
   dispose() {
@@ -573,6 +581,7 @@ export class CockpitAvionics {
     }
     for (const material of this.materials) material.dispose();
     for (const chart of this.charts.values()) chart.width = 1;
+    this.suite?.dispose();
     this.surfaces = [];
     this.charts.clear();
   }

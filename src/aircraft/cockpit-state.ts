@@ -21,8 +21,12 @@ export type CockpitState = DisplayTelemetry & {
   target: { x: number; z: number } | null;
   contacts: readonly CockpitContact[];
   stores: CockpitStores | null;
+  /** Horizontal speed over the ground, in metres a second. */
+  groundSpeed?: number;
+  /** Where the air is moving, in metres a second. */
+  wind?: { x: number; z: number };
 };
-export type ScreenKind = "hud" | "radar" | "threat" | "map" | "readout" | "flight" | "engines";
+export type ScreenKind = "hud" | "radar" | "threat" | "map" | "readout" | "flight" | "engines" | "pfd" | "mfd-nav" | "mfd-systems" | "esis" | "cdu";
 export type HudGeometry = { distance: number; height: number; eyeAbove: number };
 export type CockpitSpec = {
   url: string;
@@ -202,7 +206,9 @@ export function cockpitDriver(spec: CockpitSpec, options: { screens?: boolean } 
           part.node.position.z = part.place.z - (spec.throttle.idle + s.power * spec.throttle.travel);
         });
       turn("Gear_handle", PANEL_ACROSS, T.MathUtils.lerp(-0.42, 0.42, s.gear));
-      light("Lamp_master", s.stall || s.engineOut || (s.fuel ?? 1) < 0.1);
+      const alerts = avionics?.alerts();
+      light("Lamp_master", alerts ? alerts.caution : s.stall || s.engineOut || (s.fuel ?? 1) < 0.1);
+      light("Lamp_master_warning", alerts?.warning ?? false);
       light("Lamp_fire_left", s.engineOut);
       light("Lamp_fire_right", s.engineOut);
       for (const name of ["Lamp_gear_nose", "Lamp_gear_left", "Lamp_gear_right"]) light(name, s.gear > 0.995);

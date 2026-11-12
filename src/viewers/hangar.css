@@ -1,3 +1,4 @@
+@import "./theme.css";
 @import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Serif+Display:ital@0;1&display=swap");
 * {
   box-sizing: border-box;
@@ -5,8 +6,8 @@
 body {
   margin: 0;
   overflow: hidden;
-  background: #eaece5;
-  color: #293e42;
+  background: var(--blue-100);
+  color: var(--blue-900);
   font-family: "DM Sans", sans-serif;
   font-size: 13px;
 }
@@ -44,7 +45,7 @@ header {
   z-index: 2;
 }
 header > span {
-  color: #9aa79b;
+  color: var(--blue-600);
 }
 header a {
   padding: 10px 0;
@@ -58,7 +59,7 @@ header a {
 .eyebrow {
   font-size: 8px;
   letter-spacing: 1.8px;
-  color: #819785;
+  color: var(--blue-600);
   font-weight: 600;
 }
 h1 {
@@ -70,11 +71,11 @@ h1 {
   margin: 22px 0;
 }
 h1 em {
-  color: #577b73;
+  color: var(--blue-600);
   font-weight: 400;
 }
 .subtitle {
-  color: #7d9187;
+  color: var(--blue-600);
   font-size: 11px;
   line-height: 1.8;
 }
@@ -91,14 +92,14 @@ h1 em {
 .specs strong span {
   font-size: 12px;
   margin-left: 4px;
-  color: #9da89b;
+  color: var(--blue-600);
 }
 .specs small {
   display: block;
   font-size: 6px;
   letter-spacing: 1.2px;
   margin-top: 7px;
-  color: #99a592;
+  color: var(--blue-600);
 }
 aside {
   position: absolute;
@@ -106,23 +107,23 @@ aside {
   top: 125px;
   width: 255px;
   border: 1px solid #ffffffc0;
-  background: #f7f7efa6;
+  background: color-mix(in srgb, var(--blue-50) 65.1%, transparent);
   border-radius: 13px;
   padding: 23px;
   backdrop-filter: blur(20px);
-  box-shadow: 0 10px 30px #6074660a;
+  box-shadow: 0 10px 30px color-mix(in srgb, var(--blue-600) 3.9%, transparent);
 }
 .panel-heading {
   display: flex;
   justify-content: space-between;
   font-size: 7px;
   letter-spacing: 1px;
-  color: #899b86;
+  color: var(--blue-600);
   align-items: center;
 }
 .panel-heading button {
   font-size: 7px;
-  color: #5f806c;
+  color: var(--blue-600);
   padding: 0;
 }
 .views {
@@ -135,24 +136,24 @@ aside {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid #778e6e16;
+  border-bottom: 1px solid color-mix(in srgb, var(--blue-500) 8.6%, transparent);
   font-size: 9px;
-  color: #9aa98f;
+  color: var(--blue-600);
   border-radius: 5px;
 }
 .views button span {
   flex: 1;
   text-align: left;
   margin-left: 14px;
-  color: #5e786a;
+  color: var(--blue-600);
   font-size: 11px;
 }
 .views button.selected {
-  background: #e2e8d9;
-  color: #708a6d;
+  background: var(--blue-100);
+  color: var(--blue-600);
 }
 .rig {
-  border-top: 1px solid #829e741f;
+  border-top: 1px solid color-mix(in srgb, var(--blue-400) 12.2%, transparent);
   padding-top: 20px;
   margin-top: 18px;
 }
@@ -165,41 +166,41 @@ aside {
   gap: 13px;
   margin-top: 18px;
   font-size: 10px;
-  color: #6d8574;
+  color: var(--blue-600);
 }
 input[type="range"] {
   appearance: none;
   width: 100%;
   height: 2px;
-  background: #c6d0bd;
+  background: var(--blue-200);
   cursor: pointer;
 }
 input[type="range"]::-webkit-slider-thumb {
   appearance: none;
   width: 10px;
   height: 10px;
-  background: #739380;
-  border: 2px solid #eaeedf;
+  background: var(--blue-500);
+  border: 2px solid var(--blue-100);
   border-radius: 50%;
-  box-shadow: 0 0 0 1px #739380;
+  box-shadow: 0 0 0 1px var(--blue-500);
 }
 .prop-toggle {
-  border: 1px solid #94a78245;
+  border: 1px solid color-mix(in srgb, var(--blue-400) 27.1%, transparent);
   border-radius: 6px;
   padding: 9px;
   width: 100%;
   margin-top: 19px;
   font-size: 10px;
-  color: #557b69;
+  color: var(--blue-600);
 }
 .prop-toggle.active {
-  background: #dce5d0;
+  background: var(--blue-200);
 }
 .detail-caption {
   font-size: 9px;
   line-height: 1.9;
-  color: #91a089;
-  border-top: 1px solid #829e741f;
+  color: var(--blue-600);
+  border-top: 1px solid color-mix(in srgb, var(--blue-400) 12.2%, transparent);
   padding-top: 16px;
   margin: 20px 0 0;
 }
@@ -212,17 +213,17 @@ footer {
   justify-content: space-between;
   font-size: 7px;
   letter-spacing: 1.4px;
-  color: #819889;
+  color: var(--blue-600);
   pointer-events: none;
 }
 #stats {
   letter-spacing: 0.5px;
-  color: #9aaa97;
+  color: var(--blue-600);
 }
 #loading {
   position: absolute;
   inset: 0;
-  background: #eaece5;
+  background: var(--blue-100);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -234,11 +235,11 @@ footer {
 #loading p {
   font-size: 11px;
   letter-spacing: 0;
-  color: #92a18b;
+  color: var(--blue-600);
 }
 button:focus-visible,
 a:focus-visible {
-  outline: 2px solid #79917d;
+  outline: 2px solid var(--blue-500);
   outline-offset: 4px;
 }
 @media (max-width: 1000px) {

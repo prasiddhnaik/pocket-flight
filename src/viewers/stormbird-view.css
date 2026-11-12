@@ -1,11 +1,12 @@
+@import "./theme.css";
 * {
   box-sizing: border-box;
 }
 body {
   margin: 0;
-  color: #20343b;
+  color: var(--blue-900);
   font: 14px/1.5 system-ui;
-  background: #e6e9e6;
+  background: var(--blue-100);
 }
 canvas {
   display: block;
@@ -44,11 +45,11 @@ a {
   display: block;
   font-size: 0.5em;
   margin-top: 12px;
-  color: #697c80;
+  color: var(--blue-600);
 }
 .identity p:last-child {
   font-size: 18px;
-  color: #627477;
+  color: var(--blue-600);
 }
 aside {
   position: absolute;
@@ -58,7 +59,7 @@ aside {
   width: 235px;
   border: 1px solid #ffffffb3;
   border-radius: 12px;
-  background: #f5f7f2d9;
+  background: color-mix(in srgb, var(--blue-50) 85.1%, transparent);
   backdrop-filter: blur(14px);
 }
 aside label {
@@ -70,10 +71,10 @@ input[type="range"] {
   display: block;
   width: 100%;
   margin-top: 12px;
-  accent-color: #db7043;
+  accent-color: var(--accent);
 }
 input[type="checkbox"] {
-  accent-color: #db7043;
+  accent-color: var(--accent);
   margin-right: 8px;
 }
 output {
@@ -83,12 +84,12 @@ output {
   display: block;
   font-size: 10px;
   letter-spacing: 0.08em;
-  border-top: 1px solid #cbd4cf;
+  border-top: 1px solid var(--blue-200);
   padding-top: 17px;
 }
 #status {
   font-size: 10px;
-  color: #657578;
+  color: var(--blue-600);
 }
 footer {
   position: absolute;
@@ -105,21 +106,21 @@ nav {
 button {
   font: inherit;
   font-size: 11px;
-  background: #eef2edde;
-  color: #50666e;
+  background: color-mix(in srgb, var(--blue-100) 87.1%, transparent);
+  color: var(--blue-700);
   border: 1px solid transparent;
   border-radius: 30px;
   padding: 9px 14px;
   cursor: pointer;
 }
 button[aria-pressed="true"] {
-  background: #263d4a;
+  background: var(--blue-850);
   color: #fff;
 }
 footer p {
   font-size: 10px;
   letter-spacing: 0.05em;
-  color: #697d80;
+  color: var(--blue-600);
 }
 @media (max-width: 700px) {
   header {
@@ -139,7 +140,7 @@ footer p {
     right: 15px;
     width: 178px;
     padding: 12px;
-    background: #f5f7f2bd;
+    background: color-mix(in srgb, var(--blue-50) 74.1%, transparent);
   }
   aside label {
     margin: 9px 0;

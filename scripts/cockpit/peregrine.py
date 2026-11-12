@@ -126,13 +126,14 @@ def cockpit(k, suffix, panel_y, console_centre, seat_offset, stick_y, hud):
     back, front = console_centre - 0.6, console_centre + 0.6
     k.console("left" + suffix, -0.25, -0.66, back, front, CONSOLE_TOP, FLOOR)
     k.console("right" + suffix, 0.25, 0.66, back, front, CONSOLE_TOP, FLOOR)
-    k.floor(FLOOR, back - 0.03, panel_y + 0.1, 0.252)
-    k.knee_well(FLOOR, 2.66, panel_y + 0.02, 0.6, 0.125, panel_y - 0.09, 2.6)
-    k.pedals(0.175, panel_y - 0.12, FLOOR)
+    # Pedals under the panel, far enough forward for the seated pilot's knees; a slim pedestal between the boots carries the panel.
+    k.floor(FLOOR, back - 0.03, panel_y + 0.18, 0.252)
+    k.knee_well(FLOOR, 2.66, panel_y + 0.16, min(0.6, k.hull_half(HULL, SILL, panel_y + 0.16) - 0.01), 0.065, panel_y - 0.09, 2.61)
+    k.pedals(0.175, panel_y + 0.01, FLOOR)
     k.stick(stick_y, FLOOR)
     k.throttle("left" + suffix, -0.53, -0.49, 0.1, 0.46, 0.24, 0.17)
     with k.placed(seat_offset):
-        k.seat()
+        k.seat(top=0.022, front=4.36)
     k.map_case(k.hull_half(HULL, SILL, console_centre - 0.2) - 0.01, console_centre - 0.2, 2.8)
     k.breaker_panel(-k.hull_half(HULL, SILL, console_centre - 0.25) + 0.01, console_centre - 0.25, 2.8, side=-1)
     side = SILL + 0.005
@@ -146,10 +147,10 @@ def build(k):
     k.wall_details(HULL, SILL, 4.5, 7.05, CONSOLE_TOP, count=11)
     side = SILL + 0.005
     with k.placed((0, 0, 0)):
-        cockpit(k, "", 7.18, 6.6, (0.0, 2.055, 2.59), 6.92, [(7.4, 0.47, 3.17, side + 0.005), (7.6, 0.36, 3.08, side + 0.03), (7.75, 0.27, 3.0, side + 0.05)])
+        cockpit(k, "", 7.18, 6.6, (0.0, 2.385, 2.59), 6.92, [(7.4, 0.47, 3.17, side + 0.005), (7.6, 0.36, 3.08, side + 0.03), (7.75, 0.27, 3.0, side + 0.05)])
     # Close in, because the windscreen slopes down soon after the canopy arch.
     with k.placed((0.0, 1.49, 2.53)):
         k.hud_unit(w=0.112, h=0.1, centre=0.88, top=0.985, back=5.66, post=5.67, rail_depth=0.04)
     with k.placed((0, 0, 0), prefix="Rear_"):
-        cockpit(k, "@rear", 5.72, 5.12, (0.0, 0.57, 2.59), 5.46, [(5.98, 0.5, 3.17, side)])
+        cockpit(k, "@rear", 5.72, 5.12, (0.0, 0.9, 2.59), 5.46, [(5.98, 0.5, 3.17, side)])
     k.canopy_trim(GLASS, 7.03, [7.0, 6.65, 5.95, 5.25, 4.55, 4.36], mirrors=(0.0, -0.3, 0.3), exponent=2.2, reach=0.03, depth=0.03)

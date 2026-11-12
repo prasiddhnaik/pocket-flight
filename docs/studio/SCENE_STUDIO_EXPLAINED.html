@@ -14,7 +14,8 @@
 <body><main>
 <header>
 <div class="eyebrow">POCKET FLIGHT · IMPLEMENTATION REPORT</div>
-<h1>Scene Studio: technical architecture and object placement</h1>
+<h1>Scene Studio: technical architecture and object placement</h1><p>Source links follow the current repository layout. References to the historical <code>StudioScenePanels.tsx</code> module now open <code>src/studio/panels/</code>; the original dates and verification claims are unchanged.</p>
+
 <p class="lead">How recorded flight data becomes an editable 3D scene, how objects are transformed and animated, and how the browser captures the result as a video.</p>
 <p>This report documents the local implementation. It covers the execution path, serialized data, coordinate systems, clock mapping, asset dependencies, renderer lifecycle, audio mixing, persistence, and export behavior. A worked example connects those mechanisms to placing an object in a flight film.</p>
 <div class="metadata">
@@ -37,7 +38,7 @@
 <li><strong>Output is captured in real time.</strong> A WebGL frame is copied to a 2D canvas, title text is composited there, and MediaRecorder encodes its captured stream. Selecting 60 fps requests a capture rate; it does not ensure the GPU produces 60 unique frames per second.</li>
 <li><strong>Persistence is local.</strong> IndexedDB stores projects, replays, and assets. Portable backups embed source recordings and base64-encoded referenced asset bytes.</li>
 </ul>
-<p class="ref">Evidence: <a href="../../src/ReplayStudio.tsx">ReplayStudio.tsx</a>, <a href="../../src/replay-preview.ts">replay-preview.ts</a>, <a href="../../src/studio-scene-renderer.ts">studio-scene-renderer.ts</a>, and <a href="../../src/replay-export.ts">replay-export.ts</a>.</p>
+<p class="ref">Evidence: <a href="../../src/studio/ReplayStudio.tsx">ReplayStudio.tsx</a>, <a href="../../src/studio/replay-preview.ts">replay-preview.ts</a>, <a href="../../src/studio/studio-scene-renderer.ts">studio-scene-renderer.ts</a>, and <a href="../../src/replay/replay-export.ts">replay-export.ts</a>.</p>
 </section>
 
 <section id="architecture"><h2>2. Architecture and execution flow</h2>
@@ -62,7 +63,7 @@ requestAnimationFrame(now)
   → locateClip(project, filmTime)
   → ReplayPreview.render(sourceTime, filmTime, clip, scene)
   → ReplayVideoExport.draw(canvas, title) during export</code></pre>
-<p class="ref">Evidence: <a href="../../src/ReplayStudio.tsx">ReplayStudio.tsx</a> — commit, persist, preparation effects, and animation-frame loop; <a href="../../src/StudioScenePanels.tsx">StudioScenePanels.tsx</a> — inspector components.</p>
+<p class="ref">Evidence: <a href="../../src/studio/ReplayStudio.tsx">ReplayStudio.tsx</a> — commit, persist, preparation effects, and animation-frame loop; <a href="../../src/studio/panels/">StudioScenePanels.tsx</a> — inspector components.</p>
 </section>
 
 <section id="data"><h2>3. Project and scene data model</h2>
@@ -97,7 +98,7 @@ type PlacedObject = {
   end: number | null;                // null means through film end
 };</code></pre>
 <p>Validation requires finite vectors and ordered key times, positive scale components between 0.001 and 10,000, unique object/sound IDs, supported kinds, and bounded appearance values. Saved replay timestamps must increase, start at zero, and end near the declared duration. Validation checks data structure and numeric ranges; it does not establish model visibility or rendered quality.</p>
-<p class="ref">Evidence: <a href="../../src/replay-data.ts">replay-data.ts</a>, <a href="../../src/studio-model.ts">studio-model.ts</a>, <a href="../../src/studio-scene.ts">studio-scene.ts</a>, and <a href="../../src/studio-assets.ts">studio-assets.ts</a>.</p>
+<p class="ref">Evidence: <a href="../../src/replay/replay-data.ts">replay-data.ts</a>, <a href="../../src/studio/studio-model.ts">studio-model.ts</a>, <a href="../../src/studio/studio-scene.ts">studio-scene.ts</a>, and <a href="../../src/studio/studio-assets.ts">studio-assets.ts</a>.</p>
 </section>
 
 <section id="clocks"><h2>4. Timeline and clock mapping</h2>
@@ -120,7 +121,7 @@ type PlacedObject = {
 </div><figcaption>One clip starting at film second zero. The source progress bar represents the used 10–20-second interval. Object keys use the film clock; camera keys use the source clock.</figcaption>
 </figure>
 <p>Split duplicates the selected clip’s settings and changes its source boundaries; move swaps clips in the sequence. Object tracks belong to the project scene, so neither operation automatically remaps object keys into a specific clip.</p>
-<p class="ref">Evidence: <a href="../../src/studio-model.ts">studio-model.ts</a> — clipDuration and locateClip; <a href="../../src/replay-data.ts">replay-data.ts</a> — sampleFrames; <a href="../../src/ReplayStudio.tsx">ReplayStudio.tsx</a> — split and move.</p>
+<p class="ref">Evidence: <a href="../../src/studio/studio-model.ts">studio-model.ts</a> — clipDuration and locateClip; <a href="../../src/replay/replay-data.ts">replay-data.ts</a> — sampleFrames; <a href="../../src/studio/ReplayStudio.tsx">ReplayStudio.tsx</a> — split and move.</p>
 </section>
 
 <section id="assets"><h2>5. Asset ingestion and instantiation</h2>
@@ -142,7 +143,7 @@ type PlacedObject = {
 </tbody></table></div>
 <p>Resource resolution accepts selected local file names and paths, falling back to matching a leaf filename. Data/blob resources are allowed; unresolved resources or HTTP references cause a load error. Object URLs are revoked after loading. The model cache stores promises by asset ID, sharing both completed and in-flight loading; failed loads are removed from the cache so a retry is possible.</p>
 <div class="note"><strong>Dimensional implication:</strong> an imported model with a largest dimension of 120 meters is normalized to 6 meters at object scale 1. A uniform object scale of 20 restores a 120-meter maximum dimension. Centering also changes the effective placement pivot; Position identifies the centered instance frame, not the original file’s origin.</div>
-<p class="ref">Evidence: <a href="../../src/studio-assets.ts">studio-assets.ts</a> — readAssets; <a href="../../src/ReplayStudio.tsx">ReplayStudio.tsx</a> — importAssets and addAsset; <a href="../../src/studio-scene-renderer.ts">studio-scene-renderer.ts</a> — loadAssetModel, loadAsset, and prepare.</p>
+<p class="ref">Evidence: <a href="../../src/studio/studio-assets.ts">studio-assets.ts</a> — readAssets; <a href="../../src/studio/ReplayStudio.tsx">ReplayStudio.tsx</a> — importAssets and addAsset; <a href="../../src/studio/studio-scene-renderer.ts">studio-scene-renderer.ts</a> — loadAssetModel, loadAsset, and prepare.</p>
 </section>
 
 <section id="transforms"><h2>6. Coordinate frames and transforms</h2>
@@ -161,7 +162,7 @@ type PlacedObject = {
 <p><strong>Precision boundary:</strong> the conversion handler samples interpolated aircraft position but passes the earlier saved frame’s quaternion. The renderer uses the interpolated quaternion and may also apply suspension displacement. Thus the pure conversion function’s round-trip test establishes its mathematics for a supplied pose; it does not prove exact UI pose preservation at every between-frame playhead position.</p>
 <h3>Default placement</h3>
 <p><code>spawnPosition</code> computes aircraft position relative to the project origin, then adds <code>[8, 2, 0]</code>. New visual objects default to World anchoring. This is an offset in world axes, not eight meters along the aircraft’s local right direction. Objects default to visibility from film zero through the film end.</p>
-<p class="ref">Evidence: <a href="../../src/studio-scene.ts">studio-scene.ts</a> — convertAnchor; <a href="../../src/ReplayStudio.tsx">ReplayStudio.tsx</a> — changeObject and spawnPosition; <a href="../../src/studio-scene-renderer.ts">studio-scene-renderer.ts</a> — update.</p>
+<p class="ref">Evidence: <a href="../../src/studio/studio-scene.ts">studio-scene.ts</a> — convertAnchor; <a href="../../src/studio/ReplayStudio.tsx">ReplayStudio.tsx</a> — changeObject and spawnPosition; <a href="../../src/studio/studio-scene-renderer.ts">studio-scene-renderer.ts</a> — update.</p>
 </section>
 
 <section id="interaction"><h2>7. Selection and edit transactions</h2>
@@ -169,7 +170,7 @@ type PlacedObject = {
 <p>TransformControls attaches to the editable instance group. During a drag, orbit controls are disabled and the renderer skips overwriting that object’s transform from serialized data. On mouse-up, its local pose is read, scale components are clamped to at least 0.001, and the editor commits the transform or a keyframe.</p>
 <p><code>commit</code> stops playback, stores the previous project in an undo stack, clears redo, updates the project timestamp and state, clamps the playhead to the new duration, and sets the save status. History is capped at 40 previous project snapshots. Commits are ignored while export is running or preparing.</p>
 <p>Object selection switches to Scene mode and opens Object settings. Gizmos are enabled only when the object is selected, visible, and unlocked. Numeric fields commit finite values on blur or Enter, constrained to their configured bounds. Snapping is 1 meter for translation, 15 degrees for rotation, and 0.1 for scale.</p>
-<p class="ref">Evidence: <a href="../../src/replay-preview.ts">replay-preview.ts</a> — pointerUp, TransformControls handlers, and render; <a href="../../src/ReplayStudio.tsx">ReplayStudio.tsx</a> — commit and historyStep; <a href="../../src/StudioScenePanels.tsx">StudioScenePanels.tsx</a> — NumberField.</p>
+<p class="ref">Evidence: <a href="../../src/studio/replay-preview.ts">replay-preview.ts</a> — pointerUp, TransformControls handlers, and render; <a href="../../src/studio/ReplayStudio.tsx">ReplayStudio.tsx</a> — commit and historyStep; <a href="../../src/studio/panels/">StudioScenePanels.tsx</a> — NumberField.</p>
 </section>
 
 <section id="animation"><h2>8. Object and embedded animation</h2>
@@ -181,7 +182,7 @@ type PlacedObject = {
 <h3>Visibility and embedded clips</h3>
 <p>An instance is active when its visible flag is true and film time is inside its start/end interval, clipped to project duration. Visibility does not derive from transform keys. The active test includes the object’s end instant; soundtrack scheduling treats its end as exclusive.</p>
 <p>Each animated imported instance receives its own mixer and actions. Changing the selected embedded clip stops the previous actions and starts the new one. On each update the mixer is sampled at <code>max(0, T − object.start) × animationSpeed</code>, modulo clip duration when looping, or clamped near the final frame otherwise. This supports seeking without integrating animation incrementally. A newly imported asset selects its first animation when one exists; the inspector can select None.</p>
-<p class="ref">Evidence: <a href="../../src/studio-scene.ts">studio-scene.ts</a> — segment, sampleTransform, setTransformKey; <a href="../../src/ReplayStudio.tsx">ReplayStudio.tsx</a> — changeObjectPose and addAsset; <a href="../../src/studio-scene-renderer.ts">studio-scene-renderer.ts</a> — update.</p>
+<p class="ref">Evidence: <a href="../../src/studio/studio-scene.ts">studio-scene.ts</a> — segment, sampleTransform, setTransformKey; <a href="../../src/studio/ReplayStudio.tsx">ReplayStudio.tsx</a> — changeObjectPose and addAsset; <a href="../../src/studio/studio-scene-renderer.ts">studio-scene-renderer.ts</a> — update.</p>
 </section>
 
 <section id="camera"><h2>9. Camera reconstruction</h2>
@@ -190,7 +191,7 @@ type PlacedObject = {
 <div class="note"><strong>Camera and object anchors have different rotation semantics.</strong> An Aircraft-anchored object inherits the aircraft quaternion. A custom aircraft-tracking camera adds the aircraft position to its stored position and target offsets, without rotating those offsets by the aircraft quaternion. It follows translation while preserving those offsets in world orientation.</div>
 <p>Changing a camera anchor converts key positions and targets using translation only; the editor explicitly supplies an identity quaternion for that conversion. Capture at source time is owned by the selected flight clip, so duplicate and split operations retain that clip’s key data.</p>
 <p>In Scene mode, OrbitControls owns the view; simply orbiting does not save a camera path. Capturing a key selects the custom camera. During playback/export, the renderer samples saved camera keys or uses the selected preset. Custom camera positions do not pass through the preset terrain-clearance clamp, so authored camera paths need inspection for terrain crossings.</p>
-<p class="ref">Evidence: <a href="../../src/replay-preview.ts">replay-preview.ts</a> — camera initialization, captureCamera, and render; <a href="../../src/ReplayStudio.tsx">ReplayStudio.tsx</a> — edit and captureCamera; <a href="../../src/studio-scene.ts">studio-scene.ts</a> — sampleCamera.</p>
+<p class="ref">Evidence: <a href="../../src/studio/replay-preview.ts">replay-preview.ts</a> — camera initialization, captureCamera, and render; <a href="../../src/studio/ReplayStudio.tsx">ReplayStudio.tsx</a> — edit and captureCamera; <a href="../../src/studio/studio-scene.ts">studio-scene.ts</a> — sampleCamera.</p>
 </section>
 
 <section id="rendering"><h2>10. Per-frame rendering pipeline</h2>
@@ -206,7 +207,7 @@ type PlacedObject = {
 <p>The renderer requests antialiasing and high-performance GPU preference, uses pixel ratio 1, PCF soft shadows, and ACES filmic tone mapping. Preview normally uses 1280 × 720 internal resolution; export selects 720p or 1080p. CSS viewport sizing maintains the 16:9 display independently of canvas pixels.</p>
 <p>Scene readiness combines world, model, and soundtrack preparation. Generation counters suppress obsolete completion state after later edits or cancellation. Instance preparation avoids duplicating an instance if another preparation completed while an asset was loading.</p>
 <p>Removing an imported instance disposes its cloned materials but retains shared template geometry/textures. Removing a primitive disposes its geometry. Disposing the renderer removes instances and disposes cached templates and their textures. This ownership distinction permits multiple instances to share immutable resources.</p>
-<p class="ref">Evidence: <a href="../../src/replay-preview.ts">replay-preview.ts</a> — constructor, prepareScene, render, dispose; <a href="../../src/studio-scene-renderer.ts">studio-scene-renderer.ts</a> — prepare, update, remove, dispose.</p>
+<p class="ref">Evidence: <a href="../../src/studio/replay-preview.ts">replay-preview.ts</a> — constructor, prepareScene, render, dispose; <a href="../../src/studio/studio-scene-renderer.ts">studio-scene-renderer.ts</a> — prepare, update, remove, dispose.</p>
 </section>
 
 <section id="audio"><h2>11. Audio pipeline</h2>
@@ -214,7 +215,7 @@ type PlacedObject = {
 <div class="equation">elapsed = filmTime − layer.start<br>audioSourceTime = layer.offset + elapsed<br>looped offset = audioSourceTime mod audioBuffer.duration<br>gain target = layer.volume × max(0, min(fadeInFactor, fadeOutFactor))</div>
 <p>Audio is active only while playback is running and inside the layer interval. Non-looping audio stops when its source duration is exhausted. Sources are restarted if the placement signature changes or if estimated audio time differs from requested source time by more than 0.3 seconds. Fade gain uses <code>setTargetAtTime</code> with a 0.015-second time constant rather than abrupt per-frame gain jumps.</p>
 <p>Pausing stops active layer sources. The next playback starts from the playhead-derived source offset. Imported audio is not automatically pitch- or time-stretched to match flight clip speed. Scene soundtrack layers remain on film time, while aircraft sound is generated from the sampled aircraft state and clip volume.</p>
-<p class="ref">Evidence: <a href="../../src/studio-soundtrack.ts">studio-soundtrack.ts</a> — start, prepare, update, pause; <a href="../../src/replay-preview.ts">replay-preview.ts</a> — startAudio and audio update.</p>
+<p class="ref">Evidence: <a href="../../src/studio/studio-soundtrack.ts">studio-soundtrack.ts</a> — start, prepare, update, pause; <a href="../../src/studio/replay-preview.ts">replay-preview.ts</a> — startAudio and audio update.</p>
 </section>
 
 <section id="export"><h2>12. Video capture and finalization</h2>
@@ -238,7 +239,7 @@ type PlacedObject = {
 </tbody></table></div>
 <p>The screen-space title is drawn after the 3D scene, so it is not subject to scene depth or object occlusion. Imported images remain 3D planes and do not receive this screen-space treatment. No editing grid, transform gizmo, or light marker is included when the preview is rendered with editing disabled.</p>
 <p>This capture path samples real-time playback rather than rendering an indexed frame sequence offline. A long frame delay advances the playhead by elapsed time; visual samples may be skipped. The duration bitrate heuristic and byte limit do not establish a quality or memory-performance guarantee.</p>
-<p class="ref">Evidence: <a href="../../src/ReplayStudio.tsx">ReplayStudio.tsx</a> — exportVideo, animation loop, visibility handler; <a href="../../src/replay-export.ts">replay-export.ts</a> — start, draw, finish, releaseRecorder.</p>
+<p class="ref">Evidence: <a href="../../src/studio/ReplayStudio.tsx">ReplayStudio.tsx</a> — exportVideo, animation loop, visibility handler; <a href="../../src/replay/replay-export.ts">replay-export.ts</a> — start, draw, finish, releaseRecorder.</p>
 </section>
 
 <section id="storage"><h2>13. Persistence and portable backups</h2>
@@ -253,7 +254,7 @@ type PlacedObject = {
 }</code></pre>
 <p><code>packProject</code> includes only assets referenced by scene objects and soundtrack layers. <code>unpackProject</code> checks the envelope/version, validates the project, decodes asset bytes, validates assets, and verifies that referenced IDs exist in the bundle. Assets elsewhere in the library but unused by the film are not included.</p>
 <p>Browser saves belong to the site origin and browser profile. Clearing site data can remove them. Backups have base64 expansion of roughly one-third for binary payloads, plus JSON overhead, and packing creates additional in-memory representations. Treat an exported video and an editable backup as different deliverables.</p>
-<p class="ref">Evidence: <a href="../../src/replay-library.ts">replay-library.ts</a>, <a href="../../src/studio-assets.ts">studio-assets.ts</a> — packProject/unpackProject; <a href="../../src/ReplayStudio.tsx">ReplayStudio.tsx</a> — persistence effect and queue.</p>
+<p class="ref">Evidence: <a href="../../src/replay/replay-library.ts">replay-library.ts</a>, <a href="../../src/studio/studio-assets.ts">studio-assets.ts</a> — packProject/unpackProject; <a href="../../src/studio/ReplayStudio.tsx">ReplayStudio.tsx</a> — persistence effect and queue.</p>
 </section>
 
 <section id="placement"><h2>14. Worked example: placing a tower into the film</h2>
@@ -303,17 +304,17 @@ type PlacedObject = {
 </tbody></table></div>
 <h3>Primary source files</h3>
 <div class="table-wrap"><table><thead><tr><th>File</th><th>Report responsibility</th></tr></thead><tbody>
-<tr><td><a href="../../src/ReplayStudio.tsx">src/ReplayStudio.tsx</a></td><td>Session orchestration, state/history, editing, scene preparation, saves, playback, export.</td></tr>
-<tr><td><a href="../../src/StudioScenePanels.tsx">src/StudioScenePanels.tsx</a></td><td>Asset browser, scene outliner, object/camera/project inspectors.</td></tr>
-<tr><td><a href="../../src/studio-model.ts">src/studio-model.ts</a></td><td>Project/clip schema, copied sources, trim and clock mapping.</td></tr>
-<tr><td><a href="../../src/studio-scene.ts">src/studio-scene.ts</a></td><td>Scene schema, keyframes, interpolation, anchor conversion, dependency IDs.</td></tr>
-<tr><td><a href="../../src/studio-assets.ts">src/studio-assets.ts</a></td><td>Asset bytes, classification, content hashing, validation, backup envelope.</td></tr>
-<tr><td><a href="../../src/studio-scene-renderer.ts">src/studio-scene-renderer.ts</a></td><td>Loading, centering, normalization, caching, instantiation, picking, rendering updates, disposal.</td></tr>
-<tr><td><a href="../../src/replay-preview.ts">src/replay-preview.ts</a></td><td>Viewport, aircraft reconstruction, camera, transforms, world and audio coordination.</td></tr>
-<tr><td><a href="../../src/studio-soundtrack.ts">src/studio-soundtrack.ts</a></td><td>Audio decode/cache, layer scheduling, gain and capture mix.</td></tr>
-<tr><td><a href="../../src/replay-export.ts">src/replay-export.ts</a></td><td>Canvas capture, title composition, recorder phases, formats, output limits, cleanup.</td></tr>
-<tr><td><a href="../../src/replay-library.ts">src/replay-library.ts</a></td><td>IndexedDB schema, persistence transactions, dependency validation.</td></tr>
-<tr><td><a href="../../src/replay-data.ts">src/replay-data.ts</a></td><td>Recording serialization, validation, source sample lookup.</td></tr>
+<tr><td><a href="../../src/studio/ReplayStudio.tsx">src/ReplayStudio.tsx</a></td><td>Session orchestration, state/history, editing, scene preparation, saves, playback, export.</td></tr>
+<tr><td><a href="../../src/studio/panels/">src/StudioScenePanels.tsx</a></td><td>Asset browser, scene outliner, object/camera/project inspectors.</td></tr>
+<tr><td><a href="../../src/studio/studio-model.ts">src/studio-model.ts</a></td><td>Project/clip schema, copied sources, trim and clock mapping.</td></tr>
+<tr><td><a href="../../src/studio/studio-scene.ts">src/studio-scene.ts</a></td><td>Scene schema, keyframes, interpolation, anchor conversion, dependency IDs.</td></tr>
+<tr><td><a href="../../src/studio/studio-assets.ts">src/studio-assets.ts</a></td><td>Asset bytes, classification, content hashing, validation, backup envelope.</td></tr>
+<tr><td><a href="../../src/studio/studio-scene-renderer.ts">src/studio-scene-renderer.ts</a></td><td>Loading, centering, normalization, caching, instantiation, picking, rendering updates, disposal.</td></tr>
+<tr><td><a href="../../src/studio/replay-preview.ts">src/replay-preview.ts</a></td><td>Viewport, aircraft reconstruction, camera, transforms, world and audio coordination.</td></tr>
+<tr><td><a href="../../src/studio/studio-soundtrack.ts">src/studio-soundtrack.ts</a></td><td>Audio decode/cache, layer scheduling, gain and capture mix.</td></tr>
+<tr><td><a href="../../src/replay/replay-export.ts">src/replay-export.ts</a></td><td>Canvas capture, title composition, recorder phases, formats, output limits, cleanup.</td></tr>
+<tr><td><a href="../../src/replay/replay-library.ts">src/replay-library.ts</a></td><td>IndexedDB schema, persistence transactions, dependency validation.</td></tr>
+<tr><td><a href="../../src/replay/replay-data.ts">src/replay-data.ts</a></td><td>Recording serialization, validation, source sample lookup.</td></tr>
 <tr><td><a href="../../tests/studio.test.ts">tests/studio.test.ts</a> · <a href="../../tests/studio-scene.test.ts">tests/studio-scene.test.ts</a> · <a href="../../tests/replay.test.ts">tests/replay.test.ts</a></td><td>Focused tests executed for this report.</td></tr>
 </tbody></table></div>
 </section>

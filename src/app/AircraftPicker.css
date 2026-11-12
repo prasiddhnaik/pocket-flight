@@ -1,0 +1,129 @@
+.aircraft-picker {
+  display: inline-flex;
+  width: 100%;
+  min-width: 0;
+}
+.aircraft-picker-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--blue-300);
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+}
+.aircraft-picker-trigger:hover,
+.aircraft-picker-trigger[aria-expanded="true"] {
+  color: var(--brand);
+  border-color: var(--brand);
+  transform: none;
+}
+.aircraft-picker-trigger > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.aircraft-picker-trigger > svg {
+  flex: none;
+}
+.aircraft-picker-trigger[aria-expanded="true"] > svg {
+  transform: rotate(180deg);
+}
+.aircraft-picker-model {
+  font-weight: 400;
+  color: var(--muted);
+}
+.aircraft-menu {
+  position: fixed;
+  z-index: 150;
+  display: flex;
+  flex-direction: column;
+  padding: 8px;
+  border: 1px solid var(--blue-200);
+  border-radius: 14px;
+  background: var(--blue-50);
+  color: var(--ink);
+  box-shadow:
+    0 16px 48px #0b154330,
+    0 3px 10px #0b154315;
+  font-family: "DM Sans", system-ui, sans-serif;
+}
+.aircraft-menu-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 10px 12px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+}
+.aircraft-menu-heading > span:last-child {
+  font-size: 9px;
+  letter-spacing: 0.1em;
+}
+.aircraft-menu-options {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.aircraft-menu-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 43px;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+}
+.aircraft-menu-option + .aircraft-menu-option {
+  margin-top: 3px;
+}
+.aircraft-menu-option > svg:first-child {
+  color: var(--brand);
+  flex: none;
+}
+.aircraft-menu-name {
+  flex: 1;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.aircraft-menu-model {
+  font-size: 11px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.aircraft-menu-check {
+  width: 16px;
+  flex: none;
+}
+.aircraft-menu-option.active {
+  background: var(--blue-100);
+}
+.aircraft-menu-option[aria-selected="true"] {
+  background: var(--brand);
+  color: white;
+}
+.aircraft-menu-option[aria-selected="true"] .aircraft-menu-model,
+.aircraft-menu-option[aria-selected="true"] > svg {
+  color: white;
+}
+.aircraft-menu-option.active[aria-selected="true"] {
+  box-shadow: inset 0 0 0 2px var(--blue-300);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .aircraft-menu {
+    animation: aircraft-menu-in 0.12s ease-out;
+  }
+  @keyframes aircraft-menu-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}

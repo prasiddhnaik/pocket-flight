@@ -1,15 +1,11 @@
+@import "./theme.css";
 @import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;450;500;550;600;650;700&family=DM+Serif+Display:ital@0;1&display=swap");
 :root {
   font-family: "DM Sans", sans-serif;
-  color: #233f42;
-  background: #a8dce5;
+  color: var(--blue-900);
+  background: var(--blue-200);
   font-synthesis: none;
   font-weight: 400;
-  --ink: #233f42;
-  --muted: #698083;
-  --paper: #f6f4e9;
-  --gold: #ecd08c;
-  --line: #264b431c;
 }
 * {
   box-sizing: border-box;
@@ -36,7 +32,7 @@ button:disabled {
 button:focus-visible,
 a:focus-visible,
 [role="button"]:focus-visible {
-  outline: 2px solid #c28b36;
+  outline: 2px solid var(--accent);
   outline-offset: 5px;
 }
 button {
@@ -90,19 +86,19 @@ button span {
 }
 .vignette {
   pointer-events: none;
-  box-shadow: inset 0 0 140px #173f4014;
+  box-shadow: inset 0 0 140px color-mix(in srgb, var(--blue-850) 7.8%, transparent);
 }
 .menu-wash {
   pointer-events: none;
   background:
     linear-gradient(
       90deg,
-      #e5eee5ee 0%,
-      #e5eee5b0 24%,
-      #e5eee526 48%,
+      color-mix(in srgb, var(--blue-100) 93.3%, transparent) 0%,
+      color-mix(in srgb, var(--blue-100) 69.0%, transparent) 24%,
+      color-mix(in srgb, var(--blue-100) 14.9%, transparent) 48%,
       transparent 67%
     ),
-    linear-gradient(0deg, #173d3b30, transparent 40%);
+    linear-gradient(0deg, color-mix(in srgb, var(--blue-850) 18.8%, transparent), transparent 40%);
 }
 .header {
   position: absolute;
@@ -116,35 +112,14 @@ button span {
   z-index: 2;
 }
 .brand {
-  display: flex;
-  gap: 11px;
+  display: inline-flex;
+  flex-shrink: 0;
   align-items: center;
-  font-size: 26px;
-  line-height: 1;
-  font-weight: 650;
-  letter-spacing: -1.2px;
 }
-.brand-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 46px;
-  height: 46px;
-  border-radius: 14px;
-  background: var(--gold);
-  color: #29484a;
-  box-shadow: 0 3px 12px #283f4010;
-}
-.brand-icon svg {
-  transform: rotate(-15deg);
-}
-.brand-flight {
+.brand-logo {
   display: block;
-  font-size: 10px;
-  letter-spacing: 5.5px;
-  font-weight: 550;
-  margin-top: 6px;
-  margin-left: 1px;
+  width: 178px;
+  height: auto;
 }
 .header nav {
   display: flex;
@@ -158,7 +133,7 @@ button span {
   font-size: 13px;
   position: relative;
   padding: 12px 0;
-  color: #496366;
+  color: var(--blue-700);
 }
 .header nav button.active {
   color: var(--ink);
@@ -175,7 +150,7 @@ button span {
 }
 .nav-count {
   font-size: 10px;
-  border: 1px solid #28494530;
+  border: 1px solid color-mix(in srgb, var(--blue-800) 18.8%, transparent);
   padding: 2px 4px;
   border-radius: 4px;
 }
@@ -189,7 +164,7 @@ button span {
   align-items: center;
   gap: 8px;
   font-size: 11px;
-  background: #f7faed4f;
+  background: color-mix(in srgb, var(--blue-50) 31.0%, transparent);
   padding: 9px 13px;
   border: 1px solid #ffffff70;
   border-radius: 30px;
@@ -224,9 +199,9 @@ button span {
   display: inline-block;
   width: 6px;
   height: 6px;
-  background: #628674;
+  background: var(--blue-500);
   border-radius: 50%;
-  box-shadow: 0 0 0 4px #64887612;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--blue-500) 7.1%, transparent);
   flex-shrink: 0;
 }
 h1 {
@@ -239,7 +214,7 @@ h1 {
 }
 h1 em {
   font-weight: 400;
-  color: #466f64;
+  color: var(--brand);
 }
 h2 {
   font-family: "DM Serif Display", Georgia, serif;
@@ -252,7 +227,7 @@ h2 {
 .hero > p {
   font-size: 14px;
   line-height: 1.8;
-  color: #57706d;
+  color: var(--blue-700);
   margin-top: 24px;
 }
 .hero-buttons {
@@ -262,9 +237,10 @@ h2 {
   margin-top: 31px;
 }
 .primary {
-  background: var(--gold);
+  background: var(--accent);
+  color: white;
   padding: 16px 23px;
-  border: 1px solid #b4985922;
+  border: 1px solid color-mix(in srgb, var(--accent) 13.3%, transparent);
   border-radius: 9px;
   display: inline-flex;
   align-items: center;
@@ -272,11 +248,11 @@ h2 {
   gap: 43px;
   font-size: 13px;
   font-weight: 650;
-  box-shadow: 0 4px 14px #55532710;
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--blue-800) 6.3%, transparent);
 }
 .primary:hover {
-  background: #f3db9d;
-  box-shadow: 0 5px 15px #35483820;
+  background: var(--brand-hover);
+  box-shadow: 0 5px 15px color-mix(in srgb, var(--blue-800) 12.5%, transparent);
 }
 .text-button {
   display: inline-flex;
@@ -292,13 +268,13 @@ h2 {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #789088;
+  color: var(--blue-600);
   font-size: 10px;
 }
 .keycap {
   padding: 1px 4px;
   font-size: 10px;
-  border: 1px solid #57706d30;
+  border: 1px solid color-mix(in srgb, var(--blue-600) 18.8%, transparent);
   border-radius: 4px;
 }
 .tiny-label {
@@ -314,10 +290,10 @@ h2 {
   bottom: 67px;
   display: grid;
   grid-template-columns: 1.1fr 1.55fr 1fr;
-  background: #f8f6eaf2;
-  border: 1px solid #fff9e6;
+  background: color-mix(in srgb, var(--blue-50) 94.9%, transparent);
+  border: 1px solid var(--blue-50);
   border-radius: 14px;
-  box-shadow: 0 12px 40px #153b3520;
+  box-shadow: 0 12px 40px color-mix(in srgb, var(--blue-900) 12.5%, transparent);
   padding: 26px 28px;
   backdrop-filter: blur(18px);
   z-index: 2;
@@ -333,11 +309,11 @@ h2 {
 }
 .departure-board p {
   font-size: 10px;
-  color: #839187;
+  color: var(--blue-600);
   margin-top: 7px;
 }
 .departure-board .tiny-label {
-  color: #87958a;
+  color: var(--blue-600);
   font-size: 8px;
 }
 .flight-plan {
@@ -349,7 +325,7 @@ h2 {
   border-right: 1px solid var(--line);
 }
 .board-icon {
-  background: #eae8d7;
+  background: var(--blue-100);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -360,7 +336,7 @@ h2 {
 }
 .flight-plan p span {
   margin: 0 9px;
-  color: #b0b8a6;
+  color: var(--blue-600);
 }
 .circle-button {
   width: 30px;
@@ -382,11 +358,11 @@ h2 {
 .aircraft-caption h3 {
   gap: 10px;
 }
-.aircraft-caption h3 > span {
+.aircraft-caption h3 > span:not(.aircraft-picker) {
   font-size: 10px;
   letter-spacing: 1px;
-  color: #98a299;
-  border-left: 1px solid #abb6a54d;
+  color: var(--blue-600);
+  border-left: 1px solid color-mix(in srgb, var(--blue-300) 30.2%, transparent);
   padding-left: 10px;
 }
 .swatches {
@@ -398,7 +374,7 @@ h2 {
   width: 22px;
   height: 22px;
   background: var(--paint);
-  border: 3px solid #f6f4e9;
+  border: 3px solid var(--blue-100);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -408,13 +384,13 @@ h2 {
   box-shadow: inset 0 0 0 1px #0000000c;
 }
 .swatch.selected {
-  outline: 1px solid #587369;
+  outline: 1px solid var(--blue-600);
 }
 .paint-options > span {
   display: block;
   font-size: 9px;
   text-align: right;
-  color: #8b998d;
+  color: var(--blue-600);
   margin-top: 9px;
 }
 .board-end {
@@ -428,7 +404,7 @@ h2 {
   font-size: 13px;
 }
 .board-end > svg {
-  color: #849681;
+  color: var(--blue-600);
   flex-shrink: 0;
 }
 .menu-footer {
@@ -441,7 +417,7 @@ h2 {
   align-items: center;
   font-size: 8px;
   letter-spacing: 1.7px;
-  color: #e8eee0b0;
+  color: color-mix(in srgb, var(--blue-50) 69.0%, transparent);
 }
 .footer-mark {
   font-size: 21px;
@@ -466,7 +442,7 @@ h2 {
   border-radius: 3px;
 }
 .night .footer-location {
-  color: #f8f6dc;
+  color: var(--blue-50);
 }
 .version {
   margin-left: 16px;
@@ -476,7 +452,7 @@ h2 {
 .loading {
   position: absolute;
   inset: 0;
-  background: #e7ede1;
+  background: var(--blue-100);
   z-index: 20;
   display: flex;
   flex-direction: column;
@@ -487,6 +463,11 @@ h2 {
 .loading h2 {
   font-size: 32px;
 }
+.loading-logo {
+  width: 240px;
+  max-width: 60vw;
+  height: auto;
+}
 .loading p {
   font-size: 13px;
   color: var(--muted);
@@ -494,42 +475,42 @@ h2 {
 .night .menu-wash {
   background: linear-gradient(
     90deg,
-    #132c38ee,
-    #18353aaa 28%,
-    #18353a20 56%,
+    color-mix(in srgb, var(--blue-900) 93.3%, transparent),
+    color-mix(in srgb, var(--blue-850) 66.7%, transparent) 28%,
+    color-mix(in srgb, var(--blue-850) 12.5%, transparent) 56%,
     transparent
   );
 }
 .night.on-menu {
-  color: #f2efd8;
+  color: var(--blue-50);
 }
 .night .hero > p,
 .night .hero-note,
 .night .header nav button {
-  color: #b7ccbe;
+  color: var(--blue-200);
 }
 .night h1 em {
-  color: #ecd08c;
+  color: var(--blue-300);
 }
 .night .departure-board,
 .night .panel {
   color: var(--ink);
 }
 .night .header nav button.active {
-  color: #f2efd8;
+  color: var(--blue-50);
 }
 .night .header nav button.active:after {
-  background: #ecd08c;
+  background: var(--blue-300);
 }
 .night .text-button {
   color: inherit;
 }
 .night .hero .primary {
-  color: var(--ink);
+  color: white;
 }
 /* The flight deck stays quiet so the sky does the talking. */
 .in-flight {
-  color: #fff6df;
+  color: var(--blue-50);
 }
 .flight-header {
   position: absolute;
@@ -539,7 +520,7 @@ h2 {
   display: flex;
   gap: 20px;
   align-items: flex-start;
-  text-shadow: 0 2px 8px #1d525350;
+  text-shadow: 0 2px 8px color-mix(in srgb, var(--blue-850) 31.4%, transparent);
 }
 .flight-brand {
   padding: 0;
@@ -572,13 +553,13 @@ h2 {
   width: 18px;
   height: 3px;
   border-radius: 2px;
-  background: #e2eed84f;
+  background: color-mix(in srgb, var(--blue-100) 31.0%, transparent);
 }
 .mission-progress i.done {
-  background: #f7dda0;
+  background: var(--accent);
 }
 .mission-progress i.next {
-  background: #ffefd0;
+  background: var(--blue-100);
 }
 .mission-progress > span {
   font-size: 10px;
@@ -590,7 +571,7 @@ h2 {
   gap: 7px;
   margin-left: auto;
   align-items: center;
-  background: #24535a28;
+  background: color-mix(in srgb, var(--blue-800) 15.7%, transparent);
   backdrop-filter: blur(10px);
   border: 1px solid #ffffff26;
   padding: 3px 7px;
@@ -615,21 +596,21 @@ h2 {
   display: flex;
   align-items: center;
   gap: 17px;
-  text-shadow: 0 1px 7px #16525880;
+  text-shadow: 0 1px 7px color-mix(in srgb, var(--blue-850) 50.2%, transparent);
   font-size: 9px;
-  color: #fff9e7b0;
+  color: color-mix(in srgb, var(--blue-50) 69.0%, transparent);
 }
 .compass > i {
   height: 7px;
   width: 1px;
-  background: #fff9e76b;
+  background: color-mix(in srgb, var(--blue-50) 42.0%, transparent);
 }
 .compass strong {
   font-size: 15px;
   letter-spacing: 1.5px;
   font-weight: 500;
   position: relative;
-  color: #fff9e7;
+  color: var(--blue-50);
 }
 .compass strong b {
   position: absolute;
@@ -637,7 +618,7 @@ h2 {
   top: 24px;
   left: 50%;
   transform: translateX(-50%);
-  color: #eccc83;
+  color: var(--blue-300);
 }
 .target-label {
   position: absolute;
@@ -648,19 +629,19 @@ h2 {
   pointer-events: none;
   transform: translate(-50%, -50%);
   font-size: 11px;
-  text-shadow: 0 1px 7px #1b514970;
-  color: #ffefbe;
+  text-shadow: 0 1px 7px color-mix(in srgb, var(--blue-850) 43.9%, transparent);
+  color: var(--blue-50);
 }
 .target-diamond {
   width: 10px;
   height: 10px;
-  border: 1px solid #ffeab1;
+  border: 1px solid var(--blue-300);
   transform: rotate(45deg);
   margin-bottom: 21px;
 }
 .target-label > span:last-child {
-  background: #1e575a4f;
-  border: 1px solid #fff5c933;
+  background: color-mix(in srgb, var(--blue-800) 31.0%, transparent);
+  border: 1px solid color-mix(in srgb, var(--blue-100) 20.0%, transparent);
   padding: 6px 9px;
   border-radius: 5px;
   backdrop-filter: blur(5px);
@@ -692,13 +673,13 @@ h2 {
 .center-reticle span {
   width: 15px;
   height: 1px;
-  background: #fff8de;
+  background: var(--blue-100);
 }
 .center-reticle i {
   width: 3px;
   height: 3px;
   border-radius: 50%;
-  background: #fff8de;
+  background: var(--blue-100);
 }
 .flight-bottom {
   position: absolute;
@@ -712,13 +693,13 @@ h2 {
 }
 .telemetry {
   width: 300px;
-  background: #163d4680;
-  border: 1px solid #fff6de22;
+  background: color-mix(in srgb, var(--blue-850) 50.2%, transparent);
+  border: 1px solid color-mix(in srgb, var(--blue-100) 13.3%, transparent);
   padding: 21px 21px 15px;
   border-radius: 14px;
   backdrop-filter: blur(18px);
-  text-shadow: 0 1px 4px #082d3344;
-  box-shadow: 0 6px 35px #153e3c12;
+  text-shadow: 0 1px 4px color-mix(in srgb, var(--blue-900) 26.7%, transparent);
+  box-shadow: 0 6px 35px color-mix(in srgb, var(--blue-850) 7.1%, transparent);
 }
 .main-readouts {
   display: flex;
@@ -729,7 +710,7 @@ h2 {
 .main-readouts label {
   font-size: 8px;
   letter-spacing: 1.7px;
-  color: #e9ebdba1;
+  color: color-mix(in srgb, var(--blue-50) 63.1%, transparent);
   display: block;
 }
 .main-readouts strong {
@@ -742,7 +723,7 @@ h2 {
 }
 .main-readouts strong small {
   font-size: 13px;
-  color: #e9ebdba1;
+  color: color-mix(in srgb, var(--blue-50) 63.1%, transparent);
   margin-left: 6px;
   letter-spacing: 0;
 }
@@ -759,12 +740,12 @@ h2 {
 }
 .speed-line i {
   display: block;
-  background: #eacb82;
+  background: var(--blue-300);
   height: 100%;
 }
 .sub-readout {
   font-size: 7px;
-  color: #f5f1cf80;
+  color: color-mix(in srgb, var(--blue-50) 50.2%, transparent);
   letter-spacing: 0.6px;
   display: block;
   margin-top: 10px;
@@ -783,10 +764,10 @@ h2 {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  color: #e9ebdb9a;
+  color: color-mix(in srgb, var(--blue-50) 60.4%, transparent);
 }
 .secondary-readouts label b {
-  color: #fff5d6;
+  color: var(--blue-50);
   font-size: 10px;
   font-weight: 400;
 }
@@ -794,7 +775,7 @@ h2 {
   appearance: none;
   width: 135px;
   height: 3px;
-  background: #fff8d85c;
+  background: color-mix(in srgb, var(--blue-100) 36.1%, transparent);
   border-radius: 2px;
   outline: 0;
   cursor: pointer;
@@ -804,7 +785,7 @@ h2 {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: #e8c87f;
+  background: var(--blue-300);
 }
 .health {
   font-size: 10px;
@@ -828,7 +809,7 @@ h2 {
 .flight-center-bottom {
   text-align: center;
   font-size: 9px;
-  color: #f3f2d9a6;
+  color: color-mix(in srgb, var(--blue-50) 65.1%, transparent);
   padding-bottom: 4px;
   max-width: 470px;
 }
@@ -847,12 +828,12 @@ h2 {
   font-size: 10px;
   letter-spacing: 0.2px;
   margin-bottom: 15px;
-  background: #16444945;
-  border: 1px solid #fff3d317;
+  background: color-mix(in srgb, var(--blue-850) 27.1%, transparent);
+  border: 1px solid color-mix(in srgb, var(--blue-100) 9.0%, transparent);
   padding: 10px 14px;
   border-radius: 20px;
   backdrop-filter: blur(8px);
-  color: #ffefd6;
+  color: var(--blue-50);
 }
 .flight-hint.warning {
   color: #ffdab1;
@@ -866,10 +847,10 @@ h2 {
   position: relative;
   width: 174px;
   border-radius: 13px;
-  background: #29595a8f;
-  border: 1px solid #fff6de40;
+  background: color-mix(in srgb, var(--blue-800) 56.1%, transparent);
+  border: 1px solid color-mix(in srgb, var(--blue-100) 25.1%, transparent);
   overflow: hidden;
-  box-shadow: 0 4px 25px #10464620;
+  box-shadow: 0 4px 25px color-mix(in srgb, var(--blue-850) 12.5%, transparent);
 }
 .minimap canvas {
   width: 100%;
@@ -886,7 +867,7 @@ h2 {
   z-index: 1;
   font-size: 7px;
   letter-spacing: 1.2px;
-  text-shadow: 0 1px 4px #12433d99;
+  text-shadow: 0 1px 4px color-mix(in srgb, var(--blue-850) 60.0%, transparent);
 }
 .map-top {
   top: 10px;
@@ -901,7 +882,7 @@ h2 {
   justify-content: flex-end;
   gap: 8px;
   margin-bottom: 13px;
-  text-shadow: 0 1px 5px #11463e88;
+  text-shadow: 0 1px 5px color-mix(in srgb, var(--blue-850) 53.3%, transparent);
 }
 .flight-clock > span {
   font-size: 16px;
@@ -923,19 +904,19 @@ h2 {
   display: flex;
   align-items: center;
   gap: 12px;
-  background: #f8f4e5ed;
-  color: #315453;
+  background: color-mix(in srgb, var(--blue-100) 92.9%, transparent);
+  color: var(--blue-700);
   backdrop-filter: blur(15px);
   font-size: 12px;
   line-height: 1.5;
   max-width: 90%;
   padding: 12px 19px 12px 11px;
   border-radius: 10px;
-  box-shadow: 0 7px 24px #194b4b1a;
+  box-shadow: 0 7px 24px color-mix(in srgb, var(--blue-850) 10.2%, transparent);
   animation: toast-in 0.4s ease;
 }
 .toast-icon {
-  background: #e8d49b;
+  background: var(--blue-200);
   border-radius: 7px;
   width: 31px;
   height: 31px;
@@ -952,8 +933,8 @@ h2 {
   display: flex;
   align-items: center;
   gap: 25px;
-  background: #123940bb;
-  border: 1px solid #e8efda44;
+  background: color-mix(in srgb, var(--blue-850) 73.3%, transparent);
+  border: 1px solid color-mix(in srgb, var(--blue-100) 26.7%, transparent);
   border-radius: 10px;
   padding: 14px 20px;
   font-size: 10px;
@@ -966,7 +947,7 @@ h2 {
   gap: 10px;
 }
 .replay-bar .live-dot {
-  background: #edc888;
+  background: var(--blue-300);
 }
 .replay-bar button {
   font-size: 11px;
@@ -975,11 +956,11 @@ h2 {
 .touch-controls {
   display: none;
 }
-/* Quiet paper panels, warm ink, and a hint of vintage aviation. */
+/* Cool paper panels with navy ink. */
 .modal-scrim {
   position: absolute;
   inset: 0;
-  background: #113b4666;
+  background: color-mix(in srgb, var(--blue-850) 40.0%, transparent);
   backdrop-filter: blur(12px);
   z-index: 10;
   display: flex;
@@ -994,10 +975,10 @@ h2 {
 .result-card {
   position: relative;
   background: var(--paper);
-  border: 1px solid #fffbea;
+  border: 1px solid var(--blue-50);
   border-radius: 20px;
   padding: 39px;
-  box-shadow: 0 30px 120px #0c33384d;
+  box-shadow: 0 30px 120px color-mix(in srgb, var(--blue-900) 30.2%, transparent);
   width: 620px;
   max-height: calc(100svh - 60px);
   overflow: auto;
@@ -1006,7 +987,7 @@ h2 {
 .pause-card > p,
 .result-card > p {
   font-size: 12px;
-  color: #859185;
+  color: var(--blue-600);
   line-height: 1.7;
   margin-top: 13px;
 }
@@ -1014,13 +995,13 @@ h2 {
   position: absolute;
   right: 20px;
   top: 19px;
-  color: #7a8b7c;
+  color: var(--blue-600);
 }
 .panel .eyebrow,
 .pause-card .eyebrow,
 .result-card .eyebrow {
   font-size: 8px;
-  color: #8a987e;
+  color: var(--blue-600);
   letter-spacing: 1.7px;
 }
 .panel h2 {
@@ -1047,27 +1028,27 @@ h2 {
   border-radius: 8px;
 }
 .mission-option:hover {
-  background: #e8eadc;
+  background: var(--blue-100);
 }
 .mission-option.selected {
-  background: #e9e9d8;
-  border-color: #c8cdb36b;
+  background: var(--blue-100);
+  border-color: color-mix(in srgb, var(--blue-300) 42.0%, transparent);
 }
 .mission-number {
   font-size: 9px;
-  color: #99a28e;
+  color: var(--blue-600);
   letter-spacing: 1px;
 }
 .mission-symbol {
   width: 39px;
   height: 39px;
-  background: #e2e5d3;
+  background: var(--blue-200);
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  color: #638276;
+  color: var(--blue-600);
 }
 .mission-text {
   flex: 1;
@@ -1076,7 +1057,7 @@ h2 {
 .mission-text .tiny-label {
   font-size: 6px;
   letter-spacing: 1.2px;
-  color: #89957d;
+  color: var(--blue-600);
 }
 .mission-text strong {
   display: flex;
@@ -1089,7 +1070,7 @@ h2 {
 .mission-text > span:last-child {
   font-size: 9px;
   line-height: 1.6;
-  color: #83907e;
+  color: var(--blue-600);
   display: block;
   margin-top: 4px;
   white-space: normal;
@@ -1098,17 +1079,17 @@ h2 {
 .mission-meta {
   font-size: 10px;
   text-align: right;
-  color: #738571;
+  color: var(--blue-600);
   line-height: 1.6;
 }
 .mission-meta small {
   font-size: 8px;
   display: block;
-  color: #929d88;
+  color: var(--blue-600);
 }
 .mission-option > svg {
   width: 14px;
-  color: #768e78;
+  color: var(--blue-600);
   margin-left: 7px;
 }
 .panel-bottom {
@@ -1150,7 +1131,7 @@ h2 {
 .control-list small {
   display: block;
   font-size: 9px;
-  color: #8a977f;
+  color: var(--blue-600);
   margin-top: 5px;
 }
 .control-list > div > span:last-child {
@@ -1160,7 +1141,7 @@ h2 {
 }
 .control-list i {
   font-size: 8px;
-  color: #9da68f;
+  color: var(--blue-600);
   font-style: normal;
   padding: 0 3px;
 }
@@ -1170,34 +1151,34 @@ kbd {
   padding: 6px 8px;
   min-width: 26px;
   text-align: center;
-  border: 1px solid #cdd1be;
+  border: 1px solid var(--blue-200);
   border-bottom-width: 2px;
   border-radius: 5px;
-  background: #eeeee1;
-  color: #58725e;
+  background: var(--blue-100);
+  color: var(--blue-700);
   white-space: nowrap;
 }
 .pilot-tip {
   display: flex;
   gap: 15px;
   align-items: flex-start;
-  background: #e6e9d6;
+  background: var(--blue-100);
   padding: 17px;
   border-radius: 9px;
   margin-top: 24px;
 }
 .pilot-tip > svg {
-  color: #7d9370;
+  color: var(--blue-600);
   flex-shrink: 0;
 }
 .pilot-tip p {
   font-size: 10px;
   line-height: 1.85;
-  color: #788a70;
+  color: var(--blue-600);
 }
 .pilot-tip b {
   display: block;
-  color: #4d6b59;
+  color: var(--blue-700);
   font-size: 11px;
   margin-bottom: 4px;
 }
@@ -1226,11 +1207,11 @@ kbd {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: #e9dfba;
+  background: var(--blue-200);
   width: 61px;
   height: 61px;
   border-radius: 17px;
-  color: #71815e;
+  color: var(--blue-600);
 }
 .pause-card h2,
 .result-card h2 {
@@ -1253,14 +1234,14 @@ kbd {
   gap: 9px;
   padding: 15px 10px;
   font-size: 11px;
-  border: 1px solid #7b956c25;
+  border: 1px solid color-mix(in srgb, var(--blue-500) 14.5%, transparent);
   border-radius: 8px;
 }
 .pause-grid button:hover {
-  background: #e9ebda;
+  background: var(--blue-100);
 }
 .pause-card > .text-button {
-  color: #8a977d;
+  color: var(--blue-600);
   font-size: 10px;
 }
 .medal {
@@ -1309,7 +1290,7 @@ kbd {
 .result-score small {
   font-size: 8px;
   letter-spacing: 1.5px;
-  color: #92a081;
+  color: var(--blue-600);
   margin-left: 4px;
 }
 .result-stats,
@@ -1330,7 +1311,7 @@ kbd {
   display: block;
   font-size: 7px;
   letter-spacing: 1.1px;
-  color: #91a080;
+  color: var(--blue-600);
   margin-top: 8px;
 }
 .result-actions {
@@ -1340,7 +1321,7 @@ kbd {
 }
 .result-actions button {
   font-size: 10px;
-  color: #819175;
+  color: var(--blue-600);
 }
 .log-stats strong {
   font-size: 29px;
@@ -1354,12 +1335,12 @@ kbd {
 .empty-log {
   padding: 42px 0 10px;
   text-align: center;
-  color: #8d9b83;
+  color: var(--blue-600);
 }
 .empty-log h3 {
   font-size: 16px;
   font-weight: 500;
-  color: #506f5a;
+  color: var(--blue-700);
   margin-top: 17px;
 }
 .empty-log p {
@@ -1392,7 +1373,7 @@ kbd {
 .log-list small {
   display: block;
   font-size: 9px;
-  color: #90a07e;
+  color: var(--blue-600);
   margin-top: 5px;
   text-transform: capitalize;
 }
@@ -1416,19 +1397,19 @@ kbd {
   display: flex;
   align-items: center;
   gap: 15px;
-  color: #728d71;
+  color: var(--blue-600);
 }
 .setting-row b {
   font-size: 12px;
   font-weight: 500;
-  color: #496851;
+  color: var(--blue-700);
 }
 .setting-toggle {
   display: flex;
   gap: 13px;
   align-items: center;
-  background: #e8ebd9;
-  border: 1px solid #6b865220;
+  background: var(--blue-100);
+  border: 1px solid color-mix(in srgb, var(--blue-600) 12.5%, transparent);
   border-radius: 7px;
   padding: 10px 13px;
   font-size: 11px;
@@ -1438,12 +1419,12 @@ kbd {
   height: 25px;
 }
 .music-label { display: grid; gap: 5px; }
-.music-label small, .music-status { font-size: 10px; color: #647b67; }
-.music-volume { display: flex; align-items: center; gap: 12px; font-size: 11px; color: #496851; }
+.music-label small, .music-status { font-size: 10px; color: var(--blue-600); }
+.music-volume { display: flex; align-items: center; gap: 12px; font-size: 11px; color: var(--blue-700); }
 .music-volume > span { min-width: 30px; text-align: right; }
-.music-volume input { width: clamp(75px, 18vw, 145px); accent-color: #6b8652; cursor: pointer; }
+.music-volume input { width: clamp(75px, 18vw, 145px); accent-color: var(--brand); cursor: pointer; }
 .music-status button { text-decoration: underline; font-size: inherit; }
-.music-track-select { max-width: 60%; color: #496851; cursor: pointer; }
+.music-track-select { max-width: 60%; color: var(--blue-700); cursor: pointer; }
 @keyframes toast-in {
   from {
     opacity: 0;
@@ -1531,17 +1512,8 @@ kbd {
   .header nav button:nth-child(2) {
     display: none;
   }
-  .brand {
-    font-size: 23px;
-  }
-  .brand-icon {
-    width: 39px;
-    height: 39px;
-    border-radius: 11px;
-  }
-  .brand-flight {
-    font-size: 8px;
-    letter-spacing: 5px;
+  .brand-logo {
+    width: 148px;
   }
   .header-actions {
     gap: 3px;
@@ -1797,7 +1769,7 @@ kbd {
   .flight-plan {
     padding-right: 9px;
   }
-  .aircraft-caption h3 > span {
+  .aircraft-caption h3 > span:not(.aircraft-picker) {
     font-size: 7px;
     padding-left: 7px;
   }
@@ -1822,8 +1794,8 @@ kbd {
   }
   .menu-wash {
     background:
-      linear-gradient(90deg, #e4eee5e8, #e5eee594 48%, #e5eee510 95%),
-      linear-gradient(0deg, #173d3b30, transparent 40%);
+      linear-gradient(90deg, color-mix(in srgb, var(--blue-100) 91.0%, transparent), color-mix(in srgb, var(--blue-100) 58.0%, transparent) 48%, color-mix(in srgb, var(--blue-100) 6.3%, transparent) 95%),
+      linear-gradient(0deg, color-mix(in srgb, var(--blue-850) 18.8%, transparent), transparent 40%);
   }
   .flight-header {
     left: 15px;
@@ -2125,8 +2097,8 @@ kbd {
     left: 22px;
     width: 100px;
     height: 100px;
-    background: #16465344;
-    border: 1px solid #f5ebce55;
+    background: color-mix(in srgb, var(--blue-850) 26.7%, transparent);
+    border: 1px solid color-mix(in srgb, var(--blue-100) 33.3%, transparent);
     border-radius: 50%;
     touch-action: none;
     display: flex;
@@ -2148,8 +2120,8 @@ kbd {
     position: absolute;
     right: 24px;
     bottom: 260px;
-    background: #16465377;
-    border: 1px solid #f5ebce55;
+    background: color-mix(in srgb, var(--blue-850) 46.7%, transparent);
+    border: 1px solid color-mix(in srgb, var(--blue-100) 33.3%, transparent);
     border-radius: 50%;
     width: 61px;
     height: 61px;
@@ -2228,11 +2200,11 @@ kbd {
   flex-wrap: wrap;
   z-index: 12;
   backdrop-filter: blur(16px);
-  color: #fff8e6;
+  color: var(--blue-50);
 }
 .replay-progress { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; flex: 1 1 260px; }
 .replay-progress > span:first-child { display: flex; align-items: center; gap: 9px; flex: 1; }
-.replay-progress progress { width: 100%; height: 4px; accent-color: #edc888; }
+.replay-progress progress { width: 100%; height: 4px; accent-color: var(--accent); }
 .replay-progress small { width: 100%; font-size: 11px; line-height: 1.5; letter-spacing: 0; opacity: .85; }
 .replay-download-wrap { display: flex; flex-direction: column; align-items: center; gap: 8px; }
 .replay-download { display: inline-flex; align-items: center; justify-content: center; gap: 9px; padding: 12px 15px; border: 1px solid currentColor; border-radius: 9px; font-size: 12px; text-decoration: none; }
@@ -2246,29 +2218,15 @@ kbd {
   .is-replaying .replay-bar button, .is-replaying .replay-bar a { font-size: 11px; }
 }
 
-.aircraft-picker {
-  font: inherit;
-  color: inherit;
-  background: transparent;
-  border: 0;
-  border-bottom: 1px solid #aab9af;
-  padding: 4px 24px 4px 0;
-  max-width: 100%;
-  cursor: pointer;
-}
-.aircraft-picker:focus-visible {
-  outline: 2px solid #327c79;
-  outline-offset: 4px;
-}
 .jet-flight-note {
   display: flex;
   flex-direction: column;
   gap: 5px;
-  color: #6b837b;
+  color: var(--blue-600);
   font-size: 12px;
 }
 .jet-flight-note b {
-  color: #25464b;
+  color: var(--blue-900);
   font-size: 15px;
 }
 
@@ -2282,18 +2240,18 @@ kbd {
   font-size: 12px;
 }
 .launch-brief > span:first-child { display: flex; align-items: center; gap: 8px; font-weight: 650; }
-.launch-brief > span:last-child { color: #526f69; font-size: 11px; }
+.launch-brief > span:last-child { color: var(--blue-700); font-size: 11px; }
 .hero-buttons { margin-top: 18px; }
-.quick-help { display: inline-flex; align-items: center; gap: 8px; margin-top: 17px; padding: 6px 0; font-size: 12px; color: #3c6159; }
+.quick-help { display: inline-flex; align-items: center; gap: 8px; margin-top: 17px; padding: 6px 0; font-size: 12px; color: var(--blue-700); }
 .flight-plan { text-align: left; width: 100%; }
 .flight-plan:hover .plan-name { text-decoration: underline; text-underline-offset: 4px; }
-.night .launch-brief, .night .quick-help { color: #f6efd9; }
-.night .launch-brief > span:last-child { color: #d1dbd0; }
+.night .launch-brief, .night .quick-help { color: var(--blue-50); }
+.night .launch-brief > span:last-child { color: var(--blue-200); }
 .flight-header, .compass, .flight-bottom { z-index: 2; }
-.compass { background: #12363d; border: 1px solid #fff6de30; border-radius: 20px; padding: 7px 11px; gap: 9px; font-size: 10px; color: #e3e8db; text-shadow: none; }
+.compass { background: var(--blue-900); border: 1px solid color-mix(in srgb, var(--blue-100) 18.8%, transparent); border-radius: 20px; padding: 7px 11px; gap: 9px; font-size: 10px; color: var(--blue-50); text-shadow: none; }
 .compass strong { font-variant-numeric: tabular-nums; font-size: 15px; }
-.compass-cardinal { color: var(--gold); font-weight: 700; min-width: 20px; text-align: center; }
-.telemetry { width: 264px; background: #12363dd9; padding: 12px 14px; border-color: #fff6de30; }
+.compass-cardinal { color: var(--blue-300); font-weight: 700; min-width: 20px; text-align: center; }
+.telemetry { width: 264px; background: color-mix(in srgb, var(--blue-900) 85.1%, transparent); padding: 12px 14px; border-color: color-mix(in srgb, var(--blue-100) 18.8%, transparent); }
 .telemetry.expanded { width: 300px; }
 .deck-status { display: flex; gap: 6px; align-items: center; padding-bottom: 6px; margin-bottom: 8px; border-bottom: 1px solid #ffffff26; font-size: 10px; }
 .deck-status > span { margin-right: auto; }
@@ -2301,39 +2259,39 @@ kbd {
 .instrument-toggle:hover { background: #ffffff20; }
 .telemetry.expanded .instrument-toggle svg { transform: rotate(180deg); }
 .telemetry.expanded .main-readouts strong { font-size: 36px; }
-.deck-status b { font-size: 8px; letter-spacing: .6px; color: #e3d19c; }
+.deck-status b { font-size: 8px; letter-spacing: .6px; color: var(--accent); }
 .deck-status .stall-status { color: #ffb299; }
-.main-readouts label { font-size: 9px; letter-spacing: .7px; color: #d7e1d7; }
+.main-readouts label { font-size: 9px; letter-spacing: .7px; color: var(--blue-50); }
 .main-readouts strong { font-size: 31px; margin-top: 4px; }
-.main-readouts strong small { color: #d7e1d7; }
-.sub-readout { font-size: 8px; letter-spacing: .2px; color: #d7e1d7; margin-top: 4px; }
-.climb-readout { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 15px; font-size: 10px; color: #d7e1d7; }
-.climb-readout b { font-size: 12px; color: #fff6df; font-variant-numeric: tabular-nums; font-weight: 500; }
-.climb-readout small { font-size: 10px; color: #d7e1d7; }
+.main-readouts strong small { color: var(--blue-50); }
+.sub-readout { font-size: 8px; letter-spacing: .2px; color: var(--blue-50); margin-top: 4px; }
+.climb-readout { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 15px; font-size: 10px; color: var(--blue-50); }
+.climb-readout b { font-size: 12px; color: var(--blue-50); font-variant-numeric: tabular-nums; font-weight: 500; }
+.climb-readout small { font-size: 10px; color: var(--blue-50); }
 .secondary-readouts { margin-top: 10px; padding-top: 9px; }
-.secondary-readouts label { font-size: 9px; color: #d7e1d7; }
+.secondary-readouts label { font-size: 9px; color: var(--blue-50); }
 .secondary-readouts label b { font-size: 12px; font-weight: 600; }
 .secondary-readouts input { flex: 1; min-width: 45px; width: 80px; height: 5px; }
 .secondary-readouts input::-webkit-slider-thumb { width: 18px; height: 18px; }
-.secondary-readouts input:focus-visible { outline: 2px solid var(--gold); outline-offset: 7px; }
+.secondary-readouts input:focus-visible { outline: 2px solid var(--blue-300); outline-offset: 7px; }
 .health { font-size: 10px; }
-.flight-header { text-shadow: 0 1px 4px #082d33; }
-.objective { background: #12363dbf; border: 1px solid #fff6de30; border-radius: 10px; padding: 9px 12px; max-width: 300px; }
+.flight-header { text-shadow: 0 1px 4px var(--blue-900); }
+.objective { background: color-mix(in srgb, var(--blue-900) 74.9%, transparent); border: 1px solid color-mix(in srgb, var(--blue-100) 18.8%, transparent); border-radius: 10px; padding: 9px 12px; max-width: 300px; }
 .objective .tiny-label { font-size: 9px; opacity: 1; }
 .objective h3 { font-size: 13px; line-height: 1.4; margin-top: 5px; }
 .mission-progress { margin-top: 7px; gap: 4px; }
 .mission-progress i { width: 12px; }
 .mission-progress > span { font-size: 9px; opacity: 1; }
-.flight-tools { background: #12363de8; }
-.flight-clock { width: fit-content; margin-left: auto; padding: 8px 10px; border-radius: 9px; background: #12363de8; }
+.flight-tools { background: color-mix(in srgb, var(--blue-900) 91.0%, transparent); }
+.flight-clock { width: fit-content; margin-left: auto; padding: 8px 10px; border-radius: 9px; background: color-mix(in srgb, var(--blue-900) 91.0%, transparent); }
 .flight-clock > span { font-size: 16px; }
-.flight-clock small { font-size: 8px; color: #d7e1d7; }
+.flight-clock small { font-size: 8px; color: var(--blue-50); }
 .map-wrap, .minimap { width: 124px; }
 .map-top { font-size: 9px; }
 .map-bottom { font-size: 8px; }
-.flight-hint { background: #12363de8; color: #fff6df; font-size: 12px; line-height: 1.5; max-width: 420px; }
-.flight-center-bottom > button { font-size: 12px; padding: 8px; color: #fff6df; background: #12363de8; border-radius: 7px; }
-.flight-center-bottom > span { font-size: 11px; color: #fff6df; text-shadow: 0 1px 4px #082d33; }
+.flight-hint { background: color-mix(in srgb, var(--blue-900) 91.0%, transparent); color: var(--blue-50); font-size: 12px; line-height: 1.5; max-width: 420px; }
+.flight-center-bottom > button { font-size: 12px; padding: 8px; color: var(--blue-50); background: color-mix(in srgb, var(--blue-900) 91.0%, transparent); border-radius: 7px; }
+.flight-center-bottom > span { font-size: 11px; color: var(--blue-50); text-shadow: 0 1px 4px var(--blue-900); }
 .control-list small { font-size: 12px; line-height: 1.6; }
 .control-list b { font-size: 14px; }
 .control-list kbd { font-size: 11px; }
@@ -2343,7 +2301,7 @@ kbd {
 .mission-text > span:last-child { font-size: 12px; line-height: 1.5; }
 .mission-text .tiny-label, .mission-meta, .mission-meta small { font-size: 10px; }
 .mission-text strong { font-size: 15px; }
-.mission-option.selected { border-color: #456d60; }
+.mission-option.selected { border-color: var(--blue-700); }
 button:disabled { cursor: not-allowed; }
 @media (max-width: 1150px) {
   .compass { top: 110px; }
@@ -2441,7 +2399,7 @@ button:disabled { cursor: not-allowed; }
   .launch-brief { margin-top: 14px; }
   .hero-buttons { margin-top: 14px; }
   .departure-board { top: 105px; bottom: auto; left: auto; right: 5%; width: 35%; grid-template-columns: 1fr; padding: 18px; gap: 16px; }
-  .flight-plan { border-right: 0; border-bottom: 1px solid #25464b25; padding: 0 0 14px; }
+  .flight-plan { border-right: 0; border-bottom: 1px solid color-mix(in srgb, var(--blue-850) 14.5%, transparent); padding: 0 0 14px; }
   .aircraft-selection { padding: 0; }
   .board-icon, .board-end, .paint-options > span { display: none; }
   .aircraft-selection { flex-direction: column; align-items: flex-start; gap: 12px; }
@@ -2464,16 +2422,29 @@ button:disabled { cursor: not-allowed; }
   .header-actions .replay-studio-entry { display: inline-flex; }
 }
 /* Compact configuration controls; the wider Settings redesign is deferred. */
-.configuration-readout { display:flex; flex-wrap:wrap; gap:5px 10px; margin-top:10px; font-size:10px; letter-spacing:.06em; color:var(--muted, #66736b); }
+.configuration-readout { display:flex; flex-wrap:wrap; gap:5px 10px; margin-top:10px; font-size:10px; letter-spacing:.06em; color:var(--muted, var(--blue-600)); }
 .configuration-readout .envelope-warning { color:#a05c27; }
-.controls-settings { margin-top:24px; border-top:1px solid rgba(80,100,86,.2); padding-top:16px; }
+.controls-settings { margin-top:24px; border-top:1px solid rgba(21,37,79,.2); padding-top:16px; }
 .controls-settings h3 { margin:0 0 8px; font-size:18px; }
 .settings-credits { margin:18px 0 0; font-size:13px; line-height:1.45; opacity:.78; }
 .settings-credits a { color:inherit; text-decoration:underline; text-underline-offset:2px; }
-.controls-setting-note { font-size:13px; line-height:1.6; color:#637269; }
+.controls-setting-note { font-size:13px; line-height:1.6; color:var(--blue-600); }
 .controls-help-button { display:flex; align-items:center; gap:8px; padding:9px 0; color:inherit; background:none; border:0; cursor:pointer; }
 .touch-configuration { display:flex; gap:6px; align-self:end; }
 .holo-hud .touch-brake.touch-fire { right: 100px; }
-.f15c-cannon-status { position:absolute;top:110px;right:200px;color:#f5efd5;font:12px/1.7 ui-monospace,monospace;text-align:right;pointer-events:none;text-shadow:0 1px 3px #000;z-index:5;white-space:nowrap; }
+.f15c-cannon-status { position:absolute;top:110px;right:200px;color:var(--blue-50);font:12px/1.7 ui-monospace,monospace;text-align:right;pointer-events:none;text-shadow:0 1px 3px #000;z-index:5;white-space:nowrap; }
 @media(max-width:540px) { .f15c-cannon-status { top:280px;right:10px;font-size:10px;max-width:calc(100vw - 20px); } }
-.touch-configuration button { border:1px solid rgba(255,255,255,.45); border-radius:12px; background:rgba(27,51,43,.7); color:#fff6e6; padding:13px 10px; min-height:44px; min-width:60px; font-size:11px; touch-action:manipulation; }
+.touch-configuration button { border:1px solid rgba(255,255,255,.45); border-radius:12px; background:rgba(11,21,67,.8); color:var(--blue-50); padding:13px 10px; min-height:44px; min-width:60px; font-size:11px; touch-action:manipulation; }
+
+/* Brand actions stay consistent across the day menu and paper panels. */
+.live-dot { background: var(--brand); }
+.header nav button.active { color: var(--brand); }
+.header nav button.active:after { background: var(--brand); }
+.night .header nav button.active { color: var(--blue-100); }
+.night .header nav button.active:after { background: var(--blue-300); }
+.mission-option.selected { background: var(--blue-100); border-color: var(--brand); }
+.mission-option.selected .mission-symbol { color: var(--brand); }
+.setting-toggle[aria-pressed="true"] { background: var(--brand); border-color: var(--brand); color: white; }
+button:focus-visible, a:focus-visible, [role="button"]:focus-visible { outline-color: var(--focus); }
+select, input { accent-color: var(--brand); }
+.loading { color: var(--ink); }

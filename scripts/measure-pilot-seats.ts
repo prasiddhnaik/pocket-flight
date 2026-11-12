@@ -22,7 +22,7 @@ const round = (values: ArrayLike<number>) => Array.from(values, (v) => Math.roun
 const v = (p: T.Vector3) => round(p.toArray()) as V;
 const q = (r: T.Quaternion) => round(r.toArray()) as Q;
 // Palm centres in each control's own frame, from scripts/cockpit/kit.py (game axes: y up, z aft).
-const STICK_PALM = new T.Vector3(0, 0.44, 0.03);
+const STICK_PALM = new T.Vector3(0, 0.56, 0.03);
 const SIDE_STICK_PALM = new T.Vector3(0, 0.14, -0.015);
 const THROTTLE_PALM = new T.Vector3(0, 0.12, -0.01);
 const YOKE_PALM = new T.Vector3(-0.112, 0.045, 0.008);

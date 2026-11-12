@@ -929,7 +929,7 @@ export default function ReplayStudio({
     >
       <header className="studio-header">
         <div className="studio-brand">
-          <Film size={22} />
+          <img src="/branding/emblem-white.svg" alt="" width={36} height={36} />
           <div>
             <b>Scene Studio</b>
             <small>POCKET FLIGHT</small>

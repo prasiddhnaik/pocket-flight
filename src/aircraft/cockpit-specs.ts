@@ -18,7 +18,8 @@ export const cockpitSpecs: Partial<Record<AircraftId, CockpitSpec>> = {
     gauges: f15cGauges,
     fuelPounds: 13455,
     throttle: { idle: -0.078, travel: 0.238 },
-    stick: { pitch: 0.2, roll: 0.22 },
+    // Full roll keeps the grip clear of the seated pilot's thighs, even with the stick pulled back.
+    stick: { pitch: 0.2, roll: 0.15 },
     screens: [
       { node: "Screen_VSD", kind: "radar", width: 384, height: 384 },
       { node: "Screen_TEWS", kind: "threat", width: 384, height: 384 },
@@ -39,7 +40,7 @@ export const cockpitSpecs: Partial<Record<AircraftId, CockpitSpec>> = {
     gauges: peregrineGauges,
     fuelPounds: 4111,
     throttle: { idle: -0.04, travel: 0.22 },
-    stick: { pitch: 0.2, roll: 0.22 },
+    stick: { pitch: 0.2, roll: 0.18 },
     screens: [
       { node: "Screen_MFD_L", kind: "map", width: 512, height: 512 },
       { node: "Screen_MFD_C", kind: "radar", width: 384, height: 384 },
@@ -72,8 +73,8 @@ export const cockpitSpecs: Partial<Record<AircraftId, CockpitSpec>> = {
   },
   aurelia: {
     url: "/assets/cockpits/aurelia.glb",
-    // The left seat of the Phenom 300E-based airframe, at the height of its own pilot eye.
-    eye: [-0.32, 1.455, -6.04],
+    // The left seat of the Phenom 300E-based airframe, at the height of its own pilot eye and 0.72 m from the panel.
+    eye: [-0.32, 1.455, -5.92],
     lookDown: 0.26,
     // The airframe's simple flight deck; its glareshield deck under the windshield stays.
     replaces: [
@@ -90,13 +91,16 @@ export const cockpitSpecs: Partial<Record<AircraftId, CockpitSpec>> = {
     },
     gauges: aureliaGauges,
     fuelPounds: 2136,
-    throttle: { idle: -0.1, travel: 0.23 },
+    // Stops short of the tilt panel, which reaches back over the front of the pedestal.
+    throttle: { idle: -0.1, travel: 0.18 },
     stick: { pitch: 0.14, roll: 0.5 },
+    // The Citation CJ4 specification's suite: 8 x 10 inch portrait displays, standby instrument and CDUs.
     screens: [
-      { node: "Screen_PFD", kind: "flight", width: 512, height: 452 },
-      { node: "Screen_MFD_L", kind: "map", width: 512, height: 512 },
-      { node: "Screen_MFD_R", kind: "engines", width: 512, height: 452 },
-      { node: "Screen_FMS", kind: "readout", width: 512, height: 168 },
+      { node: "Screen_PFD", kind: "pfd", width: 512, height: 640 },
+      { node: "Screen_MFD_L", kind: "mfd-nav", width: 512, height: 640 },
+      { node: "Screen_MFD_R", kind: "mfd-systems", width: 512, height: 640 },
+      { node: "Screen_ESIS", kind: "esis", width: 256, height: 256 },
+      { node: "Screen_CDU", kind: "cdu", width: 384, height: 240 },
     ],
     panelLight: "#ffe3b8",
   },

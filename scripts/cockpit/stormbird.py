@@ -118,13 +118,14 @@ def cockpit(k, suffix, panel_y, console_centre, seat_offset):
     back, front = console_centre - 0.6, console_centre + 0.62
     k.console("left" + suffix, -0.205, -0.52, back, front, CONSOLE_TOP, FLOOR)
     k.console("right" + suffix, 0.205, 0.52, back, front, CONSOLE_TOP, FLOOR)
-    k.floor(FLOOR, back - 0.03, panel_y + 0.08, 0.207)
-    k.knee_well(FLOOR, 1.98, panel_y + 0.03, 0.5, 0.125, panel_y - 0.075, 1.96)
-    k.pedals(0.13, panel_y - 0.11, FLOOR)
+    # Pedals under the panel, far enough forward for the seated pilot's knees; a slim pedestal between the boots.
+    k.floor(FLOOR, back - 0.03, panel_y + 0.15, 0.207)
+    k.knee_well(FLOOR, 1.98, panel_y + 0.13, min(0.5, k.hull_half(HULL, SILL, panel_y + 0.13) - 0.01), 0.065, panel_y + 0.025, 1.96)
+    k.pedals(0.15, panel_y - 0.02, FLOOR)
     k.side_stick("right" + suffix, 0.35, 0.42)
     k.throttle("left" + suffix, -0.43, -0.39, 0.1, 0.46, 0.24, 0.17)
     with k.placed(seat_offset):
-        k.seat()
+        k.seat(top=0.064)
     k.map_case(k.hull_half(HULL, SILL, console_centre - 0.22) - 0.006, console_centre - 0.22, 2.3)
     k.breaker_panel(-k.hull_half(HULL, SILL, console_centre - 0.25) + 0.006, console_centre - 0.25, 2.3, side=-1)
     side = SILL + 0.005
@@ -139,10 +140,10 @@ def build(k):
     k.sill_rails(HULL, SILL, 3.1, 5.86, count=18)
     k.wall_details(HULL, SILL, 3.12, 5.88, CONSOLE_TOP, count=11)
     k.jettison_handle(-k.hull_half(HULL, SILL, 5.62) + 0.006, 5.62, 2.3)
-    cockpit(k, "", 5.9, 5.3, (0.0, 0.73, 1.875))
+    cockpit(k, "", 5.9, 5.3, (0.0, 1.085, 1.875))
     # The projector sits on top of the glareshield, clear of the displays.
     with k.placed((0.0, 0.3, 1.93)):
         k.hud_unit(w=0.128, h=0.1, centre=0.817, top=0.93, back=5.6)
     with k.placed((0, 0, 0), prefix="Rear_"):
-        cockpit(k, "@rear", 4.33, 3.72, (0.0, -0.84, 1.875))
+        cockpit(k, "@rear", 4.33, 3.72, (0.0, -0.485, 1.875))
     k.canopy_trim(GLASS, 4.06, [5.9, 5.6, 4.8, 4.0, 3.2, 3.0], mirrors=(), exponent=2.4)

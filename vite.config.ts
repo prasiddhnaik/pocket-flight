@@ -1,5 +1,7 @@
 import { defineConfig } from "vite";
+import { documentationAssets } from "./scripts/documentation";
 export default defineConfig({
+  plugins: [documentationAssets()],
   build: {
     rollupOptions: {
       input: {

@@ -1,4 +1,5 @@
 import { supportsCombat } from "../aircraft/weapons/combat-loadouts";
+import { AircraftPicker } from "./AircraftPicker";
 import { combatMission } from "../flight/missions";
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import {
@@ -172,7 +173,7 @@ function MiniMap({
     const convZ = (z: number) => conv(z - originZ);
     if (mission.rings.length) {
       ctx.setLineDash([2, 4]);
-      ctx.strokeStyle = "#f8ebc8";
+      ctx.strokeStyle = "#DCE5FF";
       ctx.lineWidth = 1;
       ctx.beginPath();
       mission.rings.forEach((p, i) =>
@@ -189,7 +190,7 @@ function MiniMap({
           0,
           Math.PI * 2,
         );
-        ctx.fillStyle = i < (snapshot?.ring ?? 0) ? "#3b7161" : "#fce3a5";
+        ctx.fillStyle = i < (snapshot?.ring ?? 0) ? "#8CA5ED" : "#FFFFFF";
         ctx.fill();
       });
     }
@@ -197,7 +198,7 @@ function MiniMap({
       ctx.save();
       ctx.translate(convX(r.x), convZ(r.z));
       ctx.rotate(r.heading);
-      ctx.fillStyle = "#f7f0d9";
+      ctx.fillStyle = "#EDF2FF";
       ctx.fillRect(-1.5, (-r.length / 2600) * 128, 3, (r.length / 2600) * 256);
       ctx.restore();
     }
@@ -205,8 +206,8 @@ function MiniMap({
       ctx.save();
       ctx.translate(convX(snapshot.x), convZ(snapshot.z));
       ctx.rotate((snapshot.heading * Math.PI) / 180);
-      ctx.fillStyle = "#fff8da";
-      ctx.shadowColor = "#214d55";
+      ctx.fillStyle = "#FFFFFF";
+      ctx.shadowColor = "#0B1543";
       ctx.shadowBlur = 4;
       ctx.beginPath();
       ctx.moveTo(0, -6);
@@ -526,7 +527,13 @@ export default function App() {
       )}
       {!ready && (
         <div className="loading">
-          <Plane size={36} />
+          <img
+            className="loading-logo"
+            src="/branding/logo.svg"
+            alt="Pocket Flight"
+            width={240}
+            height={83}
+          />
           <h2>
             {error ? "Unable to take off" : "Preparing your little escape"}
           </h2>
@@ -551,12 +558,13 @@ export default function App() {
               }}
               aria-label="Pocket Flight home"
             >
-              <span className="brand-icon">
-                <Plane size={24} strokeWidth={1.6} />
-              </span>
-              <span>
-                pocket<span className="brand-flight">FLIGHT</span>
-              </span>
+              <img
+                className="brand-logo"
+                src={night ? "/branding/logo-white.svg" : "/branding/logo.svg"}
+                alt="Pocket Flight"
+                width={178}
+                height={61}
+              />
             </a>
             <nav>
               <button
@@ -696,23 +704,11 @@ export default function App() {
                     : "CHOOSE YOUR AIRCRAFT"}
                 </span>
                 <h3>
-                  <select
-                    aria-label="Choose aircraft"
+                  <AircraftPicker
                     value={choice}
                     disabled={switchingAircraft || !ready}
-                    onChange={(e) =>
-                      void changeAircraft(parseAircraftChoice(e.target.value) ?? "finch")
-                    }
-                    className="aircraft-picker"
-                  >
-                    <option value="finch">The Finch · U–2</option>
-                    <option value="finch-attack">Finch A–2 · Attack</option>
-                    <option value="peregrine">Peregrine · HX–27</option>
-                    <option value="aurelia">Aurelia · S32</option>
-                    <option value="stormbird">Stormbird · HX–40</option>
-                    <option value="heron">Heron · UT–9</option>
-                    <option value="f15c">F-15C · Eagle</option>
-                  </select>
+                    onChange={(aircraft) => void changeAircraft(aircraft)}
+                  />
                 </h3>
                 <p>
                   <a

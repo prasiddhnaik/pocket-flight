@@ -89,7 +89,7 @@ The game drives the propeller with spool-up/coast-down and a high-speed blur tre
 ### Main files
 
 - Editable aircraft/studio: [Finch-U2.blend](../../assets/finch/Finch-U2.blend)
-- Geometry-focused source: [Finch-U2-geometry.blend](../../assets/finch/Finch-U2-geometry.blend)
+- Geometry-focused source: `Finch-U2-geometry.blend` (historical artifact unavailable in this checkout)
 - Runtime model: [finch-u2.glb](../../public/assets/finch-u2.glb)
 - Validation script: [validate_export.py](../../assets/finch/src/validate_export.py)
 - Geometry inventory: [model-manifest.json](../../assets/finch/validation/model-manifest.json)
@@ -189,9 +189,9 @@ The base builder does **not** reproduce every later MCP edit. The authoritative 
 
 ## 6. How the Blender work becomes a playable aircraft
 
-The game uses React/TypeScript for its interface and Three.js for rendering. [aircraft.ts](../../src/aircraft.ts) selects the GLB, prepares materials, locates named parts, and assigns the relevant animation controller.
+The game uses React/TypeScript for its interface and Three.js for rendering. [aircraft.ts](../../src/aircraft/aircraft.ts) selects the GLB, prepares materials, locates named parts, and assigns the relevant animation controller.
 
-The exported model is not itself the flight simulator. [physics.ts](../../src/physics.ts) calculates movement, lift/drag behavior, stalls, ground contact and damage. [game.ts](../../src/game.ts) connects those values to the visual aircraft, cameras, effects and replay state.
+The exported model is not itself the flight simulator. [physics.ts](../../src/flight/physics.ts) calculates movement, lift/drag behavior, stalls, ground contact and damage. [game.ts](../../src/flight/game.ts) connects those values to the visual aircraft, cameras, effects and replay state.
 
 ### What is imported and what is recreated
 
@@ -205,16 +205,16 @@ The exported model is not itself the flight simulator. [physics.ts](../../src/ph
 | Exhaust and afterburner effects | Browser shaders/effect code reproduce the intended appearance; Blender shader graphs do not transfer directly as equivalent WebGL effects |
 | Suspension and tire contact | Collision coordinates and visual offsets are matched to the runtime model scale |
 
-Peregrine is scaled to 0.7 and Aurelia to 0.55 in the flight loader, with a vertical center offset. Their hangar/model dimensions and their game-space collision coordinates therefore differ. Those transformations must stay consistent with [landing-gear.ts](../../src/landing-gear.ts).
+Peregrine is scaled to 0.7 and Aurelia to 0.55 in the flight loader, with a vertical center offset. Their hangar/model dimensions and their game-space collision coordinates therefore differ. Those transformations must stay consistent with [landing-gear.ts](../../src/aircraft/landing-gear.ts).
 
 Useful runtime sources:
 
-- [control-surfaces.ts](../../src/control-surfaces.ts): Finch control poses.
-- [propeller.ts](../../src/propeller.ts): propeller motion and blur behavior.
-- [jet-effects.ts](../../src/jet-effects.ts): jet motion and effects.
-- [aurelia-effects.ts](../../src/aurelia-effects.ts): Aurelia gear-track sampling, controls, fans and lights.
-- [jet-heat.ts](../../src/jet-heat.ts): browser heat-distortion implementation.
-- [App.tsx](../../src/App.tsx): aircraft selection and interface.
+- [control-surfaces.ts](../../src/aircraft/finch/control-surfaces.ts): Finch control poses.
+- [propeller.ts](../../src/aircraft/finch/propeller.ts): propeller motion and blur behavior.
+- [jet-effects.ts](../../src/aircraft/jet-effects.ts): jet motion and effects.
+- [aurelia-effects.ts](../../src/aircraft/aurelia/aurelia-effects.ts): Aurelia gear-track sampling, controls, fans and lights.
+- [jet-heat.ts](../../src/aircraft/jet-heat.ts): browser heat-distortion implementation.
+- [App.tsx](../../src/app/App.tsx): aircraft selection and interface.
 
 ## 7. Validation and recorded model sizes
 

@@ -1,53 +1,5 @@
 {
  "scales": {
-  "airspeed": [
-   [
-    0,
-    0
-   ],
-   [
-    100,
-    30
-   ],
-   [
-    200,
-    105
-   ],
-   [
-    300,
-    160
-   ],
-   [
-    400,
-    200
-   ],
-   [
-    500,
-    235
-   ],
-   [
-    600,
-    270
-   ],
-   [
-    700,
-    305
-   ],
-   [
-    800,
-    340
-   ]
-  ],
-  "altimeter": [
-   [
-    0,
-    0
-   ],
-   [
-    1000,
-    360
-   ]
-  ],
   "cabin": [
    [
     0,
@@ -70,8 +22,6 @@
   ]
  },
  "gauges": {
-  "standby_airspeed": "airspeed",
-  "standby_altimeter": "altimeter",
   "cabin": "cabin",
   "oxygen": "oxygen"
  }

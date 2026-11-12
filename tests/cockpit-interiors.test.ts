@@ -127,8 +127,10 @@ describe("the exported models", () => {
       for (const screen of spec.screens) expect(names.has(screen.node)).toBe(true);
     });
     test(`${id}: has the controls and lamps the game drives`, () => {
-      for (const name of ["Throttle_left", "Throttle_right", "Pedal_left", "Pedal_right", "Gear_handle", "Lamp_master", "Lamp_fire_left", "Lamp_fire_right", "Lamp_gear_nose", "Lamp_gear_left", "Lamp_gear_right", "Needle_clock_hour", "Needle_clock_minute", "Needle_clock_second", "Standby_ADI_ball"])
+      for (const name of ["Throttle_left", "Throttle_right", "Pedal_left", "Pedal_right", "Gear_handle", "Lamp_master", "Lamp_fire_left", "Lamp_fire_right", "Lamp_gear_nose", "Lamp_gear_left", "Lamp_gear_right", "Needle_clock_hour", "Needle_clock_minute", "Needle_clock_second"])
         expect(names.has(name)).toBe(true);
+      // The Aurelia's standby instrument is electronic, with no ball to turn.
+      if (id !== "aurelia") expect(names.has("Standby_ADI_ball")).toBe(true);
       expect(names.has("Stick") || names.has("Yoke_left")).toBe(true);
     });
     test(`${id}: stays inside its triangle budget`, () => {

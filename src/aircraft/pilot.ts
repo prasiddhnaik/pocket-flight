@@ -26,24 +26,37 @@ export type PilotSeat = {
   left: Grip;
   pedals: readonly [V, V];
   pedalsMove: boolean;
+  /** The figure's height as a fraction of the 1.83 m model, scaled about the eye. */
+  size?: number;
+  /** The figure's size in outside views, when it differs from the seat view. */
+  outsideSize?: number;
+  /** From the seat draws the hips, legs, forearms and hands: the chest and shoulders would hide the controls at any size. */
+  clearSeatView?: boolean;
+  /** Metres the body moves in outside views, where the airframe's own simple seat is showing. */
+  outside?: V;
 };
 export type PilotControls = { pitch: number; roll: number; yaw: number; power: number };
 
 // Measured control positions (scripts/measure-pilot-seats.ts) plus each seat's posture.
-const POSTURE: Record<AircraftId, { recline: number; eye?: V }> = {
+const POSTURE: Record<AircraftId, { recline: number; eye?: V; size?: number; outsideSize?: number; clearSeatView?: boolean; outside?: V }> = {
   // 10 cm forward of the old camera so the feet reach the rudder pedals.
-  finch: { recline: 0.06, eye: [-0.3, 1.01, 0.0] },
+  // The canopy is 7 cm above the eye. Outside, a 1.57 m figure sits lower and back against the seat, under the
+  // glass, and its boots stop short in the footwell; from the seat the full-size legs reach the pedals in view.
+  finch: { recline: 0.06, eye: [-0.3, 1.01, 0.0], outsideSize: 0.86, outside: [0, -0.1, 0.04] },
   // The Heron's front seats are moved aft at load (see aircraft.ts); the eye follows them, under the cabin roof.
   heron: { recline: 0.2, eye: [-0.4, 0.62, -1.0] },
-  f15c: { recline: 0.2 },
-  peregrine: { recline: 0.22 },
-  stormbird: { recline: 0.3 },
-  aurelia: { recline: 0.2 },
+  // Nearly upright against the jets' upright seat backs; reclining would push the hips off the cushion.
+  f15c: { recline: 0.05 },
+  peregrine: { recline: 0.05 },
+  stormbird: { recline: 0.05 },
+  // The eye looks down on a low panel: at 1.65 m the knees stay under the sightlines to the tilt panel.
+  // Outside, the airframe's seat is further outboard and forward.
+  aurelia: { recline: 0.2, size: 0.9, clearSeatView: true, outside: [-0.084, 0.053, -0.11] },
 };
 export const pilotSeats = Object.fromEntries(
   (Object.keys(POSTURE) as AircraftId[]).map((id) => {
     const seat = measured[id] as unknown as Omit<PilotSeat, "recline">;
-    return [id, { ...seat, eye: POSTURE[id].eye ?? seat.eye, recline: POSTURE[id].recline }];
+    return [id, { ...seat, ...POSTURE[id], eye: POSTURE[id].eye ?? seat.eye }];
   }),
 ) as Record<AircraftId, PilotSeat>;
 
@@ -59,6 +72,9 @@ const WRIST_FROM_PALM = new T.Vector3(0, -0.035, 0.075);
 const WRIST_FROM_THROTTLE = new T.Vector3(0, 0.03, 0.065);
 const ACROSS = new T.Vector3(1, 0, 0);
 const AFT = new T.Vector3(0, 0, -1);
+const FOLDED = 1e-3;
+const SEAT_VIEW_BONE = /^(hips|thigh_.|shin_.|foot_.|upperarm_.|forearm_.|hand_.)$/;
+const seatViewGeometry = new WeakMap<T.BufferGeometry, T.BufferGeometry>();
 
 let source: Promise<GLTF> | null = null;
 export function loadPilot() {
@@ -66,6 +82,36 @@ export function loadPilot() {
 }
 
 export const wristOffset = (grip: Grip) => (grip.kind === "throttle" ? WRIST_FROM_THROTTLE : WRIST_FROM_PALM);
+
+/** Bind matrices that pull each upper arm into its elbow, closing the sleeve there as the neck fold closes the collar. */
+function seatViewBinds(skeleton: T.Skeleton) {
+  return skeleton.boneInverses.map((inverse, i) => {
+    const point = skeleton.bones[i].children.find((child) => child.name.startsWith("forearm_"))?.position;
+    if (!point) return inverse;
+    const fold = new T.Matrix4().makeScale(FOLDED, FOLDED, FOLDED);
+    return new T.Matrix4().makeTranslation(point).multiply(fold).multiply(new T.Matrix4().makeTranslation(point.clone().negate())).multiply(inverse);
+  });
+}
+
+/** The triangles drawn from the seat over the mesh's own vertices: one extra index, shared like the geometry itself. */
+function seatViewOf(mesh: T.SkinnedMesh) {
+  const whole = mesh.geometry;
+  let drawn = seatViewGeometry.get(whole);
+  if (drawn) return drawn;
+  const joints = whole.getAttribute("skinIndex"), weights = whole.getAttribute("skinWeight"), index = whole.index!;
+  // A vertex also tied to the chest would stretch from a folded joint back up to the shoulders.
+  const kept = (vertex: number) => [0, 1, 2, 3].every((k) => weights.getComponent(vertex, k) < 0.01 || SEAT_VIEW_BONE.test(mesh.skeleton.bones[joints.getComponent(vertex, k)].name));
+  const triangles: number[] = [];
+  for (let i = 0; i < index.count; i += 3) {
+    const a = index.getX(i), b = index.getX(i + 1), c = index.getX(i + 2);
+    if (kept(a) && kept(b) && kept(c)) triangles.push(a, b, c);
+  }
+  drawn = new T.BufferGeometry();
+  for (const [name, attribute] of Object.entries(whole.attributes)) drawn.setAttribute(name, attribute);
+  drawn.setIndex(triangles);
+  seatViewGeometry.set(whole, drawn);
+  return drawn;
+}
 
 /** The pilot's palm target for one hand, in the aircraft group, mirroring cockpitDriver's control motion. */
 export function gripTarget(id: AircraftId, grip: Grip, c: PilotControls, out = new T.Vector3()) {
@@ -95,6 +141,7 @@ export class Pilot {
   private bones = new Map<string, T.Bone>();
   private rest = new Map<T.Bone, T.Quaternion>();
   private lengths = new Map<string, number>();
+  private meshes: { mesh: T.SkinnedMesh; whole: T.BufferGeometry; inverses: T.Matrix4[]; folded: T.Matrix4[] }[] = [];
   private firstPerson = false;
   private disposed = false;
   private controls: PilotControls = { pitch: 0, roll: 0, yaw: 0, power: 0 };
@@ -118,18 +165,35 @@ export class Pilot {
           node.frustumCulled = false;
           node.castShadow = node.receiveShadow = true;
         }
+        if (node instanceof T.SkinnedMesh) this.meshes.push({ mesh: node, whole: node.geometry, inverses: node.skeleton.boneInverses, folded: seatViewBinds(node.skeleton) });
       });
       this.root.add(figure);
+      this.root.scale.setScalar(this.size);
       this.root.updateMatrixWorld(true);
       for (const [name, child] of [["upperarm_L", "forearm_L"], ["forearm_L", "hand_L"], ["thigh_L", "shin_L"], ["shin_L", "foot_L"]])
         this.lengths.set(name.slice(0, -2), this.position(this.bone(name)).distanceTo(this.position(this.bone(child))));
       // Fit the seated figure to the eye: the posture never changes, so this happens once.
       const head = this.bone("head");
       this.eyeLocal.copy(head.worldToLocal(this.root.localToWorld(new T.Vector3(...rig.eye))));
-      this.posture();
-      this.root.position.set(...this.seat.eye).sub(this.eyeLocal.clone().applyMatrix4(this.toRoot(head)));
-      this.update(this.controls);
+      this.show();
     });
+  }
+  /** Puts the body in the seat for the current view and poses it. */
+  private show() {
+    if (!this.bones.size) return;
+    this.root.scale.setScalar(this.size);
+    this.posture();
+    this.root.position.set(...this.seat.eye).sub(this.eyeLocal.clone().applyMatrix4(this.toRoot(this.bone("head"))).multiplyScalar(this.size));
+    if (this.seat.outside && !this.firstPerson) this.root.position.add(new T.Vector3(...this.seat.outside));
+    if (this.seat.clearSeatView)
+      for (const { mesh, whole, inverses, folded } of this.meshes) {
+        mesh.geometry = this.firstPerson ? seatViewOf(mesh) : whole;
+        mesh.skeleton.boneInverses = this.firstPerson ? folded : inverses;
+      }
+    this.update(this.controls);
+  }
+  private get size() {
+    return (this.firstPerson ? undefined : this.seat.outsideSize) ?? this.seat.size ?? 1;
   }
   private bone(name: string) {
     const bone = this.bones.get(name);
@@ -189,7 +253,8 @@ export class Pilot {
     if (!this.bones.size || this.disposed) return;
     this.posture();
     const offset = this.root.position;
-    const local = (v: T.Vector3) => v.sub(offset);
+    // The rig works in the figure's own 1.83 m; everything aimed at the aircraft comes through here.
+    const local = (v: T.Vector3) => v.sub(offset).divideScalar(this.size);
     const knees: T.Vector3[] = [], hips: T.Vector3[] = [];
     this.seat.pedals.forEach((pedal, i) => {
       const side = i === 0 ? "L" : "R", sign = i === 0 ? -1 : 1;
@@ -205,8 +270,8 @@ export class Pilot {
       const palm =
         grip.kind === "thigh"
           ? hips[side === "L" ? 0 : 1].clone().lerp(knees[side === "L" ? 0 : 1], 0.7).add(new T.Vector3(0, 0.07, 0))
-          : local(gripTarget(this.id, grip, c));
-      return { side, sign, wrist: palm.add(grip.kind === "throttle" ? WRIST_FROM_THROTTLE : WRIST_FROM_PALM).add(new T.Vector3(sign * 0.01, 0, 0)) };
+          : local(gripTarget(this.id, grip, c).add(wristOffset(grip)).add(new T.Vector3(sign * 0.01, 0, 0)));
+      return { side, sign, wrist: grip.kind === "thigh" ? palm.add(WRIST_FROM_PALM).add(new T.Vector3(sign * 0.01, 0, 0)) : palm };
     });
     const short = () => Math.max(0, ...hands.map((h) => this.position(this.bone(`upperarm_${h.side}`)).distanceTo(h.wrist) - arm + 0.01));
     // Controls beyond arm's length: lean forward from the waist, keeping the head level...
@@ -246,12 +311,12 @@ export class Pilot {
   locate(name?: string) {
     // Where the eye was before the head folded away.
     const point = name ? this.position(this.bone(name)) : this.eye.clone();
-    return point.add(this.root.position);
+    return point.multiplyScalar(this.size).add(this.root.position);
   }
   setFirstPerson(on: boolean) {
     if (on === this.firstPerson) return;
     this.firstPerson = on;
-    this.update(this.controls);
+    this.show();
   }
   /** Detaches without disposing: the geometry and textures are shared by every aircraft. */
   dispose() {

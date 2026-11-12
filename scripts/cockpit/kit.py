@@ -791,13 +791,13 @@ def yoke(side, x, y, floor_z, height):
 
 
 def crew_seat(x, y, floor_z, cushion):
-    """Airliner-style crew seat: track, pedestal, leather cushions, arm rests and a five-point harness."""
+    """Airliner-style crew seat beside a centre pedestal: track, column, leather cushions, arm rests clear of the side shelf and a five-point harness."""
     for rail in (x - 0.14, x + 0.14):
         emit("Seat_track", "metal_dark", box(rail - 0.012, y - 0.32, floor_z, rail + 0.012, y + 0.3, floor_z + 0.022, chamfer=0.003))
     emit("Seat_column", "metal_dark", box(x - 0.15, y - 0.2, floor_z + 0.018, x + 0.15, y + 0.16, cushion - 0.07, chamfer=0.012))
     emit("Seat_shroud", "black", box(x - 0.1, y - 0.14, floor_z + 0.02, x + 0.1, y + 0.17, cushion - 0.06, chamfer=0.01))
     rings = []
-    for offset, half, z0, z1 in [(0.26, 0.17, -0.07, -0.02), (0.245, 0.2, -0.075, 0.012), (0.2, 0.215, -0.08, 0.03), (0.0, 0.225, -0.08, 0.036), (-0.17, 0.22, -0.08, 0.02), (-0.21, 0.2, -0.08, 0.0)]:
+    for offset, half, z0, z1 in [(0.26, 0.143, -0.07, -0.02), (0.245, 0.168, -0.075, 0.012), (0.2, 0.181, -0.08, 0.03), (0.0, 0.189, -0.08, 0.036), (-0.17, 0.185, -0.08, 0.02), (-0.21, 0.168, -0.08, 0.0)]:
         ring = []
         for k in range(20):
             a = k / 20 * TAU
@@ -808,21 +808,24 @@ def crew_seat(x, y, floor_z, cushion):
     for offset in (-0.09, 0.0, 0.09):
         emit("Seat_pan_seam", "fabric", box(x + offset - 0.002, y - 0.17, cushion + 0.018, x + offset + 0.002, y + 0.22, cushion + 0.038))
     back = Matrix.Translation((x, y - 0.21, cushion)) @ Matrix.Rotation(math.radians(13), 4, "X")
-    emit("Seat_back_shell", "black", box(-0.215, -0.07, -0.02, 0.215, -0.02, 0.62, chamfer=0.022), back)
-    emit("Seat_back_pad", "cushion", box(-0.2, -0.025, 0.02, 0.2, 0.038, 0.6, chamfer=0.024), back)
+    emit("Seat_back_shell", "black", box(-0.215, -0.07, 0.06, 0.215, -0.02, 0.62, chamfer=0.022), back)
+    emit("Seat_back_pad", "cushion", box(-0.2, -0.025, 0.06, 0.2, 0.038, 0.6, chamfer=0.024), back)
     for z in (0.17, 0.31, 0.45):
         emit("Seat_back_seam", "fabric", box(-0.2, 0.036, z, 0.2, 0.041, z + 0.005), back)
     for sign in (-1, 1):
-        emit("Seat_bolster", "cushion", box(sign * 0.19 - 0.03, -0.03, 0.05, sign * 0.19 + 0.03, 0.05, 0.56, chamfer=0.02), back)
+        emit("Seat_bolster", "cushion", box(sign * 0.19 - 0.03, -0.03, 0.07, sign * 0.19 + 0.03, 0.05, 0.56, chamfer=0.02), back)
     emit("Seat_headrest_post", "metal", box(-0.05, -0.04, 0.6, 0.05, -0.02, 0.69), back)
     emit("Seat_headrest", "cushion", box(-0.115, -0.05, 0.66, 0.115, 0.045, 0.83, chamfer=0.03), back)
     for sign in (-1, 1):
-        rest = Matrix.Translation((x + sign * 0.245, y - 0.21, cushion + 0.16)) @ Matrix.Rotation(math.radians(5), 4, "X")
+        rest = Matrix.Translation((x + sign * 0.245, y - 0.21, cushion + 0.177))
+        # The arm rest beside the pedestal is stowed up along the seat back, clear of the arm reaching for the levers.
+        if sign * x < 0:
+            rest = rest @ Matrix.Rotation(math.radians(103), 4, "X")
         emit("Seat_arm", "cushion", box(-0.03, 0.0, -0.022, 0.03, 0.34, 0.02, chamfer=0.012), rest)
         emit("Seat_arm_pivot", "metal", box(-0.038, -0.035, -0.035, 0.038, 0.015, 0.03, chamfer=0.006), rest)
         shoulder = [(x + sign * 0.085, y - 0.3, cushion + 0.6), (x + sign * 0.09, y - 0.2, cushion + 0.52), (x + sign * 0.075, y - 0.03, cushion + 0.27), (x + sign * 0.022, y + 0.09, cushion + 0.09)]
         emit("Harness_shoulder", "webbing", strap(shoulder, 0.046, 0.003, (1.0, 0.0, 0.0)))
-        lap = [(x + sign * 0.21, y - 0.15, cushion + 0.02), (x + sign * 0.15, y - 0.02, cushion + 0.07), (x + sign * 0.04, y + 0.09, cushion + 0.09)]
+        lap = [(x + sign * 0.175, y - 0.15, cushion + 0.02), (x + sign * 0.14, y - 0.02, cushion + 0.07), (x + sign * 0.04, y + 0.09, cushion + 0.09)]
         emit("Harness_lap", "webbing", strap(lap, 0.042, 0.003))
         emit("Harness_fitting", "metal", box(x + sign * 0.08 - 0.02, y - 0.09, cushion + 0.33, x + sign * 0.08 + 0.02, y - 0.05, cushion + 0.36, chamfer=0.004))
     crotch = [(x, y + 0.2, cushion + 0.03), (x, y + 0.14, cushion + 0.06), (x, y + 0.09, cushion + 0.09)]
@@ -1072,7 +1075,7 @@ def knee_well(z, top, wall_y, half, pedestal_half, pedestal_front, pedestal_top,
     emit("Knee_wall", "paint_dark", ([(-half, wall_y, z), (half, wall_y, z), (half, wall_y, top), (-half, wall_y, top)], [(3, 2, 1, 0)], []))
     emit("Pedestal", "paint", box(-pedestal_half, pedestal_front, z, pedestal_half, wall_y + 0.02, pedestal_top, chamfer=0.004))
     for k in range(4):
-        fr = Matrix.Translation((-0.09 + k * 0.06, pedestal_front - 0.003, z + 0.075))
+        fr = Matrix.Translation(((-0.09 + k * 0.06) * pedestal_half / 0.125, pedestal_front - 0.003, z + 0.075))
         emit("Pedestal_duct", "metal_dark", lathe([(0.012, -0.008), (0.012, 0.0), (0.0, 0.002)], 12), fr @ Matrix.Rotation(math.pi / 2, 4, "X"))
     if wiring:
         for side in (-1, 1):
@@ -1099,6 +1102,7 @@ def pedals(x, y, z, rail_back=-0.16, rail_front=0.14):
 
 
 def stick(base_y, z, name="Stick"):
+    """Centre stick; the grip stands above a seated pilot's thighs (palm 0.56 above the pivot, see measure-pilot-seats.ts)."""
     frame = Matrix.Translation((0.0, base_y, z))
     emit("Stick_base", "metal_dark", box(-0.075, -0.09, 0.0, 0.075, 0.09, 0.022, chamfer=0.006), frame)
     for sx in (-0.062, 0.062):
@@ -1108,12 +1112,12 @@ def stick(base_y, z, name="Stick"):
     boot_rings = [(0.052, 0.022), (0.05, 0.03)] + [(0.04 - k * 0.0028 + (0.0035 if k % 2 else -0.0015), 0.038 + k * 0.012) for k in range(8)] + [(0.02, 0.135)]
     emit("Stick_boot", "rubber", lathe(boot_rings, 20), frame)
     owner = node(name, pivot)
-    shaft = [(0.0, 0.0, 0.0), (0.0, -0.012, 0.11), (0.0, -0.03, 0.26), (0.0, -0.04, 0.42)]
+    shaft = [(0.0, 0.0, 0.0), (0.0, -0.012, 0.11), (0.0, -0.03, 0.30), (0.0, -0.04, 0.54)]
     emit("Stick_shaft", "metal_dark", tube(shaft, 0.0125, 10), pivot, owner)
-    emit("Stick_collar", "metal", transform(lathe([(0.0175, 0.0), (0.0175, 0.016), (0.014, 0.022), (0.0, 0.022)], 14), Matrix.Translation((0, -0.034, 0.34))), pivot, owner)
-    grip(pivot, owner, 0.35, -0.036)
+    emit("Stick_collar", "metal", transform(lathe([(0.0175, 0.0), (0.0175, 0.016), (0.014, 0.022), (0.0, 0.022)], 14), Matrix.Translation((0, -0.034, 0.46))), pivot, owner)
+    grip(pivot, owner, 0.47, -0.036)
     for k in range(3):
-        emit("Stick_cable", "wire", tube([(-0.008 + k * 0.008, -0.03, 0.34), (-0.012 + k * 0.012, -0.025, 0.2), (-0.015 + k * 0.015, -0.012, 0.07)], 0.0024, 5), pivot, owner)
+        emit("Stick_cable", "wire", tube([(-0.008 + k * 0.008, -0.03, 0.46), (-0.012 + k * 0.012, -0.025, 0.25), (-0.015 + k * 0.015, -0.012, 0.07)], 0.0024, 5), pivot, owner)
 
 
 def grip(pivot, owner, bottom, aft):
@@ -1276,9 +1280,21 @@ def canopy_trim(glass, y, rails, mirrors=(0.0, -0.235, 0.235), exponent=2.4, rea
         emit("Mirror_foot", "metal_dark", box(x - 0.012, y - depth - 0.012, z - 0.03, x + 0.012, y - depth + 0.01, z + 0.006, chamfer=0.002), Matrix.Identity(4), owner)
 
 
-def seat():
-    # ACES II: bucket, cushions, headbox and the yellow handle between the knees.
-    top = 0.1
+def seat(top=0.1, front=4.5):
+    """ACES II: bucket, cushions, headbox and the yellow handle between the knees.
+
+    `top` is the cushion base height. `front` shortens the pan: everything forward
+    of the seat back is drawn for 3.98-4.5 and then pulled in to 3.98-front.
+    """
+    start = len(PARTS)
+    _seat(top)
+    if front != 4.5:
+        origin, squeeze = TRANSFORM.translation.y + 3.98, (front - 3.98) / (4.5 - 3.98)
+        for part in PARTS[start:]:
+            part.verts = [Vector((v.x, origin + (v.y - origin) * squeeze, v.z)) if v.y > origin else v for v in part.verts]
+
+
+def _seat(top):
     rear, front = 3.98, 4.5
     sections = []
     for y, half, z0, z1 in [(front, 0.17, top - 0.05, top - 0.012), (front - 0.012, 0.185, top - 0.05, top + 0.006), (front - 0.05, 0.195, top - 0.05, top + 0.018), (front - 0.2, 0.2, top - 0.05, top + 0.022), (rear + 0.04, 0.195, top - 0.05, top + 0.014), (rear, 0.18, top - 0.05, top)]:
@@ -1350,6 +1366,83 @@ def world_verts(part):
         return part.verts
     matrix = NODES[part.node]["matrix"]
     return [matrix @ v for v in part.verts]
+
+
+FIT_SCENE_Y = {"f15c": 0.0, "peregrine": -2.3 * 0.7, "aurelia": -1.265,
+               "stormbird": -json.loads((ROOT / "src/aircraft/stormbird/stormbird-geometry.json").read_text())["centerOffsetY"]}
+
+
+def aircraft_point(point):
+    """Kit world (x right, y forward, z up) to aircraft-group metres.
+
+    world_verts and captured frames already include placed() offsets, including
+    Aurelia's OFFSET. Match measure-pilot-seats.ts: cancel the cockpit root scale,
+    apply glTF's Y-up conversion, then the flight scene's vertical offset.
+    """
+    return [round(v, 4) or 0.0 for v in (point.x, point.z + FIT_SCENE_Y[MOD.ID], -point.y)]
+
+
+@contextmanager
+def capture_fit_surfaces():
+    """Observe existing builders without changing geometry, including placed copies."""
+    global plate, screen, readout, hud_unit
+    original_hud = hud_unit
+    original_plate, original_screen, original_readout = plate, screen, readout
+    surfaces = []
+
+    def capture_plate(entry, suffix=""):
+        surface = entry["surface"] + suffix
+        frame = TRANSFORM @ FRAMES[surface]
+        corners = [(entry["x0"], entry["y0"], PLATE_Z),
+                   (entry["x1"], entry["y0"], PLATE_Z),
+                   (entry["x0"], entry["y1"], PLATE_Z)]
+        surfaces.append(dict(id=PREFIX + "Plate_" + entry["id"], surface=surface,
+                             corners=[frame @ Vector(p) for p in corners]))
+        original_plate(entry, suffix)
+
+    def capture_display(builder):
+        def capture(name, surface, *args, **kwargs):
+            start = len(PARTS)
+            builder(name, surface, *args, **kwargs)
+            for part in PARTS[start:]:
+                if part.material == "screen":
+                    verts = world_verts(part)
+                    surfaces.append(dict(id=part.node, surface=surface,
+                                         corners=[verts[i] for i in (0, 1, 3)]))
+        return capture
+
+    def capture_hud(*args, **kwargs):
+        start = len(PARTS)
+        original_hud(*args, **kwargs)
+        for part in PARTS[start:]:
+            if part.material == "screen":
+                verts = world_verts(part)
+                surfaces.append(dict(id=part.node, surface="hud",
+                                     corners=[verts[i] for i in (0, 1, 3)]))
+
+    hud_unit = capture_hud
+    plate, screen, readout = capture_plate, capture_display(screen), capture_display(readout)
+    try:
+        yield surfaces
+    finally:
+        hud_unit = original_hud
+        plate, screen, readout = original_plate, original_screen, original_readout
+
+
+def write_fit_map(output, surfaces):
+    """Write each named kit part at rest, before material merging or export."""
+    parts = []
+    for part in PARTS:
+        points = [aircraft_point(v) for v in world_verts(part)]
+        parts.append(dict(name=part.group + part.name, material=part.material,
+                          min=[min(p[i] for p in points) for i in range(3)],
+                          max=[max(p[i] for p in points) for i in range(3)]))
+    faces = [dict(id=s["id"], surface=s["surface"],
+                  corners=[aircraft_point(p) for p in s["corners"]]) for s in surfaces]
+    key = lambda value: json.dumps(value, sort_keys=True)
+    data = dict(id=MOD.ID, parts=sorted(parts, key=key), surfaces=sorted(faces, key=key))
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(json.dumps(data, indent=1, sort_keys=True) + "\n")
 
 
 def contact_check():

@@ -173,6 +173,93 @@ displays.dispose();</code></pre>
     GLB contains editable geometry and bindings; the TypeScript runtime supplies
     the animated textures.
   </p>
+  <h2>In-flight flight deck</h2>
+  <p>
+    The panels above belong to the reference model. The pilot's in-flight view
+    uses the separate detail cockpit, <code>scripts/cockpit/aurelia.py</code>,
+    whose avionics follow section 10 of the Citation CJ4 Specification and
+    Description (Oct 2015, <code>pocket-flight-sources/reference-pdfs</code>).
+    The airframe stays Phenom-based and flight tuning is unchanged. The CJ4's
+    limit speeds drive indications only.
+  </p>
+  <p>
+    <code>pro-line.ts</code> holds the logic and
+    <code>pro-line-displays.ts</code> draws the screens. Both read the game's
+    <code>CockpitState</code>; only the engine indications are estimates, from
+    simulated power.
+  </p>
+  <p>
+    The crew station stands 0.72 m back from the panel. The pilot is scaled to
+    1.65 m about the eye, so the knees and yoke stay below the sightlines to the
+    tilt panel. From the seat the hips, legs, forearms and hands are drawn. The
+    chest and shoulders are not: scaling about the eye leaves their outline
+    unchanged, and it covers the pedestal. Outside views show the whole body,
+    moved by <code>outside</code> in <code>pilot.ts</code> to the airframe's own seat.
+  </p>
+  <table>
+    <tr>
+      <th>Spec item</th>
+      <th>In the cockpit</th>
+    </tr>
+    <tr>
+      <td>PFDs, MFDs, EICAS</td>
+      <td>
+        Four 8 x 10 in portrait displays. Attitude, flight director, tapes, FMS
+        V-speeds, radio altitude and compass arc; map and flight plan; engines
+        and configuration.
+      </td>
+    </tr>
+    <tr>
+      <td>CAS, master lights</td>
+      <td>
+        Live, colour-coded, priority-sorted messages on the right MFD, driving
+        the warning and caution lights.
+      </td>
+    </tr>
+    <tr>
+      <td>TAWS</td>
+      <td>
+        Live: terrain shaded against the aircraft's height, descent rate, terrain
+        ahead, clearance floor, loss after takeoff and below glideslope.
+      </td>
+    </tr>
+    <tr>
+      <td>TCAS</td>
+      <td>
+        Live against the game's airborne contacts, which only exist in the
+        combat modes. Free flight shows no traffic.
+      </td>
+    </tr>
+    <tr>
+      <td>FMS, CDU, NAV, DME, charts, checklist, ESIS</td>
+      <td>
+        Live: leg to the mission's next point or nearest field, localizer and
+        glideslope to each runway, three DME distances, taxi diagram and
+        phase-of-flight checklist.
+      </td>
+    </tr>
+    <tr>
+      <td>Flight director</td>
+      <td>
+        Guidance only, on modes chosen automatically. The game has no autopilot,
+        so AP, YD and emergency descent mode cannot engage.
+      </td>
+    </tr>
+    <tr>
+      <td>
+        DCP, FGP, CCP, audio, CVR, DBU, ELT, tilt panel and pedestal switches,
+        brake and gear handles
+      </td>
+      <td>Modelled and labelled, but not operable.</td>
+    </tr>
+    <tr>
+      <td>Weather radar, broadcast weather, MDS, pulse lights</td>
+      <td>
+        Not simulated: the world has no weather returns, faults or landing
+        lights to report. The MFD reads WX STBY.
+      </td>
+    </tr>
+  </table>
   <h2>Verification</h2>
   <p>
     <code>bun run aurelia:reference-check</code> rebuilds the asset and runs

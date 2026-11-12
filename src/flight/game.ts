@@ -1209,6 +1209,8 @@ export class PocketFlight {
         air: target.kind === "air",
       })),
       stores: magazine && { ...magazine, gun: this.cannon.simulation.ammunition },
+      groundSpeed: Math.hypot(p.velocity.x, p.velocity.z),
+      wind: { x: p.wind.x, z: p.wind.z },
     };
   }
   private cameraUpdate(dt: number) {

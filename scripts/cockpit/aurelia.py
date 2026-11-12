@@ -1,9 +1,10 @@
-"""Aurelia detail flight deck for the Phenom 300E-based airframe: two crew side by side, four large displays, yokes and an overhead panel.
+"""Aurelia detail flight deck for the Phenom 300E-based airframe: two crew side by side, yokes and an overhead panel.
 
-Modelled on a light business jet flight deck, without following any one aircraft's manual.
+The panel, tilt panel and pedestal follow the avionics layout in the Citation CJ4 Specification and Description (Oct 2015, section 10.2).
 Parts are in real metres. The layout is drawn in its own frame and shifted forward by OFFSET into the airframe,
 which the game flies at its exported size.
 """
+import math
 import re
 
 from layout import *  # noqa: F401,F403
@@ -17,10 +18,12 @@ OFFSET = (0.0, 0.66, 0.0)
 FLOOR = 1.66
 SILL = 2.27
 SHELF_TOP = 2.12
-EYE = (-0.32, 5.38, 2.72)
+# The crew station stands 0.72 m back from the panel, far enough for a 1.65 m pilot's knees and the yoke to stay under the sightlines to it.
+EYE = (-0.32, 5.26, 2.72)
 PANEL = (0.0, 6.0, 2.17)
 SHELF = (0.0, 5.45, SHELF_TOP)
-PEDESTAL = (0.0, 5.55, 1.95)
+PEDESTAL = (0.0, 5.43, 1.95)
+KNEE_WALL = 6.19
 OVERHEAD = (0.0, 5.25, 2.94)
 SCALES = STANDARD
 BACKLIT = ("overhead",)
@@ -40,14 +43,21 @@ SURFACES = {
     "right": dict(scale=800, x0=0.5, x1=0.95, y0=-0.5, y1=0.5, left=368, top=704),
     "pedestal": dict(scale=1200, x0=-0.14, x1=0.14, y0=-0.36, y1=0.44, left=736, top=704),
     "overhead": dict(scale=1000, x0=-0.38, x1=0.38, y0=-0.42, y1=0.42, left=1080, top=704),
+    "tilt": dict(scale=1200, x0=-0.72, x1=0.72, y0=-0.16, y1=0.0, left=0, top=1856),
 }
-BINS = [dict(x0=0, x1=728, x=0, y=1512, row=0), dict(x0=736, x1=1072, x=736, y=1672, row=0), dict(x0=1080, x1=2048, x=1080, y=1552, row=0), dict(x0=1790, x1=2048, x=1790, y=0, row=0)]
+BINS = [dict(x0=0, x1=728, x=0, y=1512, row=0, y1=1852), dict(x0=736, x1=1072, x=736, y=1672, row=0, y1=1852), dict(x0=1080, x1=2048, x=1080, y=1552, row=0, y1=1852), dict(x0=1790, x1=2048, x=1790, y=0, row=0, y1=700)]
+NO_HSI = True
+# The tilt panel hangs from the instrument panel's lower edge, over the pedestal in the middle and clear of the shins either side.
+TILT_ANGLE = 52.0
+TILT_TOP = (5.97569, 2.03213)
+TILT_OUTER, TILT_CENTRE = 0.1, 0.15
 FRAMES = {
     "main": ("panel", PANEL, 10.0),
     "left": ("flat", SHELF),
     "right": ("flat", SHELF),
     "pedestal": ("flat", PEDESTAL),
     "overhead": ("overhead", OVERHEAD),
+    "tilt": ("panel", (0.0, *TILT_TOP), TILT_ANGLE),
 }
 # Airframe frame, game axes. The glass, its seals and the airframe's own flight deck are left whole.
 CARVE = dict(min=(-1.2, 1.62, -7.0), max=(1.2, 3.6, -5.15), keep=re.compile(r"(^|/)(Cockpit|Flight_deck|Windshield_-?1_seal|Cockpit_side_window_-?1_seal)(/|$)"), touching=True)
@@ -56,41 +66,86 @@ REPLACES = ("Cockpit_floor", "Pilot_seat_Left_mount", "Pilot_seat_Right_mount", 
             "Pedal_assembly_-1_-1_mount", "Pedal_assembly_-1_1_mount", "Pedal_assembly_1_-1_mount", "Pedal_assembly_1_1_mount", "Cockpit_partition")
 REVIEW_HIDE = REPLACES
 
-PANEL_OUTLINE = [(-0.72, 0.26), (0.72, 0.26), (0.72, -0.14), (0.47, -0.14), (0.47, -0.29), (0.16, -0.29), (0.16, -0.3), (-0.16, -0.3), (-0.16, -0.29), (-0.47, -0.29), (-0.47, -0.14), (-0.72, -0.14)]
-SCREEN_W, SCREEN_H = 0.222, 0.196
-BEZEL_W, BEZEL_H = 0.268, 0.242
-SCREENS = [("PFD", -0.49), ("MFD_L", -0.165), ("MFD_R", 0.165)]
-STANDBY_ADI = dict(x=0.0, y=-0.098, r=0.034)
-CLOCK = dict(x=-0.6, y=-0.08, r=0.028)
+PANEL_OUTLINE = [(-0.72, 0.26), (0.72, 0.26), (0.72, -0.14), (-0.72, -0.14)]
+TILT_OUTLINE = [(-0.72, 0.0), (0.72, 0.0), (0.72, -TILT_OUTER), (0.136, -TILT_OUTER), (0.136, -TILT_CENTRE), (-0.136, -TILT_CENTRE), (-0.136, -TILT_OUTER), (-0.72, -TILT_OUTER)]
+# Four 8 x 10 inch portrait displays, outer PFDs and inner MFDs, with the standby instrument between them.
+SCREEN_W, SCREEN_H = 0.2, 0.25
+BEZEL_W, BEZEL_H = 0.236, 0.286
+SCREEN_Y = 0.045
+SCREENS = [("PFD", -0.426), ("MFD_L", -0.178), ("MFD_R", 0.178)]
+ESIS = dict(x=0.0, y=0.13, size=0.09, bezel=0.112)
+CLOCK = dict(x=-0.633, y=-0.0975, r=0.028)
 GAUGES = [
-    ("standby_airspeed", "airspeed", -0.092, -0.098, 0.03, "main"),
-    ("standby_altimeter", "altimeter", 0.092, -0.098, 0.03, "main"),
-    ("cabin", "cabin", 0.6, -0.08, 0.028, "main"),
+    ("cabin", "cabin", 0.633, -0.0975, 0.028, "main"),
     ("oxygen", "oxygen", 0.3, -0.33, 0.028, "overhead"),
 ]
-CAUTIONS = ["ENG FIRE", "APU FIRE", "L OIL", "R OIL", "L GEN", "R GEN", "BLEED", "CABIN ALT", "HYD", "FUEL", "ICE", "TRIM"]
+CDU_FUNCTION_KEYS = ["IDX", "FPL", "LEGS", "DEP", "PERF", "DIR", "MFD", "TUN", "PROG", "EXEC", "PREV", "NEXT"]
+CDU_KEYS = ["1", "2", "3", "A", "B", "C", "D", "E", "4", "5", "6", "F", "G", "H", "I", "J", "7", "8", "9", "K", "L", "M", "N", "O", ".", "0", "CLR", "P", "Q", "R", "S", "T"]
+CDU_SCREEN = dict(y=-0.037, w=0.094, h=0.056)
+
+
+def cdu_plate(id, x):
+    """Line select keys beside the screen, function keys under it, then the keypad."""
+    keys = [button(x + side * 0.0575, y, w=0.009, h=0.0085) for side in (-1, 1) for y in (-0.0175, -0.0305, -0.0435, -0.0565)]
+    keys += grid([x + (i - 2.5) * 0.0205 for i in range(6)], [-0.0735, -0.0855], lambda px, py, i, j: button(px, py, face=CDU_FUNCTION_KEYS[j * 6 + i], w=0.0185, h=0.0095))
+    keys += grid([x + (i - 3.5) * 0.015 for i in range(8)], [-0.099, -0.1125, -0.126, -0.1395], lambda px, py, i, j: button(px, py, face=CDU_KEYS[j * 8 + i], w=0.0125, h=0.0105))
+    return plate(id, "tilt", x - 0.065, -0.147, x + 0.065, -0.004, controls=keys)
+
+
+def group(id, surface, x0, y0, x1, y1, title, items, columns=2):
+    return auto_plate(id, surface, x0, y0, x1, y1, title, items, columns=columns)
+
+
+GUIDANCE = auto_plate("guidance", "main", -0.295, 0.19, 0.295, 0.258, "", [("rotary", "CRS"), ("NAV", ""), ("APR", ""), ("VNV", ""), ("rotary", "HDG"), ("HDG", ""), ("FD", ""), ("AP", ""), ("YD", ""), ("XFR", ""), ("FLC", ""), ("VS", ""), ("ALT", ""), ("rotary", "ALT"), ("rotary", "CRS")], columns=15)
+GUIDANCE["legends"].append(L("CVR MIC", 0.009, 0.2495, 0.0042, "l"))
+# The handles beneath the tilt panel are labelled along its lower edge.
+OXYGEN = group("oxygen", "tilt", -0.715, -0.094, -0.655, -0.004, "OXYGEN", [("toggle", "SUPPLY"), ("lamp", "LOW"), ("knob", "MASK"), ("toggle", "PAX")])
+OXYGEN["legends"] += [L("EMER BRAKE", -0.66, -0.0972, 0.0042), L("PARK BRAKE", -0.58, -0.0972, 0.0042), L("CONTROL LOCK", -0.32, -0.0972, 0.0042)]
 PLATES = [
-    auto_plate("guidance", "main", -0.34, 0.19, 0.34, 0.258, "", [("FD", ""), ("HDG", ""), ("NAV", ""), ("APR", ""), ("rotary", "HDG"), ("rotary", "CRS"), ("AP", ""), ("YD", ""), ("rotary", "ALT"), ("VS", ""), ("FLC", ""), ("ALT", ""), ("rotary", "SPD")], columns=13),
-    plate("warn_left", "main", -0.72, 0.19, -0.345, 0.258, legends=[L("MASTER", -0.66, 0.232, 0.0048), L("WARN", -0.585, 0.232, 0.0048), L("AUDIO", -0.43, 0.242, 0.0046)], controls=[button(-0.66, 0.21, face="CAUTION", w=0.06, h=0.024, node="Lamp_master", colour="amberbutton"), lamp(-0.585, 0.21, "red", r=0.009, node="Lamp_fire_left"), knob(-0.43, 0.21, r=0.009), knob(-0.385, 0.21, r=0.009)]),
-    plate("warn_right", "main", 0.345, 0.19, 0.72, 0.258, legends=[L("MASTER", 0.66, 0.232, 0.0048), L("WARN", 0.585, 0.232, 0.0048), L("AUDIO", 0.43, 0.242, 0.0046)], controls=[button(0.66, 0.21, face="CAUTION", w=0.06, h=0.024, node="Copilot_Lamp_master", colour="amberbutton"), lamp(0.585, 0.21, "red", r=0.009, node="Lamp_fire_right"), knob(0.43, 0.21, r=0.009), knob(0.385, 0.21, r=0.009)]),
-    auto_plate("left_lower", "main", -0.715, -0.137, -0.47, -0.04, "", [("toggle", "PITOT"), ("toggle", "AOA HT"), ("knob", "PFD"), ("knob", "MFD"), ("toggle", "STALL"), ("toggle", "RAIN")], columns=6),
-    auto_plate("right_lower", "main", 0.47, -0.137, 0.715, -0.04, "", [("toggle", "PITOT"), ("toggle", "AOA HT"), ("knob", "PFD"), ("knob", "MFD"), ("toggle", "CHART"), ("toggle", "RAIN")], columns=6),
-    annunciators("caution", "main", -0.46, -0.285, -0.17, -0.142, "ANNUNCIATORS", CAUTIONS, columns=4),
-    plate("gear", "main", 0.17, -0.285, 0.46, -0.142, legends=[L("LANDING GEAR", 0.315, -0.15, 0.005), L("NOSE", 0.215, -0.17, 0.004), L("LEFT", 0.215, -0.2, 0.004), L("RIGHT", 0.215, -0.23, 0.004), L("UP", 0.32, -0.172, 0.0044), L("DN", 0.32, -0.27, 0.0044), L("BRAKE", 0.415, -0.27, 0.0044)],
-          controls=[lamp(0.245, -0.17, "green", r=0.0052, node="Lamp_gear_nose"), lamp(0.245, -0.2, "green", r=0.0052, node="Lamp_gear_left"), lamp(0.245, -0.23, "green", r=0.0052, node="Lamp_gear_right"), wheel(0.32, -0.22), pull(0.415, -0.225)]),
-    auto_plate("centre_lower", "main", -0.158, -0.298, 0.158, -0.15, "BACKUP", [("toggle", "BATT"), ("toggle", "STBY"), ("knob", "BRT"), ("lamp", "ON"), ("toggle", "AHRS"), ("toggle", "ADC"), ("knob", "BARO"), ("green", "OK")], columns=4),
-    # Side shelves beside each seat.
-    # The nose narrows forward, so the shelves stop short of the wall there.
-    auto_plate("tiller_left", "left", -0.78, 0.08, -0.55, 0.47, "NOSE STEERING", [("rotary", "TILLER"), ("toggle", "ARM"), ("lamp", "NWS"), ("toggle", "BRAKE"), ("knob", "MIC"), ("knob", "SPKR"), ("lamp", "O2"), ("toggle", "MASK"), ("toggle", "BOOM"), ("toggle", "LIGHT"), ("knob", "DIM"), ("RESET", "")], columns=3),
-    auto_plate("audio_left", "left", -0.83, -0.48, -0.55, 0.08, "AUDIO", [("COM1", ""), ("COM2", ""), ("COM3", ""), ("NAV1", ""), ("NAV2", ""), ("ADF", ""), ("DME", ""), ("MKR", ""), ("knob", "VOL"), ("knob", "ICS"), ("toggle", "HOT"), ("toggle", "EMER")], columns=3),
-    auto_plate("tiller_right", "right", 0.55, 0.08, 0.78, 0.47, "CHART / OXYGEN", [("rotary", "CHART"), ("toggle", "ARM"), ("lamp", "CHART"), ("toggle", "SYNC"), ("knob", "MIC"), ("knob", "SPKR"), ("lamp", "O2"), ("toggle", "MASK"), ("toggle", "BOOM"), ("toggle", "LIGHT"), ("knob", "DIM"), ("RESET", "")], columns=3),
-    auto_plate("audio_right", "right", 0.55, -0.48, 0.83, 0.08, "AUDIO", [("COM1", ""), ("COM2", ""), ("COM3", ""), ("NAV1", ""), ("NAV2", ""), ("ADF", ""), ("DME", ""), ("MKR", ""), ("knob", "VOL"), ("knob", "ICS"), ("toggle", "HOT"), ("toggle", "EMER")], columns=3),
-    # Centre pedestal, thrust levers forward and the flight management keypad aft.
-    plate("thrust", "pedestal", -0.13, 0.02, 0.13, 0.43, colour="gray", legends=[L("TO", 0.0, 0.33, 0.0056), L("CLB", 0.0, 0.29, 0.0056), L("CRZ", 0.0, 0.25, 0.0056), L("IDLE", 0.0, 0.1, 0.0056), L("SPD BRK", -0.098, 0.04, 0.0046), L("FLAPS", 0.098, 0.04, 0.0046)]),
-    plate("fms", "pedestal", -0.13, -0.35, 0.13, 0.02, title="FLIGHT MANAGEMENT",
-          controls=grid([-0.085, -0.0283, 0.0283, 0.085], [-0.095, -0.13, -0.165, -0.2, -0.235, -0.27, -0.305], lambda x, y, i, j: button(x, y, face=["1", "2", "3", "NAV", "4", "5", "6", "PERF", "7", "8", "9", "FPL", "CLR", "0", "ENT", "DIR", "A", "B", "C", "PROG", "D", "E", "F", "MSG", "G", "H", "I", "MENU"][j * 4 + i], w=0.045, h=0.026))),
+    # A. Centre glareshield panel.
+    plate("warn_left", "main", -0.72, 0.19, -0.5, 0.258, legends=[L("ENG FIRE", -0.68, 0.244, 0.0048), L("WARN", -0.61, 0.244, 0.0048), L("CAUTION", -0.54, 0.244, 0.0048)],
+          controls=[guarded(-0.695, 0.214), lamp(-0.665, 0.214, "red", r=0.0065, node="Lamp_fire_left"), lamp(-0.61, 0.214, "red", r=0.012, node="Lamp_master_warning"), button(-0.54, 0.214, face="MASTER", w=0.06, h=0.024, node="Lamp_master", colour="amberbutton")]),
+    plate("warn_right", "main", 0.5, 0.19, 0.72, 0.258, legends=[L("ENG FIRE", 0.68, 0.244, 0.0048), L("WARN", 0.61, 0.244, 0.0048), L("CAUTION", 0.54, 0.244, 0.0048)],
+          controls=[guarded(0.695, 0.214), lamp(0.665, 0.214, "red", r=0.0065, node="Lamp_fire_right"), lamp(0.61, 0.214, "red", r=0.012, node="Copilot_Lamp_master_warning"), button(0.54, 0.214, face="MASTER", w=0.06, h=0.024, node="Copilot_Lamp_master", colour="amberbutton")]),
+    auto_plate("dcp_left", "main", -0.495, 0.19, -0.3, 0.258, "DISPLAY CONTROL", [("knob", "BARO"), ("STD", ""), ("ROSE", ""), ("ARC", ""), ("knob", "RNG"), ("TFC", ""), ("REV", "")], columns=7),
+    GUIDANCE,
+    auto_plate("dcp_right", "main", 0.3, 0.19, 0.495, 0.258, "DISPLAY CONTROL", [("knob", "BARO"), ("STD", ""), ("ROSE", ""), ("ARC", ""), ("knob", "RNG"), ("TFC", ""), ("REV", "")], columns=7),
+    # B. Instrument panel, outboard of each PFD; the gear module sits under the standby instrument.
+    auto_plate("dacp_left", "main", -0.715, 0.04, -0.552, 0.186, "AUDIO CONTROL", [("COM1", ""), ("COM2", ""), ("NAV1", ""), ("NAV2", ""), ("DME", ""), ("MKR", ""), ("SPKR", ""), ("PA", ""), ("knob", "VOL"), ("knob", "SIDE"), ("toggle", "MASK"), ("toggle", "EMER")], columns=4),
+    auto_plate("power", "main", -0.715, -0.055, -0.552, 0.036, "AVIONICS / ELEC POWER", [("toggle", "BATT"), ("toggle", "GEN L"), ("toggle", "GEN R"), ("toggle", "AVN"), ("guard", "DISPATCH"), ("toggle", "EMER")], columns=3),
+    plate("gear", "main", -0.056, -0.135, 0.056, 0.072, legends=[L("LANDING GEAR", 0.0, 0.0625, 0.0048), L("NOSE", 0.0, 0.0335, 0.004), L("LEFT", -0.03, 0.0095, 0.004), L("RIGHT", 0.03, 0.0095, 0.004), L("UP", 0.03, -0.015, 0.0044), L("DN", 0.03, -0.075, 0.0044)],
+          controls=[lamp(0.0, 0.046, "green", r=0.0052, node="Lamp_gear_nose"), lamp(-0.03, 0.022, "green", r=0.0052, node="Lamp_gear_left"), lamp(0.03, 0.022, "green", r=0.0052, node="Lamp_gear_right"), wheel(-0.008, -0.045), button(0.0, -0.11, face="HORN MUTE", w=0.06, h=0.017)]),
+    auto_plate("dacp_right", "main", 0.552, 0.04, 0.715, 0.186, "AUDIO CONTROL", [("COM1", ""), ("COM2", ""), ("NAV1", ""), ("NAV2", ""), ("DME", ""), ("MKR", ""), ("SPKR", ""), ("PA", ""), ("knob", "VOL"), ("knob", "SIDE"), ("toggle", "MASK"), ("toggle", "EMER")], columns=4),
+    auto_plate("recorder", "main", 0.552, -0.055, 0.715, 0.036, "CVR / DATABASE", [("TEST", ""), ("ERASE", ""), ("lamp", "CVR"), ("LOAD", ""), ("USB", ""), ("lamp", "DBU")], columns=3),
+    # C. Tilt panel, left to right.
+    OXYGEN,
+    group("cockpit_temp", "tilt", -0.655, -0.094, -0.595, -0.004, "CKPT TEMP", [("rotary", "TEMP"), ("knob", "FAN"), ("toggle", "AUTO"), ("toggle", "DEFOG")]),
+    group("fuel", "tilt", -0.595, -0.094, -0.535, -0.004, "FUEL", [("toggle", "BOOST L"), ("toggle", "BOOST R"), ("toggle", "XFER L"), ("toggle", "XFER R")]),
+    group("ignition", "tilt", -0.535, -0.094, -0.475, -0.004, "IGNITION", [("toggle", "L"), ("toggle", "R"), ("lamp", "L IGN"), ("lamp", "R IGN")]),
+    group("fadec", "tilt", -0.475, -0.094, -0.415, -0.004, "FADEC", [("toggle", "L"), ("toggle", "R"), ("RESET", ""), ("lamp", "TLD")]),
+    group("pressure_tilt", "tilt", -0.415, -0.094, -0.345, -0.004, "PRESSURIZATION", [("rotary", "LDG ALT"), ("toggle", "MODE"), ("toggle", "DUMP"), ("knob", "RATE")]),
+    group("ice", "tilt", -0.345, -0.094, -0.255, -0.004, "ICE PROTECTION", [("toggle", "WING"), ("toggle", "ENG"), ("toggle", "TAIL"), ("toggle", "PITOT"), ("toggle", "WSHLD"), ("lamp", "ICE")], columns=3),
+    group("ccp_left", "tilt", -0.25, -0.094, -0.14, -0.004, "CURSOR CONTROL", [("knob", "RANGE"), ("1", ""), ("2", ""), ("3", ""), ("knob", "CURSOR"), ("MENU", ""), ("CHKL", ""), ("ENT", "")], columns=4),
+    cdu_plate("cdu_left", -0.068),
+    cdu_plate("cdu_right", 0.068),
+    group("ccp_right", "tilt", 0.14, -0.094, 0.25, -0.004, "CURSOR CONTROL", [("knob", "RANGE"), ("1", ""), ("2", ""), ("3", ""), ("knob", "CURSOR"), ("MENU", ""), ("CHKL", ""), ("ENT", "")], columns=4),
+    group("comms", "tilt", 0.255, -0.094, 0.345, -0.004, "COMMS", [("PTT", ""), ("MUTE", ""), ("EVENT", ""), ("toggle", "HOT"), ("knob", "SPKR"), ("lamp", "CVR")], columns=3),
+    group("cabin_temp", "tilt", 0.345, -0.094, 0.415, -0.004, "CABIN TEMP", [("rotary", "TEMP"), ("knob", "FAN"), ("toggle", "AUTO"), ("toggle", "AIR")]),
+    group("elt", "tilt", 0.415, -0.094, 0.475, -0.004, "ELT", [("guard", "ON"), ("lamp", "XMIT"), ("TEST", ""), ("RESET", "")]),
+    plate("hour_meter", "tilt", 0.475, -0.094, 0.565, -0.004, title="FLIGHT HOURS", legends=[L("01247.3", 0.52, -0.052, 0.0105)]),
+    group("pulse", "tilt", 0.565, -0.094, 0.715, -0.004, "LANDING LIGHTS", [("toggle", "LEFT"), ("toggle", "RIGHT"), ("toggle", "PULSE"), ("lamp", "ON")], columns=4),
+    # Side shelves beside each seat, ending short of the panel so the tilt panel's outer ends stay in view.
+    auto_plate("tiller_left", "left", -0.78, -0.02, -0.55, 0.26, "NOSE STEERING", [("rotary", "TILLER"), ("toggle", "ARM"), ("lamp", "NWS"), ("toggle", "BRAKE"), ("knob", "MIC"), ("knob", "SPKR"), ("lamp", "O2"), ("toggle", "MASK"), ("toggle", "BOOM"), ("toggle", "LIGHT"), ("knob", "DIM"), ("RESET", "")], columns=3),
+    plate("breakers_left", "left", -0.83, -0.48, -0.55, -0.02, title="CIRCUIT BREAKERS"),
+    auto_plate("tiller_right", "right", 0.55, -0.02, 0.78, 0.26, "CHART / OXYGEN", [("rotary", "CHART"), ("toggle", "ARM"), ("lamp", "CHART"), ("toggle", "SYNC"), ("knob", "MIC"), ("knob", "SPKR"), ("lamp", "O2"), ("toggle", "MASK"), ("toggle", "BOOM"), ("toggle", "LIGHT"), ("knob", "DIM"), ("RESET", "")], columns=3),
+    plate("breakers_right", "right", 0.55, -0.48, 0.83, -0.02, title="CIRCUIT BREAKERS"),
+    # D. Centre pedestal: thrust levers with their detents forward, then lighting, engine start and trim.
+    plate("thrust", "pedestal", -0.13, 0.02, 0.13, 0.3, colour="gray", legends=[L("TO", 0.0, 0.282, 0.0056), L("CLB", 0.0, 0.252, 0.0056), L("CRU", 0.0, 0.21, 0.0056), L("IDLE", 0.0, 0.1, 0.0056), L("SPD BRK", -0.098, 0.04, 0.0046), L("FLAPS", 0.098, 0.04, 0.0046), L("RET", -0.12, 0.2, 0.0042), L("EXT", -0.12, 0.12, 0.0042), L("UP", 0.12, 0.2, 0.0042), L("15", 0.12, 0.16, 0.0042), L("35", 0.12, 0.12, 0.0042)]),
+    auto_plate("lighting", "pedestal", -0.13, -0.12, 0.13, 0.02, "LIGHTING / DIMMING", [("knob", "PANEL"), ("knob", "EFIS"), ("knob", "FLOOD"), ("knob", "MAP"), ("toggle", "NAV"), ("toggle", "STROBE"), ("toggle", "BEACON"), ("toggle", "TAXI")], columns=4),
+    auto_plate("engine_start", "pedestal", -0.13, -0.22, 0.13, -0.12, "ENGINE START", [("guard", "START L"), ("guard", "START R"), ("toggle", "STOP L"), ("toggle", "STOP R")], columns=4),
+    auto_plate("trim", "pedestal", -0.13, -0.35, 0.13, -0.22, "TRIM", [("rotary", "AILERON"), ("rotary", "RUDDER"), ("toggle", "ELEV 2"), ("lamp", "SET")], columns=4),
     # Overhead: electrical, engines, lights and pressurisation.
-    auto_plate("electrical", "overhead", -0.36, 0.1, 0.0, 0.4, "ELECTRICAL", [("guard", "BATT"), ("toggle", "GEN 1"), ("toggle", "GEN 2"), ("toggle", "APU"), ("toggle", "BUS"), ("lamp", "AVAIL"), ("knob", "VOLT"), ("toggle", "EMER")], columns=4),
+    auto_plate("electrical", "overhead", -0.36, 0.1, 0.0, 0.4, "ELECTRICAL", [("guard", "BATT"), ("toggle", "GEN 1"), ("toggle", "GEN 2"), ("toggle", "INV"), ("toggle", "BUS"), ("lamp", "AC"), ("knob", "VOLT"), ("toggle", "EMER")], columns=4),
     auto_plate("engines", "overhead", 0.0, 0.1, 0.36, 0.4, "ENGINES", [("guard", "L FUEL"), ("guard", "R FUEL"), ("toggle", "IGN L"), ("toggle", "IGN R"), ("rotary", "START"), ("toggle", "BLEED"), ("toggle", "BOOST"), ("lamp", "FIRE")], columns=4),
     auto_plate("lights", "overhead", -0.36, -0.14, 0.0, 0.1, "LIGHTS", [("toggle", "NAV"), ("toggle", "STROBE"), ("toggle", "BEACON"), ("toggle", "LDG"), ("toggle", "TAXI"), ("toggle", "LOGO"), ("knob", "PANEL"), ("knob", "DOME")], columns=4),
     auto_plate("pressure", "overhead", 0.0, -0.14, 0.36, 0.1, "PRESSURE", [("rotary", "CABIN"), ("knob", "RATE"), ("toggle", "DUMP"), ("toggle", "EMER"), ("rotary", "TEMP"), ("knob", "FAN"), ("toggle", "DEFOG"), ("toggle", "ICE")], columns=4),
@@ -115,7 +170,8 @@ VIEWS = {name: (airframe(origin), airframe(target), fov) for name, (origin, targ
     "panel": (EYE, (-0.1, 6.0, 2.2), 46),
     "left": (EYE, (-0.75, 5.4, 2.12), 68),
     "right": (EYE, (0.75, 5.5, 2.3), 68),
-    "pedestal": (EYE, (0.05, 5.6, 1.98), 60),
+    "pedestal": (EYE, (0.05, 5.48, 1.98), 60),
+    "tilt": (EYE, (0.0, 5.9, 2.02), 42),
     "overhead": (EYE, (0.0, 5.3, 2.97), 68),
     "rear": ((0.0, 5.7, 2.6), (0.0, 4.5, 2.4), 72),
 }.items()}
@@ -126,6 +182,28 @@ def lever(k, name, material, x, y, z, height, knob_size=0.02):
     k.emit(name + "_slot", "rubber", k.box(x - 0.008, y - 0.05, z - 0.004, x + 0.008, y + 0.05, z + 0.0045))
     k.emit(name + "_arm", "metal", k.box(x - 0.005, y - 0.006, z, x + 0.005, y + 0.006, z + height))
     k.emit(name + "_knob", material, k.box(x - knob_size, y - knob_size * 0.8, z + height - 0.006, x + knob_size, y + knob_size * 0.8, z + height + 0.024, chamfer=0.006))
+
+
+def tilt_point(drop):
+    """Forward station and height of a point this far down the tilt panel."""
+    angle = math.radians(TILT_ANGLE)
+    return TILT_TOP[0] - drop * math.sin(angle), TILT_TOP[1] - drop * math.cos(angle)
+
+
+def tilt_body(k, name, x0, x1, drop):
+    """Solid under the tilt panel, closing the gap down to the knee wall."""
+    y, z = tilt_point(drop)
+    section = [(y, 1.895), (6.035, 1.895), (6.035, TILT_TOP[1] - 0.0015), (TILT_TOP[0], TILT_TOP[1] - 0.0015), (y, z - 0.0015)]
+    # Section is drawn in (forward, up) and swept across the aircraft.
+    k.emit(name, "paint", k.transform(k.prism(section, x0, x1), k.Matrix(((0, 0, 1, 0), (1, 0, 0, 0), (0, 1, 0, 0), (0, 0, 0, 1)))))
+
+
+def t_handle(k, name, material, x, y, z):
+    """A pull handle standing aft from a vertical face."""
+    frame = k.Matrix.Translation((x, y, z)) @ k.Matrix.Rotation(1.5708, 4, "X")
+    k.emit(f"{name}_collar", "metal_dark", k.lathe([(0.008, -0.002), (0.008, 0.002), (0.005, 0.004), (0.0, 0.004)], 12), frame)
+    k.emit(f"{name}_shaft", "metal", k.lathe([(0.003, 0.0), (0.003, 0.034), (0.0, 0.034)], 8), frame)
+    k.emit(name, material, k.box(-0.022, -0.007, 0.03, 0.022, 0.007, 0.042, chamfer=0.003), frame)
 
 
 def build(k):
@@ -150,56 +228,90 @@ def layout(k):
     for sign in (-1, 1):
         k.emit("Panel_cheek", "paint", k.box(min(sign * 0.715, sign * 1.0), 5.97, 1.84, max(sign * 0.715, sign * 1.0), 6.05, 2.46))
     # Panel.
-    k.main_panel("main", PANEL_OUTLINE, balls=(STANDBY_ADI,), fasteners=[(-0.71, 0.0), (0.71, 0.0), (-0.335, 0.183), (0.335, 0.183), (-0.012, 0.183), (0.012, 0.183)])
+    k.main_panel("main", PANEL_OUTLINE, fasteners=[(-0.7165, -0.13), (0.7165, -0.13)])
+    k.main_panel("tilt", TILT_OUTLINE)
+    tilt_body(k, "Tilt_body", -0.136, 0.136, TILT_CENTRE)
+    for x0, x1 in ((-0.715, -0.136), (0.136, 0.715)):
+        tilt_body(k, "Tilt_body", x0, x1, TILT_OUTER)
     for entry in PLATES:
         k.plate(entry)
     k.gauges()
     k.clock(CLOCK)
-    k.adi(STANDBY_ADI, "Standby_ADI", "Standby_ADI_ball")
+    k.emit("CVR_mic", "knob", k.lathe([(0.0042, -0.001), (0.0042, 0.0012), (0.003, 0.002), (0.0, 0.002)], 12), k.at("main", 0.0, 0.2495, k.PLATE_Z))
     for name, x in SCREENS:
-        k.screen(name, "main", x, 0.07, SCREEN_W, BEZEL_W, height=SCREEN_H, bezel_height=BEZEL_H)
+        k.screen(name, "main", x, SCREEN_Y, SCREEN_W, BEZEL_W, height=SCREEN_H, bezel_height=BEZEL_H)
     with k.placed(prefix="Copilot_"):
-        k.screen("PFD", "main", 0.49, 0.07, SCREEN_W, BEZEL_W, height=SCREEN_H, bezel_height=BEZEL_H)
+        k.screen("PFD", "main", -SCREENS[0][1], SCREEN_Y, SCREEN_W, BEZEL_W, height=SCREEN_H, bezel_height=BEZEL_H)
+    k.screen("ESIS", "main", ESIS["x"], ESIS["y"], ESIS["size"], ESIS["bezel"], height=ESIS["size"], bezel_height=ESIS["bezel"])
+    k.readout("CDU", "tilt", -0.068, CDU_SCREEN["y"], CDU_SCREEN["w"], CDU_SCREEN["h"])
+    with k.placed(prefix="Copilot_"):
+        k.readout("CDU", "tilt", 0.068, CDU_SCREEN["y"], CDU_SCREEN["w"], CDU_SCREEN["h"])
+    # E. Beneath the tilt panel, on the face below its lower edge.
+    face, height = tilt_point(TILT_OUTER)
+    handle_z = (height + 1.895) / 2
+    t_handle(k, "Emergency_brake_handle", "red", -0.66, face, handle_z)
+    t_handle(k, "Parking_brake_handle", "knob", -0.58, face, handle_z)
+    t_handle(k, "Control_lock_handle", "yellow", -0.32, face, handle_z)
+    # F. On the floor aft of the pedestal.
+    release = k.Matrix.Translation((0.0, 5.01, FLOOR + 0.002))
+    k.emit("Emergency_gear_well", "metal_dark", k.box(-0.03, -0.02, -0.002, 0.03, 0.02, 0.004, chamfer=0.001), release)
+    k.emit("Emergency_gear_shaft", "metal", k.lathe([(0.003, 0.0), (0.003, 0.03), (0.0, 0.03)], 8), release)
+    k.emit("Emergency_gear_handle", "red", k.box(-0.03, -0.008, 0.026, 0.03, 0.008, 0.04, chamfer=0.004), release)
+    # Miscellaneous cockpit equipment: eye position reference and four ventilation outlets.
+    k.emit("Eye_reference_post", "metal_dark", k.box(-0.0015, 5.958, 2.468, 0.0015, 5.961, 2.525))
+    for z in (2.505, 2.525):
+        k.emit("Eye_reference_ball", "white", k.lathe([(0.0, -0.005), (0.0035, -0.0035), (0.005, 0.0), (0.0035, 0.0035), (0.0, 0.005)], 12), k.Matrix.Translation((0.0, 5.9595, z)))
+    for sign in (-1, 1):
+        for z in (2.2, 2.34):
+            outlet = k.Matrix.Translation((sign * 0.745, 5.97, z)) @ k.Matrix.Rotation(1.5708, 4, "X")
+            k.emit("Vent_bezel", "metal_dark", k.lathe([(0.02, -0.002), (0.02, 0.002), (0.016, 0.006), (0.012, 0.004)], 16), outlet)
+            k.emit("Vent_ball", "knob", k.lathe([(0.012, 0.002), (0.012, 0.008), (0.008, 0.013), (0.0, 0.014)], 14), outlet)
     # Below the panel: pedestal column, knee space and floor.
-    k.emit("Knee_wall", "paint", ([(-0.95, 6.03, FLOOR), (0.95, 6.03, FLOOR), (0.95, 6.03, 1.9), (-0.95, 6.03, 1.9)], [(3, 2, 1, 0)], []))
-    k.emit("Pedestal_body", "paint", k.box(-0.135, 5.19, FLOOR, 0.135, 6.03, 1.945, chamfer=0.01))
-    k.emit("Carpet", "carpet", k.rectangle(-0.94, BULKHEAD, 0.94, 6.03, FLOOR + 0.003, step=0.08))
+    k.emit("Knee_wall", "paint", ([(-0.95, KNEE_WALL, FLOOR), (0.95, KNEE_WALL, FLOOR), (0.95, KNEE_WALL, 1.9), (-0.95, KNEE_WALL, 1.9)], [(3, 2, 1, 0)], []))
+    k.emit("Pedestal_body", "paint", k.box(-0.135, 5.07, FLOOR, 0.135, 6.03, 1.945, chamfer=0.01))
+    k.emit("Carpet", "carpet", k.rectangle(-0.94, BULKHEAD, 0.94, KNEE_WALL, FLOOR + 0.003, step=0.08))
     for x in (-0.6, -0.32, 0.32, 0.6):
-        k.emit("Floor_rib", "metal_dark", k.box(x - 0.009, BULKHEAD, FLOOR + 0.002, x + 0.009, 5.98, FLOOR + 0.008))
+        k.emit("Floor_rib", "metal_dark", k.box(x - 0.009, BULKHEAD, FLOOR + 0.002, x + 0.009, KNEE_WALL - 0.05, FLOOR + 0.008))
     for sign in (-1, 1):
         for j in range(3):
-            path = [(sign * (0.2 + j * 0.05), 6.03, 1.68 + j * 0.03), (sign * (0.22 + j * 0.05), 5.99, 1.76), (sign * (0.24 + j * 0.05), 6.03, 1.84)]
+            path = [(sign * (0.2 + j * 0.05), KNEE_WALL, 1.68 + j * 0.03), (sign * (0.22 + j * 0.05), KNEE_WALL - 0.04, 1.76), (sign * (0.24 + j * 0.05), KNEE_WALL, 1.84)]
             k.emit("Well_wiring", "wire", k.tube(path, 0.0052, 6))
     k.emit("Foot_rest", "metal_dark", k.box(-0.135, 5.9, FLOOR + 0.002, 0.135, 6.02, FLOOR + 0.04, chamfer=0.006))
     # Both crew positions.
     for x, side_name, prefix in ((-0.32, "left", ""), (0.32, "right", "Copilot_")):
         with k.placed((x, 0.0, 0.0), prefix=prefix or ""):
-            k.pedals(0.085, 5.92, FLOOR)
-        k.yoke(side_name, x, 5.78, FLOOR, 0.38)
-        k.crew_seat(x, 5.5, FLOOR, 2.0)
+            # Heels on the floor, the pedal arms rising through it, and clear of the tilt panel's lower edge.
+            k.pedals(0.11, 5.98, FLOOR - 0.065)
+        k.yoke(side_name, x, 5.68, FLOOR, 0.525)
+        k.crew_seat(x, 5.38, FLOOR, 1.958)
     # Pedestal top.
-    k.emit("Pedestal_top", "paint", k.box(-0.136, 5.19, 1.94, 0.136, 6.0, 1.951, chamfer=0.002))
-    k.throttle("pedestal", -0.04, 0.04, 0.08, 0.36, 0.2, 0.31)
-    lever(k, "Speedbrake", "knob", -0.098, 5.71, 1.953, 0.05)
-    lever(k, "Flap", "white", 0.098, 5.71, 1.953, 0.05)
-    k.readout("FMS", "pedestal", 0.0, -0.045, 0.2, 0.066)
-    # Trim wheels on the side of the pedestal, turning against the print.
+    k.emit("Pedestal_top", "paint", k.box(-0.136, 5.07, 1.94, 0.136, 6.0, 1.951, chamfer=0.002))
+    k.throttle("pedestal", -0.04, 0.04, 0.08, 0.3, 0.2, 0.292)
+    lever(k, "Speedbrake", "knob", -0.098, PEDESTAL[1] + 0.16, 1.953, 0.05)
+    lever(k, "Flap", "white", 0.098, PEDESTAL[1] + 0.16, 1.953, 0.05)
+    # Trim wheels on the side of the pedestal, ahead of the seat pans.
     for sign in (-1, 1):
-        wheel = k.Matrix.Translation((sign * 0.136, 5.6, 1.88)) @ k.Matrix.Rotation(sign * 1.5708, 4, "Y")
+        wheel = k.Matrix.Translation((sign * 0.136, 5.72, 1.88)) @ k.Matrix.Rotation(sign * 1.5708, 4, "Y")
         k.emit("Trim_wheel", "knob", k.lathe([(0.075, -0.012), (0.075, 0.012), (0.066, 0.012), (0.066, -0.012)], 28), wheel)
         k.emit("Trim_hub", "metal", k.lathe([(0.02, -0.014), (0.02, 0.014), (0.0, 0.014)], 12), wheel)
         for j in range(4):
             k.emit("Trim_spoke", "knob", k.transform(k.box(-0.007, 0.018, -0.004, 0.007, 0.068, 0.004), k.Matrix.Rotation(j * 1.5708, 4, "Z")), wheel)
     # Shelves and overhead.
-    k.console("left", -0.53, -0.95, 4.95, 5.95, SHELF_TOP, FLOOR)
-    k.console("right", 0.53, 0.95, 4.95, 5.95, SHELF_TOP, FLOOR)
+    k.console("left", -0.55, -0.95, 4.95, 5.72, SHELF_TOP, FLOOR)
+    k.console("right", 0.55, 0.95, 4.95, 5.72, SHELF_TOP, FLOOR)
     for sign, label in ((-1, "left"), (1, "right")):
-        mask = k.Matrix.Translation((sign * 0.72, 5.2, SHELF_TOP))
+        mask = k.Matrix.Translation((sign * 0.72, 5.06, SHELF_TOP))
         k.emit("Mask_box", "black", k.box(-0.08, -0.09, 0.0, 0.08, 0.09, 0.13, chamfer=0.012), mask)
         k.emit("Mask_door", "paint", k.box(-0.072, -0.082, 0.128, 0.072, 0.082, 0.136, chamfer=0.004), mask)
         k.emit("Mask_tab", "red", k.box(-0.02, -0.07, 0.135, 0.02, -0.05, 0.142), mask)
-        k.emit("Cup_holder", "metal", k.lathe([(0.042, 0.0), (0.042, 0.004), (0.036, 0.004), (0.036, -0.03)], 18), k.Matrix.Translation((sign * 0.64, 5.72, SHELF_TOP + 0.001)))
+        k.emit("Cup_holder", "metal", k.lathe([(0.042, 0.0), (0.042, 0.004), (0.036, 0.004), (0.036, -0.03)], 18), k.Matrix.Translation((sign * 0.64, 5.64, SHELF_TOP + 0.001)))
+    for surface, x0 in (("left", -0.81), ("right", 0.57)):
+        for i in range(5):
+            for j in range(10):
+                k.emit("Breaker", "white" if (i + j) % 5 == 0 else "knob", k.lathe([(0.0042, -0.0008), (0.0042, 0.003), (0.0028, 0.0052), (0.0, 0.0056)], 8), k.at(surface, x0 + i * 0.05, -0.43 + j * 0.044, k.PLATE_Z))
     frame = k.FRAMES["overhead"]
+    for x, material in ((-0.345, "white"), (0.0, "metal"), (0.345, "white")):
+        k.emit("Reading_light" if x else "Floodlight", material, k.lathe([(0.009, -0.002), (0.009, 0.004), (0.006, 0.008), (0.0, 0.008)], 14), frame @ k.Matrix.Translation((x, 0.405, 0.0)))
     k.emit("Overhead_face", "atlas_lit", k.rectangle(-0.37, -0.41, 0.37, 0.41, -0.0002, k.surface_uv("overhead"), step=0.05), frame)
     k.emit("Overhead_case", "black", k.box(-0.375, -0.415, -0.17, 0.375, 0.415, -0.0006), frame)
     # Bulkhead behind the seats with a door through to the cabin.

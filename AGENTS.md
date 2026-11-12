@@ -31,6 +31,8 @@ This is the current `pocket-flight-site` checkout. The sibling `pocket-flight` r
 
 For repository-navigation work, verify offline. Open the game only when the user requests browser verification.
 
+The site is hosted on Vercel, and a push to `main` deploys to production. Push only when the user asks; see [README.md](README.md#hosting).
+
 The navigation redesign is not authorization to delete ignored working data, regenerate aircraft assets, publish the site, or change flight tuning.
 
 ## Reports

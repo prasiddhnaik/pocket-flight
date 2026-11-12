@@ -171,7 +171,7 @@ def allot(name, width, height=None):
         x, y, row = shelf["x"], shelf["y"], shelf["row"]
         if x + width > shelf["x1"]:
             x, y, row = shelf["x0"], y + row + 4, 0
-        if y + height <= SIZE:
+        if x + width <= shelf["x1"] and y + height <= shelf.get("y1", SIZE):
             shelf.update(x=x + width + 4, y=y, row=max(row, height))
             rects[name] = (x, y, width, height)
             return rects[name]
@@ -220,7 +220,7 @@ def dial(name, scale, size):
 
 
 SIZES = {"airspeed": 288, "altimeter": 288, "aoa": 224, "gmeter": 224, "vvi": 224, "rpm": 192, "ftit": 192, "fuelflow": 192, "nozzle": 192, "oil": 128, "hydraulic": 128, "fuel": 240, "cabin": 160, "oxygen": 192}
-for name in sorted({g[1] for g in layout.GAUGES}, key=lambda n: -SIZES.get(n, 192)):
+for name in sorted({g[1] for g in layout.GAUGES}, key=lambda n: (-SIZES.get(n, 192), n)):
     dial(f"dial_{name}", layout.SCALES[name], SIZES.get(name, 192))
 
 # Clock.
@@ -268,30 +268,31 @@ for bank in (-60, -45, -30, -20, -10, 0, 10, 20, 30, 45, 60):
     major = bank % 30 == 0
     for image in (paint, lit):
         image.line([point(cx, cy, r * 0.94, bank), point(cx, cy, r * (0.82 if major else 0.87), bank)], fill=INK if image is paint else 220, width=4 if major else 2)
-x, y, w, _ = allot("hsi_ring", 288)
-cx, cy, r = x + w / 2, y + w / 2, w / 2
-paint.rectangle([x, y, x + w, y + w], fill=FACE)
-for bearing in range(0, 360, 45):
-    for image in (paint, lit):
-        image.polygon([point(cx, cy, r * 0.96, bearing), point(cx, cy, r * 0.86, bearing - 3), point(cx, cy, r * 0.86, bearing + 3)], fill=INK if image is paint else 220)
-x, y, w, _ = allot("hsi_card", 320)
-cx, cy, r = x + w / 2, y + w / 2, w / 2
-paint.rectangle([x, y, x + w, y + w], fill=FACE)
-paint.ellipse([x + 1, y + 1, x + w - 1, y + w - 1], fill=(20, 20, 22))
-for degrees in range(0, 360, 5):
-    major = degrees % 30 == 0
-    tick = r * (0.8 if major else 0.87 if degrees % 10 == 0 else 0.91)
-    for image in (paint, lit):
-        image.line([point(cx, cy, r * 0.97, degrees), point(cx, cy, tick, degrees)], fill=INK if image is paint else 220, width=3 if major else 1)
-for degrees, label in {0: "N", 30: "3", 60: "6", 90: "E", 120: "12", 150: "15", 180: "S", 210: "21", 240: "24", 270: "W", 300: "30", 330: "33"}.items():
-    tile = Image.new("L", (80, 80), 0)
-    ImageDraw.Draw(tile).text((40, 40), label, fill=255, font=font(r * 0.2, DIGITS), anchor="mm")
-    tile = tile.rotate(-degrees, resample=Image.BICUBIC)
-    tx, ty = point(cx, cy, r * 0.65, degrees)
-    box = (round(tx - 40), round(ty - 40))
-    atlas.paste(INK, box, tile)
-    glow.paste(210, box, tile)
-text(cx, cy, "HDG", r * 0.1, (150, 150, 146))
+if not getattr(layout, "NO_HSI", False):
+    x, y, w, _ = allot("hsi_ring", 288)
+    cx, cy, r = x + w / 2, y + w / 2, w / 2
+    paint.rectangle([x, y, x + w, y + w], fill=FACE)
+    for bearing in range(0, 360, 45):
+        for image in (paint, lit):
+            image.polygon([point(cx, cy, r * 0.96, bearing), point(cx, cy, r * 0.86, bearing - 3), point(cx, cy, r * 0.86, bearing + 3)], fill=INK if image is paint else 220)
+    x, y, w, _ = allot("hsi_card", 320)
+    cx, cy, r = x + w / 2, y + w / 2, w / 2
+    paint.rectangle([x, y, x + w, y + w], fill=FACE)
+    paint.ellipse([x + 1, y + 1, x + w - 1, y + w - 1], fill=(20, 20, 22))
+    for degrees in range(0, 360, 5):
+        major = degrees % 30 == 0
+        tick = r * (0.8 if major else 0.87 if degrees % 10 == 0 else 0.91)
+        for image in (paint, lit):
+            image.line([point(cx, cy, r * 0.97, degrees), point(cx, cy, tick, degrees)], fill=INK if image is paint else 220, width=3 if major else 1)
+    for degrees, label in {0: "N", 30: "3", 60: "6", 90: "E", 120: "12", 150: "15", 180: "S", 210: "21", 240: "24", 270: "W", 300: "30", 330: "33"}.items():
+        tile = Image.new("L", (80, 80), 0)
+        ImageDraw.Draw(tile).text((40, 40), label, fill=255, font=font(r * 0.2, DIGITS), anchor="mm")
+        tile = tile.rotate(-degrees, resample=Image.BICUBIC)
+        tx, ty = point(cx, cy, r * 0.65, degrees)
+        box = (round(tx - 40), round(ty - 40))
+        atlas.paste(INK, box, tile)
+        glow.paste(210, box, tile)
+    text(cx, cy, "HDG", r * 0.1, (150, 150, 146))
 
 # Altimeter and fuel counter drums: one column of digits.
 x, y, w, h = allot("drum", 32, 320)

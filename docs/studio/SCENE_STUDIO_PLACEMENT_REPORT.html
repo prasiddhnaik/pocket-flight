@@ -11,7 +11,8 @@
 <body><main>
 <header>
 <p class="meta">POCKET FLIGHT · IMPLEMENTATION REPORT · 11 October 2026</p>
-<h1>Object placement in Scene Studio</h1>
+<h1>Object placement in Scene Studio</h1><p>Source links follow the current repository layout. References to the historical <code>StudioScenePanels.tsx</code> module now open <code>src/studio/panels/</code>; the original dates and verification claims are unchanged.</p>
+
 <p>The Object inspector now measures the selected model and provides three commands: place it beside the aircraft, set its largest dimension in meters, and place it on terrain or runway ground. Edits use the existing transform, keyframe, undo, and save paths.</p>
 <p class="meta">Repository: <code>pocket-flight</code> · local working tree based on <code>249032d</code> · implemented locally; no commit or deployment performed.</p>
 </header>
@@ -48,10 +49,10 @@ For ground placement:
 
 <h2>Changed files</h2>
 <div class="table-wrap"><table><thead><tr><th>File</th><th>Responsibility</th></tr></thead><tbody>
-<tr><td><a href="../../src/studio-placement.ts">studio-placement.ts</a></td><td>Bounds, proportional sizing, aircraft-relative placement, and sampled ground support.</td></tr>
-<tr><td><a href="../../src/replay-preview.ts">replay-preview.ts</a></td><td>Connects loaded scene instances and evaluated aircraft poses to the placement helpers.</td></tr>
-<tr><td><a href="../../src/ReplayStudio.tsx">ReplayStudio.tsx</a></td><td>Measures the selection, checks readiness, commits edits, and frames beside placement.</td></tr>
-<tr><td><a href="../../src/StudioScenePanels.tsx">StudioScenePanels.tsx</a>, <a href="../../src/studio.css">studio.css</a></td><td>Placement controls, dimension labels, target-size input, and compact responsive styling.</td></tr>
+<tr><td><a href="../../src/studio/studio-placement.ts">studio-placement.ts</a></td><td>Bounds, proportional sizing, aircraft-relative placement, and sampled ground support.</td></tr>
+<tr><td><a href="../../src/studio/replay-preview.ts">replay-preview.ts</a></td><td>Connects loaded scene instances and evaluated aircraft poses to the placement helpers.</td></tr>
+<tr><td><a href="../../src/studio/ReplayStudio.tsx">ReplayStudio.tsx</a></td><td>Measures the selection, checks readiness, commits edits, and frames beside placement.</td></tr>
+<tr><td><a href="../../src/studio/panels/">StudioScenePanels.tsx</a>, <a href="../../src/studio/studio.css">studio.css</a></td><td>Placement controls, dimension labels, target-size input, and compact responsive styling.</td></tr>
 <tr><td><a href="../../tests/studio-placement.test.ts">studio-placement.test.ts</a></td><td>Ten tests covering coordinate frames, transformed bounds, proportions, invalid inputs, ground height, and current morph pose.</td></tr>
 </tbody></table></div>
 
@@ -67,7 +68,7 @@ For ground placement:
 <tr><td>Short video export</td><td>The editor reported export completion. Its exported video decoded at 1920 × 1080, duration 1.7905 seconds. Selected settings were 1080p / 30 fps; those settings do not prove captured frame rate or frame-accurate timing. Browser download retrieval timed out, so independent file inspection was not completed.</td></tr>
 <tr><td>Browser logs</td><td>No warning or error entries returned during the inspected editing/export session. Mobile interaction and large imported-asset performance were not tested.</td></tr>
 </tbody></table></div>
-<p><a href="../../artifacts/studio-placement-qa/placement-controls.jpg">Saved browser screenshot: restored tower and Placement controls</a> · <a href="../../artifacts/studio-placement-qa/tower.obj">Tower QA fixture</a></p>
+<p><span>Saved browser screenshot: restored tower and Placement controls (historical artifact unavailable in this checkout)</span> · <span>Tower QA fixture (historical artifact unavailable in this checkout)</span></p>
 
 <h2>Repository state and useful next work</h2>
 <p>The repository already contained separate aircraft, effects, world, asset, and test edits. They were preserved. This report describes the placement module, inspector integration, styling, and placement tests only; it does not claim the entire dirty working tree is validated.</p>

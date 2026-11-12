@@ -17,3 +17,4 @@ assets/finch/**/*.blend1
 .playwright/
 __pycache__/
 .superpowers/
+.vercel

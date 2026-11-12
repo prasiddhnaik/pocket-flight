@@ -104,7 +104,7 @@ output/          Local generated builds, reports, captures and working data
 | Terrain or scenery                      | [world/world.ts](src/world/world.ts), [world/terrain.ts](src/world/terrain.ts)                                                   | `tests/scenery.test.ts`, `tests/coastal-assets.test.ts`                         |
 | F-15C outer skin, pylons and gun clips    | [scripts/build-f15c-skin.py](scripts/build-f15c-skin.py), [aircraft/f15c/gun-spool.ts](src/aircraft/f15c/gun-spool.ts) | `tests/f15c-skin.test.ts`, `tests/f15c-gun-spool.test.ts`, `scripts/check-f15c-skin.py` |
 | Detail cockpits for the jets: gauges, live screens and HUD | [scripts/cockpit/kit.py](scripts/cockpit/kit.py) and one layout per jet beside it, [aircraft/cockpit-specs.ts](src/aircraft/cockpit-specs.ts), [aircraft/cockpit-state.ts](src/aircraft/cockpit-state.ts), [aircraft/cockpit-avionics.ts](src/aircraft/cockpit-avionics.ts) | `tests/cockpit-interiors.test.ts`; rebuild one with `bun run cockpit:build <id>` |
-| Seated pilot in every aircraft: eye fit, hands and feet on the controls, head folded away from the seat | [aircraft/pilot.ts](src/aircraft/pilot.ts), [scripts/measure-pilot-seats.ts](scripts/measure-pilot-seats.ts) → `aircraft/pilot-seats.json`, [scripts/build-pilot.py](scripts/build-pilot.py) | `tests/pilot.test.ts`; rebuild with `bun run pilot:build <unpacked download>`, remeasure seats after a cockpit rebuild |
+| Seated pilot in every aircraft: eye fit, hands and feet on the controls, head folded away from the seat | [aircraft/pilot.ts](src/aircraft/pilot.ts), [scripts/fit.ts](scripts/fit.ts) (`bun run fit <id|all>` reports how the pilot fits a jet's cockpit), [scripts/measure-pilot-seats.ts](scripts/measure-pilot-seats.ts) → `aircraft/pilot-seats.json`, [scripts/build-pilot.py](scripts/build-pilot.py) | `tests/pilot.test.ts`; rebuild with `bun run pilot:build <unpacked download>`, remeasure seats after a cockpit rebuild |
 | Heron outer skin, modelled on the Grand Caravan | [scripts/build-heron-skin.py](scripts/build-heron-skin.py), [scripts/check-heron-skin.py](scripts/check-heron-skin.py) | `tests/heron-skin.test.ts`, `tests/heron.test.ts` |
 | Island trees: cheap models, one draw per kind and level | [scripts/build-tropical-trees.py](scripts/build-tropical-trees.py), [world/tree-field.ts](src/world/tree-field.ts) |
 | Palm Bay landmarks: tower, terminal, lighthouse, marina, church | [scripts/build-palm-bay-buildings.py](scripts/build-palm-bay-buildings.py), [world/palm-bay-landmarks.ts](src/world/palm-bay-landmarks.ts) | `tests/palm-bay-landmarks.test.ts` |
@@ -131,7 +131,7 @@ Each aircraft has its own folder under `src/aircraft/`. Start there when changin
 | --- | --- |
 | [Finch](src/aircraft/finch/) | Design and mass budget, systems, landing gear, control surfaces, propeller, and the original Finch reference design |
 | [Peregrine](src/aircraft/peregrine/) | Design and mass budget, systems, landing gear, and jet effects layout |
-| [Aurelia](src/aircraft/aurelia/) | Design and mass budget, systems, landing gear, motion, and effects; the flown Phenom 300E-based airframe's tires, hinges and screens in `flight-model.ts` and `flight-displays.ts` |
+| [Aurelia](src/aircraft/aurelia/) | Design and mass budget, systems, landing gear, motion, and effects; the flown Phenom 300E-based airframe's tires, hinges and screens in `flight-model.ts` and `flight-displays.ts`; the in-flight cockpit's Citation CJ4-specification avionics in `pro-line.ts` and `pro-line-displays.ts` |
 | [Stormbird](src/aircraft/stormbird/) | Design and mass budget, systems, landing gear, configuration, measured geometry, contacts, kinematics, and mechanisms |
 
 Every aircraft folder has `design.ts`, `systems.ts`, and `landing-gear.ts`. The design file groups that aircraft's component mass budget, geometry, aerodynamic coefficients, and propulsion data. Add future aircraft-specific parts beside these files.
@@ -155,7 +155,7 @@ For an editor change, run `bun test ./tests/studio-editing.test.ts ./tests/studi
 ## Development checks
 
 ```sh
-# Resolve local imports, HTML entry scripts, and navigation links
+# Resolve local imports, HTML entry scripts, and links throughout retained documentation
 bun run repo:check
 
 # Active suite only; historical snapshots under output/ are excluded
@@ -171,6 +171,9 @@ bun run aurelia:reference-check
 bun run build
 bun run lab:build
 
+# Recheck links in the game's production output
+bun run repo:check --built
+
 # Serve an already-built game locally
 bun run preview
 ```
@@ -180,6 +183,8 @@ Use `bun run test` for the active suite: the package script scopes discovery to 
 For non-trivial work, start with `code-review-graph status` at the repository root. Build a missing graph or update a stale one, then use callers/importers to find affected modules. Confirm graph findings in current source. Refresh the graph after structural changes.
 
 The development game exposes `window.pocketFlight.getState()` for diagnostics. This hook is absent in production. Browser checks are a separate verification step; builds and unit tests do not establish visual acceptance.
+
+The game build packages linked F-15C research downloads and checks all emitted HTML links. References to private lab, source, authoring, or local output files are labelled “local only” in the built documentation. `bun run repo:check` checks source documentation; `bun run repo:check --built` checks an existing `dist/`.
 
 For full-game performance comparisons, start `bun run dev --host 127.0.0.1 --port 5280` in one terminal. Run `bun run engine:benchmark` for the 12-trial collision comparison, or `bun run engine:render-benchmark` for 36 rendering trials. Both keep the aircraft, physics and HUD running, save raw evidence and screenshots under `output/`, and reject hidden/invalid frames, missing HUD/aircraft, browser errors or source changes. Close other performance-heavy work before timing. Generate the HTML summary with `bun scripts/report-engine-benchmark.ts` after the collision comparison.
 
@@ -209,6 +214,10 @@ Replay frames, projects, and imported assets are stored in IndexedDB (`pocket-fl
 Use Studio's **Backup** action to preserve an editable project before moving browsers or clearing site data. **Export video** creates a watchable recording, using MP4 or WebM according to browser support. Keep the tab visible during a video export.
 
 When changing storage or project models, preserve existing schema validation and verify older backups through import and export. Moving TypeScript files does not require a saved-data migration.
+
+## Hosting
+
+The site is hosted on Vercel (project `pocket-flight`). Vercel builds every push: `main` goes to production, other branches get preview URLs. [vercel.json](vercel.json) holds the build settings: `bun install --frozen-lockfile`, `bun run build`, output in `dist/`. The private wind tunnel (`lab/`) is not deployed. `.vercel/` is the local CLI link and is ignored.
 
 ## Asset and tool workflows
 

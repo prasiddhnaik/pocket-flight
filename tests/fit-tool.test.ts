@@ -63,3 +63,16 @@ test("every cockpit fit check reads its committed fit map", async () => {
     expect(map?.id, `${id} fit map`).toBe(id);
   }
 });
+async function fitCommand(...args: string[]) {
+  const child = Bun.spawn([process.execPath, "scripts/fit.ts", ...args], { stdout: "pipe", stderr: "pipe" });
+  return { code: await child.exited, output: await new Response(child.stdout).text() };
+}
+test("fit --strict passes a fitting airframe and fails one that needs review", async () => {
+  const finch = await fitCommand("finch", "--strict");
+  expect(finch.output).toContain("finch: PASS");
+  expect(finch.code).toBe(0);
+  // The Heron's pilot currently sits through its seat back (12 Nov 2026): strict mode must say so.
+  const heron = await fitCommand("heron", "--strict");
+  expect(heron.output).toContain("heron: REVIEW");
+  expect(heron.code).toBe(1);
+}, 180_000);

@@ -68,7 +68,7 @@ jobs:
           path: ~/.bun/install/cache
           key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
       - run: bun install --frozen-lockfile
-      - run: bun run fit all
+      - run: bun run fit all --strict
 
   e2e:
     name: Startup and flight

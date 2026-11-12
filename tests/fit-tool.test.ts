@@ -56,3 +56,10 @@ test("quick real Aurelia seat pose uses game driver and catches a bad knee in me
     bad.dispose();
   } finally { pilotSeats.aurelia = original; pilot.dispose(); driver.dispose?.(); }
 });
+test("every cockpit fit check reads its committed fit map", async () => {
+  for (const id of ["f15c", "peregrine", "stormbird", "aurelia"] as const) {
+    const { map, pilot } = await load(id);
+    pilot.dispose();
+    expect(map?.id, `${id} fit map`).toBe(id);
+  }
+});

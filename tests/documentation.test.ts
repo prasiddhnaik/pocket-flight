@@ -49,6 +49,13 @@ test("repo:check checks Markdown targets and HTML anchors in retained documents"
   expect(result.output).toContain("src/moved.ts");
   expect(result.output).toContain("guide.html#removed");
 }, 60_000);
+test("repo:check accepts links into git-ignored local folders that a clean checkout lacks", async () => {
+  const { directory, write } = fixture();
+  write("docs/guide.html", '<a href="../output/run.json">Run</a> <a href="../assets/f15c/review.png">Review</a>');
+  const result = await check(directory);
+  expect(result.output).toBe("");
+  expect(result.code).toBe(0);
+}, 60_000);
 test("repo:check --built rejects links absent from the production output", async () => {
   const { directory, write } = fixture();
   write("dist/index.html", '<a href="/docs/evidence.json">Evidence</a>');

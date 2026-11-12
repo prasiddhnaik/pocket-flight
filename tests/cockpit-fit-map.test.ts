@@ -13,7 +13,7 @@ type FitMap = {
 const sceneY = { aurelia: -1.265, f15c: 0, peregrine: -JET_CENTER * JET_SCALE, stormbird: -STORMBIRD_CENTER };
 for (const id of ["aurelia", "f15c", "peregrine", "stormbird"] as const) {
   test(`${id} fit map names parts and matches every shipped screen in aircraft metres`, async () => {
-    const map: FitMap = await Bun.file(new URL(`../assets/${id}/cockpit/fit-map.json`, import.meta.url)).json();
+    const map: FitMap = await Bun.file(new URL(`../scripts/fit/maps/${id}.json`, import.meta.url)).json();
     expect(Object.keys(map).sort()).toEqual(["id", "parts", "surfaces"]);
     expect(map.id).toBe(id);
     expect(map.parts.some((part) => part.name.startsWith("Seat_"))).toBe(true);

@@ -22,7 +22,7 @@ export async function load(id: FitId) {
   const pilot = new Pilot(group, id, loadGeometryOnly(new URL("../../public/assets/pilot/fighter-pilot.glb", import.meta.url)));
   await pilot.ready;
   pilot.setFirstPerson(true);
-  const file = Bun.file(new URL(`../../assets/${id}/cockpit/fit-map.json`, import.meta.url));
+  const file = Bun.file(new URL(`./maps/${id}.json`, import.meta.url));
   const map: FitMap | undefined = await file.exists() ? await file.json() : undefined;
   if (map && (map.id !== id || !Array.isArray(map.parts) || !Array.isArray(map.surfaces))) throw new Error(`Invalid fit map for ${id}`);
   return { group, scene, pilot, driver, map };

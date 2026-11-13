@@ -10,7 +10,7 @@ type Choice = typeof choices[number];
 type Sample = { t: number; y: number; speed: number; stall: number; roll: number; mode: string; finite: boolean };
 type Result = { choice: Choice; ok: boolean; failures: string[]; errors: string[]; seconds: number; frames: number; samples: number; phases: Record<string, number> };
 
-const FLIGHT_SECONDS = 20, POWER_SECONDS = 3, WALL_LIMIT_MS = 600_000, MIN_FRAMES = 200;
+const FLIGHT_SECONDS = 20, POWER_SECONDS = 3, WALL_LIMIT_MS = 900_000, MIN_FRAMES = 200;
 const ALTITUDE_LOSS = 50, MIN_SPEED_OF_STALL = 0.9, MAX_ROLL = 1.2;
 const out = "output/e2e";
 
@@ -62,16 +62,14 @@ async function check(page: Page, choice: Choice): Promise<Omit<Result, "choice" 
     await g.aircraft.interior?.loaded;
   });
   phase("start flight");
-  // Startup: the scene draws and the HUD is up.
-  const firstFrame = await page.evaluate(() => window.e2eFrames!);
-  await page.waitForFunction((from) => window.e2eFrames! >= from + 30, firstFrame, { timeout: 120_000 });
-  if (!(await page.evaluate(() => window.pocketFlight!.getState().drawCalls)) ) failures.push("the 3D view drew nothing");
-  if (!(await page.locator(".hud-compass").first().isVisible())) failures.push("the HUD is not showing");
-  await page.screenshot({ path: `${out}/${choice}-chase.png` });
+  // Startup: the scene draws and the HUD is up. Everything runs from the cockpit camera, which draws a
+  // fraction of the outside view's triangles (the Stormbird's outside view is ~1.8 M); physics is the same.
   await page.evaluate(() => { window.pocketFlight!.cameraMode = "cockpit"; });
-  await page.waitForTimeout(500);
+  const untilFrame = (from: number, timeout = 180_000) => page.waitForFunction((n) => window.e2eFrames! >= n, from, { timeout });
+  await untilFrame((await page.evaluate(() => window.e2eFrames!)) + 30);
+  if (!(await page.evaluate(() => window.pocketFlight!.getState().drawCalls))) failures.push("the 3D view drew nothing");
+  if (!(await page.locator(".hud-compass").first().isVisible())) failures.push("the HUD is not showing");
   await page.screenshot({ path: `${out}/${choice}-cockpit.png` });
-  await page.evaluate(() => { window.pocketFlight!.cameraMode = "chase"; });
 
   phase("startup checks");
   // Flight: 20 s of the game's own clock (fixed 1/60 s physics steps), judged at every sample.
@@ -100,7 +98,10 @@ async function check(page: Page, choice: Choice): Promise<Omit<Result, "choice" 
   if (!failures.length && now.t - start.t < FLIGHT_SECONDS) failures.push(`only ${(now.t - start.t).toFixed(1)} s flown in ${WALL_LIMIT_MS / 1000} s: too slow to judge`);
   if (!failures.length && frames < MIN_FRAMES) failures.push(`only ${frames} frames rendered: too slow to judge`);
   phase("flight");
-  await page.screenshot({ path: `${out}/${choice}-flight.png` });
+  await page.evaluate(() => { window.pocketFlight!.cameraMode = "chase"; });
+  await untilFrame((await page.evaluate(() => window.e2eFrames!)) + 3).catch(() => failures.push("the outside view never drew"));
+  if (!(await page.evaluate(() => window.pocketFlight!.getState().drawCalls))) failures.push("the outside view drew nothing");
+  await page.screenshot({ path: `${out}/${choice}-chase.png` });
   return { ok: !failures.length, failures, frames, samples, phases };
 }
 

@@ -346,7 +346,8 @@ export default function App() {
           if (game.current === instance)
             setError(`Unable to load the aircraft: ${String(error)}`);
         });
-      if (import.meta.env.DEV)
+      // The CI startup and flight check (scripts/e2e) reads the game through this; players never add ?e2e.
+      if (import.meta.env.DEV || new URLSearchParams(location.search).has("e2e"))
         (window as unknown as { pocketFlight: PocketFlight }).pocketFlight =
           instance;
     } catch (e) {

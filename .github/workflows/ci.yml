@@ -71,12 +71,46 @@ jobs:
       - run: bun run fit all --strict
 
   e2e:
-    name: Startup and flight
+    # One runner per aircraft: software WebGL renders a few frames per second, so they run side by side.
+    name: Startup and flight (${{ matrix.aircraft }})
     needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        aircraft: [finch, finch-attack, peregrine, aurelia, stormbird, heron, f15c]
     steps:
-      - run: echo "Startup and flight check arrives in the next commit."
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 1 }
+      - uses: oven-sh/setup-bun@v2
+        with: { bun-version: "${{ env.BUN_VERSION }}" }
+      - uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+      - run: bun install --frozen-lockfile
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+      - run: bunx playwright install --with-deps chromium
+      - uses: actions/download-artifact@v4
+        with: { name: dist, path: dist }
+      - name: Serve the production build
+        run: |
+          bunx vite preview --host 127.0.0.1 --port 4173 --strictPort > preview.log 2>&1 &
+          for i in $(seq 1 60); do curl -sf http://127.0.0.1:4173/ > /dev/null && exit 0; sleep 1; done
+          cat preview.log; exit 1
+      - run: bun run e2e --only "$AIRCRAFT"
+        env:
+          AIRCRAFT: ${{ matrix.aircraft }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-${{ matrix.aircraft }}
+          path: output/e2e/
+          retention-days: 14
 
   ci-passed:
     name: CI passed

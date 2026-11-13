@@ -43,8 +43,9 @@ const POSTURE: Record<AircraftId, { recline: number; eye?: V; size?: number; out
   // The canopy is 7 cm above the eye. Outside, a 1.57 m figure sits lower and back against the seat, under the
   // glass, and its boots stop short in the footwell; from the seat the full-size legs reach the pedals in view.
   finch: { recline: 0.06, eye: [-0.3, 1.01, 0.0], outsideSize: 0.86, outside: [0, -0.1, 0.04] },
-  // The Heron's front seats are moved aft at load (see aircraft.ts); the eye follows them, under the cabin roof.
-  heron: { recline: 0.2, eye: [-0.4, 0.62, -1.0] },
+  // The Heron's front seats are moved aft and down at load to meet the figure (see aircraft.ts); 0.56 m keeps the
+  // helmet 3 cm under the cabin roof.
+  heron: { recline: 0.2, eye: [-0.4, 0.56, -1.0] },
   // Nearly upright against the jets' upright seat backs; reclining would push the hips off the cushion.
   f15c: { recline: 0.05 },
   peregrine: { recline: 0.05 },

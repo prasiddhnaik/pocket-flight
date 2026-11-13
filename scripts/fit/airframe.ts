@@ -3,7 +3,7 @@
 import * as T from "three";
 import { loadGeometryOnly } from "../geometry-loader";
 import { Pilot } from "../../src/aircraft/pilot";
-import { HERON_SEAT_SHIFT } from "../../src/aircraft/aircraft";
+import { moveHeronSeats } from "../../src/aircraft/aircraft";
 import { FINCH_ATTACK_ROOT, finchAttackStores } from "../../src/aircraft/finch/attack";
 import { addAircraftStores } from "../../src/aircraft/aircraft-stores";
 import { faces } from "./geometry";
@@ -18,20 +18,19 @@ const limits = {
   finch: { canopy: 0, cushion: 0.04, back: [-0.02, 0.03], hand: 0.05, footSeat: 0.035, footOutside: 0.2 },
   heron: { canopy: 0, cushion: 0.04, back: [-0.02, 0.05], hand: 0.05, footSeat: 0.035, footOutside: 0.035 },
 } as const;
-const HERON_SEATS = ["Seat_cushion_0_-1", "Seat_back_0_-1", "Seat_pedestal_0_-1", "Seat_cushion_0_1", "Seat_back_0_1", "Seat_pedestal_0_1"];
 const cm = (m: number) => (m * 100).toFixed(1);
 
 async function airframe(id: AirframeId) {
   const group = new T.Group();
   const { scene } = await loadGeometryOnly(new URL(`../../public/assets/${id === "heron" ? "heron-ut9" : "finch-u2"}.glb`, import.meta.url));
   group.add(scene);
-  if (id === "heron") for (const name of HERON_SEATS) scene.getObjectByName(name)!.position.z += HERON_SEAT_SHIFT;
+  if (id === "heron") moveHeronSeats(scene);
   if (id === "finch-attack") {
     scene.getObjectByName("Finch_U2")!.name = FINCH_ATTACK_ROOT;
     if (!addAircraftStores(scene, "finch", finchAttackStores())) throw new Error("Finch attack stores did not attach");
   }
   const glass: T.Object3D[] = [], seat: T.Object3D[] = [];
-  const roof = id === "heron" ? /^Cabin_liner$/ : /^Glass_Cabin/;
+  const roof = id === "heron" ? /^(Cabin_liner|Windshield|Windshield_post|Window_frames)$/ : /^Glass_Cabin/;
   const seatPart = id === "heron" ? /^Seat_(cushion|back)_0_-1$/ : /^Seat_Left/;
   scene.traverse((node) => {
     if (!(node instanceof T.Mesh)) return;

@@ -6,6 +6,7 @@ import { joints, poses } from "../scripts/fit/checks";
 import { limits } from "../scripts/fit/limits";
 import { Pilot, pilotSeats } from "../src/aircraft/pilot";
 import { loadGeometryOnly } from "../scripts/geometry-loader";
+import { fit } from "../scripts/fit";
 
 const v = (x: number, y: number, z: number) => new T.Vector3(x, y, z);
 test("triangle crossings distinguish separation and a true crossing", () => {
@@ -56,3 +57,27 @@ test("quick real Aurelia seat pose uses game driver and catches a bad knee in me
     bad.dispose();
   } finally { pilotSeats.aurelia = original; pilot.dispose(); driver.dispose?.(); }
 });
+test("every cockpit fit check reads its committed fit map", async () => {
+  for (const id of ["f15c", "peregrine", "stormbird", "aurelia"] as const) {
+    const { map, pilot } = await load(id);
+    pilot.dispose();
+    expect(map?.id, `${id} fit map`).toBe(id);
+  }
+});
+async function fitCommand(...args: string[]) {
+  const child = Bun.spawn([process.execPath, "scripts/fit.ts", ...args], { stdout: "pipe", stderr: "pipe" });
+  return { code: await child.exited, output: await new Response(child.stdout).text() };
+}
+test("fit --strict passes a fitting airframe and fails one that needs review", async () => {
+  const finch = await fitCommand("finch", "--strict");
+  expect(finch.output).toContain("finch: PASS");
+  expect(finch.code).toBe(0);
+  // A full-size Finch pilot in the old outside position puts the helmet through the canopy.
+  const seat = pilotSeats.finch, saved = { outside: seat.outside, outsideSize: seat.outsideSize };
+  try {
+    Object.assign(seat, { outside: [0, 0, 0], outsideSize: 1 });
+    expect(await fit(["finch", "--strict"])).toBe(1);
+  } finally {
+    Object.assign(seat, saved);
+  }
+}, 180_000);

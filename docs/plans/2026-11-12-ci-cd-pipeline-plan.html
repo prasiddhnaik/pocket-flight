@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CI/CD pipeline implementation plan · Pocket Flight</title>
+<style>
+  body { font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #1b1f24; margin: 0; }
+  header, main { max-width: 880px; margin: 0 auto; padding: 0 20px; }
+  header { padding: 32px 20px 16px; border-bottom: 1px solid #d0d7de; }
+  h1 { font-size: 1.6rem; margin: 0 0 6px; }
+  h2 { font-size: 1.2rem; margin: 32px 0 8px; border-bottom: 1px solid #eaeef2; padding-bottom: 4px; }
+  h3 { font-size: 1rem; margin: 22px 0 6px; }
+  .meta { color: #57606a; font-size: .9rem; margin: 0; }
+  code, pre { font: .86em ui-monospace, SFMono-Regular, Menlo, monospace; background: #f6f8fa; border-radius: 4px; }
+  code { padding: 1px 4px; }
+  pre { padding: 10px 12px; overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: .92rem; }
+  th, td { border: 1px solid #d0d7de; padding: 6px 8px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  ul.steps { list-style: none; padding-left: 0; }
+  ul.steps li::before { content: "☐ "; color: #57606a; }
+  .files { font-size: .92rem; }
+  .note { border-left: 3px solid #0969da; background: #ddf4ff; padding: 8px 12px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>CI/CD pipeline implementation plan</h1>
+  <p class="meta">Pocket Flight · 12 November 2026 · implements <code>docs/plans/2026-11-12-ci-cd-pipeline-design.html</code></p>
+</header>
+<main>
+
+<p class="note">For agentic workers: execute task by task (superpowers:executing-plans or superpowers:subagent-driven-development). Read the design first. Work on branch <code>ci-pipeline</code>, never on <code>main</code>.</p>
+
+<section>
+  <h2>Summary</h2>
+  <p><strong>Goal:</strong> pull requests to <code>main</code> merge themselves only after GitHub Actions proves a clean build, the full test suite, pilot fit for all seven aircraft variants, and startup and flight in a real browser; <code>main</code> refuses everything else.</p>
+  <p><strong>Approach:</strong> first make every existing check pass on a clean checkout. Then add one workflow with four jobs and a final required job, a strict mode for the fit tool covering the Finch and Heron, and a Playwright startup-and-flight script against the production build. Finally, switch on auto-merge and branch protection.</p>
+  <p><strong>Tech:</strong> GitHub Actions, <code>oven-sh/setup-bun</code>, Bun 1.3.x, Vite 7 <code>vite preview</code>, Playwright Chromium with software WebGL, three.js geometry checks (existing <code>scripts/fit/</code>), <code>gh</code> CLI for repository settings.</p>
+</section>
+
+<section>
+  <h2>Global constraints</h2>
+  <ul>
+    <li>Install everywhere with <code>bun install --frozen-lockfile</code>; build with <code>bun run build</code> (Vercel's commands, from <code>vercel.json</code>).</li>
+    <li>The checks only observe. No change to flight tuning, physics, visuals, aircraft or cockpit models.</li>
+    <li>No secrets or deploy tokens in GitHub. Vercel settings stay unchanged.</li>
+    <li>Every job runs on every pull request and push to <code>main</code>: no path filters, so the required check always reports.</li>
+    <li>Required status check name: <code>CI passed</code>. Merge method: squash. Protection includes administrators.</li>
+    <li>A failing check is fixed, never retried until green and never skipped. Do not add retries to tests.</li>
+    <li>Strict TypeScript, no <code>any</code>. Bun only (no npm or yarn).</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Review focus</h2>
+  <ol>
+    <li><strong>Clean checkout missing git-ignored files.</strong> Expect a clear test failure naming the file, never a silent skip. Pinned by Task 1's clean-clone run.</li>
+    <li><strong>Slow software WebGL on runners.</strong> Expect the flight check to judge 20 seconds of <em>simulated</em> time with generous wall-clock limits, and to fail with "too slow to judge" rather than pass on too few frames. Pinned in Task 4.</li>
+    <li><strong>A docs-only or workflow-only pull request.</strong> Expect every job to still run and <code>CI passed</code> to report, so auto-merge neither stalls nor merges unchecked. Pinned in Task 2's workflow (no path filters) and Task 6's proof.</li>
+    <li><strong>A pull request from a fork</strong> (the repository is public). Expect the checks to run without secrets and nothing to merge without a maintainer turning on auto-merge. Pinned in Task 2: <code>pull_request</code> trigger only, read-only <code>permissions</code>.</li>
+    <li><strong>Harmless-looking console errors in the browser.</strong> Expect any <code>pageerror</code> or <code>console.error</code> to fail the run with its text. Fix the source; no allowlist. Pinned in Task 4.</li>
+  </ol>
+</section>
+
+<section>
+  <h2>Files</h2>
+  <table class="files">
+    <thead><tr><th>File</th><th>Responsibility</th></tr></thead>
+    <tbody>
+      <tr><td><code>scripts/fit/maps/&lt;id&gt;.json</code> (moved, tracked)</td><td>Cockpit fit maps, formerly at git-ignored <code>assets/&lt;id&gt;/cockpit/fit-map.json</code></td></tr>
+      <tr><td><code>scripts/build-cockpit.py</code>, <code>scripts/fit/load.ts</code>, <code>tests/cockpit-fit-map.test.ts</code></td><td>Write and read the new fit-map path</td></tr>
+      <tr><td><code>.github/workflows/ci.yml</code> (new)</td><td>The four jobs plus <code>CI passed</code></td></tr>
+      <tr><td><code>scripts/fit/airframe.ts</code> (new)</td><td>Fit checks for the Finch, Finch attack and Heron airframes</td></tr>
+      <tr><td><code>scripts/fit/limits.ts</code>, <code>scripts/fit.ts</code></td><td>New ids, <code>--strict</code> exit code</td></tr>
+      <tr><td><code>tests/fit-airframe.test.ts</code> (new)</td><td>Pins the airframe checks</td></tr>
+      <tr><td><code>src/app/App.tsx</code></td><td>Expose <code>window.pocketFlight</code> in production when the URL has <code>?e2e=1</code></td></tr>
+      <tr><td><code>scripts/e2e/startup-flight.ts</code> (new)</td><td>Browser startup and flight check for seven variants</td></tr>
+      <tr><td><code>package.json</code></td><td><code>e2e</code> script; <code>playwright</code> as an explicit dev dependency</td></tr>
+      <tr><td><code>AGENTS.md</code>, <code>README.md</code></td><td>Pull-request rule and Hosting section</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>Task 1: Every existing check passes on a clean checkout</h2>
+  <p><strong>Produces:</strong> fit maps at <code>scripts/fit/maps/&lt;id&gt;.json</code> for <code>f15c</code>, <code>peregrine</code>, <code>stormbird</code> and <code>aurelia</code>; <code>load(id)</code> in <code>scripts/fit/load.ts</code> reads them from there. A clean clone passes <code>bun run build</code>, <code>bun run test</code> and <code>bun run fit all</code>.</p>
+  <ul class="steps">
+    <li>Clone the branch shallowly into a temp folder (<code>git clone --depth 1 file://$PWD /tmp/pf-ci</code>), run <code>bun install --frozen-lockfile</code>, <code>bun run build</code>, <code>bun test ./tests</code> and <code>bun run fit all</code>. Record every failure and every file it could not find. Expected: <code>tests/cockpit-fit-map.test.ts</code> fails, the fit tool reports "no fit-map", and possibly <code>tests/heron-realism.test.ts</code> and <code>tests/f15c-flight.test.ts</code>.</li>
+    <li><code>git mv</code> is not possible for ignored files: copy each <code>assets/&lt;id&gt;/cockpit/fit-map.json</code> to <code>scripts/fit/maps/&lt;id&gt;.json</code>. Point <code>build-cockpit.py</code>'s <code>--fit-map</code> output, <code>load.ts</code> and <code>cockpit-fit-map.test.ts</code> at the new path.</li>
+    <li>For each other failure, track the needed data next to its owner when it is under 1 MB, or change the test to build the data itself. Never make a test skip when a file is missing.</li>
+    <li>Repeat the clean-clone run. Expected: build passes; tests 0 fail; fit shows four NEAR PASS with "fit-map labels + surfaces".</li>
+    <li>Run <code>bun run repo:check</code>. Expected: OK.</li>
+    <li>Commit: "Make every check pass on a clean checkout".</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Task 2: Workflow with build, tests and fit</h2>
+  <p><strong>Consumes:</strong> Task 1. <strong>Produces:</strong> workflow <code>CI</code> with jobs <code>build</code>, <code>tests</code>, <code>fit</code>, <code>e2e</code> (stub here, filled in by Task 4) and <code>ci-passed</code> (display name <code>CI passed</code>). Artifact <code>dist</code> uploaded by <code>build</code>.</p>
+  <ul class="steps">
+    <li>Create <code>.github/workflows/ci.yml</code>: <code>on: pull_request: branches: [main]</code> and <code>push: branches: [main]</code>; <code>permissions: contents: read</code>; <code>concurrency</code> grouped by ref, with cancel-in-progress for pull requests only. Each job: <code>actions/checkout@v4</code> with <code>fetch-depth: 1</code>, <code>oven-sh/setup-bun@v2</code> with <code>bun-version: 1.3.14</code>, Bun install cache, <code>bun install --frozen-lockfile</code>, <code>runs-on: ubuntu-latest</code>.</li>
+    <li><code>build</code>: <code>bun run repo:check</code>, <code>bun run build</code>, upload <code>dist/</code> as artifact <code>dist</code>. <code>tests</code>: <code>bun test ./tests</code>, timeout 20 minutes. <code>fit</code>: <code>bun run fit all</code>, timeout 15 minutes (changed to <code>--strict</code> in Task 3).</li>
+    <li><code>ci-passed</code>: <code>needs: [build, tests, fit, e2e]</code>, <code>if: always()</code>; fails unless every needed job's result is <code>success</code>.</li>
+    <li>Push the branch and open a draft pull request. Expected: all jobs green on GitHub, and <code>CI passed</code> reported.</li>
+    <li>Commit: "Add CI workflow: build, tests, pilot fit".</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Task 3: Fit check for the Finch, Finch attack and Heron, with a strict mode</h2>
+  <p><strong>Produces:</strong></p>
+  <ul>
+    <li><code>ids</code> in <code>limits.ts</code> stays the cockpit list. New <code>airframeIds = ["finch", "finch-attack", "heron"] as const</code> and <code>type AirframeId</code> in <code>scripts/fit/airframe.ts</code>.</li>
+    <li><code>checkAirframe(id: AirframeId): Promise&lt;AirframeReport&gt;</code>, with <code>AirframeReport = { id: AirframeId; verdict: "PASS" | "NEAR PASS" | "REVIEW"; issues: string[]; seconds: number }</code>, and <code>airframeText(report: AirframeReport): string</code>.</li>
+    <li><code>bun run fit &lt;id|all&gt; [--json] [--strict]</code>: <code>all</code> covers the seven variants. <code>--strict</code> sets exit code 1 when any verdict is <code>REVIEW</code>.</li>
+  </ul>
+  <p><strong>What <code>checkAirframe</code> measures</strong>, in the same poses as the cockpit check, with the real <code>Pilot</code> on the airframe GLB (Heron front seats shifted by <code>HERON_SEAT_SHIFT</code>, as <code>aircraft.ts</code> does; Finch attack loads the same GLB with its stores added):</p>
+  <table>
+    <thead><tr><th>Check</th><th>Finch and Finch attack</th><th>Heron</th></tr></thead>
+    <tbody>
+      <tr><td>Helmet and shoulders to canopy or cabin roof, outside view (rays from the outside eye; glass treated as double-sided)</td><td>gap ≥ 0 cm</td><td>gap ≥ 0 cm against the cabin roof</td></tr>
+      <tr><td>Hips into seat cushion, outside view</td><td>≤ 4 cm</td><td>≤ 4 cm</td></tr>
+      <tr><td>Back to seat back at chest height, outside view</td><td>between −2 and 3 cm</td><td>between −2 and 5 cm</td></tr>
+      <tr><td>Hand miss to grips, both views</td><td>≤ 5 cm</td><td>≤ 5 cm</td></tr>
+      <tr><td>Foot miss, seat view</td><td>≤ 3.5 cm</td><td>≤ 3.5 cm</td></tr>
+      <tr><td>Foot miss, outside view</td><td>≤ 20 cm (12 Nov decision)</td><td>≤ 3.5 cm</td></tr>
+    </tbody>
+  </table>
+  <p>Any failed row → <code>REVIEW</code>. All rows pass → <code>PASS</code>. Port the measurements from <code>output/pilot-fit-work/finch-sweep.ts</code>.</p>
+  <ul class="steps">
+    <li>Write <code>tests/fit-airframe.test.ts</code>: <code>checkAirframe("finch")</code>, <code>("finch-attack")</code> and <code>("heron")</code> each return verdict <code>PASS</code> with <code>issues</code> empty. A second test sets <code>pilotSeats.finch.outside = [0, 0, 0]</code> and <code>outsideSize = 1</code> for one run, expects <code>REVIEW</code> with an issue containing <code>"canopy"</code>, and restores both in <code>finally</code>.</li>
+    <li>Run <code>bun test tests/fit-airframe.test.ts</code>. Expected: fails, module not found.</li>
+    <li>Implement <code>scripts/fit/airframe.ts</code> and the <code>fit.ts</code> changes.</li>
+    <li>Run the test. Expected: pass. If the Heron fails a row, report it to the owner before changing any seat or posture: that is a real fit finding, not a test to loosen.</li>
+    <li>Run <code>bun run fit all --strict; echo $?</code>. Expected: seven reports, exit 0. Extend <code>tests/fit-tool.test.ts</code> with <code>--strict</code> exiting 1 on a <code>REVIEW</code> report.</li>
+    <li>Change the workflow's <code>fit</code> job to <code>bun run fit all --strict</code>. Commit: "Pilot fit covers Finch, Finch attack and Heron; add --strict".</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Task 4: Startup and flight check in a real browser</h2>
+  <p><strong>Consumes:</strong> artifact <code>dist</code> (Task 2). <strong>Produces:</strong> <code>bun run e2e [--base &lt;url&gt;] [--only &lt;choice&gt;]</code>; default base <code>http://127.0.0.1:4173</code>. Screenshots go to <code>output/e2e/&lt;choice&gt;-cockpit.png</code> and <code>-chase.png</code>, and a summary to <code>output/e2e/summary.json</code>. Exit code 1 on any failure.</p>
+  <ul class="steps">
+    <li>In <code>App.tsx</code>, set <code>window.pocketFlight</code> when <code>import.meta.env.DEV || new URLSearchParams(location.search).has("e2e")</code>.</li>
+    <li>Add <code>playwright</code> to <code>devDependencies</code> at the version <code>@playwright/cli</code> already resolves in <code>bun.lock</code>.</li>
+    <li>Write <code>scripts/e2e/startup-flight.ts</code>. Launch Chromium headless with <code>--use-angle=swiftshader --enable-unsafe-swiftshader --ignore-gpu-blocklist</code>, viewport 1280×720. For each choice in <code>["finch", "finch-attack", "peregrine", "aurelia", "stormbird", "heron", "f15c"]</code>, in a fresh page:
+      <ol>
+        <li>Open <code>&lt;base&gt;/?e2e=1&amp;aircraft=&lt;choice&gt;</code>. Collect <code>pageerror</code> and <code>console.error</code>.</li>
+        <li>Await <code>pocketFlight.aircraft.ready</code> and <code>world.ready</code> (timeout 180 s). Click the "Free flight" button and wait for <code>mode === "playing"</code>. Await <code>aircraft.pilot.ready</code> and, if present, <code>aircraft.interior.loaded</code>.</li>
+        <li>Startup passes when <code>renderer.info.render.calls &gt; 0</code> after 30 frames and the HUD is visible. Take the chase screenshot; switch <code>cameraMode</code> to <code>"cockpit"</code> and take the cockpit screenshot.</li>
+        <li>Flight: record start altitude (<code>physics.position.y</code>), hold <code>ShiftLeft</code> for 3 s of simulated time, then hold <code>ArrowDown</code> lightly (key down 0.3 s of every 1 s) until 20 s of <em>simulated</em> time have passed, measured from the game's own clock. Wall-clock limit 240 s. If fewer than 200 frames are rendered, fail with "too slow to judge".</li>
+        <li>Flight passes when, at every sampled frame: position, velocity and quaternion are finite; <code>mode === "playing"</code> (no crash); altitude ≥ start − 50 m; speed (<code>physics.velocity.length()</code>) ≥ 0.9 × <code>physics.stallSpeed</code>; |roll| &lt; 1.2 rad.</li>
+      </ol>
+      Write per-choice results and errors to <code>summary.json</code>; print one line per choice.</li>
+    <li>Run locally against the production build: <code>bun run build &amp;&amp; bunx vite preview --port 4173 &amp;</code>, then <code>bun run e2e</code>. Expected: seven <code>PASS</code> lines and 14 screenshots. Then break it on purpose (<code>--only finch</code> with an injected <code>throw</code> in the console via <code>page.evaluate</code> in a scratch run). Expected: <code>FAIL</code> with the error text. Revert the scratch change.</li>
+    <li>Fill in the workflow's <code>e2e</code> job: download <code>dist</code>, install Chromium (<code>bunx playwright install --with-deps chromium</code>, cached), start <code>bunx vite preview --port 4173 --strictPort</code> in the background, wait for the port, run <code>bun run e2e</code>, and upload <code>output/e2e/</code> as artifact <code>e2e-screenshots</code> with <code>if: always()</code>. Timeout 30 minutes.</li>
+    <li>Push. Expected: <code>e2e</code> green on GitHub, artifact with 14 screenshots, whole run under 15 minutes. If <code>e2e</code> fails only on GitHub, treat it as a real finding (often frame-time dependence) and report it to the owner. Do not loosen the bounds.</li>
+    <li>Commit: "Browser startup and flight check for all aircraft".</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Task 5: Lock <code>main</code>, auto-merge, working rules</h2>
+  <ul class="steps">
+    <li>Update <code>AGENTS.md</code>: replace "a push to <code>main</code> deploys to production. Push only when the user asks" with: never push to <code>main</code>; branch, open a pull request, run <code>gh pr merge --auto --squash</code>, and watch it until it merges; fix failures on the branch. Update the README Hosting section to match, and list the four checks with their local commands (<code>bun run build</code>, <code>bun run test</code>, <code>bun run fit all --strict</code>, <code>bun run e2e</code>).</li>
+    <li>Run <code>bun run repo:check</code> and <code>bun test tests/documentation.test.ts</code>. Expected: pass. Commit: "Document the pull-request workflow".</li>
+    <li>Confirm with the owner before changing repository settings, then run:
+<pre>gh api -X PATCH repos/prasiddhnaik/pocket-flight -F allow_auto_merge=true -F delete_branch_on_merge=true -F allow_squash_merge=true
+gh api -X PUT repos/prasiddhnaik/pocket-flight/branches/main/protection --input - &lt;&lt;'JSON'
+{"required_status_checks":{"strict":false,"contexts":["CI passed"]},
+ "enforce_admins":true,
+ "required_pull_request_reviews":null,
+ "restrictions":null,
+ "allow_force_pushes":false,
+ "allow_deletions":false}
+JSON</pre>
+      Required reviews stay off, because auto-merge with no second reviewer is the owner's choice. Pull requests are still required: direct pushes fail because the status check cannot be met by a push.</li>
+    <li>Verify: <code>gh api repos/prasiddhnaik/pocket-flight/branches/main/protection --jq '.required_status_checks.contexts, .enforce_admins.enabled'</code>. Expected: <code>["CI passed"]</code> and <code>true</code>. <code>git push github HEAD:main</code> from a scratch commit is refused (then drop the scratch commit).</li>
+    <li>Mark the <code>ci-pipeline</code> pull request ready and turn on auto-merge. Expected: it merges itself once green, and Vercel publishes it.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Task 6: Prove it</h2>
+  <ul class="steps">
+    <li>Open pull request "CI proof: deliberate failure" that changes one assertion in <code>tests/pilot.test.ts</code> to fail, and turn on auto-merge. Expected: <code>tests</code> fails, <code>CI passed</code> fails, and it does not merge. Close it without merging and delete the branch.</li>
+    <li>Open pull request "CI proof: docs-only" that fixes a typo in the README, with auto-merge. Expected: every job runs, it merges itself, and the Vercel production deployment for the merge commit reaches READY.</li>
+    <li>Write <code>output/reports/ci-cd-pipeline-2026-11-12.html</code> from <code>docs/REPORT_TEMPLATE.html</code>: run times per job, links to both proof pull requests, and any checks not run.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Spec coverage</h2>
+  <table>
+    <thead><tr><th>Design requirement</th><th>Task</th></tr></thead>
+    <tbody>
+      <tr><td>Clean-checkout build with Vercel's commands</td><td>1, 2</td></tr>
+      <tr><td>Full test suite (physics)</td><td>2</td></tr>
+      <tr><td>Pilot fit, all seven variants, fail worse than NEAR PASS</td><td>3</td></tr>
+      <tr><td>Startup and 20-second flight for seven variants, screenshots</td><td>4</td></tr>
+      <tr><td>Production test hook behind <code>?e2e=1</code></td><td>4</td></tr>
+      <tr><td>Branch protection incl. admins, auto-merge, squash, delete branches</td><td>5</td></tr>
+      <tr><td>AGENTS.md and README rules</td><td>5</td></tr>
+      <tr><td>Proof: failing pull request blocked, clean one merges and goes live</td><td>6</td></tr>
+      <tr><td>Run under about 15 minutes</td><td>4, 6</td></tr>
+    </tbody>
+  </table>
+</section>
+
+</main>
+</body>
+</html>

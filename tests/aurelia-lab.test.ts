@@ -16,11 +16,18 @@ import {
 } from "../src/aircraft/aurelia/exterior-mechanisms";
 import { solveWing } from "../lab/solver";
 
+const significant = (value: unknown): unknown =>
+  typeof value === "number" ? Number(value.toPrecision(12))
+  : Array.isArray(value) ? value.map(significant)
+  : value && typeof value === "object" ? Object.fromEntries(Object.entries(value).map(([k, v]) => [k, significant(v)]))
+  : value;
+
 test("Aurelia lab geometry matches the current Phenom export without changing runtime calibration", async () => {
   const measured = await measureAureliaLab();
   expect(aircraftCatalog.aurelia.asset).toBe("aurelia-phenom300e.glb");
   expect(runtimeAircraftCatalog.aurelia.asset).toBe("aurelia-flight.glb");
-  expect(measured).toEqual(fleetMeasurements.find((m) => m.id === "aurelia"));
+  // Linux and macOS round the last digit of some trigonometry differently: compare to 12 significant digits.
+  expect(significant(measured)).toEqual(significant(fleetMeasurements.find((m) => m.id === "aurelia")));
   expect(wingForAircraft("aurelia").revision).toBe(measured.revision);
   expect(runtimeWingForAircraft("aurelia").revision).not.toBe(
     measured.revision,

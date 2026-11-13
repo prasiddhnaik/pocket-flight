@@ -3,6 +3,7 @@ import { dirname, relative, resolve } from "node:path";
 import type { Plugin } from "vite";
 
 const remote = /^(?:[a-z][a-z\d+.-]*:|\/\/)/i;
+const LOCAL_ONLY = /^(?:assets|output)\//;
 export const walkDocuments = (directory: string): string[] =>
   existsSync(directory) ? readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
     const path = resolve(directory, entry.name);
@@ -39,7 +40,12 @@ export function checkDocumentation(root: string, built = false) {
     let destination: string;
     try { destination = target(root, file, url, built); }
     catch { failures.push(`${relative(root, file)}: invalid URL ${url}`); continue; }
-    if (!existsSync(destination)) failures.push(`${relative(root, file)}: ${url}`);
+    if (!existsSync(destination)) {
+      // Git-ignored working data: present on the author's machine, absent from a clean checkout.
+      // The production build labels these links "local only" and checks its own output separately.
+      if (!built && LOCAL_ONLY.test(relative(root, destination))) continue;
+      failures.push(`${relative(root, file)}: ${url}`);
+    }
     else if (url.includes("#") && destination.endsWith(".html") && statSync(destination).isFile()) {
       const anchor = decodeURIComponent(url.slice(url.indexOf("#") + 1));
       const ids = [...readFileSync(destination, "utf8").matchAll(/\bid\s*=\s*(["'])(.*?)\1/g)].map((m) => m[2]);

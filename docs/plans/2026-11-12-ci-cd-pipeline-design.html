@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CI/CD pipeline design · Pocket Flight</title>
+<style>
+  body { font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #1b1f24; background: #fff; margin: 0; }
+  main, header { max-width: 860px; margin: 0 auto; padding: 0 20px; }
+  header { padding-top: 32px; border-bottom: 1px solid #d0d7de; padding-bottom: 16px; }
+  h1 { font-size: 1.7rem; margin: 0 0 6px; }
+  h2 { font-size: 1.2rem; margin: 32px 0 8px; border-bottom: 1px solid #eaeef2; padding-bottom: 4px; }
+  h3 { font-size: 1rem; margin: 20px 0 6px; }
+  .meta { color: #57606a; font-size: .9rem; margin: 0; }
+  table { border-collapse: collapse; width: 100%; font-size: .93rem; margin: 8px 0; }
+  th, td { border: 1px solid #d0d7de; padding: 6px 8px; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+  code { font: .88em ui-monospace, SFMono-Regular, Menlo, monospace; background: #f6f8fa; padding: 1px 4px; border-radius: 4px; }
+  .who { white-space: nowrap; font-size: .85rem; color: #57606a; }
+  .note { border-left: 3px solid #9a6700; background: #fff8c5; padding: 8px 12px; margin: 12px 0; }
+  li { margin: 3px 0; }
+  footer { max-width: 860px; margin: 40px auto; padding: 0 20px; color: #57606a; font-size: .85rem; }
+  @media print { body { font-size: 12px; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>CI/CD pipeline design</h1>
+  <p class="meta">Pocket Flight · repository <code>prasiddhnaik/pocket-flight</code> · Vercel project <code>pocket-flight</code> · 12 November 2026 · status: design, not built</p>
+</header>
+<main>
+
+<section>
+  <h2>Purpose</h2>
+  <p>Nothing broken reaches the live site. Every change has to prove that the game starts, the physics behaves and the pilot fits each cockpit before it can reach <code>main</code>, and Vercel only publishes <code>main</code>.</p>
+  <p>Why now: on 12 November a push that passed every local check failed on Vercel. A published doc linked to images in git-ignored folders, which exist on the developer's Mac but not in a clean checkout. Nothing checked the change between the push and the deploy.</p>
+</section>
+
+<section>
+  <h2>Current state</h2>
+  <ul>
+    <li>Vercel builds every push. A push to <code>main</code> goes straight to production; other branches get preview URLs. Previews are behind Vercel login (SSO protection on all deployments except custom domains).</li>
+    <li>No CI. <code>main</code> is unprotected and changes are pushed to it directly. Repository auto-merge is off. The repository is public, so branch protection and Actions minutes are free.</li>
+    <li>Checks that exist locally: <code>bun run build</code> (typecheck, Vite build, production docs link check), <code>bun run test</code> (853 tests, about 2.5 minutes), <code>bun run repo:check</code>, and <code>bun run fit all</code> (pilot fit for the F-15C, Peregrine, Stormbird and Aurelia; all four are currently NEAR PASS).</li>
+    <li>The game exposes <code>window.pocketFlight</code> for browser checks only in development builds (<code>src/app/App.tsx</code>). <code>scripts/check-pilot-browser.js</code> and <code>scripts/run-pilot-check.ts</code> already drive the game through it with Playwright.</li>
+    <li>Some checks read git-ignored folders. The fit tool and <code>tests/cockpit-fit-map.test.ts</code> load <code>assets/&lt;id&gt;/cockpit/fit-map.json</code>, and <code>/assets/</code> is ignored. <code>tests/heron-realism.test.ts</code> and <code>tests/f15c-flight.test.ts</code> also refer to <code>assets/</code> or <code>output/</code>. These pass locally only because the files happen to exist.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Goals, non-goals, anti-goals</h2>
+  <h3>Goals</h3>
+  <ul>
+    <li>A pull request merges into <code>main</code> only when every check below has passed.</li>
+    <li>The checks run on a clean checkout with the same install and build commands Vercel uses.</li>
+    <li>All six aircraft and the Finch attack variant are checked for startup, a short flight and pilot fit.</li>
+    <li>A green pull request merges itself. Whoever opened it watches it until it is green, fixing failures along the way.</li>
+  </ul>
+  <h3>Non-goals</h3>
+  <ul>
+    <li>Changing flight tuning, physics or visuals. The checks only observe.</li>
+    <li>Rebuilding aircraft or cockpits in CI. Blender does not run in CI; the checks read the committed models.</li>
+    <li>Checking the private wind tunnel (<code>lab/</code>). It is not deployed. Adding <code>bun run lab:build</code> later is optional.</li>
+  </ul>
+  <h3>Anti-goals (this fails even if it technically works)</h3>
+  <ul>
+    <li>A change reaches the live site without passing the checks, including the owner's own pushes.</li>
+    <li>Flaky checks that fail at random, so people learn to rerun until green.</li>
+    <li>Secrets or deploy tokens stored in GitHub when they are not needed.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>How a change flows</h2>
+  <ol>
+    <li>Work happens on a branch. The author (owner or agent) opens a pull request and turns on auto-merge (<code>gh pr merge --auto --squash</code>).</li>
+    <li>GitHub Actions runs the checks on the pull request. Vercel builds a preview as it does today; the checks do not depend on it.</li>
+    <li>The author watches the pull request until it is green. If a check fails, the author fixes it on the same branch and the checks run again.</li>
+    <li>When every required check is green, GitHub squash-merges the pull request into <code>main</code> and deletes the branch.</li>
+    <li>Vercel builds <code>main</code> and publishes it to production, unchanged from today.</li>
+  </ol>
+  <p>Direct pushes to <code>main</code> are refused, for admins too.</p>
+</section>
+
+<section>
+  <h2>The checks</h2>
+  <p>One workflow, <code>.github/workflows/ci.yml</code>, triggered on pull requests to <code>main</code> and on pushes to <code>main</code>. Bun is installed with <code>oven-sh/setup-bun</code>, at the version in use locally (1.3.x). Every job installs with <code>bun install --frozen-lockfile</code>. The final job is named <em>CI passed</em>; branch protection requires only that one.</p>
+  <table>
+    <thead><tr><th>Job</th><th>What it runs</th><th>Fails when</th></tr></thead>
+    <tbody>
+      <tr><td>1. Build</td><td><code>bun run repo:check</code>, then <code>bun run build</code> on the clean checkout. Uploads <code>dist/</code> for job 4.</td><td>Typecheck errors, build errors, broken production docs links, files the build needs that are not committed.</td></tr>
+      <tr><td>2. Tests (physics and the rest)</td><td><code>bun run test</code>: the full suite, including flight envelope, landing, engines and stalls.</td><td>Any test fails.</td></tr>
+      <tr><td>3. Pilot fit</td><td><code>bun run fit all</code>, extended to cover the Finch, the Finch attack variant and the Heron (see below).</td><td>Any aircraft is worse than NEAR PASS, meaning a real clip, an out-of-reach control or a hidden screen. Side-console plates hidden under the pilot's own arms and legs stay allowed.</td></tr>
+      <tr><td>4. Startup and flight</td><td>Serves job 1's <code>dist/</code> with <code>vite preview</code> and opens it in Playwright Chromium with software WebGL. For each of the seven variants: choose the aircraft, start a free flight, wait for the aircraft, the HUD and the scenery, then fly about 20 seconds of simulation with throttle up and a gentle climb. Screenshots are saved as run artifacts.</td><td>A page error or console error; a blank 3D view; an aircraft, cockpit or pilot that never loads; or flight values that are not numbers or fall outside sane bounds for that aircraft (altitude collapsing, speed outside its envelope, attitude spinning).</td></tr>
+      <tr><td>CI passed</td><td>Depends on jobs 1 to 4.</td><td>Any of them failed or was skipped.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Extending the fit check to the Finch and the Heron</h3>
+  <ul>
+    <li>The Finch and the Heron have no detail cockpit or fit map; the pilot sits in the airframe model (<code>finch-u2.glb</code>, <code>heron-ut9.glb</code>). Their fit uses the airframe's own seat, canopy glass and controls.</li>
+    <li>Finch, in outside views: the helmet stays under the canopy glass, the back rests on the seat, the hips are no more than about 3 cm into the cushion, and the hands reach their grips. The boots are allowed to fall short of the pedals, which is the 12 November decision for this airframe.</li>
+    <li>Finch, in the seat view: hands and feet reach the controls, as <code>tests/pilot.test.ts</code> already checks.</li>
+    <li>Heron: the same clipping, reach and screen checks as the jets, against its moved front seats.</li>
+    <li>The 12 November one-off scripts (<code>output/pilot-fit-work/finch*.ts</code>) show the canopy, cushion and seat-back measurements to build on.</li>
+  </ul>
+
+  <h3>Game test hook in production builds</h3>
+  <p>Job 4 tests the same build Vercel would ship, so the production build has to expose the test hook. <code>window.pocketFlight</code> is set in production only when the page URL carries <code>?e2e=1</code>; development keeps it as now. Players never see it.</p>
+</section>
+
+<section>
+  <h2>Repository and Vercel settings</h2>
+  <table>
+    <thead><tr><th>Setting</th><th>Value</th></tr></thead>
+    <tbody>
+      <tr><td>Branch protection on <code>main</code></td><td>Require a pull request; require the <em>CI passed</em> check; include administrators; block force pushes and deletion. Branches do not have to be up to date with <code>main</code> before merging (this keeps auto-merge from stalling; solo work rarely conflicts).</td></tr>
+      <tr><td>Allow auto-merge</td><td>On (currently off).</td></tr>
+      <tr><td>Merge method</td><td>Squash. Automatically delete head branches.</td></tr>
+      <tr><td>Vercel</td><td>Unchanged: production from <code>main</code>, previews for branches. Deployment Checks are not used, because the locked <code>main</code> already keeps unchecked code from production.</td></tr>
+      <tr><td>Secrets</td><td>None needed.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>Working rules for people and agents</h2>
+  <ul>
+    <li>Never push to <code>main</code>. Branch, open a pull request, turn on auto-merge, and watch it until it merges.</li>
+    <li>A failed check is fixed on the branch, never bypassed. If a check itself is wrong, fixing the check is its own reviewed change.</li>
+    <li>Update <code>AGENTS.md</code> (replace "a push to main deploys to production" with the pull-request rule) and the README's Hosting section.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Decisions</h2>
+  <table>
+    <thead><tr><th>Decision</th><th class="who">Decided by</th></tr></thead>
+    <tbody>
+      <tr><td>Checks run before anything reaches Vercel's production.</td><td class="who">Owner</td></tr>
+      <tr><td>Checks: the game starts, the physics works, the pilot does not clip.</td><td class="who">Owner</td></tr>
+      <tr><td>Startup check covers every aircraft.</td><td class="who">Owner</td></tr>
+      <tr><td>Fit check extended to the Finch (and attack variant) and the Heron.</td><td class="who">Owner</td></tr>
+      <tr><td>Changes go through pull requests that are watched until they pass.</td><td class="who">Owner</td></tr>
+      <tr><td>Green pull requests merge themselves.</td><td class="who">Owner</td></tr>
+      <tr><td>GitHub Actions runs the checks.</td><td class="who">Owner</td></tr>
+      <tr><td>Startup and flight check tests CI's own clean build, not the Vercel preview: previews are behind Vercel login, and the clean build uses Vercel's exact commands, so no bypass secret is needed.</td><td class="who">Claude's call</td></tr>
+      <tr><td>No Vercel Deployment Checks; the locked <code>main</code> does the job.</td><td class="who">Claude's call</td></tr>
+      <tr><td>Flight check: about 20 seconds per aircraft, observe-only, with sanity bounds.</td><td class="who">Claude's call</td></tr>
+      <tr><td>Test hook in production behind <code>?e2e=1</code>.</td><td class="who">Claude's call</td></tr>
+      <tr><td>Squash merges; branches need not be up to date before merging; admins included in protection.</td><td class="who">Claude's call</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>Left to the builder</h2>
+  <ul>
+    <li>Exact flight bounds per aircraft. Take them from the existing flight models and tests, not new tuning.</li>
+    <li>Where the fit maps live once tracked: commit them, or move them next to each aircraft's cockpit files. Then find and fix every other check that reads git-ignored folders. The first CI run will list them.</li>
+    <li>Caching (Bun install cache, Playwright browser cache) and job timeouts.</li>
+    <li>Whether job 4 runs the seven variants in one browser session or separately.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Risks</h2>
+  <ul>
+    <li><strong>Software WebGL is slow on CI runners.</strong> Startup may take far longer than on a Mac. Use generous timeouts and judge by simulation state, not frame rate. A check that fails at random must be fixed, not retried.</li>
+    <li><strong>Frame-rate-dependent behaviour.</strong> A slow runner may expose simulation steps that depend on frame time. If the flight check finds this, it is a real bug and the fix belongs in the game.</li>
+    <li><strong>Hidden local dependencies.</strong> Tests that pass only because ignored files exist will fail in CI at first. That is the point; fix them before turning protection on.</li>
+    <li><strong>Lock-out.</strong> With administrators included, a broken CI blocks every merge, including fixes to the CI itself. Repair path: the owner temporarily lifts protection in GitHub settings.</li>
+    <li><strong>Checkout size.</strong> About 370 MB with runtime models; use a shallow checkout.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Phases</h2>
+  <ol>
+    <li>Make every existing check pass on a clean checkout: track the fit maps and fix the other ignored-folder dependencies.</li>
+    <li>Add the workflow with jobs 1 to 3 on a pull request; confirm green.</li>
+    <li>Add the production test hook and job 4 (startup and flight for seven variants, with screenshots).</li>
+    <li>Extend the fit check to the Finch, the Finch attack variant and the Heron.</li>
+    <li>Turn on auto-merge and branch protection, and update <code>AGENTS.md</code> and the README.</li>
+    <li>Prove it: one pull request that is meant to break (a deliberate test failure) is blocked, and one clean pull request merges itself and goes live.</li>
+  </ol>
+</section>
+
+<section>
+  <h2>Success criteria</h2>
+  <ul>
+    <li>A direct push to <code>main</code> is refused.</li>
+    <li>A pull request with a failing test, a broken startup or a clipping pilot cannot merge, and the run shows which check and aircraft failed, with screenshots for job 4.</li>
+    <li>A clean pull request merges itself and Vercel publishes it, with no manual step.</li>
+    <li>A full run takes under about 15 minutes.</li>
+  </ul>
+</section>
+
+</main>
+<footer>Design document. Implementation follows a separate plan once this is approved.</footer>
+</body>
+</html>

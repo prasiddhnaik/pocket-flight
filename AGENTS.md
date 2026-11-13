@@ -31,7 +31,9 @@ This is the current `pocket-flight-site` checkout. The sibling `pocket-flight` r
 
 For repository-navigation work, verify offline. Open the game only when the user requests browser verification.
 
-The site is hosted on Vercel, and a push to `main` deploys to production. Push only when the user asks; see [README.md](README.md#hosting).
+## Ship a change
+
+`main` is protected and Vercel publishes it to production. Never push to `main`. Work on a branch, open a pull request, run `gh pr merge --auto --squash`, and watch it until it merges. A failing check is fixed on the branch, never bypassed; a wrong check is fixed in its own pull request. See [README.md](README.md#hosting).
 
 The navigation redesign is not authorization to delete ignored working data, regenerate aircraft assets, publish the site, or change flight tuning.
 

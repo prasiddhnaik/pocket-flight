@@ -19,7 +19,10 @@ import { FINCH_ATTACK_ROOT, type FinchVariant, finchAttackStores, paintFinchAtta
 export const isPropellerAircraft = (id: AircraftId) => id === "finch" || id === "heron";
 export const JET_SCALE = 0.7;
 export const JET_CENTER = 2.3;
-export const HERON_SEAT_SHIFT = 0.45;
+// The Heron's front seats overlap its panel; moved aft and down, they meet the seated pilot under the cabin roof.
+const HERON_SEAT_SHIFT = new T.Vector3(0, -0.06, 0.7);
+const HERON_SEATS = ["Seat_cushion_0_-1", "Seat_back_0_-1", "Seat_pedestal_0_-1", "Seat_cushion_0_1", "Seat_back_0_1", "Seat_pedestal_0_1"];
+export const moveHeronSeats = (scene: T.Object3D) => { for (const name of HERON_SEATS) scene.getObjectByName(name)!.position.add(HERON_SEAT_SHIFT); };
 import { controlSurfaces } from "./finch/control-surfaces";
 import { propellerAnimation } from "./finch/propeller";
 export const paints = [
@@ -166,10 +169,7 @@ export function makeAircraft(paintIndex = 0, id: AircraftId = "finch", variant: 
       if (id !== "aurelia") model.displays = new CockpitDisplays(gltf.scene, id);
       if (model.cockpit) model.interior = new CockpitInterior(gltf.scene, cockpitDriver(model.cockpit));
       group.add(gltf.scene);
-      // The Heron's front seats overlap its panel; moved aft, they leave room for the pilot's legs.
-      if (id === "heron")
-        for (const name of ["Seat_cushion_0_-1", "Seat_back_0_-1", "Seat_pedestal_0_-1", "Seat_cushion_0_1", "Seat_back_0_1", "Seat_pedestal_0_1"])
-          gltf.scene.getObjectByName(name)!.position.z += HERON_SEAT_SHIFT;
+      if (id === "heron") moveHeronSeats(gltf.scene);
       // The rigged pilot replaces the F-15C's simple mannequin.
       if (id === "f15c") gltf.scene.traverse((node) => { if (node.name.startsWith("Pilot_")) node.visible = false; });
       model.pilot = new Pilot(group, id);

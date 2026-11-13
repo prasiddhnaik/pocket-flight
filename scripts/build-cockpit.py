@@ -25,7 +25,7 @@ print("COCKPIT", args[0], json.dumps({k: v for k, v in result.items() if k != "f
 if result["floating"]:
     raise SystemExit("Floating cockpit parts: " + ", ".join(result["floating"]))
 if fit_map:
-    output = ROOT / f"assets/{aircraft.ID}/cockpit/fit-map.json"
+    output = ROOT / f"scripts/fit/maps/{aircraft.ID}.json"
     kit.write_fit_map(output, surfaces)
     print("Wrote", output)
     raise SystemExit(0)

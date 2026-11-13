@@ -1,0 +1,129 @@
+# Every pull request to main must pass these checks before it can merge; main only accepts such merges,
+# and Vercel publishes main. No secrets: forks' pull requests run the same checks read-only.
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  BUN_VERSION: 1.3.14
+
+jobs:
+  build:
+    name: Build (clean checkout, Vercel's commands)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 1 }
+      - uses: oven-sh/setup-bun@v2
+        with: { bun-version: "${{ env.BUN_VERSION }}" }
+      - uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+      - run: bun install --frozen-lockfile
+      - run: bun run repo:check
+      - run: bun run build
+      - uses: actions/upload-artifact@v4
+        with: { name: dist, path: dist, retention-days: 3 }
+
+  tests:
+    name: Tests (physics and the rest)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 1 }
+      - uses: oven-sh/setup-bun@v2
+        with: { bun-version: "${{ env.BUN_VERSION }}" }
+      - uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+      - run: bun install --frozen-lockfile
+      - run: bun run test
+
+  fit:
+    name: Pilot fit
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 1 }
+      - uses: oven-sh/setup-bun@v2
+        with: { bun-version: "${{ env.BUN_VERSION }}" }
+      - uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+      - run: bun install --frozen-lockfile
+      - run: bun run fit all --strict
+
+  e2e:
+    # One runner per aircraft: software WebGL renders a few frames per second, so they run side by side.
+    name: Startup and flight (${{ matrix.aircraft }})
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        aircraft: [finch, finch-attack, peregrine, aurelia, stormbird, heron, f15c]
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 1 }
+      - uses: oven-sh/setup-bun@v2
+        with: { bun-version: "${{ env.BUN_VERSION }}" }
+      - uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+      - run: bun install --frozen-lockfile
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+      - run: bunx playwright install --with-deps chromium
+      - uses: actions/download-artifact@v4
+        with: { name: dist, path: dist }
+      - name: Serve the production build
+        run: |
+          bunx vite preview --host 127.0.0.1 --port 4173 --strictPort > preview.log 2>&1 &
+          for i in $(seq 1 60); do curl -sf http://127.0.0.1:4173/ > /dev/null && exit 0; sleep 1; done
+          cat preview.log; exit 1
+      - run: bun run e2e --only "$AIRCRAFT"
+        env:
+          AIRCRAFT: ${{ matrix.aircraft }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-${{ matrix.aircraft }}
+          path: output/e2e/
+          retention-days: 14
+
+  ci-passed:
+    name: CI passed
+    needs: [build, tests, fit, e2e]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Every check succeeded
+        env:
+          BUILD: ${{ needs.build.result }}
+          TESTS: ${{ needs.tests.result }}
+          FIT: ${{ needs.fit.result }}
+          E2E: ${{ needs.e2e.result }}
+        run: |
+          echo "build=$BUILD tests=$TESTS fit=$FIT e2e=$E2E"
+          for result in "$BUILD" "$TESTS" "$FIT" "$E2E"; do test "$result" = success; done

@@ -217,7 +217,18 @@ When changing storage or project models, preserve existing schema validation and
 
 ## Hosting
 
-The site is hosted on Vercel (project `pocket-flight`). Vercel builds every push: `main` goes to production, other branches get preview URLs. [vercel.json](vercel.json) holds the build settings: `bun install --frozen-lockfile`, `bun run build`, output in `dist/`. The private wind tunnel (`lab/`) is not deployed. `.vercel/` is the local CLI link and is ignored.
+The site is hosted on Vercel (project `pocket-flight`). `main` goes to production and other branches get preview URLs. [vercel.json](vercel.json) holds the build settings: `bun install --frozen-lockfile`, `bun run build`, output in `dist/`. The private wind tunnel (`lab/`) is not deployed. `.vercel/` is the local CLI link and is ignored.
+
+`main` only accepts pull requests whose checks pass ([.github/workflows/ci.yml](.github/workflows/ci.yml)); a green pull request with auto-merge on merges itself. The checks run on a clean checkout, so anything the site needs must be committed. Run them locally with:
+
+| Check | Command |
+| --- | --- |
+| Build, with the repository and documentation link checks | `bun run repo:check && bun run build` |
+| Tests, including the flight physics | `bun run test` |
+| Pilot fit in all seven aircraft variants | `bun run fit all --strict` |
+| Startup and a 20 s flight in each aircraft (serve the build first: `bunx vite preview --host 127.0.0.1 --port 4173`) | `bun run e2e` |
+
+On GitHub the startup and flight check saves screenshots of each aircraft as run artifacts.
 
 ## Asset and tool workflows
 

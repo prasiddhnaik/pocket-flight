@@ -52,7 +52,7 @@ jobs:
           path: ~/.bun/install/cache
           key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
       - run: bun install --frozen-lockfile
-      - run: bun test ./tests
+      - run: bun run test
 
   fit:
     name: Pilot fit

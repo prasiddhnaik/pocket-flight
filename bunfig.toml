@@ -1,3 +1,0 @@
-[test]
-# GitHub runners are slower than a laptop: a test may take this long before it fails as a timeout.
-timeout = 30000

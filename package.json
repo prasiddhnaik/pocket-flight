@@ -13,7 +13,7 @@
     "scenery:tree-lod": "bun scripts/build-tree-lod.ts",
     "build": "tsc -b && vite build",
     "preview": "vite preview --host 0.0.0.0",
-    "test": "bun test ./tests",
+    "test": "bun test --timeout 30000 ./tests",
     "engine:benchmark": "bun scripts/run-engine-benchmark.ts",
     "engine:render-benchmark": "bun scripts/run-engine-benchmark.ts --render",
     "engine:uncapped": "bun scripts/run-engine-benchmark.ts --uncapped",

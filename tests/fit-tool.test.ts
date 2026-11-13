@@ -6,6 +6,7 @@ import { joints, poses } from "../scripts/fit/checks";
 import { limits } from "../scripts/fit/limits";
 import { Pilot, pilotSeats } from "../src/aircraft/pilot";
 import { loadGeometryOnly } from "../scripts/geometry-loader";
+import { fit } from "../scripts/fit";
 
 const v = (x: number, y: number, z: number) => new T.Vector3(x, y, z);
 test("triangle crossings distinguish separation and a true crossing", () => {
@@ -71,8 +72,12 @@ test("fit --strict passes a fitting airframe and fails one that needs review", a
   const finch = await fitCommand("finch", "--strict");
   expect(finch.output).toContain("finch: PASS");
   expect(finch.code).toBe(0);
-  // The Heron's pilot currently sits through its seat back (12 Nov 2026): strict mode must say so.
-  const heron = await fitCommand("heron", "--strict");
-  expect(heron.output).toContain("heron: REVIEW");
-  expect(heron.code).toBe(1);
+  // A full-size Finch pilot in the old outside position puts the helmet through the canopy.
+  const seat = pilotSeats.finch, saved = { outside: seat.outside, outsideSize: seat.outsideSize };
+  try {
+    Object.assign(seat, { outside: [0, 0, 0], outsideSize: 1 });
+    expect(await fit(["finch", "--strict"])).toBe(1);
+  } finally {
+    Object.assign(seat, saved);
+  }
 }, 180_000);
